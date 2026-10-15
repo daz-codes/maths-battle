@@ -9,11 +9,9 @@
       data-test-topic-value="<%= TimesTables::TOPIC %>"
       data-test-submit-url-value="<%= attempts_path %>">
   <header class="test__bar">
-    <div class="timer">
-      <%= render "clock", timer: true, class: "timer__clock" %>
-      <span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span>
-    </div>
     <span class="test__score" data-test-target="score" aria-label="Score">0</span>
+    <%= render "clock", timer: true, class: "timer__clock" %>
+    <span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span>
   </header>
 
   <div class="test__stage">
