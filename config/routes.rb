@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   get "times-tables", to: "times_tables#show", as: :times_tables
   resources :attempts, only: %i[create show]
+  get "stats", to: "stats#show", as: :stats
   get "s/:share_token", to: "shares#show", as: :share
 
   get "up" => "rails/health#show", as: :rails_health_check

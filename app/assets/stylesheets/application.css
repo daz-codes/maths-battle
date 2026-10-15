@@ -376,6 +376,51 @@ a:not(.button, .logo):hover, .link-button:hover {
 
 .footer { color: var(--muted); font-size: 0.85rem; }
 
+/* ── Stats ──────────────────────────────────────── */
+
+.stats--three { grid-template-columns: repeat(3, 1fr); }
+.stats--three div:nth-child(3) { --stripe: var(--blue); }
+
+.tables {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.tables caption { margin-bottom: 0.5rem; }
+
+.tables th, .tables td { padding: 0.45rem 0.3rem; text-align: right; white-space: nowrap; }
+.tables thead th { color: var(--muted); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.tables tbody tr { border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); }
+.tables tbody th { font-weight: 700; text-align: left; }
+.tables__bar { width: 100%; }
+
+/* One hue for every bar: the percentage is a magnitude, and the number beside it carries the value */
+.bar {
+  display: block;
+  height: 0.85rem;
+  overflow: hidden;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper-alt);
+}
+
+.bar__fill {
+  display: block;
+  height: 100%;
+  background: var(--blue);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--blue) var(--glow-strength), transparent);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* ── Test ───────────────────────────────────────── */
 
 /* Fill the screen, no scrolling, no zooming, no text selection while tapping fast */

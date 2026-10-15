@@ -1,0 +1,46 @@
+<% content_for :title, "Your stats · MatheMinute" %>
+
+<main class="page">
+  <h1 class="heading">Your stats</h1>
+
+  <% if @stats.any? %>
+    <dl class="stats stats--three">
+      <div><dt>Right</dt><dd><%= percent(@stats.overall.percent) %></dd></div>
+      <div><dt>Average</dt><dd><%= seconds(@stats.overall.average_ms) %></dd></div>
+      <div><dt>Games</dt><dd><%= @stats.games %></dd></div>
+    </dl>
+
+    <table class="tables">
+      <caption class="label">Each times table</caption>
+      <thead>
+        <tr>
+          <th scope="col">Table</th>
+          <th scope="col"><span class="visually-hidden">Bar</span></th>
+          <th scope="col">Right</th>
+          <th scope="col">Speed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @stats.tables.each do |row| %>
+          <tr title="<%= row.label %> table: <%= row.answered.positive? ? "#{row.right} of #{row.answered} right, average #{seconds(row.average_ms)}" : "not asked yet" %>">
+            <th scope="row"><%= row.label %></th>
+            <td class="tables__bar">
+              <span class="bar"><span class="bar__fill" style="width: <%= row.percent || 0 %>%"></span></span>
+            </td>
+            <td><%= percent(row.percent) %></td>
+            <td><%= seconds(row.average_ms) %><%= tag.span(" 🐢", title: "Slower than usual") if row.slow? %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <p class="hint hint--centre">
+      Speed is the average time for a right answer.
+      <% if @stats.tables.any?(&:slow?) %>🐢 means slower than your usual.<% end %>
+    </p>
+  <% else %>
+    <p class="aside">Play a game and your stats will show up here.</p>
+  <% end %>
+
+  <%= link_to "Start", times_tables_path, class: "button button--go button--wide" %>
+</main>

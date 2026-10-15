@@ -28,6 +28,7 @@
       <div><dt>Best</dt><dd>🏆 <%= @user.high_score %></dd></div>
       <div><dt>Longest streak</dt><dd><%= @user.longest_streak %></dd></div>
     </dl>
+    <%= link_to "See all your stats", stats_path %>
   <% end %>
 
   <% if @user.guest? && @user.persisted? %>
