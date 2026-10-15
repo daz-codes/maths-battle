@@ -4,6 +4,13 @@
   <h1 class="heading">Your stats</h1>
 
   <% if @user.tracked? %>
+    <% if @user.best_table %>
+      <p class="summary">
+        Your best times table is <strong><%= @user.best_table.label %></strong><% if @user.table_needing_practice %>,
+        and the <strong><%= @user.table_needing_practice.label %></strong> times table needs the most practice<% end %>.
+      </p>
+    <% end %>
+
     <dl class="stats stats--three">
       <div><dt>Accuracy</dt><dd><%= percent(@user.overall_stats.percent) %></dd></div>
       <div><dt>Average</dt><dd><%= seconds(@user.overall_stats.average_ms) %></dd></div>
@@ -42,5 +49,5 @@
     <p class="aside">Play a game and your stats will show up here.</p>
   <% end %>
 
-  <%= link_to "Play", times_tables_path, class: "button button--go button--wide" %>
+  <%= link_to "Play", times_tables_path, class: "button button--blue button--wide" %>
 </main>

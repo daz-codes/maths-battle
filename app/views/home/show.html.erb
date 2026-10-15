@@ -1,4 +1,4 @@
-<% content_for :tagline, "Improve your maths in a minute every day" %>
+<% content_for :tagline, "Improve your #{maths} in a minute every day" %>
 
 <main class="page home">
   <%= render "flash" %>
@@ -6,7 +6,7 @@
   <% if @user.display_name %>
     <h1 class="greeting">
       <%= link_to edit_profile_path, class: "greeting__avatar", aria: { label: "Settings" } do %>
-        <%= render "avatar", user: @user %>
+        <%= render "avatar", user: @user, size: "greeting" %>
       <% end %>
       Hi <%= @user.display_name %>!
     </h1>

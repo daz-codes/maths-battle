@@ -20,6 +20,7 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     assert_select "tbody tr:nth-child(5) td", text: "—" # 5× not asked yet
     assert_select ".stats dd", text: "67%"
     assert_select ".stats dd", text: "1.5s"
+    assert_select ".summary", count: 0, text: /best/, message: "no table has enough answers to rank yet"
   end
 
   test "visitors see an empty state" do

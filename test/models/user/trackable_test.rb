@@ -19,6 +19,26 @@ class User::TrackableTest < ActiveSupport::TestCase
     assert_nil tables["9×"].percent
   end
 
+  test "best table on accuracy then speed, and the one needing most practice" do
+    stat("2x3", 10, 0, 20_000) # 2× and 3×: all right, 2s
+    stat("4x6", 9, 1, 13_500)  # 4× and 6×: 90%, 1.5s
+    stat("6x7", 5, 5, 15_000)  # 6× now worse, 7×: 50%
+    stat("5x5", 10, 0, 10_000) # 5×: all right, 1s: beats 2× and 3× on speed
+
+    assert_equal "5×", @user.best_table.label
+    assert_equal "7×", @user.table_needing_practice.label
+  end
+
+  test "rankings ignore the trivial tables and tables with too few answers" do
+    stat("1x10", 20, 0, 10_000)
+    stat("8x9", 2, 2, 2_000)
+    stat("3x4", 6, 0, 9_000)
+    stat("2x5", 3, 0, 3_000)
+
+    # Only 3× and 4× (from 3×4) qualify: 1× and 10× are trivial, 8× and 9× have 4 answers each
+    assert_equal [ "3×", "4×" ], [ @user.best_table.label, @user.table_needing_practice.label ]
+  end
+
   test "average score counts real games only" do
     Attempt.record!(user: @user, results: answers(*right_answers(10)))
     Attempt.record!(user: @user, results: answers(*right_answers(20)))

@@ -81,6 +81,39 @@ class User::PractisableTest < ActiveSupport::TestCase
     assert_equal 1.0, weights[[ 7, 8 ]]
   end
 
+  def play(right:, wrong:)
+    Attempt.record!(user: @user, results: answers(*right_answers(right), *Array.new(wrong) { [ 7, 8, 1 ] }))
+  end
+
+  test "players doing well, and new players, get the normal mix" do
+    assert_equal 0.0, User.find(@user.id).easing
+
+    play(right: 18, wrong: 2)
+    assert_equal 0.0, User.find(@user.id).easing
+  end
+
+  test "a struggling player gets more easy questions and fewer hard ones" do
+    play(right: 8, wrong: 12)
+    struggling = User.find(@user.id)
+
+    assert_equal 1.0, struggling.easing
+    assert_in_delta 3.0, struggling.question_weights[[ 2, 5 ]]
+    assert_in_delta 1.5, struggling.question_weights[[ 3, 4 ]]
+    assert_operator struggling.question_weights[[ 6, 9 ]], :<, 0.5
+  end
+
+  test "the shift eases off as recent games improve" do
+    play(right: 8, wrong: 12)
+    3.times { play(right: 19, wrong: 1) }
+
+    assert_equal 0.0, User.find(@user.id).easing, "only the last few games count"
+  end
+
+  test "partway struggling gets a partial shift" do
+    play(right: 13, wrong: 7) # 65%: halfway between 80% and 50%
+    assert_in_delta 0.5, User.find(@user.id).easing
+  end
+
   test "a fact comes up less as its percentage correct improves" do
     stat = @user.fact_stats.create!(topic: "times_tables", fact: "7x8", correct_count: 1, wrong_count: 3)
     before = weights[[ 7, 8 ]]

@@ -1,8 +1,9 @@
 # Chooses a player's questions at random, weighted so that facts with a lower percentage correct,
-# and facts answered right but slowly, come up more often and drop back as the player improves
+# and facts answered right but slowly, come up more often and drop back as the player improves.
+# A player who is struggling overall gets more easy questions and fewer hard ones, to build confidence
+# back up; that eases off by itself as their recent accuracy rises
 module User::Practisable
   QUESTION_COUNT = 150
-  TRIVIAL_FACTORS = [ 1, 10 ]
   TRIVIAL_WEIGHT = 0.1
   # A fact never answered right comes up this many times as often as one always answered right
   MAX_BOOST = 5
@@ -10,6 +11,14 @@ module User::Practisable
   SLOW_BOOST = 2
   # A fact's average time only counts once it has been answered right this many times
   MIN_TIMED_ANSWERS = 2
+  # Recent accuracy below this starts the shift towards easier questions…
+  STRUGGLING_BELOW = 0.8
+  # …and at this or lower it's at full strength
+  FULLY_EASED_AT = 0.5
+  RECENT_GAMES = 3
+  MIN_RECENT_ANSWERS = 15
+  # At full strength easy facts come up 3× as often, medium 1.5×, and hard ones 0.4×
+  EASING = { 0 => 2.0, 1 => 0.5, 2 => -0.6 }
 
   def questions(count: QUESTION_COUNT, random: Random.new)
     previous = nil
@@ -24,14 +33,32 @@ module User::Practisable
     @question_weights ||= TimesTables.facts.index_with { |fact| question_weight(fact) }
   end
 
+  # 0 for a player doing fine (or new), rising to 1 for one getting half or fewer right recently
+  def easing
+    @easing ||= recent_accuracy ? ((STRUGGLING_BELOW - recent_accuracy) / (STRUGGLING_BELOW - FULLY_EASED_AT)).clamp(0.0, 1.0) : 0.0
+  end
+
   private
     def question_weight(fact)
       stat = times_tables_stats[TimesTables.fact_key(*fact)]
-      base_weight(fact) * (1 + accuracy_boost(stat) + slow_boost(stat))
+      base_weight(fact) * (1 + accuracy_boost(stat) + slow_boost(stat)) * difficulty_factor(fact)
+    end
+
+    def difficulty_factor(fact)
+      1 + EASING.fetch(TimesTables.difficulty(fact)) * easing
+    end
+
+    def recent_accuracy
+      answers = recent_answers
+      answers.count { |answer| answer["correct"] }.fdiv(answers.size) if answers.size >= MIN_RECENT_ANSWERS
+    end
+
+    def recent_answers
+      attempts.where(topic: TimesTables::TOPIC).order(created_at: :desc).limit(RECENT_GAMES).flat_map(&:results)
     end
 
     def base_weight(fact)
-      fact.intersect?(TRIVIAL_FACTORS) ? TRIVIAL_WEIGHT : 1.0
+      TimesTables.trivial?(fact) ? TRIVIAL_WEIGHT : 1.0
     end
 
     # 0 for a fact always answered right (or not asked yet), up to MAX_BOOST - 1 for one never answered right

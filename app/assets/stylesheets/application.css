@@ -310,7 +310,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 
 .greeting {
   margin: 0.5rem 0 -0.75rem;
-  font-size: clamp(1.6rem, 7vw, 2rem);
+  font-size: clamp(2rem, 9vw, 2.6rem);
   font-weight: 700;
   letter-spacing: -0.04em;
 }
@@ -439,6 +439,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 
 .avatar--small { --avatar-size: 2rem; }
 .avatar--medium { --avatar-size: 2.75rem; }
+.avatar--greeting { --avatar-size: 3.6rem; }
 .avatar--large { --avatar-size: 6rem; }
 
 /* No picture: the first letter on the player's neon colour */
@@ -457,7 +458,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 .avatar--blue { --fill: var(--blue); }
 .avatar--pink { --fill: var(--pink); }
 
-.greeting { display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+.greeting { display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
 .greeting__avatar { display: inline-flex; border-radius: 50%; text-decoration: none; }
 
 .avatar-field { margin: 0 0 0.75rem; padding: 0; border: 0; }
@@ -472,6 +473,9 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 /* ── Stats ──────────────────────────────────────── */
 
 .stats--three { grid-template-columns: repeat(3, 1fr); }
+
+.summary { margin: 0; font-size: 1.15rem; line-height: 1.5; }
+.summary strong { color: var(--pink-text); font-weight: 700; }
 
 
 .tables {
@@ -493,9 +497,8 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
   display: block;
   height: 0.85rem;
   overflow: hidden;
-  border: 1.5px solid var(--line);
   border-radius: 999px;
-  background: var(--paper-alt);
+  background: color-mix(in srgb, var(--ink) 9%, var(--paper));
 }
 
 .bar__fill {
