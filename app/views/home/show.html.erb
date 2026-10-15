@@ -21,6 +21,8 @@
     <p class="nudge">Your streak is safe for today, but you can keep playing to practise more.</p>
   <% elsif @user.streak_at_risk? %>
     <p class="nudge nudge--risk">Don't lose your streak!</p>
+  <% else %>
+    <p class="nudge">Click play to start your streak</p>
   <% end %>
 
   <%= link_to "Play", times_tables_path, class: "button button--start" %>
