@@ -23,7 +23,7 @@
   --radius: 10px;
   --radius-big: 16px;
   --quarters: linear-gradient(90deg, var(--yellow) 0 25%, var(--green) 25% 50%, var(--blue) 50% 75%, var(--pink) 75%);
-  --font: "Avenir Next", Avenir, "Inter", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font: "Nunito", ui-rounded, "SF Pro Rounded", ui-sans-serif, system-ui, sans-serif;
 
   color-scheme: light dark;
 }
