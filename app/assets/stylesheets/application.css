@@ -89,6 +89,12 @@ a {
 
 [hidden] { display: none !important; }
 
+.site-header {
+  display: flex;
+  justify-content: center;
+  padding: calc(1.5rem + env(safe-area-inset-top)) 1rem 0;
+}
+
 .page {
   display: flex;
   flex-direction: column;

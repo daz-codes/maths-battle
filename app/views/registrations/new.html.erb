@@ -1,7 +1,6 @@
 <% content_for :title, "Sign up · MatheMinute" %>
 
 <main class="page page--narrow">
-  <%= render "logo" %>
   <h1 class="heading">Make an account</h1>
   <% if @user.persisted? && @user.attempts.any? %>
     <p class="aside">Your streak and best score will be saved, and you can play on any device.</p>

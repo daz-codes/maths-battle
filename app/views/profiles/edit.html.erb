@@ -1,7 +1,6 @@
 <% content_for :title, "Settings · MatheMinute" %>
 
 <main class="page page--narrow">
-  <%= render "logo" %>
   <h1 class="heading">Settings</h1>
 
   <%= form_with model: @user, url: profile_path, method: :patch, class: "form" do |form| %>
@@ -22,6 +21,4 @@
 
     <%= form.submit "Save", class: "button button--go" %>
   <% end %>
-
-  <%= link_to "Back", root_path, class: "aside" %>
 </main>
