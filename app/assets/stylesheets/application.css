@@ -82,6 +82,20 @@ a {
   text-underline-offset: 4px;
 }
 
+/* Text links (and the sign out button, styled as one): green underline and a faint wash on hover.
+   The wash is a touch of ink mixed into the paper, so it's slightly darker in light mode and lighter in dark */
+a:not(.button, .logo), .link-button {
+  margin: 0 -0.2em;
+  padding: 0.05em 0.2em;
+  border-radius: 4px;
+  transition: background-color 120ms, text-decoration-color 120ms;
+}
+
+a:not(.button, .logo):hover, .link-button:hover {
+  background-color: color-mix(in srgb, var(--ink) 5%, var(--paper));
+  text-decoration-color: var(--green);
+}
+
 :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 
 [hidden] { display: none !important; }
@@ -205,7 +219,6 @@ a {
 .button--wide { width: 100%; }
 
 .link-button {
-  padding: 0;
   border: 0;
   background: none;
   color: inherit;
