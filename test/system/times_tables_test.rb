@@ -3,7 +3,7 @@ require "application_system_test_case"
 class TimesTablesTest < ApplicationSystemTestCase
   test "plays a test with the keyboard and sees the results" do
     sign_in users(:ada)
-    click_on "Start"
+    click_on "Play"
 
     # Shorten the minute so the test runs quickly; the countdown still plays first
     page.execute_script(<<~JS)
