@@ -24,6 +24,15 @@ class TimesTables::FeedbackTest < ActiveSupport::TestCase
     assert_equal [ "7 × 8 = 56" ], feedback.missed_facts
   end
 
+  test "lists right answers that were much slower than usual" do
+    results = right_answers(10).map { |a, b, given| { a: a, b: b, given: given, ms: 1500 } }
+    results << { a: 7, b: 8, given: 56, ms: 5000 } << { a: 6, b: 9, given: 54, ms: 2000 } << { a: 4, b: 4, given: 15, ms: 6000 }
+    feedback = TimesTables::Feedback.new(Attempt.record!(user: @user, results: results))
+
+    assert_equal [ "7 × 8 = 56" ], feedback.slow_facts, "6 × 9 was only a little slow, and 4 × 4 was wrong, not slow"
+    assert_equal [ "4 × 4 = 16" ], feedback.missed_facts
+  end
+
   test "includes the last two weeks of history" do
     travel_to 3.days.ago do
       Attempt.record!(user: @user, results: answers(*Array.new(10) { [ 9, 4, 35 ] }))

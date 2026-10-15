@@ -12,7 +12,8 @@
 
   <p class="nudge <%= "nudge--risk" if @user.streak_at_risk? %>">
     <% if @user.practised_today? %>
-      Done for today! Come back tomorrow.
+      <strong><%= @user.streak == 1 ? "Streak started!" : "Streak still going!" %></strong>
+      You can keep playing to practise more.
     <% elsif @user.streak_at_risk? %>
       Do today's minute to keep your streak!
     <% else %>

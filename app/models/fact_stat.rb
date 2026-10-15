@@ -7,9 +7,10 @@ class FactStat < ApplicationRecord
 
     attempt.results.group_by { |r| topic.fact_key(r["a"], r["b"]) }.each do |fact, answers|
       stat = attempt.user.fact_stats.find_or_initialize_by(topic: attempt.topic, fact: fact)
-      wrong = answers.count { |r| !r["correct"] }
-      stat.correct_count += answers.size - wrong
-      stat.wrong_count += wrong
+      right = answers.select { |r| r["correct"] }
+      stat.correct_count += right.size
+      stat.wrong_count += answers.size - right.size
+      stat.correct_ms += right.sum { |r| TimesTables::Speed.counted_ms(r["ms"]) }
       stat.save!
     end
   end
@@ -21,6 +22,11 @@ class FactStat < ApplicationRecord
   # 0.0 to 1.0, or nil if the fact hasn't been asked yet
   def fraction_correct
     correct_count.fdiv(answered_count) if answered_count.positive?
+  end
+
+  # How long right answers take on average, or nil before any
+  def average_correct_ms
+    correct_ms / correct_count if correct_count.positive?
   end
 
   def percent_correct

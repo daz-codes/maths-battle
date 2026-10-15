@@ -50,6 +50,15 @@ class AttemptTest < ActiveSupport::TestCase
     assert_equal 67, seven_eight.reload.percent_correct
   end
 
+  test "keeps the average time of right answers, capping very long ones" do
+    Attempt.record!(user: @user, results: [ { a: 7, b: 8, given: 56, ms: 2000 }, { a: 8, b: 7, given: 56, ms: 4000 }, { a: 7, b: 8, given: 1, ms: 9000 } ])
+    seven_eight = @user.fact_stats.find_by!(fact: "7x8")
+    assert_equal 3000, seven_eight.average_correct_ms, "wrong answers aren't timed"
+
+    Attempt.record!(user: @user, results: [ { a: 7, b: 8, given: 56, ms: 30_000 } ])
+    assert_equal 16_000, seven_eight.reload.correct_ms, "a 30 second answer counts as 10"
+  end
+
   test "counts toward the streak when enough questions were answered" do
     attempt = Attempt.record!(user: @user, results: answers(*right_answers(5)))
 

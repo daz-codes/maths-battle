@@ -54,6 +54,32 @@ class TimesTables::QuestionGeneratorTest < ActiveSupport::TestCase
     assert_equal 1.0, weights[[ 2, 4 ]], "facts not asked yet start at the normal weight"
   end
 
+  def timed_stat(fact, average_ms, correct_count: 4)
+    @user.fact_stats.create!(topic: "times_tables", fact: fact, correct_count: correct_count, correct_ms: average_ms * correct_count)
+  end
+
+  test "facts answered right but slowly come up more often" do
+    %w[2x3 2x4 2x5 3x4 3x5].each { timed_stat(_1, 2000) }
+    timed_stat("7x8", 4000)
+
+    assert_equal 3.0, weights[[ 7, 8 ]], "twice the typical time gets the full slow boost"
+    assert_equal 1.0, weights[[ 2, 3 ]]
+  end
+
+  test "quick answers are never slow, even for a very fast player" do
+    %w[2x3 2x4 2x5 3x4 3x5].each { timed_stat(_1, 600) }
+    timed_stat("7x8", 1200)
+
+    assert_equal 1.0, weights[[ 7, 8 ]]
+  end
+
+  test "one timed answer isn't enough to call a fact slow" do
+    %w[2x3 2x4 2x5].each { timed_stat(_1, 2000) }
+    timed_stat("7x8", 8000, correct_count: 1)
+
+    assert_equal 1.0, weights[[ 7, 8 ]]
+  end
+
   test "a fact comes up less as its percentage correct improves" do
     stat = @user.fact_stats.create!(topic: "times_tables", fact: "7x8", correct_count: 1, wrong_count: 3)
     before = weights[[ 7, 8 ]]

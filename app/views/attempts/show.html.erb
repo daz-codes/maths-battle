@@ -12,14 +12,20 @@
 
   <p class="feedback"><%= @feedback.message %></p>
 
-  <% if @feedback.missed_facts.any? %>
+  <% if @feedback.missed_facts.any? || @feedback.slow_facts.any? %>
     <section class="missed">
-      <h2 class="label">Learn these</h2>
+      <h2 class="label">Work on these</h2>
       <ul>
         <% @feedback.missed_facts.each do |fact| %>
           <li><%= fact %></li>
         <% end %>
+        <% @feedback.slow_facts.each do |fact| %>
+          <li class="missed__slow"><%= fact %> <span title="Right, but slow">🐢</span></li>
+        <% end %>
       </ul>
+      <% if @feedback.slow_facts.any? %>
+        <p class="hint hint--centre">🐢 Right, but slow. Practise these to get quicker.</p>
+      <% end %>
     </section>
   <% end %>
 

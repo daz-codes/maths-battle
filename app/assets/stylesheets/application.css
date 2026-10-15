@@ -568,6 +568,14 @@ body.testing {
   font-weight: 600;
 }
 
+/* Right but slow: yellow rather than pink */
+.missed li.missed__slow {
+  border-color: color-mix(in srgb, var(--yellow) 70%, var(--ink));
+  background: color-mix(in srgb, var(--yellow) 30%, var(--paper));
+}
+
+.hint--centre { margin-top: 0.6rem; text-align: center; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
   .banner { transform: none; }

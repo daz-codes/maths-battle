@@ -1,7 +1,8 @@
-# Works out what to say on the results page: the tables to practise and the facts missed today
+# Works out what to say on the results page: the tables to practise, and the facts missed or slow today
 class TimesTables::Feedback
   TABLES = 2..12
   MAX_WEAK_TABLES = 3
+  MAX_SLOW_FACTS = 5
   GOOD_ENOUGH = 0.9
   HISTORY = 14.days
 
@@ -26,6 +27,20 @@ class TimesTables::Feedback
     @attempt.mistakes.uniq { |r| TimesTables.fact_key(r["a"], r["b"]) }.map do |r|
       "#{r["a"]} × #{r["b"]} = #{TimesTables.answer(r["a"], r["b"])}"
     end
+  end
+
+  # Today's right answers that took much longer than this player usually takes, slowest first
+  def slow_facts
+    right = @attempt.results.select { |r| r["correct"] }
+    typical = TimesTables::Speed.typical_ms(right.map { |r| r["ms"] })
+    missed = @attempt.mistakes.map { |r| TimesTables.fact_key(r["a"], r["b"]) }
+
+    right.select { |r| TimesTables::Speed.slow?(r["ms"], typical) }
+      .sort_by { |r| -r["ms"] }
+      .uniq { |r| TimesTables.fact_key(r["a"], r["b"]) }
+      .reject { |r| missed.include?(TimesTables.fact_key(r["a"], r["b"])) }
+      .first(MAX_SLOW_FACTS)
+      .map { |r| "#{r["a"]} × #{r["b"]} = #{TimesTables.answer(r["a"], r["b"])}" }
   end
 
   # The tables with the worst accuracy over this attempt and the two weeks before it

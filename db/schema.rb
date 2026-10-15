@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_15_140000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_15_160000) do
   create_table "attempts", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "topic", default: "times_tables", null: false
@@ -35,6 +35,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_15_140000) do
     t.integer "wrong_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "correct_ms", default: 0, null: false
     t.index ["user_id", "topic", "fact"], name: "index_fact_stats_on_user_id_and_topic_and_fact", unique: true
     t.index ["user_id"], name: "index_fact_stats_on_user_id"
   end
