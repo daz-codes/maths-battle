@@ -28,7 +28,6 @@
 
   --radius: 10px;
   --radius-big: 16px;
-  --quarters: linear-gradient(90deg, var(--yellow) 0 25%, var(--green) 25% 50%, var(--blue) 50% 75%, var(--pink) 75%);
   --font: "Nunito", ui-rounded, "SF Pro Rounded", ui-sans-serif, system-ui, sans-serif;
 
   color-scheme: light dark;
@@ -654,29 +653,36 @@ body.testing {
   transform: rotate(-2deg);
 }
 
-/* The logo's four neon quarters of a minute across the top */
-.card {
-  width: 100%;
-  padding: 1.5rem 1rem 1.25rem;
-  border: 2px solid var(--line);
-  border-radius: var(--radius-big);
-  background: var(--quarters) top / 100% 8px no-repeat, var(--paper);
-  box-shadow: 0 0 30px color-mix(in srgb, var(--yellow) calc(var(--glow-strength) / 2), transparent);
+/* The score sits inside a big copy of the logo's ring of four neon quarters */
+.result { display: grid; justify-items: center; gap: 0.75rem; width: 100%; }
+
+.result__ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(17rem, 78vw);
+  aspect-ratio: 1;
 }
 
-.card p { margin: 0; }
+.result__clock {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--blue) var(--glow-strength), transparent));
+}
 
-.card__score { font-size: 1.25rem; font-weight: 600; }
+.result__score { position: relative; margin: 0; font-size: 1.15rem; font-weight: 600; }
 
 .card__number {
   display: block;
-  font-size: clamp(4.5rem, 25vw, 7rem);
+  font-size: clamp(4.5rem, 24vw, 6.5rem);
   font-weight: 700;
   letter-spacing: -0.06em;
-  line-height: 1.05;
+  line-height: 1;
 }
 
-.card__stats { margin-top: 0.5rem !important; color: var(--muted); font-size: 1rem; font-weight: 500; }
+.result__stats { margin: 0; color: var(--muted); font-size: 1rem; font-weight: 500; }
 
 .feedback { margin: 0; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; }
 

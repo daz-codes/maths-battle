@@ -1,5 +1,9 @@
-<%# The result as shared: score, streak and best. Nothing about who the player is %>
-<section class="card">
-  <p class="card__score"><span class="card__number"><%= attempt.score %></span> in a minute!</p>
-  <p class="card__stats">🔥 <%= attempt.streak %> day streak · 🏆 Best: <%= attempt.user.high_score %></p>
+<%# The result as shared: the score inside the logo's ring of four neon quarters, then streak and best.
+    Nothing about who the player is %>
+<section class="result">
+  <div class="result__ring">
+    <%= render "clock", hands: false, class: "result__clock" %>
+    <p class="result__score"><span class="card__number"><%= attempt.score %></span> in a minute!</p>
+  </div>
+  <p class="result__stats">🔥 <%= attempt.streak %> day streak · 🏆 Best: <%= attempt.user.high_score %></p>
 </section>

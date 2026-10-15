@@ -5,7 +5,7 @@
 
   <% if @stats.any? %>
     <dl class="stats stats--three">
-      <div><dt>Right</dt><dd><%= percent(@stats.overall.percent) %></dd></div>
+      <div><dt>Accuracy</dt><dd><%= percent(@stats.overall.percent) %></dd></div>
       <div><dt>Average</dt><dd><%= seconds(@stats.overall.average_ms) %></dd></div>
       <div><dt>Games</dt><dd><%= @stats.games %></dd></div>
     </dl>
@@ -16,7 +16,7 @@
         <tr>
           <th scope="col">Table</th>
           <th scope="col"><span class="visually-hidden">Bar</span></th>
-          <th scope="col">Right</th>
+          <th scope="col">Accuracy</th>
           <th scope="col">Speed</th>
         </tr>
       </thead>

@@ -12,6 +12,8 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     get stats_path
     assert_response :success
     assert_select "tbody tr", 12
+    assert_select "thead th", text: "Accuracy"
+    assert_select ".stats dt", text: "Accuracy"
     assert_select "tbody tr:nth-child(7) td", text: "50%" # 7×: 7×8 right, 7×7 wrong
     assert_select "tbody tr:nth-child(7) td", text: "2.0s"
     assert_select "tbody tr:nth-child(8) td", text: "100%"
