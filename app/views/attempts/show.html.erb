@@ -2,10 +2,13 @@
 
 <main class="page results">
   <% if @attempt.new_high_score %>
-    <p class="banner">🎉 New high score! 🎉</p>
+    <p class="banner" data-controller="confetti">🎉 New high score! 🎉</p>
   <% end %>
 
-  <%= render "card", attempt: @attempt, share_text: @share_text %>
+  <%= render "card", attempt: @attempt %>
+
+  <button type="button" class="button button--share button--wide" data-controller="share"
+          data-share-text-value="<%= @share_text %>" data-action="share#share">Share</button>
 
   <p class="feedback"><%= @feedback.message %></p>
 
@@ -20,16 +23,13 @@
     </section>
   <% end %>
 
+  <%= link_to "Try again", times_tables_path, class: "button button--go button--wide" %>
+
   <% if @attempt.user.guest? %>
     <p class="save-nudge">
       <%= link_to "Make an account", new_registration_path %> to keep your streak safe and play on any device.
     </p>
   <% end %>
 
-  <nav class="actions">
-    <%= link_to "Go again!", times_tables_path, class: "button button--go" %>
-    <button type="button" class="button button--share" data-controller="share"
-            data-share-text-value="<%= @share_text %>" data-action="share#share">Share</button>
-    <%= link_to "Home", root_path, class: "button" %>
-  </nav>
+  <%= link_to "Home", root_path, class: "button button--wide" %>
 </main>

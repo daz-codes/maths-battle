@@ -13,7 +13,7 @@ class SharesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".card__number", text: "6"
     assert_select "body", text: /A MatheMinute player/
     assert_no_match(/squirrel/i, response.body)
-    assert_select "a[href=?]", new_registration_path, text: "Try MatheMinute!"
+    assert_select "a[href=?]", root_path, text: "Try MatheMinute!"
   end
 
   test "is hidden from search engines and previews nicely" do

@@ -491,14 +491,6 @@ body.testing {
 
 .card__stats { margin-top: 0.5rem !important; font-size: 1.15rem; font-weight: 800; }
 
-.card__squares {
-  margin-top: 0.75rem !important;
-  font-size: 1.1rem;
-  letter-spacing: 0.05em;
-  line-height: 1.3;
-  word-break: break-all;
-}
-
 .feedback { margin: 0; font-size: 1.4rem; font-weight: 900; letter-spacing: -0.02em; }
 
 .missed { width: 100%; }
@@ -521,14 +513,7 @@ body.testing {
   font-weight: 900;
 }
 
-.actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.9rem;
-  width: 100%;
-}
-
-.actions > :first-child { grid-column: 1 / -1; }
+.button--wide { width: 100%; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }

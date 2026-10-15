@@ -1,6 +1,5 @@
-<%# The result as shared: score, streak, best and the right/wrong squares. Nothing about who the player is %>
+<%# The result as shared: score, streak and best. Nothing about who the player is %>
 <section class="card">
   <p class="card__score"><span class="card__number"><%= attempt.score %></span> in a minute!</p>
   <p class="card__stats">🔥 <%= attempt.streak %> day streak · 🏆 Best: <%= attempt.user.high_score %></p>
-  <p class="card__squares" aria-label="<%= attempt.score %> right out of <%= attempt.answered %>"><%= share_text.emoji_row %></p>
 </section>

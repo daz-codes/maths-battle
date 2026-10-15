@@ -13,11 +13,9 @@
   <%= render "logo" %>
   <p class="label">A MatheMinute player got</p>
 
-  <%= render "attempts/card", attempt: @attempt, share_text: @share_text %>
+  <%= render "attempts/card", attempt: @attempt %>
 
   <p class="feedback">Can you beat it?</p>
 
-  <nav class="actions">
-    <%= link_to "Try MatheMinute!", new_registration_path, class: "button button--cta" %>
-  </nav>
+  <%= link_to "Try MatheMinute!", root_path, class: "button button--cta button--wide" %>
 </main>
