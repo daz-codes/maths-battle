@@ -1,8 +1,8 @@
 // Keeps MatheMinute's assets on the device so it opens fast, and shows a friendly page when offline.
 // Pages themselves are never cached: they're personal and must always be fresh
-const CACHE = "matheminute-v2"
+const CACHE = "matheminute-v3"
 const OFFLINE_URL = "/offline.html"
-const PRECACHE = [ OFFLINE_URL, "/favicon.svg" ]
+const PRECACHE = [ OFFLINE_URL ]
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting()))

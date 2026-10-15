@@ -130,11 +130,8 @@ a:not(.button, .logo):hover, .link-button:hover {
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   color: var(--ink);
-  font-size: 2.1rem;
-  font-weight: 500;
-  letter-spacing: -0.035em;
   text-decoration: none;
 }
 
@@ -144,7 +141,9 @@ a:not(.button, .logo):hover, .link-button:hover {
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--blue) var(--glow-strength), transparent));
 }
 
-.logo__word strong { color: var(--pink-text); font-weight: 700; }
+/* The wordmark is an SVG of Bree Serif: Mathe in ink, Minute in pink */
+.logo__word { display: block; height: 1.9rem; width: auto; }
+.logo__minute { fill: var(--pink-text); }
 
 /* ── Type ───────────────────────────────────────── */
 
