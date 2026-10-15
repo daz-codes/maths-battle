@@ -4,7 +4,7 @@ import confetti from "canvas-confetti"
 // Celebrates a new high score with bursts from both sides
 export default class extends Controller {
   connect() {
-    const colors = [ "#0085ca", "#b0fc38", "#f5002f", "#ffdc00" ]
+    const colors = [ "#efff2e", "#ff5cc6", "#2be4ff", "#5dff7a" ]
     const burst = (x, angle) => confetti({ particleCount: 80, spread: 70, angle, origin: { x, y: 0.7 }, colors, disableForReducedMotion: true })
 
     burst(0, 60)

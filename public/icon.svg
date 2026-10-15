@@ -1,4 +1,23 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" rx="96" fill="#0085ca"/>
-  <text x="256" y="340" text-anchor="middle" font-family="Inter, 'Arial Black', Helvetica, sans-serif" font-weight="900" font-size="250" letter-spacing="-12" fill="#fff">M<tspan fill="#b0fc38">!</tspan></text>
+  <defs>
+    <filter id="glow" filterUnits="userSpaceOnUse" x="-20" y="-20" width="90" height="90"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="#121310"/>
+  <g transform="translate(64 56) scale(8)">
+    <g transform="rotate(-90 24 28)" fill="none" stroke-width="6" filter="url(#glow)" opacity=".7">
+      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#efff2e" stroke-dasharray="23 77"/>
+      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#5dff7a" stroke-dasharray="23 77" stroke-dashoffset="-25"/>
+      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#2be4ff" stroke-dasharray="23 77" stroke-dashoffset="-50"/>
+      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#ff5cc6" stroke-dasharray="23 77" stroke-dashoffset="-75"/>
+    </g>
+    <rect x="20" y="1" width="8" height="5" rx="2" fill="#f4f4ea"/>
+    <rect x="22.5" y="5" width="3" height="4" fill="#f4f4ea"/>
+    <g transform="rotate(-90 24 28)" fill="none" stroke-width="6">
+      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#efff2e" stroke-dasharray="23 77"/>
+      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#5dff7a" stroke-dasharray="23 77" stroke-dashoffset="-25"/>
+      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#2be4ff" stroke-dasharray="23 77" stroke-dashoffset="-50"/>
+      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#ff5cc6" stroke-dasharray="23 77" stroke-dashoffset="-75"/>
+    </g>
+    <path d="M19 23 L29 33 M29 23 L19 33" stroke="#f4f4ea" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
 </svg>

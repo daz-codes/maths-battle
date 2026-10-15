@@ -6,20 +6,21 @@
   <title>Offline · MatheMinute</title>
   <style>
     body { margin: 0; min-height: 100dvh; display: grid; place-content: center; gap: 1rem; padding: 1rem;
-      font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; text-align: center;
-      background: #fff; color: oklch(26% 0.05 264); }
-    @media (prefers-color-scheme: dark) { body { background: oklch(20% 0.03 264); color: oklch(96% 0.01 258); } }
-    .logo { justify-self: center; padding: 0.35rem 1.4rem; border-radius: 0.9rem; background: #0085ca; color: #fff;
-      font-size: 2rem; font-weight: 900; letter-spacing: -0.06em; }
-    .logo span { color: #b0fc38; }
-    h1 { margin: 0; font-size: 2.25rem; font-weight: 900; letter-spacing: -0.035em; }
-    p { margin: 0; font-size: 1.15rem; font-weight: 700; }
-    button { justify-self: center; min-height: 3.5rem; padding: 0.6rem 1.5rem; border: 4px solid currentColor;
-      border-radius: 0.9rem; background: #b0fc38; color: oklch(26% 0.05 264); font: inherit; font-size: 1.25rem; font-weight: 900; }
+      font-family: "Avenir Next", Avenir, "Segoe UI", ui-sans-serif, system-ui, sans-serif; text-align: center;
+      background: #fffef9; color: #24251f; }
+    @media (prefers-color-scheme: dark) { body { background: #121310; color: #f4f4ea; } }
+    .logo { display: inline-flex; align-items: center; gap: 0.6rem; justify-self: center; font-size: 1.6rem; font-weight: 700; letter-spacing: -0.045em; }
+    .logo { font-weight: 500; letter-spacing: -0.04em; }
+    .logo img { width: 2.6rem; height: 2.6rem; border-radius: 10px; }
+    .logo strong { font-weight: 700; }
+    h1 { margin: 0; font-size: 2.25rem; font-weight: 700; letter-spacing: -0.045em; }
+    p { margin: 0; font-size: 1.1rem; color: #6f7064; }
+    button { justify-self: center; min-height: 3.25rem; padding: 0.6rem 1.4rem; border: 2px solid #24251f; border-radius: 10px;
+      background: #5dff7a; color: #24251f; box-shadow: 3px 3px 0 #000; font: inherit; font-size: 1.1rem; font-weight: 700; }
   </style>
 </head>
 <body>
-  <div class="logo">MATHEM<span>!</span>NUTE<span>!</span></div>
+  <div class="logo"><img src="/icon.svg" alt=""><span>mathe<strong>minute</strong></span></div>
   <h1>You're offline</h1>
   <p>Connect to the internet to do today's minute.</p>
   <button onclick="location.reload()">Try again</button>

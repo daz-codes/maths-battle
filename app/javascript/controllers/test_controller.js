@@ -60,7 +60,7 @@ export default class extends Controller {
     if (seconds !== this.seconds) {
       this.seconds = seconds
       this.secondsTarget.textContent = seconds
-      this.element.classList.toggle("test--ending", seconds <= 10)
+      this.element.dataset.quarter = Math.min(3, Math.floor((60 - seconds) / 15))
     }
     this.frame = requestAnimationFrame(this.tick)
   }

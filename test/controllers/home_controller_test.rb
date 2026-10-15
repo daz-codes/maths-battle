@@ -7,7 +7,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
-    assert_select "a[href=?]", times_tables_path, text: "START"
+    assert_select "a[href=?]", times_tables_path, text: "Start"
     assert_select ".streak__number", text: /0/
     assert_select "a[href=?]", new_registration_path
   end
@@ -27,7 +27,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
     assert_select ".streak__number", text: /12/
     assert_select ".stats", text: /41/
-    assert_select "a[href=?]", times_tables_path, text: "START"
+    assert_select "a[href=?]", times_tables_path, text: "Start"
     assert_select ".nudge", text: /Done for today/
   end
 
