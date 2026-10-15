@@ -20,6 +20,12 @@
     </section>
   <% end %>
 
+  <% if @attempt.user.guest? %>
+    <p class="save-nudge">
+      <%= link_to "Make an account", new_registration_path %> to keep your streak safe and play on any device.
+    </p>
+  <% end %>
+
   <nav class="actions">
     <%= link_to "Go again!", times_tables_path, class: "button button--go" %>
     <button type="button" class="button button--share" data-controller="share"

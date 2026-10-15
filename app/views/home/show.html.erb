@@ -1,5 +1,10 @@
 <main class="page home">
   <%= render "logo" %>
+  <%= render "flash" %>
+
+  <% if @user.display_name %>
+    <h1 class="greeting">Hi <%= @user.display_name %>!</h1>
+  <% end %>
 
   <section class="streak <%= "streak--done" if @user.practised_today? %>" aria-label="Streak">
     <span class="streak__number">🔥 <%= @user.streak %></span>
@@ -12,18 +17,36 @@
     <% elsif @user.streak_at_risk? %>
       Do today's minute to keep your streak!
     <% else %>
-      Do one minute a day to build a streak.
+      Do one minute of times tables a day to build a streak.
     <% end %>
   </p>
 
   <%= link_to "START", times_tables_path, class: "button button--start" %>
 
-  <dl class="stats">
-    <div><dt>Best</dt><dd>🏆 <%= @user.high_score %></dd></div>
-    <div><dt>Longest streak</dt><dd><%= @user.longest_streak %></dd></div>
-  </dl>
+  <% if @user.persisted? %>
+    <dl class="stats">
+      <div><dt>Best</dt><dd>🏆 <%= @user.high_score %></dd></div>
+      <div><dt>Longest streak</dt><dd><%= @user.longest_streak %></dd></div>
+    </dl>
+  <% end %>
+
+  <% if @user.guest? && @user.persisted? %>
+    <p class="save-nudge">
+      Your streak is only saved on this device.
+      <%= link_to "Make an account", new_registration_path %> to keep it safe.
+    </p>
+  <% end %>
+
+  <%= render "install" %>
 
   <footer class="footer">
-    <%= @user.username %> · <%= button_to "Sign out", session_path, method: :delete, class: "link-button", form_class: "inline" %>
+    <% if @user.guest? %>
+      <%= link_to "Sign in", new_session_path %> ·
+      <% unless @user.persisted? %><%= link_to "Make an account", new_registration_path %> · <% end %>
+      <%= link_to "Settings", edit_profile_path %>
+    <% else %>
+      <%= @user.username %> · <%= link_to "Settings", edit_profile_path %> ·
+      <%= button_to "Sign out", session_path, method: :delete, class: "link-button", form_class: "inline" %>
+    <% end %>
   </footer>
 </main>

@@ -10,8 +10,20 @@ class FactStat < ApplicationRecord
       wrong = answers.count { |r| !r["correct"] }
       stat.correct_count += answers.size - wrong
       stat.wrong_count += wrong
-      stat.last_wrong_at = attempt.created_at if wrong.positive?
       stat.save!
     end
+  end
+
+  def answered_count
+    correct_count + wrong_count
+  end
+
+  # 0.0 to 1.0, or nil if the fact hasn't been asked yet
+  def fraction_correct
+    correct_count.fdiv(answered_count) if answered_count.positive?
+  end
+
+  def percent_correct
+    (fraction_correct * 100).round if fraction_correct
   end
 end

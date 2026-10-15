@@ -40,20 +40,14 @@ class AttemptTest < ActiveSupport::TestCase
   end
 
   test "updates the fact stats, treating both orders as one fact" do
-    travel_to Time.zone.local(2026, 10, 15, 9) do
-      Attempt.record!(user: @user, results: answers([ 7, 8, 56 ], [ 8, 7, 54 ], [ 3, 4, 12 ]))
-    end
+    Attempt.record!(user: @user, results: answers([ 7, 8, 56 ], [ 8, 7, 54 ], [ 3, 4, 12 ]))
 
     seven_eight = @user.fact_stats.find_by!(topic: "times_tables", fact: "7x8")
-    assert_equal 1, seven_eight.correct_count
-    assert_equal 1, seven_eight.wrong_count
-    assert_equal Time.zone.local(2026, 10, 15, 9), seven_eight.last_wrong_at
-
-    three_four = @user.fact_stats.find_by!(fact: "3x4")
-    assert_equal [ 1, 0, nil ], [ three_four.correct_count, three_four.wrong_count, three_four.last_wrong_at ]
+    assert_equal [ 1, 1, 50 ], [ seven_eight.correct_count, seven_eight.wrong_count, seven_eight.percent_correct ]
+    assert_equal 100, @user.fact_stats.find_by!(fact: "3x4").percent_correct
 
     Attempt.record!(user: @user, results: answers([ 8, 7, 56 ]))
-    assert_equal 2, seven_eight.reload.correct_count
+    assert_equal 67, seven_eight.reload.percent_correct
   end
 
   test "counts toward the streak when enough questions were answered" do

@@ -1,16 +1,44 @@
 class User < ApplicationRecord
-  has_secure_password
+  THEMES = %w[ system light dark ]
+
+  # Guests play without signing up, so they have no username or password until they register
+  has_secure_password validations: false
   has_many :sessions, dependent: :destroy
   has_many :attempts, dependent: :destroy
   has_many :fact_stats, dependent: :destroy
 
-  normalizes :username, with: ->(u) { u.strip.downcase }
+  normalizes :username, with: ->(u) { u.strip.downcase.presence }
+  normalizes :name, with: ->(n) { n.squish.presence }
 
-  validates :username, presence: true, uniqueness: true,
-    format: { with: /\A[a-z0-9_]+\z/, message: "can only use letters, numbers and _" },
-    length: { in: 3..20 }
-  validates :password, length: { minimum: 4 }, allow_nil: true
+  with_options if: :registering? do
+    validates :username, presence: true, uniqueness: true,
+      format: { with: /\A[a-z0-9_]+\z/, message: "can only use letters, numbers and _", allow_blank: true },
+      length: { in: 3..20, allow_blank: true }
+    validate { errors.add(:password, :blank) if password_digest.blank? }
+  end
+  validates :name, presence: true, on: :registration
+  validates :password, length: { in: 4..72 }, allow_nil: true
+  validates :name, length: { maximum: 30 }
+  validates :theme, inclusion: { in: THEMES }
   validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map(&:name) }
+
+  def self.create_guest!
+    create!
+  end
+
+  def guest?
+    username.nil?
+  end
+
+  # Turns a guest into a registered user, keeping their streak and history
+  def register(attributes)
+    assign_attributes(attributes)
+    save(context: :registration)
+  end
+
+  def display_name
+    name || username
+  end
 
   def today
     ActiveSupport::TimeZone[time_zone].today
@@ -48,6 +76,10 @@ class User < ApplicationRecord
   end
 
   private
+    def registering?
+      username.present? || validation_context == :registration
+    end
+
     def practised_since?(date)
       last_practised_on.present? && last_practised_on >= date
     end

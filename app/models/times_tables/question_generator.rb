@@ -1,10 +1,11 @@
-# Builds a weighted random list of questions, so facts a user gets wrong come up more often
+# Builds a weighted random list of questions. The lower a user's percentage correct on a fact,
+# the more often it comes up, so it drops back as they improve
 class TimesTables::QuestionGenerator
   COUNT = 150
   TRIVIAL_FACTORS = [ 1, 10 ]
   TRIVIAL_WEIGHT = 0.1
-  RECENT_WRONG_BONUS = 2
-  RECENT = 7.days
+  # A fact never answered right comes up this many times as often as one always answered right
+  MAX_BOOST = 5
 
   def initialize(user, count: COUNT, random: Random.new)
     @user, @count, @random = user, count, random
@@ -32,13 +33,8 @@ class TimesTables::QuestionGenerator
 
     def weight_for(fact)
       base = fact.intersect?(TRIVIAL_FACTORS) ? TRIVIAL_WEIGHT : 1.0
-      stat = stats[TimesTables.fact_key(*fact)]
-      return base unless stat
-
-      total = stat.correct_count + stat.wrong_count
-      weight = base * (1 + 4.0 * stat.wrong_count / (total + 1))
-      weight += RECENT_WRONG_BONUS if stat.last_wrong_at&.after?(RECENT.ago)
-      weight
+      fraction_correct = stats[TimesTables.fact_key(*fact)]&.fraction_correct || 1.0
+      base * (1 + (MAX_BOOST - 1) * (1 - fraction_correct))
     end
 
     def stats

@@ -84,3 +84,28 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 10, @user.reload.high_score
   end
 end
+
+class UserGuestTest < ActiveSupport::TestCase
+  test "guests have no username or password" do
+    guest = User.create_guest!
+    assert guest.guest?
+    assert_nil guest.display_name
+  end
+
+  test "registering a guest needs a name, username and password" do
+    guest = User.create_guest!
+
+    assert_not guest.register(name: "", username: "", password: "")
+    assert_equal %i[ name password username ], guest.errors.attribute_names.sort
+
+    assert guest.register(name: "Zara", username: "Zara_B", password: "1234")
+    assert_not guest.reload.guest?
+    assert_equal "Zara", guest.display_name
+  end
+
+  test "display name falls back to username" do
+    assert_equal "ada", users(:ada).display_name
+    users(:ada).name = "Ada"
+    assert_equal "Ada", users(:ada).display_name
+  end
+end

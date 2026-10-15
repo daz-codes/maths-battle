@@ -7,6 +7,7 @@ class SessionsController < ApplicationController
 
   def create
     if user = User.authenticate_by(params.permit(:username, :password))
+      terminate_session if authenticated?
       start_new_session_for user
       redirect_to after_authentication_url
     else

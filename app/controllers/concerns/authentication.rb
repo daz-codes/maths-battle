@@ -3,7 +3,7 @@ module Authentication
 
   included do
     before_action :require_authentication
-    helper_method :authenticated?
+    helper_method :authenticated?, :current_player
   end
 
   class_methods do
@@ -27,6 +27,16 @@ module Authentication
 
     def find_session_by_cookie
       Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
+    end
+
+    # Whoever is playing: a signed in user, a guest, or a visitor who hasn't played yet (unsaved)
+    def current_player
+      @current_player ||= (Current.user if authenticated?) || User.new
+    end
+
+    # Guests don't sign up: their first save quietly gives them an account and a session on this device
+    def resume_or_start_guest_session
+      resume_session || start_new_session_for(User.create_guest!)
     end
 
     def request_authentication

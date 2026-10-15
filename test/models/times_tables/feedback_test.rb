@@ -40,6 +40,11 @@ class TimesTables::FeedbackTest < ActiveSupport::TestCase
   test "says well done when everything was right" do
     feedback = feedback_for([ 2, 3, 6 ], [ 4, 5, 20 ])
     assert_empty feedback.missed_facts
-    assert_equal "Every answer right. Brilliant!", feedback.message
+    assert_equal "Every answer right. Brilliant, ada!", feedback.message
+  end
+
+  test "uses the player's name" do
+    @user.update!(name: "Ada")
+    assert_equal "Every answer right. Brilliant, Ada!", feedback_for([ 2, 3, 6 ]).message
   end
 end

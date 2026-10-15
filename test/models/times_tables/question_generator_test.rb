@@ -32,20 +32,33 @@ class TimesTables::QuestionGeneratorTest < ActiveSupport::TestCase
     assert_operator trivial.fdiv(questions.size), :<, 0.05
   end
 
-  test "facts the user gets wrong come up more often" do
-    @user.fact_stats.create!(topic: "times_tables", fact: "7x8", correct_count: 1, wrong_count: 5, last_wrong_at: 1.day.ago)
+  def weights = TimesTables::QuestionGenerator.new(@user).weights
 
-    weights = TimesTables::QuestionGenerator.new(@user).weights
+  test "facts with a lower percentage correct come up more often" do
+    @user.fact_stats.create!(topic: "times_tables", fact: "7x8", correct_count: 1, wrong_count: 3)
+
     assert_operator weights[[ 7, 8 ]], :>, weights[[ 6, 8 ]] * 3
 
     questions = generate(count: 5000)
     assert_operator questions.count { |q| key(q) == "7x8" }, :>, questions.count { |q| key(q) == "6x8" } * 3
   end
 
-  test "facts the user always gets right keep their normal weight" do
+  test "weight goes from 1 at 100% correct up to 5 at 0% correct" do
     @user.fact_stats.create!(topic: "times_tables", fact: "2x3", correct_count: 20, wrong_count: 0)
+    @user.fact_stats.create!(topic: "times_tables", fact: "4x6", correct_count: 5, wrong_count: 5)
+    @user.fact_stats.create!(topic: "times_tables", fact: "8x9", correct_count: 0, wrong_count: 2)
 
-    weights = TimesTables::QuestionGenerator.new(@user).weights
-    assert_equal weights[[ 2, 4 ]], weights[[ 2, 3 ]]
+    assert_equal 1.0, weights[[ 2, 3 ]]
+    assert_equal 3.0, weights[[ 4, 6 ]]
+    assert_equal 5.0, weights[[ 8, 9 ]]
+    assert_equal 1.0, weights[[ 2, 4 ]], "facts not asked yet start at the normal weight"
+  end
+
+  test "a fact comes up less as its percentage correct improves" do
+    stat = @user.fact_stats.create!(topic: "times_tables", fact: "7x8", correct_count: 1, wrong_count: 3)
+    before = weights[[ 7, 8 ]]
+
+    stat.update!(correct_count: 9)
+    assert_operator weights[[ 7, 8 ]], :<, before
   end
 end

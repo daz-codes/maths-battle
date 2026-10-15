@@ -3,9 +3,21 @@ require "test_helper"
 class HomeControllerTest < ActionDispatch::IntegrationTest
   setup { @user = users(:ada) }
 
-  test "sends signed out visitors to sign in" do
+  test "visitors can start playing without signing up" do
     get root_path
-    assert_redirected_to new_session_path
+
+    assert_response :success
+    assert_select "a[href=?]", times_tables_path, text: "START"
+    assert_select ".streak__number", text: /0/
+    assert_select "a[href=?]", new_registration_path
+  end
+
+  test "greets the player by name" do
+    @user.update!(name: "Ada")
+    sign_in_as @user
+
+    get root_path
+    assert_select ".greeting", text: "Hi Ada!"
   end
 
   test "shows the streak, best score and start button" do

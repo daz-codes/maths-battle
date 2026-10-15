@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_15_111914) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_15_140000) do
   create_table "attempts", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "topic", default: "times_tables", null: false
@@ -33,7 +33,6 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_15_111914) do
     t.string "fact", null: false
     t.integer "correct_count", default: 0, null: false
     t.integer "wrong_count", default: 0, null: false
-    t.datetime "last_wrong_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id", "topic", "fact"], name: "index_fact_stats_on_user_id_and_topic_and_fact", unique: true
@@ -50,8 +49,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_15_111914) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "username", null: false
-    t.string "password_digest", null: false
+    t.string "username"
+    t.string "password_digest"
     t.integer "current_streak", default: 0, null: false
     t.integer "longest_streak", default: 0, null: false
     t.date "last_practised_on"
@@ -59,6 +58,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_15_111914) do
     t.string "time_zone", default: "London", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name"
+    t.string "theme", default: "system", null: false
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 

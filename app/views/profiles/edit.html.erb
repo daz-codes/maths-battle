@@ -1,0 +1,27 @@
+<% content_for :title, "Settings · MatheMinute" %>
+
+<main class="page page--narrow">
+  <%= render "logo" %>
+  <h1 class="heading">Settings</h1>
+
+  <%= form_with model: @user, url: profile_path, method: :patch, class: "form" do |form| %>
+    <%= render "errors", user: @user %>
+
+    <%= form.label :name, "What should we call you?" %>
+    <%= form.text_field :name, autocomplete: "given-name", maxlength: 30 %>
+
+    <fieldset class="choice" data-controller="theme">
+      <legend>Colours</legend>
+      <% { "system" => "Same as device", "light" => "Light", "dark" => "Dark" }.each do |theme, label| %>
+        <label class="choice__option">
+          <%= form.radio_button :theme, theme, data: { action: "theme#preview" } %>
+          <span><%= label %></span>
+        </label>
+      <% end %>
+    </fieldset>
+
+    <%= form.submit "Save", class: "button button--go" %>
+  <% end %>
+
+  <%= link_to "Back", root_path, class: "aside" %>
+</main>

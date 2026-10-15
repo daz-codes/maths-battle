@@ -15,9 +15,9 @@ class TimesTables::Feedback
     elsif weak_tables.any?
       "Practise your #{weak_tables.map { |t| "#{t}×" }.to_sentence} tables"
     elsif @attempt.perfect?
-      "Every answer right. Brilliant!"
+      "Every answer right. Brilliant#{name}!"
     else
-      "Great work — keep your streak going!"
+      "Great work#{name} — keep your streak going!"
     end
   end
 
@@ -39,6 +39,10 @@ class TimesTables::Feedback
   end
 
   private
+    def name
+      ", #{@attempt.user.display_name}" if @attempt.user.display_name
+    end
+
     def accuracy_by_table
       TABLES.index_with { [ 0, 0 ] }.tap do |tally|
         recent_results.each do |r|

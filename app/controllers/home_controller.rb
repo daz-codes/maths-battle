@@ -1,5 +1,7 @@
 class HomeController < ApplicationController
+  allow_unauthenticated_access
+
   def show
-    @user = Current.user
+    @user = current_player
   end
 end
