@@ -412,8 +412,8 @@ body.testing {
 .timer { display: flex; align-items: center; gap: 0.6rem; }
 
 .timer__clock {
-  width: 4.5rem;
-  height: 4.5rem;
+  width: 5.5rem;
+  height: 5.5rem;
   filter: drop-shadow(0 0 8px color-mix(in srgb, var(--quarter) var(--glow-strength), transparent));
 }
 
@@ -424,23 +424,20 @@ body.testing {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .test__seconds, .test__score {
-  min-width: 3ch;
-  padding: 0.05rem 0.45rem;
   border-radius: var(--radius);
-  font-size: 1.5rem;
   font-weight: 700;
-  text-align: center;
 }
 
 .test[data-quarter="1"] { --quarter: var(--green); }
 .test[data-quarter="2"] { --quarter: var(--blue); }
 .test[data-quarter="3"] { --quarter: var(--pink); }
 
-.test__seconds { min-width: 2ch; padding: 0; text-align: left; }
+.test__seconds { min-width: 2ch; font-size: 1.75rem; }
 
 .test__score {
-  border: 2px solid var(--line);
-  background: var(--paper-alt);
+  padding: 0 0.3rem;
+  font-size: 2.5rem;
+  line-height: 1;
 }
 
 .test__score::before { content: "✓ "; color: var(--muted); font-size: 0.7em; }

@@ -5,6 +5,7 @@ const DURATION = 60_000
 const WRONG_PAUSE = 400
 // Each quarter of the clock ring is 23 of 100 units long, leaving small gaps between them
 const QUARTER_LENGTH = 23
+const COUNTDOWN = [ [ "Ready", 900 ], [ "Set", 900 ], [ "GO!", 600 ] ]
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 
 // Runs the whole one-minute test in the browser: nothing touches the network until it ends
@@ -25,7 +26,7 @@ export default class extends Controller {
     document.addEventListener("keydown", this.keydown)
     window.addEventListener("beforeunload", this.beforeUnload)
 
-    this.countdown(3)
+    this.countdown(COUNTDOWN)
   }
 
   disconnect() {
@@ -36,12 +37,13 @@ export default class extends Controller {
     clearTimeout(this.endTimer)
   }
 
-  // 3, 2, 1 so the first second of the test isn't spent getting ready
-  countdown(n) {
-    if (n === 0) return this.start()
+  // Ready, set, go! so the first second of the test isn't spent getting ready
+  countdown(steps) {
+    if (steps.length === 0) return this.start()
 
-    this.questionTarget.textContent = n
-    this.timer = setTimeout(() => this.countdown(n - 1), 1000)
+    const [ [ word, ms ], ...rest ] = steps
+    this.questionTarget.textContent = word
+    this.timer = setTimeout(() => this.countdown(rest), ms)
   }
 
   start() {
