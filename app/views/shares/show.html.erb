@@ -1,0 +1,23 @@
+<% content_for :title, @share_text.title %>
+<% content_for :head do %>
+  <meta name="robots" content="noindex">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MatheMinute">
+  <meta property="og:title" content="<%= @share_text.title %>">
+  <meta property="og:description" content="A MatheMinute player got <%= @attempt.score %> times tables right in 60 seconds. Can you beat it?">
+  <meta property="og:url" content="<%= share_url(@attempt.share_token) %>">
+  <meta name="twitter:card" content="summary">
+<% end %>
+
+<main class="page results">
+  <%= render "logo" %>
+  <p class="label">A MatheMinute player got</p>
+
+  <%= render "attempts/card", attempt: @attempt, share_text: @share_text %>
+
+  <p class="feedback">Can you beat it?</p>
+
+  <nav class="actions">
+    <%= link_to "Try MatheMinute!", new_registration_path, class: "button button--cta" %>
+  </nav>
+</main>

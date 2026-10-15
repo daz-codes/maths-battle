@@ -1,0 +1,31 @@
+<% content_for :title, "Times tables · MatheMinute" %>
+<% content_for :viewport, "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" %>
+<% content_for :body_class, "testing" %>
+<% content_for :head, tag.meta(name: "turbo-cache-control", content: "no-cache") %>
+
+<main class="test" data-controller="test"
+      data-test-questions-value="<%= @questions.to_json %>"
+      data-test-topic-value="<%= TimesTables::TOPIC %>"
+      data-test-submit-url-value="<%= attempts_path %>">
+  <header class="test__bar">
+    <div class="timer" aria-hidden="true"><div class="timer__fill" data-test-target="bar"></div></div>
+    <span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span>
+    <span class="test__score" data-test-target="score" aria-label="Score">0</span>
+  </header>
+
+  <div class="test__stage">
+    <p class="question" data-test-target="question" aria-live="off">3</p>
+    <p class="answer" data-test-target="answer" aria-live="polite"></p>
+    <p class="test__status" data-test-target="status" hidden></p>
+    <button type="button" class="button button--go" data-test-target="retry" data-action="test#submit" hidden>Try again</button>
+  </div>
+
+  <div class="keypad" data-test-target="keypad">
+    <% %w[1 2 3 4 5 6 7 8 9].each do |digit| %>
+      <button type="button" class="keypad__key" data-action="pointerdown->test#tap" data-digit="<%= digit %>"><%= digit %></button>
+    <% end %>
+    <span></span>
+    <button type="button" class="keypad__key" data-action="pointerdown->test#tap" data-digit="0">0</button>
+    <button type="button" class="keypad__key keypad__key--back" data-action="pointerdown->test#tap" data-digit="back" aria-label="Delete">⌫</button>
+  </div>
+</main>

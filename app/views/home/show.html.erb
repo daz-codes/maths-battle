@@ -1,0 +1,29 @@
+<main class="page home">
+  <%= render "logo" %>
+
+  <section class="streak <%= "streak--done" if @user.practised_today? %>" aria-label="Streak">
+    <span class="streak__number">🔥 <%= @user.streak %></span>
+    <span class="streak__label">day streak</span>
+  </section>
+
+  <p class="nudge <%= "nudge--risk" if @user.streak_at_risk? %>">
+    <% if @user.practised_today? %>
+      Done for today! Come back tomorrow.
+    <% elsif @user.streak_at_risk? %>
+      Do today's minute to keep your streak!
+    <% else %>
+      Do one minute a day to build a streak.
+    <% end %>
+  </p>
+
+  <%= link_to "START", times_tables_path, class: "button button--start" %>
+
+  <dl class="stats">
+    <div><dt>Best</dt><dd>🏆 <%= @user.high_score %></dd></div>
+    <div><dt>Longest streak</dt><dd><%= @user.longest_streak %></dd></div>
+  </dl>
+
+  <footer class="footer">
+    <%= @user.username %> · <%= button_to "Sign out", session_path, method: :delete, class: "link-button", form_class: "inline" %>
+  </footer>
+</main>

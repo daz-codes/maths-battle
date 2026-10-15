@@ -1,0 +1,29 @@
+<% content_for :title, "#{@attempt.score} in a minute! · MatheMinute" %>
+
+<main class="page results">
+  <% if @attempt.new_high_score %>
+    <p class="banner">🎉 New high score! 🎉</p>
+  <% end %>
+
+  <%= render "card", attempt: @attempt, share_text: @share_text %>
+
+  <p class="feedback"><%= @feedback.message %></p>
+
+  <% if @feedback.missed_facts.any? %>
+    <section class="missed">
+      <h2 class="label">Learn these</h2>
+      <ul>
+        <% @feedback.missed_facts.each do |fact| %>
+          <li><%= fact %></li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <nav class="actions">
+    <%= link_to "Go again!", times_tables_path, class: "button button--go" %>
+    <button type="button" class="button button--share" data-controller="share"
+            data-share-text-value="<%= @share_text %>" data-action="share#share">Share</button>
+    <%= link_to "Home", root_path, class: "button" %>
+  </nav>
+</main>

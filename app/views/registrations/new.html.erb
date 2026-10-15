@@ -1,0 +1,28 @@
+<% content_for :title, "Sign up · MatheMinute" %>
+
+<main class="page page--narrow">
+  <%= render "logo" %>
+  <h1 class="heading">Make an account</h1>
+  <%= render "flash" %>
+
+  <%= form_with model: @user, url: registration_path, class: "form" do |form| %>
+    <% if @user.errors.any? %>
+      <ul class="flash flash--alert" role="alert">
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <%= form.label :username, "Pick a username" %>
+    <%= form.text_field :username, required: true, autofocus: true, autocomplete: "username", autocapitalize: "none", spellcheck: false, minlength: 3, maxlength: 20 %>
+    <p class="hint">Don't use your real name.</p>
+
+    <%= form.label :password %>
+    <%= form.password_field :password, required: true, autocomplete: "new-password", minlength: 4, maxlength: 72 %>
+
+    <%= form.submit "Let's go!", class: "button button--go" %>
+  <% end %>
+
+  <p class="aside">Already have an account? <%= link_to "Sign in", new_session_path %></p>
+</main>

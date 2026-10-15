@@ -1,0 +1,19 @@
+<% content_for :title, "Sign in · MatheMinute" %>
+
+<main class="page page--narrow">
+  <%= render "logo" %>
+  <h1 class="heading">Welcome back!</h1>
+  <%= render "flash" %>
+
+  <%= form_with url: session_path, class: "form" do |form| %>
+    <%= form.label :username %>
+    <%= form.text_field :username, required: true, autofocus: true, autocomplete: "username", autocapitalize: "none", spellcheck: false, value: params[:username] %>
+
+    <%= form.label :password %>
+    <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72 %>
+
+    <%= form.submit "Sign in", class: "button button--go" %>
+  <% end %>
+
+  <p class="aside">New here? <%= link_to "Make an account", new_registration_path %></p>
+</main>
