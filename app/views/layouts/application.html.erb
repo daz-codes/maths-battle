@@ -32,7 +32,10 @@
   <body class="<%= content_for(:body_class) %>">
     <%# The logo is the way home from every page, except mid-test where nothing should distract %>
     <% unless content_for?(:focus_mode) %>
-      <header class="site-header"><%= render "logo" %></header>
+      <header class="site-header">
+        <%= render "logo" %>
+        <%= tag.p(yield(:tagline), class: "tagline") if content_for?(:tagline) %>
+      </header>
     <% end %>
     <%= yield %>
   </body>

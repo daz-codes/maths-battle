@@ -1,3 +1,5 @@
+<% content_for :tagline, "Improve your maths in a minute every day" %>
+
 <main class="page home">
   <%= render "flash" %>
 
@@ -15,16 +17,14 @@
     <span class="streak__label">day streak</span>
   </section>
 
-  <p class="nudge <%= "nudge--risk" if @user.streak_at_risk? %>">
-    <% if @user.practised_today? %>
+  <% if @user.practised_today? %>
+    <p class="nudge">
       <strong><%= @user.streak == 1 ? "Streak started!" : "Streak still going!" %></strong>
       You can keep playing to practise more.
-    <% elsif @user.streak_at_risk? %>
-      Do today's minute to keep your streak!
-    <% else %>
-      Do one minute of times tables a day to build a streak.
-    <% end %>
-  </p>
+    </p>
+  <% elsif @user.streak_at_risk? %>
+    <p class="nudge nudge--risk">Do today's minute to keep your streak!</p>
+  <% end %>
 
   <%= link_to "Start", times_tables_path, class: "button button--start" %>
 

@@ -7,6 +7,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
+    assert_select ".site-header .tagline", text: "Improve your maths in a minute every day"
     assert_select "a[href=?]", times_tables_path, text: "Start"
     assert_select ".streak__number", text: /0/
     assert_select "a[href=?]", new_registration_path
