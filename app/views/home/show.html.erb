@@ -44,15 +44,4 @@
   <% end %>
 
   <%= render "install" %>
-
-  <footer class="footer">
-    <% if @user.guest? %>
-      <%= link_to "Sign in", new_session_path %> ·
-      <% unless @user.persisted? %><%= link_to "Make an account", new_registration_path %> · <% end %>
-      <%= link_to "Settings", edit_profile_path %>
-    <% else %>
-      <%= @user.username %> · <%= link_to "Settings", edit_profile_path %> ·
-      <%= button_to "Sign out", session_path, method: :delete, class: "link-button", form_class: "inline" %>
-    <% end %>
-  </footer>
 </main>

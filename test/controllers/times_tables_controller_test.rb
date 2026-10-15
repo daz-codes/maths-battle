@@ -11,5 +11,6 @@ class TimesTablesControllerTest < ActionDispatch::IntegrationTest
     assert_equal %w[a b], questions.first.keys
     assert_select "meta[name=viewport][content*='maximum-scale=1']"
     assert_select "a.logo", count: 0, message: "nothing to tap away to mid-test"
+    assert_select ".site-footer", count: 0
   end
 end

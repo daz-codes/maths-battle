@@ -13,7 +13,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     visit new_session_path
     fill_in "Username", with: user.username
     fill_in "Password", with: "password"
-    click_on "Sign in"
+    click_button "Sign in"
     assert_selector ".streak"
   end
 end

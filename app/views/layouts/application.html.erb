@@ -38,5 +38,6 @@
       </header>
     <% end %>
     <%= yield %>
+    <%= render "footer" unless content_for?(:focus_mode) %>
   </body>
 </html>

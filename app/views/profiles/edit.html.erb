@@ -42,4 +42,11 @@
 
     <%= form.submit "Save", class: "button button--go" %>
   <% end %>
+
+  <% if @user.guest? %>
+    <p class="aside"><%= link_to "Make an account", new_registration_path %> to keep your streak safe.</p>
+  <% else %>
+    <p class="aside">Signed in as <strong><%= @user.username %></strong></p>
+    <%= button_to "Sign out", session_path, method: :delete, class: "button button--wide", form_class: "wide-form" %>
+  <% end %>
 </main>

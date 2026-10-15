@@ -13,7 +13,7 @@ class SharesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".card__number", text: "6"
     assert_select "body", text: /A MatheMinute player/
     assert_no_match(/squirrel/i, response.body)
-    assert_select ".avatar", count: 0
+    assert_select "main .avatar", count: 0, message: "the sharer's picture is never shown"
     assert_select "a[href=?]", root_path, text: "Try MatheMinute!"
   end
 

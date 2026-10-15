@@ -38,6 +38,19 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".greeting .avatar--letter", text: "A"
   end
 
+  test "registered players sign out from settings" do
+    get edit_profile_path
+    assert_select "form[action=?] button", session_path, text: "Sign out"
+  end
+
+  test "the footer shows the player and links to settings and stats" do
+    get root_path
+    assert_select ".site-footer a.site-footer__player[href=?]", edit_profile_path, text: /ada/
+    assert_select ".site-footer a.site-footer__player .avatar"
+    assert_select ".site-footer a.site-footer__stats[href=?] svg.stats-icon", stats_path
+    assert_select ".site-footer", text: /Settings/, count: 0
+  end
+
   test "rejects unknown themes" do
     patch profile_path, params: { user: { theme: "purple" } }
     assert_response :unprocessable_entity
