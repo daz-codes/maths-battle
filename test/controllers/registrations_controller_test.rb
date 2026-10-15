@@ -14,7 +14,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     assert cookies[:session_id]
     follow_redirect!
-    assert_select ".greeting", text: "Hi Zara!"
+    assert_select ".greeting", text: /Hi Zara!/
   end
 
   test "a name, username and password are all needed" do

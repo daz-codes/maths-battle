@@ -17,7 +17,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
-    assert_select ".greeting", text: "Hi Ada!"
+    assert_select ".greeting", text: /Hi Ada!/
   end
 
   test "shows the streak, best score and start button" do

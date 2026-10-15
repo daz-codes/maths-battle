@@ -6,6 +6,27 @@
   <%= form_with model: @user, url: profile_path, method: :patch, class: "form" do |form| %>
     <%= render "errors", user: @user %>
 
+    <fieldset class="avatar-field" data-controller="avatar-preview">
+      <legend>Your picture</legend>
+      <div class="avatar-field__row">
+        <%= render "avatar", user: @user, size: "large", data: { avatar_preview_target: "current" } %>
+        <img class="avatar avatar--large" alt="" hidden data-avatar-preview-target="preview">
+        <div class="avatar-field__controls">
+          <label class="button">
+            <%= @user.avatar.attached? ? "Change picture" : "Add a picture" %>
+            <%= form.file_field :avatar_upload, accept: "image/*", class: "visually-hidden",
+                  data: { action: "avatar-preview#show" } %>
+          </label>
+          <% if @user.avatar.attached? %>
+            <label class="avatar-field__remove">
+              <%= form.check_box :remove_avatar %> Remove picture
+            </label>
+          <% end %>
+        </div>
+      </div>
+      <p class="hint">Only you can see it. It's never shown on shared results.</p>
+    </fieldset>
+
     <%= form.label :name, "What should we call you?" %>
     <%= form.text_field :name, autocomplete: "given-name", maxlength: 30 %>
 

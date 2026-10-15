@@ -2,7 +2,12 @@
   <%= render "flash" %>
 
   <% if @user.display_name %>
-    <h1 class="greeting">Hi <%= @user.display_name %>!</h1>
+    <h1 class="greeting">
+      <%= link_to edit_profile_path, class: "greeting__avatar", aria: { label: "Settings" } do %>
+        <%= render "avatar", user: @user %>
+      <% end %>
+      Hi <%= @user.display_name %>!
+    </h1>
   <% end %>
 
   <section class="streak <%= "streak--done" if @user.practised_today? %>" aria-label="Streak">

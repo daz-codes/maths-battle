@@ -22,6 +22,22 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_select "html[data-theme=dark]"
   end
 
+  test "uploads a picture, shown on the home page" do
+    patch profile_path, params: { user: { avatar_upload: fixture_file_upload("photo.jpg", "image/jpeg") } }
+    assert_redirected_to root_path
+    assert @user.reload.avatar.attached?
+
+    @user.update!(name: "Ada")
+    get root_path
+    assert_select ".greeting img.avatar"
+  end
+
+  test "without a picture the home page shows a letter" do
+    @user.update!(name: "Ada")
+    get root_path
+    assert_select ".greeting .avatar--letter", text: "A"
+  end
+
   test "rejects unknown themes" do
     patch profile_path, params: { user: { theme: "purple" } }
     assert_response :unprocessable_entity

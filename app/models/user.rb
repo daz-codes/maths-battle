@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include Avatar
+
   THEMES = %w[ system light dark ]
 
   # Guests play without signing up, so they have no username or password until they register

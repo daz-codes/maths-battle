@@ -34,6 +34,7 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".feedback", text: /Practise your/
     assert_select ".missed li", text: "7 × 8 = 56"
     assert_select ".missed__slow", count: 0
+    assert_select "a[href=?]", stats_path
     assert_select "[data-controller=share][data-share-text-value*=?]", share_url(attempt.share_token)
     assert_select "header a.logo[href=?]", root_path
     assert_select "a.button", text: "Home", count: 0

@@ -29,6 +29,9 @@ gem "solid_cable"
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", ">= 1.24.1", require: false
 
+# Resize and clean up uploaded avatars [https://github.com/janko/image_processing]
+gem "image_processing", "~> 1.2"
+
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 gem "kamal", require: false
 

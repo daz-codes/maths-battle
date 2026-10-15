@@ -84,14 +84,14 @@ a {
 
 /* Text links (and the sign out button, styled as one): green underline and a faint wash on hover.
    The wash is a touch of ink mixed into the paper, so it's slightly darker in light mode and lighter in dark */
-a:not(.button, .logo), .link-button {
+a:not(.button, .logo, .greeting__avatar), .link-button {
   margin: 0 -0.2em;
   padding: 0.05em 0.2em;
   border-radius: 4px;
   transition: background-color 120ms, text-decoration-color 120ms;
 }
 
-a:not(.button, .logo):hover, .link-button:hover {
+a:not(.button, .logo, .greeting__avatar):hover, .link-button:hover {
   background-color: color-mix(in srgb, var(--ink) 5%, var(--paper));
   text-decoration-color: var(--green);
 }
@@ -375,6 +375,50 @@ a:not(.button, .logo):hover, .link-button:hover {
 .stats dd { margin: 0; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; }
 
 .footer { color: var(--muted); font-size: 0.85rem; }
+
+/* ── Avatars ─────────────────────────────────────── */
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar--medium { --avatar-size: 2.75rem; }
+.avatar--large { --avatar-size: 6rem; }
+
+/* No picture: the first letter on the player's neon colour */
+.avatar--letter {
+  --fill: var(--yellow);
+  border-color: var(--on-neon);
+  background: var(--fill);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--fill) var(--glow-strength), transparent);
+  color: var(--on-neon);
+  font-size: calc(var(--avatar-size) * 0.48);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.avatar--green { --fill: var(--green); }
+.avatar--blue { --fill: var(--blue); }
+.avatar--pink { --fill: var(--pink); }
+
+.greeting { display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+.greeting__avatar { display: inline-flex; border-radius: 50%; text-decoration: none; }
+
+.avatar-field { margin: 0 0 0.75rem; padding: 0; border: 0; }
+.avatar-field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.9rem; font-weight: 700; }
+.avatar-field__row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.6rem; }
+.avatar-field__controls { display: grid; gap: 0.6rem; justify-items: start; }
+.avatar-field__controls .button { min-height: 2.75rem; padding: 0.4rem 1rem; font-size: 0.85rem; cursor: pointer; }
+.avatar-field__controls .button:focus-within { outline: 3px solid var(--blue); outline-offset: 3px; }
+.avatar-field__remove { display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; font-weight: 500; }
+.avatar-field .hint { margin-top: 0; }
 
 /* ── Stats ──────────────────────────────────────── */
 

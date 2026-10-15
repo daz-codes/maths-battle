@@ -30,6 +30,7 @@
   <% end %>
 
   <%= link_to "Try again", times_tables_path, class: "button button--go button--wide" %>
+  <%= link_to "See all your stats", stats_path %>
 
   <% if @attempt.user.guest? %>
     <p class="save-nudge">

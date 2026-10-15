@@ -1,0 +1,8 @@
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+# Uploads live in storage/, which is a persistent Docker volume in production (see config/deploy.yml)
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
