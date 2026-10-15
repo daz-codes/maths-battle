@@ -208,6 +208,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 
 /* Coloured buttons: a deep shade so the white text reads, glowing in the full neon in dark mode */
 .button--go { --fill: var(--green-deep); --glow: var(--green); }
+.button--blue { --fill: var(--blue-deep); --glow: var(--blue); }
 .button--share { --fill: var(--pink-deep); --glow: var(--pink); }
 .button--cta { --fill: var(--blue-deep); --glow: var(--blue); min-height: 4rem; font-size: 1.5rem; }
 
@@ -376,6 +377,8 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 }
 
 .stats div:nth-child(2) { --stripe: var(--green); }
+.stats div:nth-child(3) { --stripe: var(--blue); }
+.stats div:nth-child(4) { --stripe: var(--pink); }
 
 .stats dt { color: var(--muted); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
 .stats dd { margin: 0; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; }
@@ -466,7 +469,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 /* ── Stats ──────────────────────────────────────── */
 
 .stats--three { grid-template-columns: repeat(3, 1fr); }
-.stats--three div:nth-child(3) { --stripe: var(--blue); }
+
 
 .tables {
   width: 100%;

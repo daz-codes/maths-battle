@@ -22,12 +22,21 @@ module User::Trackable
     attempts.where(topic: TimesTables::TOPIC).count
   end
 
+  # Over real games only: a test started and walked away from shouldn't drag it down
+  def average_score
+    counted_games.average(:score)&.round
+  end
+
   # One tally per table, 1× to 12×. A fact like 7×8 counts toward both the 7× and 8× tables
   def table_stats
     @table_stats ||= mark_slow_tables(TimesTables::FACTORS.map { |table| tally("#{table}×", stats_for_table(table)) })
   end
 
   private
+    def counted_games
+      attempts.where(topic: TimesTables::TOPIC, answered: Attempt::MIN_ANSWERS_FOR_STREAK..)
+    end
+
     def stats_for_table(table)
       times_tables_stats.values.select { |stat| factors_of(stat).include?(table) }
     end

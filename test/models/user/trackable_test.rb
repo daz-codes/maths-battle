@@ -19,6 +19,15 @@ class User::TrackableTest < ActiveSupport::TestCase
     assert_nil tables["9×"].percent
   end
 
+  test "average score counts real games only" do
+    Attempt.record!(user: @user, results: answers(*right_answers(10)))
+    Attempt.record!(user: @user, results: answers(*right_answers(20)))
+    Attempt.record!(user: @user, results: answers(*right_answers(2)))
+
+    assert_equal 15, @user.average_score
+    assert_nil User.new.average_score
+  end
+
   test "flags tables much slower than the player's usual" do
     %w[2x3 3x4 4x5 5x6].each { stat(_1, 4, 0, 8000) }
     stat("8x9", 4, 0, 24_000)

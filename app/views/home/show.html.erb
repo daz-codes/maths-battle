@@ -32,8 +32,10 @@
     <dl class="stats">
       <div><dt>Best</dt><dd>🏆 <%= @user.high_score %></dd></div>
       <div><dt>Longest streak</dt><dd><%= @user.longest_streak %></dd></div>
+      <div><dt>Average score</dt><dd><%= @user.average_score || "—" %></dd></div>
+      <div><dt>Average time</dt><dd><%= seconds(@user.overall_stats.average_ms) %></dd></div>
     </dl>
-    <%= link_to "See all your stats", stats_path %>
+    <%= link_to "See all stats", stats_path %>
   <% end %>
 
   <% if @user.guest? && @user.persisted? %>
