@@ -30,15 +30,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".stats", text: /41/
     assert_select "a[href=?]", stats_path, text: "See all stats"
     assert_select "a[href=?]", times_tables_path, text: "Play"
-    assert_select ".nudge", text: /Streak still going! You can keep playing to practise more/
-  end
-
-  test "says the streak has started on its first day" do
-    @user.update!(current_streak: 1, last_practised_on: @user.today)
-    sign_in_as @user
-
-    get root_path
-    assert_select ".nudge", text: /Streak started!/
+    assert_select ".nudge", text: "Your streak is safe for today, but you can keep playing to practise more."
   end
 
   test "warns when the streak is at risk" do
@@ -46,6 +38,6 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
-    assert_select ".nudge--risk", text: /keep your streak/
+    assert_select ".nudge--risk", text: "Don't lose your streak!"
   end
 end

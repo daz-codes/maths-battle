@@ -18,12 +18,9 @@
   </section>
 
   <% if @user.practised_today? %>
-    <p class="nudge">
-      <strong><%= @user.streak == 1 ? "Streak started!" : "Streak still going!" %></strong>
-      You can keep playing to practise more.
-    </p>
+    <p class="nudge">Your streak is safe for today, but you can keep playing to practise more.</p>
   <% elsif @user.streak_at_risk? %>
-    <p class="nudge nudge--risk">Do today's minute to keep your streak!</p>
+    <p class="nudge nudge--risk">Don't lose your streak!</p>
   <% end %>
 
   <%= link_to "Play", times_tables_path, class: "button button--start" %>
