@@ -90,6 +90,9 @@ jobs:
         with:
           bundler-cache: true
 
+      - name: Install libvips for avatar processing
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips
+
       - name: Run tests
         env:
           RAILS_ENV: test
@@ -115,6 +118,9 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+
+      - name: Install libvips for avatar processing
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips
 
       - name: Run System Tests
         env:
