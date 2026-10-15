@@ -1,6 +1,6 @@
 # A player's picture. Uploads are never stored as they come: each is cropped to a small square and
 # re-encoded without metadata, so a phone photo's location and camera details are thrown away
-module User::Avatar
+module User::Avatarable
   extend ActiveSupport::Concern
 
   SIZE = 256

@@ -3,11 +3,11 @@
 <main class="page">
   <h1 class="heading">Your stats</h1>
 
-  <% if @stats.any? %>
+  <% if @user.tracked? %>
     <dl class="stats stats--three">
-      <div><dt>Accuracy</dt><dd><%= percent(@stats.overall.percent) %></dd></div>
-      <div><dt>Average</dt><dd><%= seconds(@stats.overall.average_ms) %></dd></div>
-      <div><dt>Games</dt><dd><%= @stats.games %></dd></div>
+      <div><dt>Accuracy</dt><dd><%= percent(@user.overall_stats.percent) %></dd></div>
+      <div><dt>Average</dt><dd><%= seconds(@user.overall_stats.average_ms) %></dd></div>
+      <div><dt>Games</dt><dd><%= @user.games_played %></dd></div>
     </dl>
 
     <table class="tables">
@@ -21,7 +21,7 @@
         </tr>
       </thead>
       <tbody>
-        <% @stats.tables.each do |row| %>
+        <% @user.table_stats.each do |row| %>
           <tr title="<%= row.label %> table: <%= row.answered.positive? ? "#{row.right} of #{row.answered} right, average #{seconds(row.average_ms)}" : "not asked yet" %>">
             <th scope="row"><%= row.label %></th>
             <td class="tables__bar">
@@ -36,7 +36,7 @@
 
     <p class="hint hint--centre">
       Speed is the average time for a right answer.
-      <% if @stats.tables.any?(&:slow?) %>🐢 means slower than your usual.<% end %>
+      <% if @user.table_stats.any?(&:slow?) %>🐢 means slower than your usual.<% end %>
     </p>
   <% else %>
     <p class="aside">Play a game and your stats will show up here.</p>

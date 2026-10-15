@@ -8,22 +8,22 @@
   <%= render "card", attempt: @attempt %>
 
   <button type="button" class="button button--share button--wide" data-controller="share"
-          data-share-text-value="<%= @share_text %>" data-action="share#share">Share</button>
+          data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>
 
-  <p class="feedback"><%= @feedback.message %></p>
+  <p class="feedback"><%= @attempt.feedback_message %></p>
 
-  <% if @feedback.missed_facts.any? || @feedback.slow_facts.any? %>
+  <% if @attempt.missed_facts.any? || @attempt.slow_facts.any? %>
     <section class="missed">
       <h2 class="label">Work on these</h2>
       <ul>
-        <% @feedback.missed_facts.each do |fact| %>
+        <% @attempt.missed_facts.each do |fact| %>
           <li><%= fact %></li>
         <% end %>
-        <% @feedback.slow_facts.each do |fact| %>
+        <% @attempt.slow_facts.each do |fact| %>
           <li class="missed__slow"><%= fact %> <span title="Right, but slow">🐢</span></li>
         <% end %>
       </ul>
-      <% if @feedback.slow_facts.any? %>
+      <% if @attempt.slow_facts.any? %>
         <p class="hint hint--centre">🐢 Right, but slow. Practise these to get quicker.</p>
       <% end %>
     </section>

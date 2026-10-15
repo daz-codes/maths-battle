@@ -1,18 +1,22 @@
 class FactStat < ApplicationRecord
+  include Timeable
+
   belongs_to :user
 
-  # Adds each answer in an attempt to the user's running totals for that fact
+  # Adds each answer in an attempt to the player's running totals for that fact
   def self.record(attempt)
-    topic = attempt.topic_module
-
-    attempt.results.group_by { |r| topic.fact_key(r["a"], r["b"]) }.each do |fact, answers|
-      stat = attempt.user.fact_stats.find_or_initialize_by(topic: attempt.topic, fact: fact)
-      right = answers.select { |r| r["correct"] }
-      stat.correct_count += right.size
-      stat.wrong_count += answers.size - right.size
-      stat.correct_ms += right.sum { |r| TimesTables::Speed.counted_ms(r["ms"]) }
-      stat.save!
+    attempt.results_by_fact.each do |fact, answers|
+      find_or_initialize_by(topic: attempt.topic, fact: fact).add(answers)
     end
+  end
+
+  def add(answers)
+    right = answers.select { |answer| answer["correct"] }
+
+    self.correct_count += right.size
+    self.wrong_count += answers.size - right.size
+    self.correct_ms += self.class.total_counted_ms(right)
+    save!
   end
 
   def answered_count
@@ -22,11 +26,6 @@ class FactStat < ApplicationRecord
   # 0.0 to 1.0, or nil if the fact hasn't been asked yet
   def fraction_correct
     correct_count.fdiv(answered_count) if answered_count.positive?
-  end
-
-  # How long right answers take on average, or nil before any
-  def average_correct_ms
-    correct_ms / correct_count if correct_count.positive?
   end
 
   def percent_correct

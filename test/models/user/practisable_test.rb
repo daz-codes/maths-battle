@@ -1,10 +1,10 @@
 require "test_helper"
 
-class TimesTables::QuestionGeneratorTest < ActiveSupport::TestCase
+class User::PractisableTest < ActiveSupport::TestCase
   setup { @user = users(:ada) }
 
   def generate(count: 150, seed: 1)
-    TimesTables::QuestionGenerator.new(@user, count: count, random: Random.new(seed)).questions
+    @user.questions(count: count, random: Random.new(seed))
   end
 
   def key(question) = TimesTables.fact_key(question[:a], question[:b])
@@ -32,7 +32,8 @@ class TimesTables::QuestionGeneratorTest < ActiveSupport::TestCase
     assert_operator trivial.fdiv(questions.size), :<, 0.05
   end
 
-  def weights = TimesTables::QuestionGenerator.new(@user).weights
+  # A fresh copy each time, as weights are worked out once per player object
+  def weights = User.find(@user.id).question_weights
 
   test "facts with a lower percentage correct come up more often" do
     @user.fact_stats.create!(topic: "times_tables", fact: "7x8", correct_count: 1, wrong_count: 3)

@@ -4,6 +4,5 @@ class SharesController < ApplicationController
 
   def show
     @attempt = Attempt.find_by!(share_token: params[:share_token])
-    @share_text = ShareText.new(@attempt, url: share_url(@attempt.share_token))
   end
 end

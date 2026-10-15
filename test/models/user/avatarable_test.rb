@@ -1,6 +1,6 @@
 require "test_helper"
 
-class User::AvatarTest < ActiveSupport::TestCase
+class User::AvatarableTest < ActiveSupport::TestCase
   setup { @user = users(:ada) }
 
   def upload(name, type)
@@ -43,7 +43,7 @@ class User::AvatarTest < ActiveSupport::TestCase
 
   test "without a picture: the username's first letter on a neon colour" do
     assert_equal "A", @user.avatar_letter
-    assert_includes User::Avatar::COLOURS, @user.avatar_colour
+    assert_includes User::Avatarable::COLOURS, @user.avatar_colour
     assert_equal "?", User.new.avatar_letter
   end
 end

@@ -11,7 +11,7 @@ class RegistrationsController < ApplicationController
   def create
     @user = current_player
 
-    if @user.register(params.expect(user: %i[ name username password ]))
+    if @user.register(registration_params)
       start_new_session_for @user unless authenticated?
       redirect_to root_path, notice: "You're signed up, #{@user.display_name}!"
     else
@@ -20,6 +20,10 @@ class RegistrationsController < ApplicationController
   end
 
   private
+    def registration_params
+      params.expect(user: %i[ name username password ])
+    end
+
     def redirect_registered_users
       redirect_to root_path if authenticated? && !Current.user.guest?
     end
