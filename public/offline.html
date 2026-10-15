@@ -12,7 +12,8 @@
     .logo { display: inline-flex; align-items: center; gap: 0.6rem; justify-self: center; font-size: 1.6rem; font-weight: 700; letter-spacing: -0.045em; }
     .logo { font-weight: 500; letter-spacing: -0.04em; }
     .logo img { width: 2.6rem; height: 2.6rem; border-radius: 10px; }
-    .logo strong { font-weight: 700; }
+    .logo strong { font-weight: 700; color: #e5139a; }
+    @media (prefers-color-scheme: dark) { .logo strong { color: #ff5cc6; } }
     h1 { margin: 0; font-size: 2.25rem; font-weight: 700; letter-spacing: -0.045em; }
     p { margin: 0; font-size: 1.1rem; color: #6f7064; }
     button { justify-self: center; min-height: 3.25rem; padding: 0.6rem 1.4rem; border: 2px solid #24251f; border-radius: 10px;
@@ -20,7 +21,7 @@
   </style>
 </head>
 <body>
-  <div class="logo"><img src="/icon.svg" alt=""><span>mathe<strong>minute</strong></span></div>
+  <div class="logo"><img src="/icon.svg" alt=""><span>Mathe<strong>Minute</strong></span></div>
   <h1>You're offline</h1>
   <p>Connect to the internet to do today's minute.</p>
   <button onclick="location.reload()">Try again</button>

@@ -1,23 +1,25 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <filter id="glow" filterUnits="userSpaceOnUse" x="-20" y="-20" width="90" height="90"><feGaussianBlur stdDeviation="14"/></filter>
+    <filter id="glow" filterUnits="userSpaceOnUse" x="-20" y="-20" width="90" height="90"><feGaussianBlur stdDeviation="1.8"/></filter>
   </defs>
   <rect width="512" height="512" rx="96" fill="#121310"/>
-  <g transform="translate(64 56) scale(8)">
-    <g transform="rotate(-90 24 28)" fill="none" stroke-width="6" filter="url(#glow)" opacity=".7">
-      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#efff2e" stroke-dasharray="23 77"/>
-      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#5dff7a" stroke-dasharray="23 77" stroke-dashoffset="-25"/>
-      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#2be4ff" stroke-dasharray="23 77" stroke-dashoffset="-50"/>
-      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#ff5cc6" stroke-dasharray="23 77" stroke-dashoffset="-75"/>
+  <g transform="translate(64 64) scale(8)">
+    <g transform="rotate(-90 24 24)" fill="none" stroke-width="6">
+      <g filter="url(#glow)" opacity=".7">
+        <circle cx="24" cy="24" r="20" stroke="#efff2e" stroke-dasharray="28.90 96.76"/>
+        <circle cx="24" cy="24" r="20" stroke="#5dff7a" stroke-dasharray="28.90 96.76" stroke-dashoffset="-31.42"/>
+        <circle cx="24" cy="24" r="20" stroke="#2be4ff" stroke-dasharray="28.90 96.76" stroke-dashoffset="-62.83"/>
+        <circle cx="24" cy="24" r="20" stroke="#ff5cc6" stroke-dasharray="28.90 96.76" stroke-dashoffset="-94.25"/>
+      </g>
+      <circle cx="24" cy="24" r="20" stroke="#efff2e" stroke-dasharray="28.90 96.76"/>
+      <circle cx="24" cy="24" r="20" stroke="#5dff7a" stroke-dasharray="28.90 96.76" stroke-dashoffset="-31.42"/>
+      <circle cx="24" cy="24" r="20" stroke="#2be4ff" stroke-dasharray="28.90 96.76" stroke-dashoffset="-62.83"/>
+      <circle cx="24" cy="24" r="20" stroke="#ff5cc6" stroke-dasharray="28.90 96.76" stroke-dashoffset="-94.25"/>
     </g>
-    <rect x="20" y="1" width="8" height="5" rx="2" fill="#f4f4ea"/>
-    <rect x="22.5" y="5" width="3" height="4" fill="#f4f4ea"/>
-    <g transform="rotate(-90 24 28)" fill="none" stroke-width="6">
-      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#efff2e" stroke-dasharray="23 77"/>
-      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#5dff7a" stroke-dasharray="23 77" stroke-dashoffset="-25"/>
-      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#2be4ff" stroke-dasharray="23 77" stroke-dashoffset="-50"/>
-      <circle cx="24" cy="28" r="16.5" pathLength="100" stroke="#ff5cc6" stroke-dasharray="23 77" stroke-dashoffset="-75"/>
+    <g stroke="#f4f4ea" stroke-linecap="round">
+      <line x1="24" y1="24" x2="24" y2="10.5" stroke-width="3"/>
+      <line x1="24" y1="24" x2="30.5" y2="27.75" stroke-width="3.5"/>
     </g>
-    <path d="M19 23 L29 33 M29 23 L19 33" stroke="#f4f4ea" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="24" cy="24" r="2.4" fill="#f4f4ea"/>
   </g>
 </svg>

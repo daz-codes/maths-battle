@@ -3,11 +3,13 @@ import { Turbo } from "@hotwired/turbo-rails"
 
 const DURATION = 60_000
 const WRONG_PAUSE = 400
+// Each quarter of the clock ring is 23 of 100 units long, leaving small gaps between them
+const QUARTER_LENGTH = 23
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 
 // Runs the whole one-minute test in the browser: nothing touches the network until it ends
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "bar", "seconds", "status", "retry", "keypad" ]
+  static targets = [ "question", "answer", "score", "quarter", "seconds", "status", "retry", "keypad" ]
   static values = { questions: Array, topic: String, submitUrl: String }
 
   connect() {
@@ -44,6 +46,7 @@ export default class extends Controller {
 
   start() {
     this.state = "running"
+    this.element.classList.add("test--running")
     this.endsAt = performance.now() + DURATION
     // A backup in case animation frames stop, e.g. while the tab is hidden
     this.endTimer = setTimeout(() => this.finish(), DURATION + 50)
@@ -55,7 +58,7 @@ export default class extends Controller {
     const left = this.endsAt - performance.now()
     if (left <= 0) return this.finish()
 
-    this.barTarget.style.transform = `scaleX(${left / DURATION})`
+    this.fillRing(1 - left / DURATION)
     const seconds = Math.ceil(left / 1000)
     if (seconds !== this.seconds) {
       this.seconds = seconds
@@ -63,6 +66,14 @@ export default class extends Controller {
       this.element.dataset.quarter = Math.min(3, Math.floor((60 - seconds) / 15))
     }
     this.frame = requestAnimationFrame(this.tick)
+  }
+
+  // Fills the ring's quarters one after another, so a whole minute completes the logo
+  fillRing(elapsed) {
+    this.quarterTargets.forEach((quarter, i) => {
+      const filled = Math.min(1, Math.max(0, elapsed * 4 - i)) * QUARTER_LENGTH
+      quarter.setAttribute("stroke-dasharray", `${filled} ${100 - filled}`)
+    })
   }
 
   // Input
@@ -165,9 +176,10 @@ export default class extends Controller {
     if (this.state !== "running") return
 
     this.state = "done"
+    this.element.classList.remove("test--running")
     cancelAnimationFrame(this.frame)
     clearTimeout(this.endTimer)
-    this.barTarget.style.transform = "scaleX(0)"
+    this.fillRing(1)
     this.secondsTarget.textContent = 0
     this.questionTarget.textContent = "Time's up!"
     this.questionTarget.classList.add("question--done")

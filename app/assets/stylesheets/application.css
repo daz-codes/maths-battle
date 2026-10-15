@@ -1,7 +1,7 @@
 /*
   MatheMinute. Warm paper and a dark ink with four neon colours (after Breadboarder's palette, pushed to full neon),
-  thin borders and small offset shadows. The logo's stopwatch ring splits a minute into four neon quarters,
-  and that motif comes back in the timer and the result card. In dark mode the neon glows.
+  thin borders and small offset shadows. The logo is a clock ringed by a minute in four neon quarters; the same
+  clock is the test timer, and the quarter colours run through the app. In dark mode the neon glows.
 */
 
 :root {
@@ -10,6 +10,7 @@
   --blue: #2be4ff;
   --green: #5dff7a;
   --wrong: #ff2d6f;
+  --pink-text: #e5139a;
 
   --ink: #24251f;
   --on-neon: #24251f;
@@ -37,6 +38,7 @@
   --line: #4a4c40;
   --shadow-color: #000;
   --glow-strength: 55%;
+  --pink-text: var(--pink);
   color-scheme: dark;
 }
 
@@ -52,6 +54,7 @@
     --line: #4a4c40;
     --shadow-color: #000;
     --glow-strength: 55%;
+    --pink-text: var(--pink);
   }
 }
 
@@ -99,7 +102,13 @@ a {
 
 .page--narrow { max-width: 24rem; }
 
-/* ── Logo: a stopwatch whose hands make a times sign ── */
+/* ── Clock: the logo and the test timer ───────── */
+
+/* A clock face ringed by a minute in four neon quarters */
+.clock { display: block; color: var(--ink); overflow: visible; }
+.clock__track { opacity: 0.15; }
+/* Each hand turns about its bottom end, the centre of the clock */
+.clock__hand { transform-box: fill-box; transform-origin: 50% 100%; }
 
 .logo {
   display: inline-flex;
@@ -108,17 +117,17 @@ a {
   color: var(--ink);
   font-size: 1.65rem;
   font-weight: 500;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.035em;
   text-decoration: none;
 }
 
 .logo__mark {
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 2.5rem;
+  height: 2.5rem;
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--blue) var(--glow-strength), transparent));
 }
 
-.logo__word strong { font-weight: 700; }
+.logo__word strong { color: var(--pink-text); font-weight: 700; }
 
 /* ── Type ───────────────────────────────────────── */
 
@@ -339,11 +348,14 @@ a {
 }
 
 .stats div {
-  padding: 0.7rem;
+  --stripe: var(--yellow);
+  padding: 0.85rem 0.7rem 0.7rem;
   border: 2px solid var(--line);
   border-radius: var(--radius);
-  background: var(--paper-alt);
+  background: linear-gradient(var(--stripe) 0 6px, var(--paper-alt) 6px);
 }
+
+.stats div:nth-child(2) { --stripe: var(--green); }
 
 .stats dt { color: var(--muted); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
 .stats dd { margin: 0; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; }
@@ -365,6 +377,7 @@ body.testing {
 
 .test {
   --right: var(--green);
+  --quarter: var(--yellow);
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 100dvh;
@@ -374,32 +387,26 @@ body.testing {
 }
 
 .test__bar {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
 }
 
-.timer {
-  height: 0.9rem;
-  overflow: hidden;
-  border: 2px solid var(--line);
-  border-radius: 999px;
+/* The timer is the logo's clock: its quarters fill in over the minute while the hands spin */
+.timer { display: flex; align-items: center; gap: 0.6rem; }
+
+.timer__clock {
+  width: 4.5rem;
+  height: 4.5rem;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--quarter) var(--glow-strength), transparent));
 }
 
-/* Like the logo's ring, each quarter of the minute has its own colour */
-.timer__fill {
-  --quarter: var(--yellow);
-  height: 100%;
-  background: var(--quarter);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--quarter) var(--glow-strength), transparent);
-  transform-origin: left;
-  will-change: transform;
-}
+/* Quick spins, just to show time moving */
+.test--running .clock__hand--long { animation: spin 1.5s linear infinite; }
+.test--running .clock__hand--short { animation: spin 12s linear infinite; }
 
-.test[data-quarter="1"] .timer__fill { --quarter: var(--green); }
-.test[data-quarter="2"] .timer__fill { --quarter: var(--blue); }
-.test[data-quarter="3"] .timer__fill { --quarter: var(--pink); }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .test__seconds, .test__score {
   min-width: 3ch;
@@ -409,6 +416,12 @@ body.testing {
   font-weight: 700;
   text-align: center;
 }
+
+.test[data-quarter="1"] { --quarter: var(--green); }
+.test[data-quarter="2"] { --quarter: var(--blue); }
+.test[data-quarter="3"] { --quarter: var(--pink); }
+
+.test__seconds { min-width: 2ch; padding: 0; text-align: left; }
 
 .test__score {
   border: 2px solid var(--line);
@@ -477,8 +490,8 @@ body.testing {
 /* Instant press feedback, no transition to wait for */
 .keypad__key:active {
   border-color: var(--on-neon);
-  background: var(--yellow);
-  box-shadow: 1px 1px 0 var(--shadow-color), 0 0 18px color-mix(in srgb, var(--yellow) var(--glow-strength), transparent);
+  background: var(--quarter);
+  box-shadow: 1px 1px 0 var(--shadow-color), 0 0 18px color-mix(in srgb, var(--quarter) var(--glow-strength), transparent);
   color: var(--on-neon);
   transform: translate(2px, 2px);
 }
@@ -540,9 +553,9 @@ body.testing {
 
 .missed li {
   padding: 0.25rem 0.7rem;
-  border: 2px solid var(--line);
+  border: 2px solid var(--pink);
   border-radius: var(--radius);
-  background: var(--paper-alt);
+  background: color-mix(in srgb, var(--pink) 14%, var(--paper));
   font-size: 1.15rem;
   font-weight: 600;
 }
