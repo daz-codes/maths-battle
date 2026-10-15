@@ -1,6 +1,6 @@
 /*
   MatheMinute. Warm paper and a dark ink with four neon colours (after Breadboarder's palette, pushed to full neon),
-  thin borders and small offset shadows. The logo is a clock ringed by a minute in four neon quarters; the same
+  thin borders and no drop shadows. The logo is a clock ringed by a minute in four neon quarters; the same
   clock is the test timer, and the quarter colours run through the app. In dark mode the neon glows.
 */
 
@@ -18,7 +18,6 @@
   --paper: #fffef9;
   --paper-alt: #f3f2e9;
   --line: var(--ink);
-  --shadow-color: var(--ink);
   --glow-strength: 0%;
 
   --radius: 10px;
@@ -36,7 +35,6 @@
   --paper: #121310;
   --paper-alt: #1c1d18;
   --line: #4a4c40;
-  --shadow-color: #000;
   --glow-strength: 55%;
   --pink-text: var(--pink);
   color-scheme: dark;
@@ -52,7 +50,6 @@
     --paper: #121310;
     --paper-alt: #1c1d18;
     --line: #4a4c40;
-    --shadow-color: #000;
     --glow-strength: 55%;
     --pink-text: var(--pink);
   }
@@ -169,28 +166,27 @@ a {
   border: 2px solid var(--line);
   border-radius: var(--radius);
   background: var(--fill);
-  box-shadow: 3px 3px 0 var(--shadow-color);
   color: var(--ink);
   cursor: pointer;
   font: inherit;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
+  letter-spacing: 0.06em;
   text-decoration: none;
+  text-transform: uppercase;
   touch-action: manipulation;
-  transition: transform 100ms, box-shadow 100ms;
+  transition: transform 100ms;
   -webkit-tap-highlight-color: transparent;
 }
 
-.button:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--shadow-color);
-}
+/* With no shadow to press into, a tap shrinks the button slightly */
+.button:active { transform: scale(0.97); }
 
 /* Neon buttons: dark text in both themes, and a glow in the dark */
 .button--go, .button--share, .button--start, .button--cta {
   border-color: var(--on-neon);
   color: var(--on-neon);
-  box-shadow: 3px 3px 0 var(--shadow-color), 0 0 22px color-mix(in srgb, var(--fill) var(--glow-strength), transparent);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--fill) var(--glow-strength), transparent);
 }
 
 .button--go { --fill: var(--green); }
@@ -203,7 +199,7 @@ a {
   min-height: 5.5rem;
   border-radius: var(--radius-big);
   font-size: clamp(2.25rem, 11vw, 3rem);
-  letter-spacing: -0.03em;
+  letter-spacing: 0.04em;
 }
 
 .button--wide { width: 100%; }
@@ -484,7 +480,6 @@ body.testing {
   border: 2px solid var(--line);
   border-radius: var(--radius);
   background: var(--paper-alt);
-  box-shadow: 3px 3px 0 var(--shadow-color);
   color: var(--ink);
   font: inherit;
   font-size: 2rem;
@@ -497,9 +492,9 @@ body.testing {
 .keypad__key:active {
   border-color: var(--on-neon);
   background: var(--quarter);
-  box-shadow: 1px 1px 0 var(--shadow-color), 0 0 18px color-mix(in srgb, var(--quarter) var(--glow-strength), transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--quarter) var(--glow-strength), transparent);
   color: var(--on-neon);
-  transform: translate(2px, 2px);
+  transform: scale(0.97);
 }
 
 .keypad__key--back { background: var(--paper); font-size: 1.6rem; }
@@ -512,7 +507,7 @@ body.testing {
   border: 2px solid var(--on-neon);
   border-radius: var(--radius);
   background: var(--yellow);
-  box-shadow: 3px 3px 0 var(--shadow-color), 0 0 24px color-mix(in srgb, var(--yellow) var(--glow-strength), transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--yellow) var(--glow-strength), transparent);
   color: var(--on-neon);
   font-size: 1.25rem;
   font-weight: 700;
@@ -526,7 +521,7 @@ body.testing {
   border: 2px solid var(--line);
   border-radius: var(--radius-big);
   background: var(--quarters) top / 100% 8px no-repeat, var(--paper);
-  box-shadow: 5px 6px 0 var(--shadow-color), 0 0 30px color-mix(in srgb, var(--yellow) calc(var(--glow-strength) / 2), transparent);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--yellow) calc(var(--glow-strength) / 2), transparent);
 }
 
 .card p { margin: 0; }
