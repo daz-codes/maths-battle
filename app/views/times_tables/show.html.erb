@@ -8,6 +8,8 @@
       data-test-questions-value="<%= @questions.to_json %>"
       data-test-topic-value="<%= TimesTables::TOPIC %>"
       data-test-submit-url-value="<%= attempts_path %>">
+  <button type="button" class="test__stop" data-action="test#confirmStop" aria-label="Stop the game">✕</button>
+
   <header class="test__bar">
     <span class="test__score" data-test-target="score" aria-label="Score">0</span>
     <%= render "clock", timer: true, class: "timer__clock" %>
@@ -29,4 +31,13 @@
     <button type="button" class="keypad__key" data-action="pointerdown->test#tap" data-digit="0">0</button>
     <button type="button" class="keypad__key keypad__key--back" data-action="pointerdown->test#tap" data-digit="back" aria-label="Delete">⌫</button>
   </div>
+
+  <dialog class="dialog" data-test-target="stopDialog" data-action="cancel->test#keepPlaying">
+    <h2 class="dialog__title">Stop this game?</h2>
+    <p class="dialog__text">Your answers won't be saved.</p>
+    <div class="dialog__actions">
+      <button type="button" class="button button--blue" data-action="test#keepPlaying" autofocus>Keep playing</button>
+      <button type="button" class="button" data-action="test#stopGame">Stop game</button>
+    </div>
+  </dialog>
 </main>

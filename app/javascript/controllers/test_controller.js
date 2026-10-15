@@ -8,9 +8,10 @@ const QUARTER_LENGTH = 23
 const COUNTDOWN = [ [ "Ready", 900 ], [ "Set", 900 ], [ "GO!", 600 ] ]
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 
-// Runs the whole one-minute test in the browser: nothing touches the network until it ends
+// Runs the whole one-minute test in the browser: nothing touches the network until it ends.
+// It can be stopped part way, after a warning, and then nothing is saved
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "seconds", "status", "retry", "keypad" ]
+  static targets = [ "question", "answer", "score", "quarter", "seconds", "status", "retry", "keypad", "stopDialog" ]
   static values = { questions: Array, topic: String, submitUrl: String }
 
   connect() {
@@ -33,7 +34,8 @@ export default class extends Controller {
     document.removeEventListener("keydown", this.keydown)
     window.removeEventListener("beforeunload", this.beforeUnload)
     cancelAnimationFrame(this.frame)
-    clearTimeout(this.timer)
+    clearTimeout(this.countdownTimer)
+    clearTimeout(this.correctionTimer)
     clearTimeout(this.endTimer)
   }
 
@@ -43,17 +45,27 @@ export default class extends Controller {
 
     const [ [ word, ms ], ...rest ] = steps
     this.questionTarget.textContent = word
-    this.timer = setTimeout(() => this.countdown(rest), ms)
+    this.countdownTimer = setTimeout(() => this.countdown(rest), ms)
   }
 
   start() {
+    this.endsAt = performance.now() + DURATION
+    this.show()
+    this.run()
+  }
+
+  run() {
     this.state = "running"
     this.element.classList.add("test--running")
-    this.endsAt = performance.now() + DURATION
     // A backup in case animation frames stop, e.g. while the tab is hidden
-    this.endTimer = setTimeout(() => this.finish(), DURATION + 50)
-    this.show()
+    this.endTimer = setTimeout(() => this.finish(), this.endsAt - performance.now() + 50)
     this.frame = requestAnimationFrame(this.tick)
+  }
+
+  stopClock() {
+    this.element.classList.remove("test--running")
+    cancelAnimationFrame(this.frame)
+    clearTimeout(this.endTimer)
   }
 
   tick() {
@@ -115,7 +127,7 @@ export default class extends Controller {
   }
 
   get accepting() {
-    return this.state === "running" && !this.paused
+    return this.state === "running" && !this.showingCorrection
   }
 
   // Questions
@@ -148,16 +160,20 @@ export default class extends Controller {
       this.flash(this.scoreTarget, "--right")
       this.next()
     } else {
-      // Show the right answer briefly so it sticks, then carry on
-      this.paused = true
-      this.answerTarget.textContent = this.correctAnswer
-      this.answerTarget.classList.add("answer--wrong")
-      this.timer = setTimeout(() => {
-        this.paused = false
-        this.answerTarget.classList.remove("answer--wrong")
-        if (this.state === "running") this.next()
-      }, WRONG_PAUSE)
+      this.showCorrection()
     }
+  }
+
+  // Show the right answer briefly so it sticks, then carry on
+  showCorrection() {
+    this.showingCorrection = true
+    this.answerTarget.textContent = this.correctAnswer
+    this.answerTarget.classList.add("answer--wrong")
+    this.correctionTimer = setTimeout(() => {
+      this.showingCorrection = false
+      this.answerTarget.classList.remove("answer--wrong")
+      if (this.state === "running" || this.state === "paused") this.next()
+    }, WRONG_PAUSE)
   }
 
   next() {
@@ -172,15 +188,59 @@ export default class extends Controller {
     element.animate([ { backgroundColor: colour }, { backgroundColor: "transparent" } ], { duration: 300, easing: "ease-out" })
   }
 
+  // Stopping part way. The clock pauses while the warning is open, so keeping playing costs no time
+
+  confirmStop() {
+    if (this.state !== "running" && this.state !== "countdown") return
+
+    this.pause()
+    this.stopDialogTarget.showModal()
+  }
+
+  keepPlaying(event) {
+    event?.preventDefault()
+    this.stopDialogTarget.close()
+    this.resume()
+  }
+
+  stopGame() {
+    this.state = "stopped"
+    this.stopDialogTarget.close()
+    Turbo.visit("/", { action: "replace" })
+  }
+
+  pause() {
+    this.pausedFrom = this.state
+    this.pausedAt = performance.now()
+    this.state = "paused"
+    this.element.classList.add("test--paused")
+    clearTimeout(this.countdownTimer)
+    this.stopClock()
+  }
+
+  resume() {
+    this.element.classList.remove("test--paused")
+    if (this.pausedFrom === "countdown") return this.restartCountdown()
+
+    const pausedFor = performance.now() - this.pausedAt
+    this.endsAt += pausedFor
+    // A question shown during the pause (after a correction) starts its timing now
+    this.shownAt = this.shownAt < this.pausedAt ? this.shownAt + pausedFor : performance.now()
+    this.run()
+  }
+
+  restartCountdown() {
+    this.state = "countdown"
+    this.countdown(COUNTDOWN)
+  }
+
   // Finishing
 
   finish() {
     if (this.state !== "running") return
 
     this.state = "done"
-    this.element.classList.remove("test--running")
-    cancelAnimationFrame(this.frame)
-    clearTimeout(this.endTimer)
+    this.stopClock()
     this.fillRing(1)
     this.secondsTarget.textContent = 0
     this.questionTarget.textContent = "Time's up!"
@@ -223,7 +283,7 @@ export default class extends Controller {
   }
 
   beforeUnload(event) {
-    if (this.state === "running" || this.state === "done") {
+    if ([ "running", "paused", "done" ].includes(this.state)) {
       event.preventDefault()
       event.returnValue = ""
     }

@@ -33,13 +33,15 @@
   color-scheme: light dark;
 }
 
-/* Dark colours, used when chosen in settings, or when following a device set to dark */
+/* Dark colours: a midnight purple-blue, after Priority's dark mode. Used when chosen in settings,
+   or when following a device set to dark */
 :root[data-theme="dark"] {
-  --ink: #f4f4ea;
-  --muted: #a3a496;
-  --paper: #121310;
-  --paper-alt: #1c1d18;
-  --line: #4a4c40;
+  --ink: #eceef7;
+  --muted: #a5aabe;
+  --paper: #181a32;
+  --paper-alt: #232641;
+  --line: #414563;
+  --grey-deep: #3c405d;
   --glow-strength: 55%;
   --pink-text: var(--pink);
   color-scheme: dark;
@@ -50,11 +52,12 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ink: #f4f4ea;
-    --muted: #a3a496;
-    --paper: #121310;
-    --paper-alt: #1c1d18;
-    --line: #4a4c40;
+    --ink: #eceef7;
+    --muted: #a5aabe;
+    --paper: #181a32;
+    --paper-alt: #232641;
+    --line: #414563;
+    --grey-deep: #3c405d;
     --glow-strength: 55%;
     --pink-text: var(--pink);
   }
@@ -293,7 +296,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
   width: 100%;
   margin: 0;
   padding: 0.7rem 1rem;
-  border: 2px solid var(--on-neon);
+  border: 0;
   border-radius: var(--radius);
   background: var(--green);
   color: var(--on-neon);
@@ -616,10 +619,11 @@ body.testing {
   gap: 0.55rem;
 }
 
+/* Soft keys: a faint border, so the numbers stand out rather than the boxes */
 .keypad__key {
   min-height: 72px;
   height: clamp(72px, 9dvh, 86px);
-  border: 2px solid var(--line);
+  border: 1.5px solid color-mix(in srgb, var(--ink) 14%, transparent);
   border-radius: var(--radius);
   background: var(--paper-alt);
   color: var(--ink);
@@ -640,6 +644,50 @@ body.testing {
 }
 
 .keypad__key--back { background: var(--paper); font-size: 1.6rem; }
+
+/* ── Stopping a game ─────────────────────────────── */
+
+.test { position: relative; }
+
+.test__stop {
+  position: absolute;
+  top: calc(0.75rem + env(safe-area-inset-top));
+  left: 0.75rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.25rem;
+  touch-action: manipulation;
+}
+
+.test__stop:hover { background: color-mix(in srgb, var(--ink) 6%, var(--paper)); color: var(--ink); }
+
+/* While the warning is open the question is hidden, so the pause can't be used to think */
+.test--paused .test__stage, .test--paused .keypad { filter: blur(14px); }
+
+.dialog {
+  width: min(22rem, calc(100vw - 2rem));
+  padding: 1.5rem;
+  border: 0;
+  border-radius: var(--radius-big);
+  background: var(--paper);
+  color: var(--ink);
+  text-align: center;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.25);
+}
+
+.dialog::backdrop { background: rgb(24 26 50 / 0.5); }
+.dialog__title { margin: 0; font-size: 1.5rem; font-weight: 700; }
+.dialog__text { margin: 0.5rem 0 1.25rem; color: var(--muted); }
+.dialog__actions { display: grid; gap: 0.6rem; }
 
 /* ── Results and share ──────────────────────────── */
 
