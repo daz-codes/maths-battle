@@ -55,10 +55,10 @@
     <p class="aside">Play a game of <%= @topic.title.downcase %> and your stats will show up here.</p>
   <% end %>
 
-  <%= link_to badges_path, class: "badge-summary" do %>
-    <span class="label">Badges</span>
+  <%= link_to achievements_path, class: "badge-summary" do %>
+    <span class="label">Achievements</span>
     <span class="badge-summary__emojis" aria-hidden="true"><%= @user.badges_by_kind.values.sort_by(&:earned_at).last(8).map(&:emoji).join %></span>
-    <span><%= @user.badges_by_kind.size %> of <%= Badge.catalogue.size %> collected</span>
+    <span><%= @user.badges_by_kind.size %> of <%= Badge.catalogue.size %> unlocked</span>
   <% end %>
 
   <%= link_to "Play", play_path(@topic.slug, level: @level), class: "button button--blue button--wide" %>

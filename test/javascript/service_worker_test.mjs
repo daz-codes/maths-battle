@@ -60,12 +60,12 @@ test('level query parameters select separate offline pages', async () => {
   assert.equal(await response.text(), 'level one')
 })
 
-test('the badges page opens offline', async () => {
+test('the achievements page opens offline', async () => {
   const w = worker()
-  await load(w, '/badges', page('ada', 1, 'badges'))
+  await load(w, '/achievements', page('ada', 1, 'achievements'))
   w.context.fetch = async () => { throw new Error('offline') }
-  const response = await w.fromNetwork(request('/badges'), new URL('https://example.test/badges'))
-  assert.equal(await response.text(), 'badges')
+  const response = await w.fromNetwork(request('/achievements'), new URL('https://example.test/achievements'))
+  assert.equal(await response.text(), 'achievements')
 })
 
 test('expired sessions cannot open private cached pages offline', async () => {

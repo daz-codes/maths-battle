@@ -48,6 +48,7 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".site-footer a.site-footer__player[href=?]", edit_profile_path, text: /ada/
     assert_select ".site-footer a.site-footer__player .avatar"
     assert_select ".site-footer a.site-footer__stats[href=?] svg.stats-icon", stats_path
+    assert_select ".site-footer a.site-footer__achievements[href=?]", achievements_path, text: "Achievements"
     assert_select ".site-footer", text: /Settings/, count: 0
   end
 

@@ -40,9 +40,9 @@ game count towards a streak. Three games with at least 20 answers and 90% accura
 The first saved game creates a guest account; registering preserves that guest's history. Signing into
 an existing account switches accounts without merging guest history.
 
-## Badges
+## Achievements
 
-Players collect badges for their first game, scores in each topic, streaks, unlocking levels, perfect
+Players collect achievements (badges, in the code) for their first game, scores in each topic, streaks, unlocking levels, perfect
 and fast games, playing every topic, and beating their best after a week away. Every badge and its rule
 is listed in `Badge::Catalogued`; the rules are questions asked of a game (`Attempt::Badgeable`), and only
 look at that game and earlier ones. Each badge is earned once, by the first game to meet it, and is

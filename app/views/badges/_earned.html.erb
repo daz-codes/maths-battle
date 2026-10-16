@@ -1,7 +1,7 @@
 <%# The badges one game earned, on its results page and its share page. Badges never name the player %>
 <% if badges.any? %>
   <section class="badges badges--new" <%= tag.attributes(data: { controller: ("confetti" if local_assigns[:celebrate]) }) %>>
-    <h2 class="label"><%= badges.one? ? "New badge!" : "New badges!" %></h2>
+    <h2 class="label"><%= badges.one? ? "New achievement!" : "New achievements!" %></h2>
     <ul class="badges__list">
       <% badges.each do |badge| %>
         <li class="badge">

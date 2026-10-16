@@ -92,14 +92,14 @@ a {
 
 /* Text links (and the sign out button, styled as one): green underline and a faint wash on hover.
    The wash is a touch of ink mixed into the paper, so it's slightly darker in light mode and lighter in dark */
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__stats), .link-button {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab), .link-button {
   margin: 0 -0.2em;
   padding: 0.05em 0.2em;
   border-radius: 4px;
   transition: background-color 120ms, text-decoration-color 120ms;
 }
 
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__stats):hover, .link-button:hover {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab):hover, .link-button:hover {
   background-color: color-mix(in srgb, var(--ink) 5%, var(--paper));
   text-decoration-color: var(--green);
 }
@@ -391,13 +391,14 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 
 /* ── Footer: fixed to the bottom like an app's tab bar ── */
 
+/* Three columns, so achievements sits in the middle whatever is either side of it */
 .site-footer {
   position: fixed;
   inset: auto 0 0;
   z-index: 10;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: 0.75rem;
   padding: 0.55rem max(1rem, calc((100% - 30rem) / 2 + 1rem)) calc(0.55rem + env(safe-area-inset-bottom));
   border-top: 1.5px solid var(--line);
@@ -406,7 +407,9 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
   font-size: 0.9rem;
 }
 
-.site-footer__player, .site-footer__stats {
+.site-footer__start { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+
+.site-footer__player, .site-footer__tab {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -419,11 +422,16 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
   text-decoration: none;
 }
 
-.site-footer__player:hover, .site-footer__stats:hover { background: color-mix(in srgb, var(--ink) 5%, var(--paper)); }
-.site-footer__player span { overflow: hidden; max-width: 9rem; text-overflow: ellipsis; white-space: nowrap; }
-.site-footer__auth { color: var(--muted); white-space: nowrap; }
+.site-footer__player { min-width: 0; }
+.site-footer__player:hover, .site-footer__tab:hover { background: color-mix(in srgb, var(--ink) 5%, var(--paper)); }
+.site-footer__player span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.site-footer__auth { display: flex; flex-direction: column; gap: 0.1rem; font-size: 0.8rem; line-height: 1.2; white-space: nowrap; }
 
-.stats-icon { width: 1.5rem; height: 1.5rem; }
+/* Icon above its label, like a tab bar, so three fit on a small phone */
+.site-footer__tab { flex-direction: column; justify-content: center; gap: 0.1rem; font-size: 0.75rem; }
+.site-footer__stats { justify-self: end; }
+
+.footer-icon { width: 1.5rem; height: 1.5rem; }
 
 .wide-form { width: 100%; }
 

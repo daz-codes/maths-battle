@@ -1,19 +1,39 @@
-<%# Fixed to the bottom of every page except the test: who's playing (tap for settings), and stats %>
+<%# Fixed to the bottom of every page except the test: who's playing (tap for settings), achievements, and stats.
+    Guests get sign in and sign up links in place of a name %>
 <% player = current_player %>
 <footer class="site-footer">
-  <%= link_to edit_profile_path, class: "site-footer__player" do %>
-    <%= render "avatar", user: player, size: "small" %>
-    <span><%= player.username || "Guest" %></span>
+  <div class="site-footer__start">
+    <%= link_to edit_profile_path, class: "site-footer__player", aria: { label: ("Settings" if player.guest?) } do %>
+      <%= render "avatar", user: player, size: "small" %>
+      <%= tag.span(player.username) unless player.guest? %>
+    <% end %>
+
+    <% if player.guest? %>
+      <span class="site-footer__auth">
+        <%= link_to "Sign in", new_session_path %>
+        <%= link_to "Sign up", new_registration_path %>
+      </span>
+    <% end %>
+  </div>
+
+  <%= link_to achievements_path, class: "site-footer__tab site-footer__achievements" do %>
+    <%# A medal on two ribbons, in the neons, drawn like the stats icon %>
+    <svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5.5 2h5l2.5 7h-5z" fill="var(--pink)"/>
+      <path d="M18.5 2h-5L11 9h5z" fill="var(--blue)"/>
+      <circle cx="12" cy="15.5" r="6" fill="var(--yellow)"/>
+      <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+        <path d="M5.5 2h5l2.5 7h-5z"/>
+        <path d="M18.5 2h-5L11 9h5z"/>
+        <circle cx="12" cy="15.5" r="6"/>
+        <path d="M12 12.6l.9 1.9 2 .2-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.2z"/>
+      </g>
+    </svg>
+    <span>Achievements</span>
   <% end %>
 
-  <% if player.guest? %>
-    <span class="site-footer__auth">
-      <%= link_to "Sign in", new_session_path %> · <%= link_to "Sign up", new_registration_path %>
-    </span>
-  <% end %>
-
-  <%= link_to stats_path, class: "site-footer__stats" do %>
-    <svg class="stats-icon" viewBox="0 0 24 24" aria-hidden="true">
+  <%= link_to stats_path, class: "site-footer__tab site-footer__stats" do %>
+    <svg class="footer-icon stats-icon" viewBox="0 0 24 24" aria-hidden="true">
       <rect x="3" y="12" width="5" height="9" rx="1.5" fill="var(--yellow)"/>
       <rect x="9.5" y="7" width="5" height="14" rx="1.5" fill="var(--green)"/>
       <rect x="16" y="3" width="5" height="18" rx="1.5" fill="var(--blue)"/>

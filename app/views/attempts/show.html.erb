@@ -37,7 +37,7 @@
   <% end %>
   <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue button--wide" %>
   <%= link_to "See your stats", stats_path(@attempt.topic_module.slug) %>
-  <%= link_to "See your badges", badges_path if @attempt.badges.any? %>
+  <%= link_to "See your achievements", achievements_path if @attempt.badges.any? %>
 
   <% if @attempt.user.guest? %>
     <p class="save-nudge">

@@ -7,9 +7,10 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
     Attempt.record!(user: @user, results: answers(*right_answers(10)))
     sign_in_as @user
 
-    get badges_path
+    get achievements_path
     assert_response :success
-    assert_select ".aside", text: "3 of #{Badge.catalogue.size} collected"
+    assert_select "h1", text: "Achievements"
+    assert_select ".aside", text: "3 of #{Badge.catalogue.size} unlocked"
     assert_select ".badge:not(.badge--locked) .badge__name", text: "First minute"
     assert_select ".badge--locked .badge__name", text: "1 week streak"
     assert_select ".badge--locked .badge__how", text: /Play 7 days in a row/
@@ -17,8 +18,13 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".badge", Badge.catalogue.size
   end
 
+  test "the old badges address goes to achievements" do
+    get "/badges"
+    assert_redirected_to "/achievements"
+  end
+
   test "visitors see them all still to earn" do
-    get badges_path
+    get achievements_path
     assert_response :success
     assert_select ".badge--locked", Badge.catalogue.size
   end
@@ -31,7 +37,8 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
 
     get attempt_path(attempt)
     assert_select ".badges--new[data-controller=confetti] .badge__name", text: "5 times tables in a minute"
-    assert_select "a[href=?]", badges_path, text: "See your badges"
+    assert_select ".badges--new .label", text: "New achievement!"
+    assert_select "a[href=?]", achievements_path, text: "See your achievements"
   end
 
   test "one lot of confetti: a new high score already has it" do
@@ -54,12 +61,12 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/squirrel|Sammy/, response.body)
   end
 
-  test "the stats page shows how many have been collected" do
+  test "the stats page shows how many have been unlocked" do
     Attempt.record!(user: @user, results: answers(*right_answers(5)))
     sign_in_as @user
 
     get stats_path
-    assert_select "a.badge-summary[href=?]", badges_path, text: /2 of #{Badge.catalogue.size} collected/
+    assert_select "a.badge-summary[href=?]", achievements_path, text: /2 of #{Badge.catalogue.size} unlocked/
     assert_select ".badge-summary__emojis", text: "🎉🎯"
   end
 end

@@ -1,8 +1,8 @@
-<% content_for :title, "Badges · MatheMinute" %>
+<% content_for :title, "Achievements · MatheMinute" %>
 
 <main class="page">
-  <h1 class="heading">Badges</h1>
-  <p class="aside"><%= @user.badges_by_kind.size %> of <%= Badge.catalogue.size %> collected</p>
+  <h1 class="heading">Achievements</h1>
+  <p class="aside"><%= @user.badges_by_kind.size %> of <%= Badge.catalogue.size %> unlocked</p>
 
   <% Badge::GROUPS.each do |group, heading| %>
     <section class="badges" aria-labelledby="badges-<%= group %>">
