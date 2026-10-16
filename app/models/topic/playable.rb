@@ -31,4 +31,8 @@ module Topic::Playable
   def max_level
     levels.size
   end
+
+  def badge_scores
+    self::BADGE_SCORES
+  end
 end

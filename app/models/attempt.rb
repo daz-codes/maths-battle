@@ -1,5 +1,5 @@
 class Attempt < ApplicationRecord
-  include Gradable, Recordable, Reviewable, Shareable
+  include Badgeable, Gradable, Recordable, Reviewable, Shareable
 
   belongs_to :user
 

@@ -1,0 +1,19 @@
+<% content_for :title, "Badges · MatheMinute" %>
+
+<main class="page">
+  <h1 class="heading">Badges</h1>
+  <p class="aside"><%= @user.badges_by_kind.size %> of <%= Badge.catalogue.size %> collected</p>
+
+  <% Badge::GROUPS.each do |group, heading| %>
+    <section class="badges" aria-labelledby="badges-<%= group %>">
+      <h2 class="label" id="badges-<%= group %>"><%= heading %></h2>
+      <ul class="badges__list">
+        <% Badge.in_group(group).each do |kind| %>
+          <%= render "badges/badge", kind: kind, earned: @user.badges_by_kind[kind.key] %>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <%= link_to "Play", play_path(current_topic.slug), class: "button button--blue button--wide" %>
+</main>

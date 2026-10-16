@@ -40,6 +40,16 @@ game count towards a streak. Three games with at least 20 answers and 90% accura
 The first saved game creates a guest account; registering preserves that guest's history. Signing into
 an existing account switches accounts without merging guest history.
 
+## Badges
+
+Players collect badges for their first game, scores in each topic, streaks, unlocking levels, perfect
+and fast games, playing every topic, and beating their best after a week away. Every badge and its rule
+is listed in `Badge::Catalogued`; the rules are questions asked of a game (`Attempt::Badgeable`), and only
+look at that game and earlier ones. Each badge is earned once, by the first game to meet it, and is
+celebrated on that game's results page. `User#catch_up_badges!` replays a player's games in order, which is
+how existing players got their badges, and how a newly added badge can reach players who already earned it.
+Badges never name the player, so shared results can show them.
+
 ## Authentication and offline play
 
 New passwords require 15–72 characters, with bcrypt's additional 72-byte limit. Existing passwords

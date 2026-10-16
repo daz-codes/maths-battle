@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   get "times-tables", to: redirect("/play/times-tables")
   resources :attempts, only: %i[create show]
   get "stats(/:topic)", to: "stats#show", as: :stats
+  resource :badges, only: :show
   get "s/:share_token", to: "shares#show", as: :share
 
   get "up" => "rails/health#show", as: :rails_health_check

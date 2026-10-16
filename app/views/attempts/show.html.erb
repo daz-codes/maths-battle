@@ -8,6 +8,7 @@
   <% end %>
 
   <%= render "card", attempt: @attempt %>
+  <%= render "badges/earned", badges: @attempt.badges, celebrate: !(@attempt.levelled_up || @attempt.new_high_score) %>
 
   <button type="button" class="button button--share button--wide" data-controller="share"
           data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>
@@ -36,6 +37,7 @@
   <% end %>
   <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue button--wide" %>
   <%= link_to "See your stats", stats_path(@attempt.topic_module.slug) %>
+  <%= link_to "See your badges", badges_path if @attempt.badges.any? %>
 
   <% if @attempt.user.guest? %>
     <p class="save-nudge">

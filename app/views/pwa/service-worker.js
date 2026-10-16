@@ -36,7 +36,7 @@ function isPage(request) {
 }
 
 function keptForOffline(path) {
-  return path === "/" || path.startsWith("/play/") || path === "/stats" || path.startsWith("/stats/")
+  return path === "/" || path.startsWith("/play/") || path === "/stats" || path.startsWith("/stats/") || path === "/badges"
 }
 
 async function playerState() {

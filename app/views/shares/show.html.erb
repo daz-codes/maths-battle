@@ -13,6 +13,7 @@
   <p class="label">A MatheMinute player got</p>
 
   <%= render "attempts/card", attempt: @attempt %>
+  <%= render "badges/earned", badges: @attempt.badges %>
 
   <p class="feedback">Can you beat it?</p>
 

@@ -1,0 +1,65 @@
+require "test_helper"
+
+class BadgesControllerTest < ActionDispatch::IntegrationTest
+  setup { @user = users(:ada) }
+
+  test "shows every badge, with the earned ones picked out" do
+    Attempt.record!(user: @user, results: answers(*right_answers(10)))
+    sign_in_as @user
+
+    get badges_path
+    assert_response :success
+    assert_select ".aside", text: "3 of #{Badge.catalogue.size} collected"
+    assert_select ".badge:not(.badge--locked) .badge__name", text: "First minute"
+    assert_select ".badge--locked .badge__name", text: "1 week streak"
+    assert_select ".badge--locked .badge__how", text: /Play 7 days in a row/
+    assert_select ".badge:not(.badge--locked) .badge__how", text: /#{Time.current.strftime("%-d %b %Y")}/
+    assert_select ".badge", Badge.catalogue.size
+  end
+
+  test "visitors see them all still to earn" do
+    get badges_path
+    assert_response :success
+    assert_select ".badge--locked", Badge.catalogue.size
+  end
+
+  test "the results page celebrates new badges" do
+    sign_in_as @user
+    Attempt.record!(user: @user, results: answers(*right_answers(5)))
+    attempt = Attempt.record!(user: @user, results: answers(*right_answers(5)))
+    @user.badges.where.not(kind: "first_game").update_all(attempt_id: attempt.id)
+
+    get attempt_path(attempt)
+    assert_select ".badges--new[data-controller=confetti] .badge__name", text: "5 times tables in a minute"
+    assert_select "a[href=?]", badges_path, text: "See your badges"
+  end
+
+  test "one lot of confetti: a new high score already has it" do
+    sign_in_as @user
+    attempt = Attempt.record!(user: @user, results: answers(*right_answers(5)))
+
+    get attempt_path(attempt)
+    assert_select ".banner[data-controller=confetti]", text: /New high score/
+    assert_select ".badges--new .badge__name", text: "First minute"
+    assert_select ".badges--new[data-controller]", count: 0
+  end
+
+  test "a shared result shows its badges, still without the player's name" do
+    player = User.create!(username: "secret_squirrel", name: "Sammy", password: "a long enough password")
+    attempt = Attempt.record!(user: player, results: answers(*right_answers(5)))
+
+    get share_path(attempt.share_token)
+    assert_select ".badges--new .badge__name", text: "First minute"
+    assert_select ".badges--new[data-controller]", count: 0
+    assert_no_match(/squirrel|Sammy/, response.body)
+  end
+
+  test "the stats page shows how many have been collected" do
+    Attempt.record!(user: @user, results: answers(*right_answers(5)))
+    sign_in_as @user
+
+    get stats_path
+    assert_select "a.badge-summary[href=?]", badges_path, text: /2 of #{Badge.catalogue.size} collected/
+    assert_select ".badge-summary__emojis", text: "🎉🎯"
+  end
+end

@@ -23,6 +23,8 @@ module TimesTables
     { number: 5, name: "Negatives", example: "0.7 × −3000" }
   ]
   FIRST_TABLES = 2..5
+  # Scores in one game that earn a badge
+  BADGE_SCORES = [ 5, 10, 25, 50, 75, 100 ]
   # The powers of ten each level can scale a number by: 3 means ×1000, −2 means ÷100
   POWERS = { 1 => 0..0, 2 => 0..0, 3 => 0..3, 4 => -2..3, 5 => -2..3 }
   # Between them the two numbers move by at most this many places, so answers stay typeable
