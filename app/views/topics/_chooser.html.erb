@@ -20,7 +20,9 @@
           <%= details[:number] %>
         <% end %>
       <% else %>
-        <span class="levels__level levels__level--locked" title="Level <%= details[:number] %>: <%= details[:name] %> (locked)">🔒</span>
+        <span class="levels__level levels__level--locked" title="Level <%= details[:number] %>: <%= details[:name] %> (locked)">
+          <%= render "icons/lock" %>
+        </span>
       <% end %>
     <% end %>
   </nav>

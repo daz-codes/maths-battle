@@ -6,22 +6,25 @@ class LevelsTest < ActionDispatch::IntegrationTest
     sign_in_as @user
   end
 
+  NEEDED = User::Levelable::GOOD_GAMES_TO_LEVEL_UP
+
   def good_games(count, level:)
     count.times { Attempt.record!(user: @user, level: level, results: answers(*Array.new(20) { [ 2, 3, 6 ] }, ms: 1000)) }
   end
 
   test "home shows the levels, with locked ones padlocked, and how close the next one is" do
-    good_games(2, level: 1)
+    good_games(1, level: 1)
     get root_path
 
     assert_select ".levels .levels__level[aria-current=true]", text: "1"
     assert_select ".levels__level--locked", 4
     assert_select ".levels__name", text: "Level 1: Tables 2–5"
-    assert_select ".level-progress", text: /3 more good games at level 1 to unlock\s+Level 2: Tables 2–12/
+    assert_select ".level-progress", text: /#{NEEDED - 1} more good games at level 1 to unlock\s+Level 2: Tables 2–12/
+    assert_select ".levels__level--locked svg.icon", 4
   end
 
   test "levelling up is celebrated, and Play moves up to the new level" do
-    good_games(4, level: 1)
+    good_games(NEEDED - 1, level: 1)
     patch level_path, params: { level: 1 }
 
     post attempts_path, params: { attempt: { level: 1, results: answers(*Array.new(20) { [ 2, 3, 6 ] }, ms: 1000) } }, as: :json
@@ -33,7 +36,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
   end
 
   test "an easier unlocked level can be picked, and is what Play plays" do
-    good_games(5, level: 1)
+    good_games(NEEDED, level: 1)
     patch level_path, params: { level: 1 }
     get root_path
     assert_select ".levels__name", text: "Level 1: Tables 2–5"
@@ -49,7 +52,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
   end
 
   test "the stats page uses the same topic and level chooser, leading to stats" do
-    good_games(5, level: 1)
+    good_games(NEEDED, level: 1)
     get stats_path("times-tables", level: 1)
 
     assert_select ".switcher__option[aria-current=true]", text: /Times tables/
@@ -65,7 +68,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
   end
 
   test "the keypad grows a decimal point, then a minus sign" do
-    (1..4).each { |level| good_games(5, level: level) }
+    (1..4).each { |level| good_games(NEEDED, level: level) }
 
     get play_path("times-tables", level: 3)
     assert_select ".keypad__key--extra", count: 0
@@ -79,7 +82,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
   end
 
   test "a game of decimals and negatives is checked on the server" do
-    (1..4).each { |level| good_games(5, level: level) }
+    (1..4).each { |level| good_games(NEEDED, level: level) }
     results = [ { a: "0.7", b: "-3000", given: "-2100", ms: 3000 }, { a: "-0.4", b: "0.6", given: "-0.24", ms: 3000 }, { a: "0.4", b: "0.6", given: "0.240", ms: 3000 } ]
 
     post attempts_path, params: { attempt: { level: 5, results: results } }, as: :json

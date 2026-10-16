@@ -7,7 +7,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
-    assert_select ".site-header .tagline", text: "Improve your math in a minute every day"
+    assert_select ".site-header .tagline", text: "Improve your math, one minute at a time"
     assert_select "a[href=?]", play_path("times-tables"), text: "Play"
     assert_select ".streak__number", text: /0/
     assert_select ".nudge", text: "Click play to start your streak"
@@ -16,13 +16,13 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
   test "says maths to browsers set to the UK, and math to everyone else" do
     get root_path, headers: { "Accept-Language" => "en-GB,en;q=0.9" }
-    assert_select ".tagline", text: "Improve your maths in a minute every day"
+    assert_select ".tagline", text: "Improve your maths, one minute at a time"
 
     get root_path, headers: { "Accept-Language" => "en-US,en;q=0.9" }
-    assert_select ".tagline", text: "Improve your math in a minute every day"
+    assert_select ".tagline", text: "Improve your math, one minute at a time"
 
     get root_path, headers: { "Accept-Language" => "fr-FR" }
-    assert_select ".tagline", text: /your math in/
+    assert_select ".tagline", text: /your math,/
   end
 
   test "greets the player by name" do

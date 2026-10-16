@@ -520,7 +520,8 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 }
 
 .levels__level[aria-current="true"] { background: var(--blue-deep); color: #fff; box-shadow: 0 0 14px color-mix(in srgb, var(--blue) var(--glow-strength), transparent); }
-.levels__level--locked { cursor: default; font-size: 0.9rem; opacity: 0.55; }
+.levels__level--locked { cursor: default; color: var(--ink); }
+.levels__level--locked .icon { width: 1rem; height: 1rem; }
 .levels__name { margin: -0.6rem 0 0; color: var(--muted); font-size: 0.95rem; font-weight: 600; }
 
 .level-progress { margin: 0; color: var(--muted); font-size: 0.95rem; }

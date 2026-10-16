@@ -3,7 +3,7 @@
 module User::Levelable
   GOOD_GAME_ANSWERS = 20
   GOOD_GAME_ACCURACY = 0.9
-  GOOD_GAMES_TO_LEVEL_UP = 5
+  GOOD_GAMES_TO_LEVEL_UP = 3
 
   # The highest level unlocked: level 1, then each level after one with enough good games (or already played)
   def unlocked_level(topic)
