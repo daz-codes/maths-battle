@@ -1,0 +1,28 @@
+<%# Picks a topic and one of its unlocked levels, the same on every page that needs it.
+    choosing: :play on the home page (changes what Play plays), or :stats on the stats page %>
+<nav class="switcher" aria-label="Topic">
+  <% Topic::ALL.each do |choice| %>
+    <% url, options = topic_choice(choosing, choice) %>
+    <%= button_to url, **options, class: "switcher__option", form_class: "switcher__form", aria: { current: (choice == topic) } do %>
+      <span aria-hidden="true"><%= choice::EMOJI %></span> <%= choice::NAME %>
+    <% end %>
+  <% end %>
+</nav>
+
+<% if topic.levels.many? %>
+  <% unlocked = user.unlocked_level(topic) %>
+  <nav class="levels" aria-label="Level">
+    <% topic.levels.each do |details| %>
+      <% if details[:number] <= unlocked %>
+        <% url, options = level_choice(choosing, topic, details[:number]) %>
+        <%= button_to url, **options, class: "levels__level", form_class: "levels__form",
+              title: "Level #{details[:number]}: #{details[:name]}", aria: { current: (details[:number] == level) } do %>
+          <%= details[:number] %>
+        <% end %>
+      <% else %>
+        <span class="levels__level levels__level--locked" title="Level <%= details[:number] %>: <%= details[:name] %> (locked)">🔒</span>
+      <% end %>
+    <% end %>
+  </nav>
+  <p class="levels__name">Level <%= level %>: <%= Topic.level(topic, level)[:name] %></p>
+<% end %>

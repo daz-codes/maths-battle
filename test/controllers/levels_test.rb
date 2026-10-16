@@ -48,6 +48,22 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_select "[data-test-level-value=1]"
   end
 
+  test "the stats page uses the same topic and level chooser, leading to stats" do
+    good_games(5, level: 1)
+    get stats_path("times-tables", level: 1)
+
+    assert_select ".switcher__option[aria-current=true]", text: /Times tables/
+    assert_select "form[action=?][method=get] .switcher__option", stats_path("equations")
+    assert_select "form[action=?][method=get] input[name=level][value=2]", stats_path("times-tables")
+    assert_select ".levels .levels__level[aria-current=true]", text: "1"
+    assert_select ".levels__level--locked", 3
+    assert_select ".levels__name", text: "Level 1: Tables 2–5"
+
+    get stats_path("times-tables", level: 2)
+    assert_select ".levels .levels__level[aria-current=true]", text: "2"
+    assert_equal 2, @user.unlocked_level(TimesTables), "looking at stats doesn't change anything"
+  end
+
   test "the keypad grows a decimal point, then a minus sign" do
     (1..4).each { |level| good_games(5, level: level) }
 

@@ -529,21 +529,6 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 
 .banner--level { background: var(--green); }
 
-/* Topic tabs on the stats page */
-.tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
-
-.tabs .tabs__tab {
-  margin: 0;
-  padding: 0.4rem 0.9rem;
-  border-radius: 999px;
-  color: var(--muted);
-  text-decoration: none;
-}
-
-.tabs .tabs__tab[aria-current="page"] { background: var(--ink); color: var(--paper); }
-.tabs--levels { margin-top: -0.5rem; }
-.tabs--levels .tabs__tab { padding: 0.25rem 0.75rem; font-size: 0.9rem; }
-
 .tables__example { display: block; color: var(--muted); font-size: 0.75rem; font-weight: 500; }
 
 /* ── Stats ──────────────────────────────────────── */

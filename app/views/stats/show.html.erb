@@ -3,20 +3,7 @@
 <main class="page">
   <h1 class="heading">Your stats</h1>
 
-  <nav class="tabs" aria-label="Topic">
-    <% Topic::ALL.each do |topic| %>
-      <%= link_to "#{topic::EMOJI} #{topic::NAME}", stats_path(topic::SLUG), class: "tabs__tab", aria: { current: ("page" if topic == @topic) } %>
-    <% end %>
-  </nav>
-
-  <% if @topic.levels.many? %>
-    <nav class="tabs tabs--levels" aria-label="Level">
-      <% @user.unlocked_levels(@topic).each do |level| %>
-        <%= link_to "Level #{level[:number]}", stats_path(@topic::SLUG, level: level[:number]), class: "tabs__tab", title: level[:name],
-              aria: { current: ("page" if level[:number] == @level) } %>
-      <% end %>
-    </nav>
-  <% end %>
+  <%= render "topics/chooser", choosing: :stats, user: @user, topic: @topic, level: @level %>
 
   <% if @user.tracked?(@topic, @level) %>
     <% if (best = @user.best_group(@topic, @level)) %>

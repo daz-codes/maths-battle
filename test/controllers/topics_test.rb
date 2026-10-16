@@ -53,7 +53,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ 20, 6 ], [ @user.best_score(TimesTables, 1), @user.best_score(Equations, 1) ]
 
     get stats_path("equations")
-    assert_select ".tabs__tab[aria-current=page]", text: /Equations/
+    assert_select ".switcher__option[aria-current=true]", text: /Equations/
     assert_select "thead th", text: "Type"
     assert_select "tbody th", text: /ax = b\s+e\.g\. 3x = 12/
     assert_select ".stats dd", text: "100%"

@@ -25,8 +25,7 @@
     <p class="nudge">Click play to start your streak</p>
   <% end %>
 
-  <%= render "topics/switcher" %>
-  <%= render "levels/picker" %>
+  <%= render "topics/chooser", choosing: :play, user: current_player, topic: current_topic, level: current_level %>
   <%= link_to "Play", play_path(current_topic::SLUG), class: "button button--start" %>
   <%= render "levels/progress", user: @user, topic: current_topic %>
 
