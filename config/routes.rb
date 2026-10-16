@@ -4,10 +4,13 @@ Rails.application.routes.draw do
   resource :session, only: %i[new create destroy]
   resource :registration, only: %i[new create]
   resource :profile, only: %i[edit update]
+  resource :topic, only: :update
 
-  get "times-tables", to: "times_tables#show", as: :times_tables
+  get "play/:topic", to: "games#show", as: :play
+  # Where the times tables game used to be, still linked from copies kept on devices
+  get "times-tables", to: redirect("/play/times-tables")
   resources :attempts, only: %i[create show]
-  get "stats", to: "stats#show", as: :stats
+  get "stats(/:topic)", to: "stats#show", as: :stats
   get "s/:share_token", to: "shares#show", as: :share
 
   get "up" => "rails/health#show", as: :rails_health_check

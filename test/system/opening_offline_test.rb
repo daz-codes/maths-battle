@@ -9,12 +9,12 @@ class OpeningOfflineTest < ApplicationSystemTestCase
   end
 
   test "the home, game and stats pages are kept for offline use" do
-    visit times_tables_path
+    visit play_path("times-tables")
     assert_selector ".question", text: "×", wait: 5
     visit stats_path
     visit root_path
 
-    assert_equal [ "/", "/stats", "/times-tables" ], kept_pages.sort
+    assert_equal [ "/", "/play/times-tables", "/stats" ], kept_pages.sort
   end
 
   test "signing out forgets this player's pages and unsent games" do
@@ -45,7 +45,7 @@ class OpeningOfflineTest < ApplicationSystemTestCase
       sleep 0.3 # pages are stored just after they load
       page.evaluate_async_script(<<~JS)
         const done = arguments[0]
-        caches.open("matheminute-pages-v1")
+        caches.open("matheminute-pages-v2")
           .then((cache) => cache.keys())
           .then((requests) => done(requests.map((request) => new URL(request.url).pathname)))
       JS

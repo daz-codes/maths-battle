@@ -18,11 +18,11 @@ module Attempt::Shareable
   end
 
   def share_headline
-    "MatheMinute ✖️ #{score} in 60s"
+    "MatheMinute #{topic_module::EMOJI} #{topic_module::NAME}: #{score} in 60s"
   end
 
   def share_stats
-    "🔥 #{streak} day streak  🏆 Best: #{user.high_score}"
+    "🔥 #{streak} day streak  🏆 Best: #{user.best_score(topic_module)}"
   end
 
   def emoji_row

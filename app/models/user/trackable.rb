@@ -1,14 +1,10 @@
-# A player's all-time record for each times table: accuracy and average answer speed,
-# and which table is their best and which needs the most practice
+# A player's all-time record in a topic, for each of its groups (each times table, each type of equation):
+# accuracy and average answer speed, and which group is their best and which needs the most practice
 module User::Trackable
-  # A table needs this many answers before it can be called best or worst
+  # A group needs this many answers before it can be called best or worst
   MIN_ANSWERS_TO_RANK = 5
 
-  Tally = Data.define(:table, :right, :answered, :average_ms, :slow) do
-    def label
-      table ? "#{table}×" : "All tables"
-    end
-
+  Tally = Data.define(:group, :label, :right, :answered, :average_ms, :slow) do
     def percent
       (right * 100.0 / answered).round if answered.positive?
     end
@@ -18,66 +14,58 @@ module User::Trackable
     end
   end
 
-  def tracked?
-    overall_stats.answered.positive?
+  def tracked?(topic)
+    overall_stats(topic).answered.positive?
   end
 
-  def overall_stats
-    @overall_stats ||= tally(nil, times_tables_stats.values)
+  def overall_stats(topic)
+    tally(nil, "All", stats_for(topic).values)
   end
 
-  def games_played
-    attempts.where(topic: TimesTables::TOPIC).count
+  def games_played(topic)
+    attempts.in_topic(topic).count
   end
 
   # Over real games only: a test started and walked away from shouldn't drag it down
-  def average_score
-    counted_games.average(:score)&.round
+  def average_score(topic)
+    attempts.counted.in_topic(topic).average(:score)&.round
   end
 
-  # One tally per table, 1× to 12×. A fact like 7×8 counts toward both the 7× and 8× tables
-  def table_stats
-    @table_stats ||= mark_slow_tables(TimesTables::FACTORS.map { |table| tally(table, stats_for_table(table)) })
+  def group_stats(topic)
+    (@group_stats ||= {})[topic] ||= mark_slow_groups(topic.groups.map { |group| tally(group, topic.group_label(group), stats_for_group(topic, group)) })
   end
 
   # Best on accuracy, then speed
-  def best_table
-    ranked_tables.first
+  def best_group(topic)
+    ranked_groups(topic).first
   end
 
-  def table_needing_practice
-    ranked_tables.last if ranked_tables.many?
+  def group_needing_practice(topic)
+    ranked = ranked_groups(topic)
+    ranked.last if ranked.many?
   end
 
   private
-    def counted_games
-      attempts.counted.where(topic: TimesTables::TOPIC)
+    def stats_for_group(topic, group)
+      stats_for(topic).values.select { |stat| topic.groups_of(stat.fact).include?(group) }
     end
 
-    def stats_for_table(table)
-      times_tables_stats.values.select { |stat| factors_of(stat).include?(table) }
-    end
-
-    def factors_of(stat)
-      stat.fact.split("x").map(&:to_i)
-    end
-
-    def tally(table, stats)
+    def tally(group, label, stats)
       right = stats.sum(&:correct_count)
       average_ms = stats.sum(&:correct_ms) / right if right.positive?
-      Tally.new(table:, right:, answered: stats.sum(&:answered_count), average_ms:, slow: false)
+      Tally.new(group:, label:, right:, answered: stats.sum(&:answered_count), average_ms:, slow: false)
     end
 
-    def ranked_tables
-      @ranked_tables ||= table_stats.select { |tally| rankable?(tally) }.sort_by { |tally| [ -tally.percent, tally.average_ms || Float::INFINITY ] }
-    end
-
-    def rankable?(tally)
-      tally.answered >= MIN_ANSWERS_TO_RANK && TimesTables::TRIVIAL_FACTORS.exclude?(tally.table)
-    end
-
-    def mark_slow_tables(tallies)
+    def mark_slow_groups(tallies)
       typical = FactStat.typical_ms(tallies.filter_map(&:average_ms))
       tallies.map { |tally| tally.with(slow: tally.average_ms.present? && FactStat.slow?(tally.average_ms, typical)) }
+    end
+
+    def ranked_groups(topic)
+      group_stats(topic).select { |tally| rankable?(topic, tally) }.sort_by { |tally| [ -tally.percent, tally.average_ms || Float::INFINITY ] }
+    end
+
+    def rankable?(topic, tally)
+      tally.answered >= MIN_ANSWERS_TO_RANK && topic.rankable_group?(tally.group)
     end
 end

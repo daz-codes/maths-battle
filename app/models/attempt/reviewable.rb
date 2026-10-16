@@ -1,7 +1,7 @@
-# What to say on the results page: the tables to practise, and the facts missed or slow today
+# What to say on the results page: the groups to practise (times tables, types of equation),
+# and the questions missed or slow today
 module Attempt::Reviewable
-  TABLES = 2..12
-  MAX_WEAK_TABLES = 3
+  MAX_WEAK_GROUPS = 3
   MAX_SLOW_FACTS = 5
   GOOD_ENOUGH = 0.9
   HISTORY = 14.days
@@ -9,8 +9,8 @@ module Attempt::Reviewable
   def feedback_message
     if answered.zero?
       "Have another go — type your answers as fast as you can!"
-    elsif weak_tables.any?
-      "Practise your #{weak_tables.map { |table| "#{table}×" }.to_sentence} tables"
+    elsif weak_groups.any?
+      topic_module.practise_message(weak_groups)
     elsif perfect?
       "Every answer right. Brilliant#{with_name}!"
     else
@@ -18,7 +18,7 @@ module Attempt::Reviewable
     end
   end
 
-  # Today's mistakes, one per fact, as e.g. "7 × 8 = 56"
+  # Today's mistakes, one per fact, as e.g. "7 × 8 = 56" or "2y + 7 = 11, so y = 2"
   def missed_facts
     mistakes.uniq { |result| fact_key(result) }.map { |result| fact_label(result) }
   end
@@ -33,14 +33,14 @@ module Attempt::Reviewable
       .map { |result| fact_label(result) }
   end
 
-  # The tables with the worst accuracy over this attempt and the two weeks before it
-  def weak_tables
-    @weak_tables ||= accuracy_by_table
+  # The groups with the worst accuracy over this attempt and the two weeks before it
+  def weak_groups
+    @weak_groups ||= accuracy_by_group
       .select { |_, (right, total)| total.positive? && right.fdiv(total) < GOOD_ENOUGH }
-      .sort_by { |table, (right, total)| [ right.fdiv(total), table ] }
-      .first(MAX_WEAK_TABLES)
+      .sort_by { |group, (right, total)| [ right.fdiv(total), topic_module.groups.index(group) ] }
+      .first(MAX_WEAK_GROUPS)
       .map(&:first)
-      .sort
+      .sort_by { |group| topic_module.groups.index(group) }
   end
 
   private
@@ -49,7 +49,7 @@ module Attempt::Reviewable
     end
 
     def fact_label(result)
-      "#{result["a"]} × #{result["b"]} = #{topic_module.answer(result["a"], result["b"])}"
+      topic_module.label(result)
     end
 
     def right_answers
@@ -65,19 +65,19 @@ module Attempt::Reviewable
       mistakes.map { |result| fact_key(result) }
     end
 
-    # [right, total] for each table. A fact like 7×8 counts toward both tables, a square like 7×7 once
-    def accuracy_by_table
-      TABLES.index_with { [ 0, 0 ] }.tap do |tally|
+    # [right, total] for each group. In times tables 7×8 counts toward both tables, 7×7 once
+    def accuracy_by_group
+      topic_module.feedback_groups.index_with { [ 0, 0 ] }.tap do |tally|
         recent_results.each { |result| tally_result(tally, result) }
       end
     end
 
     def tally_result(tally, result)
-      [ result["a"], result["b"] ].uniq.each do |table|
-        next unless tally.key?(table)
+      topic_module.groups_of(fact_key(result)).each do |group|
+        next unless tally.key?(group)
 
-        tally[table][0] += 1 if result["correct"]
-        tally[table][1] += 1
+        tally[group][0] += 1 if result["correct"]
+        tally[group][1] += 1
       end
     end
 

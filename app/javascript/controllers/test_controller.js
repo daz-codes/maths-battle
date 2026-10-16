@@ -14,7 +14,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // after a warning, and then nothing is saved
 export default class extends Controller {
   static targets = [ "question", "answer", "score", "quarter", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore" ]
-  static values = { questionSets: Array, topic: String, submitUrl: String }
+  static values = { questionSets: Array, topic: String, submitUrl: String, fractions: Boolean }
 
   connect() {
     this.questions = chooseQuestionSet(this.questionSetsValue).questions
@@ -104,7 +104,7 @@ export default class extends Controller {
   keydown(event) {
     if (event.metaKey || event.ctrlKey || event.altKey) return
 
-    if (/^[0-9]$/.test(event.key)) {
+    if (/^[0-9]$/.test(event.key) || (event.key === "/" && this.fractionsValue)) {
       event.preventDefault()
       this.type(event.key)
     } else if (event.key === "Backspace") {
@@ -113,13 +113,18 @@ export default class extends Controller {
     }
   }
 
-  type(digit) {
-    if (!this.accepting) return
+  type(key) {
+    if (!this.accepting || !this.allowed(key)) return
 
-    this.typed += digit
+    this.typed += key
     this.answerTarget.textContent = this.typed
-    // Check as soon as there are as many digits as the right answer, so there's no Enter to press
-    if (this.typed.length >= String(this.correctAnswer).length) this.check()
+    // Check as soon as the answer is as long as the right one ("56", "3/4"), so there's no Enter to press
+    if (this.typed.length >= this.correctAnswer.length) this.check()
+  }
+
+  // One fraction line, and only after a number: 11/9
+  allowed(key) {
+    return key !== "/" || (this.fractionsValue && this.typed.length > 0 && !this.typed.includes("/"))
   }
 
   backspace() {
@@ -139,25 +144,25 @@ export default class extends Controller {
     return this.questions[this.index]
   }
 
+  // Each question comes with its answer written the way it's typed: "56", "3/4", "11/9"
   get correctAnswer() {
-    return this.current.a * this.current.b
+    return this.current.answer
   }
 
+  // The question text is built on the server from numbers and letters (equations use HTML for fractions)
   show() {
-    const { a, b } = this.current
-    this.questionTarget.textContent = `${a} × ${b}`
+    this.questionTarget.innerHTML = this.current.text
     this.typed = ""
     this.answerTarget.textContent = ""
     this.shownAt = performance.now()
   }
 
+  // The question's own details go back with the answer, so the server can check it for itself
   check() {
-    const given = parseInt(this.typed, 10)
-    const correct = given === this.correctAnswer
-    const { a, b } = this.current
-    this.results.push({ a, b, given, ms: Math.round(performance.now() - this.shownAt) })
+    const { text, answer, ...question } = this.current
+    this.results.push({ ...question, given: this.typed, ms: Math.round(performance.now() - this.shownAt) })
 
-    if (correct) {
+    if (this.typed === answer) {
       this.score++
       this.scoreTarget.textContent = this.score
       this.flash(this.scoreTarget, "--right")

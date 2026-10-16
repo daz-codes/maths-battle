@@ -27,6 +27,18 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_response :created
   end
 
+  test "saves an equations game, checking the answers itself" do
+    results = [ { type: "ax=b", a: 12, b: 9, v: "x", flip: false, given: "3/4", ms: 2000 },
+                { type: "a(x+b)=c", a: 4, b: 2, c: 30, v: "t", flip: true, given: "6", ms: 3000 } ]
+
+    post attempts_path, params: { attempt: { topic: "equations", results: results } }, as: :json
+
+    assert_response :created
+    attempt = @user.attempts.last
+    assert_equal [ "equations", 1, 2 ], [ attempt.topic, attempt.score, attempt.answered ]
+    assert_equal [ true, false ], attempt.results.map { _1["correct"] }
+  end
+
   test "rejects a made-up attempt" do
     assert_no_difference -> { Attempt.count } do
       post attempts_path, params: { attempt: { results: answers(*Array.new(151) { [ 2, 2, 4 ] }, ms: 10) } }, as: :json
@@ -44,8 +56,8 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".feedback", text: /Practise your/
     assert_select ".missed li", text: "7 × 8 = 56"
     assert_select ".missed__slow", count: 0
-    assert_select "a[href=?]", stats_path, text: "See your stats"
-    assert_select "a.button--blue[href=?]", times_tables_path, text: "Play again"
+    assert_select "a[href=?]", stats_path("times-tables"), text: "See your stats"
+    assert_select "a.button--blue[href=?]", play_path("times-tables"), text: "Play again"
     assert_select "[data-controller=share][data-share-text-value*=?]", share_url(attempt.share_token)
     assert_select "header a.logo[href=?]", root_path
     assert_select "a.button", text: "Home", count: 0

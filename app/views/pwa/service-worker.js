@@ -1,11 +1,10 @@
 // Lets MatheMinute open and be played offline.
-// Pages always come from the network when there is one, so they're never stale online. The home, game and
-// stats pages are kept each time they load, so they open offline, and the game page carries spare
+// Pages always come from the network when there is one, so they're never stale online. The home page,
+// each topic's game and stats pages are kept each time they load, so they open offline, and the game page carries spare
 // question sets for offline games. Assets are fingerprinted, so they're kept and served from here.
-const CACHE = "matheminute-v4"
-const PAGES = "matheminute-pages-v1"
+const CACHE = "matheminute-v5"
+const PAGES = "matheminute-pages-v2"
 const OFFLINE_URL = "/offline.html"
-const OFFLINE_PAGES = [ "/", "/times-tables", "/stats" ]
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.add(OFFLINE_URL)).then(() => self.skipWaiting()))
@@ -36,6 +35,10 @@ self.addEventListener("fetch", (event) => {
   }
 })
 
+function keptForOffline(path) {
+  return path === "/" || path.startsWith("/play/") || path === "/stats" || path.startsWith("/stats/")
+}
+
 // Full page loads, and Turbo's page fetches when moving between pages
 function isPage(request) {
   return request.mode === "navigate" || (request.headers.get("Accept") || "").includes("text/html")
@@ -44,7 +47,7 @@ function isPage(request) {
 async function pageFromNetwork(request, url) {
   try {
     const response = await fetch(request)
-    if (response.ok && OFFLINE_PAGES.includes(url.pathname)) {
+    if (response.ok && keptForOffline(url.pathname)) {
       const copy = response.clone()
       caches.open(PAGES).then((cache) => cache.put(url.pathname, copy))
     }

@@ -1,17 +1,16 @@
 class Attempt < ApplicationRecord
   include Recordable, Reviewable, Shareable
 
-  TOPICS = { TimesTables::TOPIC => TimesTables }
-
   belongs_to :user
 
-  validates :topic, inclusion: { in: TOPICS.keys }
+  validates :topic, inclusion: { in: Topic.keys }
 
   # Games long enough to count: starting a test and walking away doesn't
   scope :counted, -> { where(answered: MIN_ANSWERS_FOR_STREAK..) }
+  scope :in_topic, ->(topic) { where(topic: topic::TOPIC) }
 
   def topic_module
-    TOPICS.fetch(topic)
+    Topic.find(topic)
   end
 
   def results_by_fact
@@ -28,6 +27,6 @@ class Attempt < ApplicationRecord
 
   private
     def fact_key(result)
-      topic_module.fact_key(result["a"], result["b"])
+      topic_module.fact_key(result)
     end
 end

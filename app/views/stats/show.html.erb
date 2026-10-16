@@ -3,33 +3,40 @@
 <main class="page">
   <h1 class="heading">Your stats</h1>
 
-  <% if @user.tracked? %>
-    <% if @user.best_table %>
+  <nav class="tabs" aria-label="Topic">
+    <% Topic::ALL.each do |topic| %>
+      <%= link_to "#{topic::EMOJI} #{topic::NAME}", stats_path(topic::SLUG), class: "tabs__tab", aria: { current: ("page" if topic == @topic) } %>
+    <% end %>
+  </nav>
+
+  <% if @user.tracked?(@topic) %>
+    <% if (best = @user.best_group(@topic)) %>
+      <% needs = @user.group_needing_practice(@topic) %>
       <p class="summary">
-        Your best times table is <strong><%= @user.best_table.label %></strong><% if @user.table_needing_practice %>,
-        and the <strong><%= @user.table_needing_practice.label %></strong> times table needs the most practice<% end %>.
+        <%= sanitize @topic.summary(best: tag.strong(best.label), needs: (tag.strong(needs.label) if needs)), tags: %w[ strong ] %>
       </p>
     <% end %>
 
+    <% overall = @user.overall_stats(@topic) %>
     <dl class="stats stats--three">
-      <div><dt>Accuracy</dt><dd><%= percent(@user.overall_stats.percent) %></dd></div>
-      <div><dt>Average</dt><dd><%= seconds(@user.overall_stats.average_ms) %></dd></div>
-      <div><dt>Games</dt><dd><%= @user.games_played %></dd></div>
+      <div><dt>Accuracy</dt><dd><%= percent(overall.percent) %></dd></div>
+      <div><dt>Average</dt><dd><%= seconds(overall.average_ms) %></dd></div>
+      <div><dt>Games</dt><dd><%= @user.games_played(@topic) %></dd></div>
     </dl>
 
     <table class="tables">
-      <caption class="label">Each times table</caption>
+      <caption class="label">Each <%= @topic.group_heading.downcase %></caption>
       <thead>
         <tr>
-          <th scope="col">Table</th>
+          <th scope="col"><%= @topic.group_heading %></th>
           <th scope="col"><span class="visually-hidden">Bar</span></th>
           <th scope="col">Accuracy</th>
           <th scope="col">Speed</th>
         </tr>
       </thead>
       <tbody>
-        <% @user.table_stats.each do |row| %>
-          <tr title="<%= row.label %> table: <%= row.answered.positive? ? "#{row.right} of #{row.answered} right, average #{seconds(row.average_ms)}" : "not asked yet" %>">
+        <% @user.group_stats(@topic).each do |row| %>
+          <tr title="<%= row.label %>: <%= row.answered.positive? ? "#{row.right} of #{row.answered} right, average #{seconds(row.average_ms)}" : "not asked yet" %>">
             <th scope="row"><%= row.label %></th>
             <td class="tables__bar">
               <span class="bar"><span class="bar__fill" style="width: <%= row.percent || 0 %>%"></span></span>
@@ -43,11 +50,11 @@
 
     <p class="hint hint--centre">
       Speed is the average time for a right answer.
-      <% if @user.table_stats.any?(&:slow?) %>🐢 means slower than your usual.<% end %>
+      <% if @user.group_stats(@topic).any?(&:slow?) %>🐢 means slower than your usual.<% end %>
     </p>
   <% else %>
-    <p class="aside">Play a game and your stats will show up here.</p>
+    <p class="aside">Play a game of <%= @topic::NAME.downcase %> and your stats will show up here.</p>
   <% end %>
 
-  <%= link_to "Play", times_tables_path, class: "button button--blue button--wide" %>
+  <%= link_to "Play", play_path(@topic::SLUG), class: "button button--blue button--wide" %>
 </main>

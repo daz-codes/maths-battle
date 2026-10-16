@@ -101,11 +101,10 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2, @user.current_streak
   end
 
-  test "high score only goes up" do
-    assert @user.record_score!(10)
-    assert_not @user.record_score!(8)
-    assert_not @user.record_score!(10)
-    assert_equal 10, @user.reload.high_score
+  test "best score is the highest in a topic" do
+    Attempt.record!(user: @user, results: answers(*right_answers(10)))
+    Attempt.record!(user: @user, results: answers(*right_answers(8)))
+    assert_equal 10, @user.best_score(TimesTables)
   end
 end
 

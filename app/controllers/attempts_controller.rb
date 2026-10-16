@@ -20,7 +20,7 @@ class AttemptsController < ApplicationController
     end
 
     def topic_param
-      params.dig(:attempt, :topic) || TimesTables::TOPIC
+      params.dig(:attempt, :topic) || Topic.default::TOPIC
     end
 
     # Games played offline arrive later, with an id made on the device and the time they were played
@@ -29,6 +29,6 @@ class AttemptsController < ApplicationController
     end
 
     def results_param
-      params.fetch(:attempt, {}).permit(results: %i[ a b given ms ]).fetch(:results, []).map(&:to_h)
+      params.fetch(:attempt, {}).permit(results: Attempt::RESULT_FIELDS).fetch(:results, []).map(&:to_h)
     end
 end

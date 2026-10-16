@@ -1,0 +1,65 @@
+require "test_helper"
+
+class TopicsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    @user = users(:ada)
+    sign_in_as @user
+  end
+
+  test "the switcher changes what Play plays, and is remembered" do
+    get root_path
+    assert_select "a.button--start[href=?]", play_path("times-tables")
+
+    patch topic_path, params: { topic: "equations" }
+    assert_redirected_to root_path
+    follow_redirect!
+    assert_select "a.button--start[href=?]", play_path("equations")
+    assert_select ".switcher__option[aria-current=true]", text: /Equations/
+  end
+
+  test "playing a topic makes it the current one" do
+    get play_path("equations")
+    get root_path
+    assert_select "a.button--start[href=?]", play_path("equations")
+  end
+
+  test "the equations game has a fraction key; times tables doesn't" do
+    get play_path("equations")
+    assert_select ".keypad__key--slash", text: "/"
+    assert_select "[data-test-fractions-value=true]"
+
+    get play_path("times-tables")
+    assert_select ".keypad__key--slash", count: 0
+  end
+
+  test "unknown topics aren't found" do
+    get play_path("algebra-9000")
+    assert_response :not_found
+  end
+
+  test "the old times tables address still works" do
+    get "/times-tables"
+    assert_redirected_to "/play/times-tables"
+  end
+
+  test "best scores and stats are per topic" do
+    Attempt.record!(user: @user, results: answers(*right_answers(20)))
+    equations = Attempt.record!(user: @user, topic: "equations", results: [ { type: "ax=b", a: 12, b: 9, v: "x", flip: false, given: "3/4", ms: 2000 } ] * 6)
+
+    assert equations.new_high_score, "a first equations game is a best, even after a bigger times tables score"
+    assert_equal [ 20, 6 ], [ @user.best_score(TimesTables), @user.best_score(Equations) ]
+
+    get stats_path("equations")
+    assert_select ".tabs__tab[aria-current=page]", text: /Equations/
+    assert_select "thead th", text: "Type"
+    assert_select "tbody th", text: "3x = 12"
+    assert_select ".stats dd", text: "100%"
+  end
+
+  test "equations feedback names the type to practise" do
+    attempt = Attempt.record!(user: @user, topic: "equations", results: [ { type: "ax+b=c", a: 2, b: 7, c: 11, v: "y", flip: false, given: "3", ms: 2000 } ] * 6)
+
+    assert_equal "Practise equations like 2x + 7 = 11", attempt.feedback_message
+    assert_equal [ "2y + 7 = 11, so y = 2" ], attempt.missed_facts
+  end
+end

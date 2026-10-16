@@ -10,13 +10,13 @@ class Attempt::ReviewableTest < ActiveSupport::TestCase
   test "names the weakest tables" do
     feedback = attempt_with([ 7, 8, 54 ], [ 8, 8, 63 ], [ 7, 7, 49 ], [ 6, 6, 36 ], [ 9, 9, 81 ])
 
-    assert_equal [ 7, 8 ], feedback.weak_tables
+    assert_equal [ 7, 8 ], feedback.weak_groups
     assert_equal "Practise your 7× and 8× tables", feedback.feedback_message
   end
 
   test "picks at most three tables" do
     feedback = attempt_with([ 2, 2, 5 ], [ 3, 3, 10 ], [ 4, 4, 17 ], [ 5, 5, 26 ], [ 6, 6, 37 ])
-    assert_equal 3, feedback.weak_tables.size
+    assert_equal 3, feedback.weak_groups.size
   end
 
   test "lists each missed fact once with its answer" do
@@ -42,8 +42,8 @@ class Attempt::ReviewableTest < ActiveSupport::TestCase
     end
 
     feedback = attempt_with([ 9, 9, 81 ], [ 9, 3, 27 ], [ 5, 5, 25 ])
-    assert_includes feedback.weak_tables, 9
-    assert_not_includes feedback.weak_tables, 11
+    assert_includes feedback.weak_groups, 9
+    assert_not_includes feedback.weak_groups, 11
   end
 
   test "says well done when everything was right" do

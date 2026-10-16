@@ -25,16 +25,17 @@
     <p class="nudge">Click play to start your streak</p>
   <% end %>
 
-  <%= link_to "Play", times_tables_path, class: "button button--start" %>
+  <%= render "topics/switcher" %>
+  <%= link_to "Play", play_path(current_topic::SLUG), class: "button button--start" %>
 
   <% if @user.persisted? %>
     <dl class="stats">
-      <div><dt>Best</dt><dd>🏆 <%= @user.high_score %></dd></div>
+      <div><dt>Best</dt><dd>🏆 <%= @user.best_score(current_topic) %></dd></div>
       <div><dt>Longest streak</dt><dd><%= @user.longest_streak %></dd></div>
-      <div><dt>Average score</dt><dd><%= @user.average_score || "—" %></dd></div>
-      <div><dt>Average time</dt><dd><%= seconds(@user.overall_stats.average_ms) %></dd></div>
+      <div><dt>Average score</dt><dd><%= @user.average_score(current_topic) || "—" %></dd></div>
+      <div><dt>Average time</dt><dd><%= seconds(@user.overall_stats(current_topic).average_ms) %></dd></div>
     </dl>
-    <%= link_to "See all stats", stats_path %>
+    <%= link_to "See all stats", stats_path(current_topic::SLUG) %>
   <% end %>
 
   <% if @user.guest? && @user.persisted? %>

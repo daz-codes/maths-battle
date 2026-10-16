@@ -7,12 +7,12 @@ class User::PractisableTest < ActiveSupport::TestCase
     @user.questions(count: count, random: Random.new(seed))
   end
 
-  def key(question) = TimesTables.fact_key(question[:a], question[:b])
+  def key(question) = TimesTables.fact_key(question.slice(:a, :b).stringify_keys)
 
   test "makes the requested number of questions within the tables" do
     questions = generate
     assert_equal 150, questions.size
-    assert questions.all? { |q| TimesTables.valid_question?(q[:a], q[:b]) }
+    assert questions.all? { |q| TimesTables::FACTORS.cover?(q[:a]) && TimesTables::FACTORS.cover?(q[:b]) }
   end
 
   test "never asks the same fact twice in a row" do
@@ -21,7 +21,7 @@ class User::PractisableTest < ActiveSupport::TestCase
   end
 
   test "asks facts both ways round" do
-    sevens_eights = generate(count: 5000).select { |q| key(q) == "7x8" }
+    sevens_eights = generate(count: 5000).select { |q| key(q) == "7x8" }.map { |q| q.slice(:a, :b) }
     assert_includes sevens_eights, { a: 7, b: 8 }
     assert_includes sevens_eights, { a: 8, b: 7 }
   end
@@ -38,7 +38,7 @@ class User::PractisableTest < ActiveSupport::TestCase
   test "facts with a lower percentage correct come up more often" do
     @user.fact_stats.create!(topic: "times_tables", fact: "7x8", correct_count: 1, wrong_count: 3)
 
-    assert_operator weights[[ 7, 8 ]], :>, weights[[ 6, 8 ]] * 3
+    assert_operator weights["7x8"], :>, weights["6x8"] * 3
 
     questions = generate(count: 5000)
     assert_operator questions.count { |q| key(q) == "7x8" }, :>, questions.count { |q| key(q) == "6x8" } * 3
@@ -49,10 +49,10 @@ class User::PractisableTest < ActiveSupport::TestCase
     @user.fact_stats.create!(topic: "times_tables", fact: "4x6", correct_count: 5, wrong_count: 5)
     @user.fact_stats.create!(topic: "times_tables", fact: "8x9", correct_count: 0, wrong_count: 2)
 
-    assert_equal 1.0, weights[[ 2, 3 ]]
-    assert_equal 3.0, weights[[ 4, 6 ]]
-    assert_equal 5.0, weights[[ 8, 9 ]]
-    assert_equal 1.0, weights[[ 2, 4 ]], "facts not asked yet start at the normal weight"
+    assert_equal 1.0, weights["2x3"]
+    assert_equal 3.0, weights["4x6"]
+    assert_equal 5.0, weights["8x9"]
+    assert_equal 1.0, weights["2x4"], "facts not asked yet start at the normal weight"
   end
 
   def timed_stat(fact, average_ms, correct_count: 4)
@@ -63,22 +63,22 @@ class User::PractisableTest < ActiveSupport::TestCase
     %w[2x3 2x4 2x5 3x4 3x5].each { timed_stat(_1, 2000) }
     timed_stat("7x8", 4000)
 
-    assert_equal 3.0, weights[[ 7, 8 ]], "twice the typical time gets the full slow boost"
-    assert_equal 1.0, weights[[ 2, 3 ]]
+    assert_equal 3.0, weights["7x8"], "twice the typical time gets the full slow boost"
+    assert_equal 1.0, weights["2x3"]
   end
 
   test "quick answers are never slow, even for a very fast player" do
     %w[2x3 2x4 2x5 3x4 3x5].each { timed_stat(_1, 600) }
     timed_stat("7x8", 1200)
 
-    assert_equal 1.0, weights[[ 7, 8 ]]
+    assert_equal 1.0, weights["7x8"]
   end
 
   test "one timed answer isn't enough to call a fact slow" do
     %w[2x3 2x4 2x5].each { timed_stat(_1, 2000) }
     timed_stat("7x8", 8000, correct_count: 1)
 
-    assert_equal 1.0, weights[[ 7, 8 ]]
+    assert_equal 1.0, weights["7x8"]
   end
 
   def play(right:, wrong:)
@@ -97,9 +97,9 @@ class User::PractisableTest < ActiveSupport::TestCase
     struggling = User.find(@user.id)
 
     assert_equal 1.0, struggling.easing
-    assert_in_delta 3.0, struggling.question_weights[[ 2, 5 ]]
-    assert_in_delta 1.5, struggling.question_weights[[ 3, 4 ]]
-    assert_operator struggling.question_weights[[ 6, 9 ]], :<, 0.5
+    assert_in_delta 3.0, struggling.question_weights["2x5"]
+    assert_in_delta 1.5, struggling.question_weights["3x4"]
+    assert_operator struggling.question_weights["6x9"], :<, 0.5
   end
 
   test "the shift eases off as recent games improve" do
@@ -116,9 +116,9 @@ class User::PractisableTest < ActiveSupport::TestCase
 
   test "a fact comes up less as its percentage correct improves" do
     stat = @user.fact_stats.create!(topic: "times_tables", fact: "7x8", correct_count: 1, wrong_count: 3)
-    before = weights[[ 7, 8 ]]
+    before = weights["7x8"]
 
     stat.update!(correct_count: 9)
-    assert_operator weights[[ 7, 8 ]], :<, before
+    assert_operator weights["7x8"], :<, before
   end
 end

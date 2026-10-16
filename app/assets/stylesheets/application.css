@@ -470,6 +470,49 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 .avatar-field__remove { display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; font-weight: 500; }
 .avatar-field .hint { margin-top: 0; }
 
+/* ── Topics ─────────────────────────────────────── */
+
+/* The topic switcher on the home page: what Play plays */
+.switcher {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.3rem;
+  border-radius: calc(var(--radius) + 0.3rem);
+  background: color-mix(in srgb, var(--ink) 7%, var(--paper));
+}
+
+.switcher__form { display: contents; }
+
+.switcher__option {
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  touch-action: manipulation;
+}
+
+.switcher__option[aria-current="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 4px rgb(0 0 0 / 0.12); }
+
+/* Topic tabs on the stats page */
+.tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+
+.tabs .tabs__tab {
+  margin: 0;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.tabs .tabs__tab[aria-current="page"] { background: var(--ink); color: var(--paper); }
+
 /* ── Stats ──────────────────────────────────────── */
 
 .stats--three { grid-template-columns: repeat(3, 1fr); }
@@ -599,6 +642,25 @@ body.testing {
 }
 
 .question--done { font-size: clamp(2.75rem, 12vw, 5rem); }
+
+/* Equations are longer than times tables, so smaller; the letter is italic, fractions are stacked */
+.test--equations .question { font-size: clamp(2.4rem, 11vw, 4.75rem); }
+.question var { font-style: italic; font-weight: 600; padding-right: 0.04em; }
+
+.frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  margin: 0 0.08em;
+  font-size: 0.62em;
+  line-height: 1.05;
+}
+
+.frac > span:first-child { padding: 0 0.15em 0.04em; border-bottom: 0.08em solid currentColor; }
+.frac > span:last-child { padding-top: 0.04em; }
+
+.keypad__key--slash { background: var(--paper); }
 
 /* Fixed height so the layout never shifts as digits appear */
 .answer {

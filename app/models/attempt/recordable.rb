@@ -7,7 +7,8 @@ module Attempt::Recordable
   MIN_ANSWERS_FOR_STREAK = 5
   # The test lasts 60 seconds; allow a little slack for the end-of-test POST
   MAX_TOTAL_MS = 65_000
-  MAX_ANSWER = 999
+  # Every field a result can have in any topic. Each topic checks its own fields strictly
+  RESULT_FIELDS = %i[ a b c type v flip given ms ]
   # A game played offline still counts if it reaches the server within this long
   MAX_OFFLINE_AGE = 30.days
 
@@ -21,7 +22,7 @@ module Attempt::Recordable
   class_methods do
     # Raises Attempt::Invalid when the answers couldn't have come from a real test.
     # A game sent again with the same client id (a retried upload) is only recorded once
-    def record!(user:, results:, topic: TimesTables::TOPIC, client_id: nil, played_at: nil)
+    def record!(user:, results:, topic: Topic.default::TOPIC, client_id: nil, played_at: nil)
       already_recorded(user, client_id) || create_for!(user, client_id:, played_at:, topic:, results: clean_results(topic_named(topic), results))
     rescue ActiveRecord::RecordNotUnique
       already_recorded(user, client_id) || raise
@@ -48,7 +49,7 @@ module Attempt::Recordable
       end
 
       def topic_named(topic)
-        Attempt::TOPICS.fetch(topic) { raise Invalid, "Unknown topic" }
+        Topic.find(topic) || raise(Invalid, "Unknown topic")
       end
 
       def clean_results(topic, results)
@@ -58,23 +59,16 @@ module Attempt::Recordable
         results.map { |result| clean_result(topic, result) }.tap { |cleaned| check_total_time(cleaned) }
       end
 
+      # The topic checks and scores each answer; the timing check is the same for every topic
       def clean_result(topic, result)
-        a, b, given, ms = numbers_in(result)
-        check_result(topic, a, b, given, ms)
-
-        { "a" => a, "b" => b, "given" => given, "correct" => given == topic.answer(a, b), "ms" => ms }
-      end
-
-      def numbers_in(result)
         raise Invalid, "Bad answer" unless result.is_a?(Hash)
 
-        result.stringify_keys.values_at("a", "b", "given", "ms").map { |value| Integer(value, exception: false) }
+        result = result.stringify_keys
+        topic.clean_result(result).merge("ms" => clean_ms(result["ms"]))
       end
 
-      def check_result(topic, a, b, given, ms)
-        raise Invalid, "Bad question" unless a && b && topic.valid_question?(a, b)
-        raise Invalid, "Bad answer" unless given&.between?(0, MAX_ANSWER)
-        raise Invalid, "Bad timing" unless ms&.between?(0, MAX_TOTAL_MS)
+      def clean_ms(ms)
+        Integer(ms, exception: false).tap { |value| raise Invalid, "Bad timing" unless value&.between?(0, MAX_TOTAL_MS) }
       end
 
       def check_total_time(results)
@@ -94,8 +88,9 @@ module Attempt::Recordable
       self.played_on = played_at.in_time_zone(user.time_zone).to_date
     end
 
+    # Best in this topic: a good times tables score shouldn't make equations look bad
     def record_high_score
-      self.new_high_score = user.record_score!(score)
+      self.new_high_score = score.positive? && score > user.best_score(topic_module)
     end
 
     # A snapshot of the streak is kept on the attempt for its results and share pages

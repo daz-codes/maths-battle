@@ -2,7 +2,7 @@ require "test_helper"
 
 class GuestPlayTest < ActionDispatch::IntegrationTest
   test "a visitor can take the test" do
-    get times_tables_path
+    get play_path("times-tables")
     assert_response :success
   end
 
@@ -29,13 +29,13 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
       post attempts_path, params: { attempt: { results: answers(*right_answers(6)) } }, as: :json
     end
     assert_equal 2, User.last.attempts.count
-    assert_equal 6, User.last.high_score
+    assert_equal 6, User.last.best_score(TimesTables)
   end
 
   test "visiting pages doesn't create guests" do
     assert_no_difference -> { User.count } do
       get root_path
-      get times_tables_path
+      get play_path("times-tables")
       get edit_profile_path
     end
   end

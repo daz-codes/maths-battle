@@ -113,6 +113,6 @@ class AttemptTest < ActiveSupport::TestCase
 
     assert first.new_high_score
     assert_not worse.new_high_score
-    assert_equal 6, @user.reload.high_score
+    assert_equal 6, @user.best_score(TimesTables)
   end
 end
