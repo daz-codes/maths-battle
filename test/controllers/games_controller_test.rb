@@ -15,4 +15,10 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a.logo", count: 0, message: "nothing to tap away to mid-test"
     assert_select ".site-footer", count: 0
   end
+
+  test "the timer has one hand, starting at 12" do
+    get play_path("times-tables")
+    assert_select ".timer__clock .clock__hand", 1
+    assert_select ".timer__clock .clock__hand[data-test-target=hand]:not([transform])"
+  end
 end

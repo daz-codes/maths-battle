@@ -23,6 +23,21 @@ class StoppingAGameTest < ApplicationSystemTestCase
     assert_selector ".test__score", text: "1"
   end
 
+  test "the clock's hand goes round once in the minute, and stops while paused" do
+    page.execute_script(<<~JS)
+      const test = window.Stimulus.getControllerForElementAndIdentifier(document.querySelector("[data-controller=test]"), "test")
+      test.endsAt = performance.now() + 45_000
+    JS
+    page.document.synchronize { raise Capybara::ExpectationNotMet unless hand_angle > 45 }
+    assert_in_delta 90, hand_angle, 10, "a quarter of the minute gone is a quarter of the way round"
+
+    find(".test__stop").click
+    assert_selector ".test--paused"
+    paused_at = hand_angle
+    sleep 1
+    assert_equal paused_at, hand_angle
+  end
+
   test "stop game: back home and nothing saved" do
     a, b = find(".question").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
@@ -33,4 +48,9 @@ class StoppingAGameTest < ApplicationSystemTestCase
       assert_selector ".streak"
     end
   end
+
+  private
+    def hand_angle
+      find(".clock__hand", visible: :all)[:transform][/rotate\(([\d.]+)/, 1].to_f
+    end
 end

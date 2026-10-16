@@ -136,8 +136,6 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* A clock face ringed by a minute in four neon quarters */
 .clock { display: block; color: var(--ink); overflow: visible; }
 .clock__track { opacity: 0.15; }
-/* Each hand turns about its bottom end, the centre of the clock */
-.clock__hand { transform-box: fill-box; transform-origin: 50% 100%; }
 
 .logo {
   display: inline-flex;
@@ -147,15 +145,18 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   text-decoration: none;
 }
 
+/* Grows with the screen, but never wider than a small phone allows */
 .logo__mark {
-  width: 3.2rem;
-  height: 3.2rem;
+  width: clamp(3.2rem, 14.4vw, 4rem);
+  height: clamp(3.2rem, 14.4vw, 4rem);
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--blue) var(--glow-strength), transparent));
 }
 
-/* The wordmark is an SVG of Bree Serif: Mathe in ink, Minute in pink */
-.logo__word { display: block; height: 1.9rem; width: auto; }
-.logo__minute { fill: var(--pink-text); }
+/* The wordmark is an SVG of Bree Serif: Mathe in ink, Minute in pink. Outlining each letter in its
+   own colour makes it bolder than the font */
+.logo__word { display: block; height: clamp(1.9rem, 8.6vw, 2.4rem); width: auto; overflow: visible; }
+.logo__word path { stroke: currentColor; stroke-width: 2.2; stroke-linejoin: round; }
+.logo__minute { fill: var(--pink-text); stroke: var(--pink-text) !important; }
 
 /* ── Type ───────────────────────────────────────── */
 
@@ -219,9 +220,9 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   --fill: var(--blue-deep);
   --glow: var(--blue);
   width: 100%;
-  min-height: 5.5rem;
+  min-height: 4.25rem;
   border-radius: var(--radius-big);
-  font-size: clamp(2.25rem, 11vw, 3rem);
+  font-size: clamp(1.75rem, 8.5vw, 2.25rem);
   letter-spacing: 0.04em;
 }
 
@@ -327,7 +328,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 }
 
 .streak__number {
-  font-size: clamp(4.5rem, 26vw, 7.5rem);
+  font-size: clamp(3.5rem, 20vw, 5.5rem);
   font-weight: 700;
   letter-spacing: -0.06em;
   line-height: 1;
@@ -669,18 +670,12 @@ body.testing {
   gap: 0.9rem;
 }
 
-/* The timer is the logo's clock: its quarters fill in over the minute while the hands spin */
+/* The timer is the logo's clock: its quarters fill in over the minute while one hand goes round */
 .timer__clock {
   width: 5.5rem;
   height: 5.5rem;
   filter: drop-shadow(0 0 8px color-mix(in srgb, var(--quarter) var(--glow-strength), transparent));
 }
-
-/* Quick spins, just to show time moving */
-.test--running .clock__hand--long { animation: spin 1.5s linear infinite; }
-.test--running .clock__hand--short { animation: spin 12s linear infinite; }
-
-@keyframes spin { to { transform: rotate(360deg); } }
 
 .test__seconds, .test__score {
   border-radius: var(--radius);

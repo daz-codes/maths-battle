@@ -13,7 +13,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // Offline, the finished game is kept on the device and uploaded later. It can be stopped part way,
 // after a warning, and then nothing is saved
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable" ]
+  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable" ]
   static values = { questionSets: Array, topic: String, level: Number, submitUrl: String, keys: Array }
 
   connect() {
@@ -100,12 +100,14 @@ export default class extends Controller {
     this.frame = requestAnimationFrame(this.tick)
   }
 
-  // Fills the ring's quarters one after another, so a whole minute completes the logo
+  // Fills the ring's quarters one after another, so a whole minute completes the logo,
+  // and turns the hand once round with it, like a real second hand
   fillRing(elapsed) {
     this.quarterTargets.forEach((quarter, i) => {
       const filled = Math.min(1, Math.max(0, elapsed * 4 - i)) * QUARTER_LENGTH
       quarter.setAttribute("stroke-dasharray", `${filled} ${100 - filled}`)
     })
+    if (this.hasHandTarget) this.handTarget.setAttribute("transform", `rotate(${elapsed * 360} 24 24)`)
   }
 
   // Input
