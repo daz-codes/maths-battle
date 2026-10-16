@@ -3,13 +3,13 @@ require "test_helper"
 class EquationsTest < ActiveSupport::TestCase
   def solve(type, a, b, c = nil) = Equations.written(Equations.solve({ type: type, a: a, b: b, c: c }))
 
-  def answer(type, given, **numbers)
-    Equations.clean_result({ "type" => type, "v" => "x", "flip" => false, "given" => given, **numbers.stringify_keys })
+  def answer(type, given, level: 5, **numbers)
+    Equations.clean_result({ "type" => type, "v" => "x", "flip" => false, "given" => given, **numbers.stringify_keys }, level: level)
   end
 
-  def sample(count = 2000, seed: 1)
+  def sample(count = 2000, seed: 1, level: 5)
     random = Random.new(seed)
-    Array.new(count) { Equations.question(Equations.facts.sample(random: random), random: random) }
+    Array.new(count) { Equations.question(Equations.facts(level).sample(random: random), level: level, random: random) }
   end
 
   test "fractions are written top-heavy in lowest terms" do
@@ -34,7 +34,7 @@ class EquationsTest < ActiveSupport::TestCase
     sample.each do |question|
       assert_predicate Equations.solve(question), :positive?
       sent = question.except(:text, :answer).transform_keys(&:to_s).merge("given" => question[:answer])
-      assert Equations.clean_result(sent)["correct"], question.inspect
+      assert Equations.clean_result(sent, level: 5)["correct"], question.inspect
     end
   end
 
@@ -53,9 +53,25 @@ class EquationsTest < ActiveSupport::TestCase
 
   test "refuses questions the game couldn't have asked" do
     assert_raises(Attempt::Invalid) { answer("x^2=b", "2", a: 1, b: 4) }
-    assert_raises(Attempt::Invalid) { Equations.clean_result({ "type" => "ax=b", "v" => "o", "a" => 2, "b" => 4, "given" => "2" }) }
+    assert_raises(Attempt::Invalid) { Equations.clean_result({ "type" => "ax=b", "v" => "o", "a" => 2, "b" => 4, "given" => "2" }, level: 5) }
     assert_raises(Attempt::Invalid) { answer("x+a=b", "0", a: 5, b: 5) }
     assert_raises(Attempt::Invalid) { answer("ax=b", "1/2/3", a: 2, b: 1) }
+  end
+
+  test "levels go from one step with small numbers to two step, bigger numbers, then fractions" do
+    assert_equal Equations::ONE_STEP.sort, sample(500, level: 1).map { _1[:type] }.uniq.sort
+    assert sample(500, level: 2).all? { Equations::ONE_STEP.include?(_1[:type]) }
+    assert sample(500, level: 3).map { _1[:type] }.intersect?(Equations::TWO_STEP)
+    assert sample(500, level: 4).map { _1[:type] }.intersect?(Equations::BRACKETS)
+    assert sample(500, level: 1).none? { _1[:flip] }, "level 1 is always written the usual way round"
+    assert (1..4).all? { |level| sample(500, level: level).none? { _1[:answer].include?("/") } }
+    assert_operator sample(500, level: 2).map { _1[:a] }.max, :>, sample(500, level: 1).map { _1[:a] }.max
+  end
+
+  test "each level accepts its own and easier questions, but not harder ones" do
+    assert answer("x+a=b", "4", level: 3, a: 5, b: 9)["correct"], "a one step question at the two step level"
+    assert_raises(Attempt::Invalid) { answer("ax+b=c", "2", level: 2, a: 2, b: 7, c: 11) }
+    assert_raises(Attempt::Invalid) { answer("ax=b", "3/4", level: 4, a: 12, b: 9) }
   end
 
   test "written out for the results page, with brackets where a fraction's top has two terms" do

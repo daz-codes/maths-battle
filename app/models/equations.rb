@@ -21,10 +21,25 @@ module Equations
     "a(x+b)=c"   => { difficulty: 2, form: "a(x + b) = c",  example: "4(x + 2) = 30" },
     "(x+a)/b=c"  => { difficulty: 2, form: "(x + a)/b = c", example: "(x + 3)/5 = 2" }
   }
-  LEVELS = [ { number: 1, name: "Equations", example: "2x + 7 = 11" } ]
+  ONE_STEP = %w[ x+a=b x-a=b x/a=b ax=b ]
+  TWO_STEP = %w[ ax+b=c ax-b=c x/a+b=c x/a-b=c ]
+  BRACKETS = %w[ a(x+b)=c (x+a)/b=c ]
+
+  # Each level adds to the one before, so earlier levels' questions are always fair game.
+  # The limits set how big the numbers get; fractions only come at the top level
+  SMALL = { solution: 1..10, multiplier: 2..5, divisor: 2..5, addend: 1..10 }
+  BIG = { solution: 1..20, multiplier: 2..12, divisor: 2..10, addend: 1..20 }
+  LEVELS = [
+    { number: 1, name: "One step", example: "x + 4 = 9", types: ONE_STEP, limits: SMALL, flip: false, fractions: false },
+    { number: 2, name: "Bigger one step", example: "12x = 96", types: ONE_STEP, limits: BIG, flip: true, fractions: false },
+    { number: 3, name: "Two step", example: "2x + 3 = 11", types: ONE_STEP + TWO_STEP, limits: SMALL, flip: true, fractions: false },
+    { number: 4, name: "Bigger two step", example: "4(x + 3) = 36", types: ONE_STEP + TWO_STEP + BRACKETS, limits: BIG, flip: true, fractions: false },
+    { number: 5, name: "Fractions", example: "12x = 9", types: ONE_STEP + TWO_STEP + BRACKETS, limits: BIG, flip: true, fractions: true }
+  ]
   # Letters that can't be mistaken for a number or for each other (no i, l, o, s)
   VARIABLES = %w[ x y a b c d k m n p t w z h g r ]
-  FRACTION_CHANCE = 0.35
+  # At the fractions level, how often a question that could have a fraction answer does
+  FRACTION_CHANCE = 0.5
   # How often the equation is written the other way round: 11 = 2x + 7
   FLIP_CHANCE = 0.25
   # The largest number the server accepts in a question sent back (well above anything generated)
@@ -37,15 +52,15 @@ module Equations
     LEVELS
   end
 
-  # Extra keypad keys beyond the digits
-  def keys(_level)
-    [ "/" ]
+  # Extra keypad keys beyond the digits: the fraction line, only at the level with fraction answers
+  def keys(level)
+    level_details(level)[:fractions] ? [ "/" ] : []
   end
 
   # Facts: equation types
 
-  def facts(_level = 1)
-    TYPES.keys
+  def facts(level = 1)
+    level_details(level)[:types]
   end
 
   def fact_key(result)
@@ -63,16 +78,19 @@ module Equations
   # Questions
 
   def question(type, level: 1, random:)
-    numbers = build(type, random)
-    question = { type: type, **numbers, v: VARIABLES.sample(random: random), flip: random.rand < FLIP_CHANCE }
+    details = level_details(level)
+    numbers = build(type, details, random)
+    question = { type: type, **numbers, v: VARIABLES.sample(random: random), flip: details[:flip] && random.rand < FLIP_CHANCE }
     question.merge(text: html(question), answer: written(solve(question)))
   end
 
   # Re-solves the equation from its numbers, so the score never depends on the browser
+  # A question from this level or an easier one: its type must be in the level, and fractions only at the top
   def clean_result(result, level: 1)
     question = question_from(result)
     solution = solve(question)
-    raise Attempt::Invalid, "Bad question" unless solution.positive?
+    raise Attempt::Invalid, "Bad question" unless solution.positive? && facts(level).include?(question[:type])
+    raise Attempt::Invalid, "Bad question" unless solution.denominator == 1 || level_details(level)[:fractions]
 
     given = result["given"].to_s
     raise Attempt::Invalid, "Bad answer" unless given.match?(GIVEN_FORMAT)
@@ -88,8 +106,8 @@ module Equations
 
   # Groups: each type of equation
 
-  def groups
-    facts
+  def groups(level = Topic.max_level(self))
+    facts(level)
   end
 
   def groups_of(type)
@@ -113,8 +131,8 @@ module Equations
     true
   end
 
-  def feedback_groups
-    groups
+  def feedback_groups(level)
+    groups(level)
   end
 
   def practise_message(types)
@@ -148,25 +166,31 @@ module Equations
   end
 
   private
-    # Builds the numbers from a solution chosen first, so every equation works out
-    def build(type, random)
+    def level_details(level)
+      Topic.level(self, level) || raise(Attempt::Invalid, "Unknown level")
+    end
+
+    # Builds the numbers from a solution chosen first, so every equation works out, within the level's limits
+    def build(type, details, random)
+      limits = details[:limits]
+
       case type
-      when "x+a=b"     then plus(random)
-      when "x-a=b"     then minus(random)
-      when "x/a=b"     then divided(random)
-      when "ax=b"      then times(solution(random), random)
-      when "ax+b=c"    then times_plus(solution(random), random)
-      when "ax-b=c"    then times_minus(solution(random), random)
-      when "x/a+b=c"   then divided_plus(random)
-      when "x/a-b=c"   then divided_minus(random)
-      when "a(x+b)=c"  then bracket(solution(random), random)
-      when "(x+a)/b=c" then over(random)
+      when "x+a=b"     then plus(limits, random)
+      when "x-a=b"     then minus(limits, random)
+      when "x/a=b"     then divided(limits, random)
+      when "ax=b"      then times(solution(details, random), limits, random)
+      when "ax+b=c"    then times_plus(solution(details, random), limits, random)
+      when "ax-b=c"    then times_minus(solution(details, random), limits, random)
+      when "x/a+b=c"   then divided_plus(limits, random)
+      when "x/a-b=c"   then divided_minus(limits, random)
+      when "a(x+b)=c"  then bracket(solution(details, random), limits, random)
+      when "(x+a)/b=c" then over(limits, random)
       end
     end
 
-    # A whole number, or for some questions a fraction like 3/4 or 11/9 (never a whole one like 6/3)
-    def solution(random)
-      return Rational(random.rand(1..12)) unless random.rand < FRACTION_CHANCE
+    # A whole number, or at the fractions level often a fraction like 3/4 or 11/9 (never a whole one like 6/3)
+    def solution(details, random)
+      return Rational(random.rand(details[:limits][:solution])) unless details[:fractions] && random.rand < FRACTION_CHANCE
 
       denominator = random.rand(2..9)
       numerator = random.rand(1..denominator * 3) until numerator && numerator.gcd(denominator) == 1 && numerator % denominator != 0
@@ -174,66 +198,66 @@ module Equations
     end
 
     # What the letter is multiplied by: a multiple of the solution's denominator, so the other numbers are whole
-    def multiplier(solution, random, up_to: 12)
+    def multiplier(solution, limits, random, up_to: limits[:multiplier].max)
       denominator = solution.denominator
-      denominator == 1 ? random.rand(2..up_to) : denominator * random.rand(1..[ up_to / denominator, 1 ].max)
+      denominator == 1 ? random.rand(limits[:multiplier].min..up_to) : denominator * random.rand(1..[ up_to / denominator, 1 ].max)
     end
 
-    def plus(random)
-      x, a = random.rand(1..15), random.rand(1..15)
+    def plus(limits, random)
+      x, a = random.rand(limits[:solution]), random.rand(limits[:addend])
       { a: a, b: x + a }
     end
 
-    def minus(random)
-      x = random.rand(2..20)
-      a = random.rand(1..x - 1)
+    def minus(limits, random)
+      x = random.rand([ limits[:solution].min, 2 ].max..limits[:solution].max)
+      a = random.rand(1..[ x - 1, limits[:addend].max ].min)
       { a: a, b: x - a }
     end
 
-    def divided(random)
-      { a: random.rand(2..9), b: random.rand(1..12) }
+    def divided(limits, random)
+      { a: random.rand(limits[:divisor]), b: random.rand(limits[:solution]) }
     end
 
-    def times(solution, random)
-      a = multiplier(solution, random)
+    def times(solution, limits, random)
+      a = multiplier(solution, limits, random)
       { a: a, b: (a * solution).to_i }
     end
 
-    def times_plus(solution, random)
-      a = multiplier(solution, random)
-      b = random.rand(1..15)
+    def times_plus(solution, limits, random)
+      a = multiplier(solution, limits, random)
+      b = random.rand(limits[:addend])
       { a: a, b: b, c: (a * solution).to_i + b }
     end
 
-    def times_minus(solution, random)
-      a = multiplier(solution, random)
+    def times_minus(solution, limits, random)
+      a = multiplier(solution, limits, random)
       a *= 2 while a * solution < 2
       product = (a * solution).to_i
-      b = random.rand(1..[ product - 1, 15 ].min)
+      b = random.rand(1..[ product - 1, limits[:addend].max ].min)
       { a: a, b: b, c: product - b }
     end
 
-    def divided_plus(random)
-      a, quotient, b = random.rand(2..9), random.rand(1..10), random.rand(1..12)
+    def divided_plus(limits, random)
+      a, quotient, b = random.rand(limits[:divisor]), random.rand(1..10), random.rand(limits[:addend])
       { a: a, b: b, c: quotient + b }
     end
 
-    def divided_minus(random)
-      a, quotient = random.rand(2..9), random.rand(2..12)
-      b = random.rand(1..quotient - 1)
+    def divided_minus(limits, random)
+      a, quotient = random.rand(limits[:divisor]), random.rand(2..12)
+      b = random.rand(1..[ quotient - 1, limits[:addend].max ].min)
       { a: a, b: b, c: quotient - b }
     end
 
     # Smaller numbers, as the bracket is already the hard part: 4(x + 2) = 30
-    def bracket(solution, random)
-      a = multiplier(solution, random, up_to: 6)
+    def bracket(solution, limits, random)
+      a = multiplier(solution, limits, random, up_to: [ limits[:multiplier].max, 6 ].min)
       b = random.rand(1..6)
       { a: a, b: b, c: (a * (solution + b)).to_i }
     end
 
-    def over(random)
-      b, c = random.rand(2..9), random.rand(1..10)
-      { a: random.rand(1..[ b * c - 1, 15 ].min), b: b, c: c }
+    def over(limits, random)
+      b, c = random.rand(limits[:divisor]), random.rand(1..10)
+      { a: random.rand(1..[ b * c - 1, limits[:addend].max ].min), b: b, c: c }
     end
 
     def question_from(result)

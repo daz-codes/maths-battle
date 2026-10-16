@@ -28,10 +28,11 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "saves an equations game, checking the answers itself" do
+    unlock(@user, Equations, 5)
     results = [ { type: "ax=b", a: 12, b: 9, v: "x", flip: false, given: "3/4", ms: 2000 },
                 { type: "a(x+b)=c", a: 4, b: 2, c: 30, v: "t", flip: true, given: "6", ms: 3000 } ]
 
-    post attempts_path, params: { attempt: { topic: "equations", results: results } }, as: :json
+    post attempts_path, params: { attempt: { topic: "equations", level: 5, results: results } }, as: :json
 
     assert_response :created
     attempt = @user.attempts.last

@@ -37,10 +37,10 @@ module Attempt::Reviewable
   def weak_groups
     @weak_groups ||= accuracy_by_group
       .select { |_, (right, total)| total.positive? && right.fdiv(total) < GOOD_ENOUGH }
-      .sort_by { |group, (right, total)| [ right.fdiv(total), topic_module.groups.index(group) ] }
+      .sort_by { |group, (right, total)| [ right.fdiv(total), topic_module.groups(level).index(group) ] }
       .first(MAX_WEAK_GROUPS)
       .map(&:first)
-      .sort_by { |group| topic_module.groups.index(group) }
+      .sort_by { |group| topic_module.groups(level).index(group) }
   end
 
   private
@@ -67,7 +67,7 @@ module Attempt::Reviewable
 
     # [right, total] for each group. In times tables 7×8 counts toward both tables, 7×7 once
     def accuracy_by_group
-      topic_module.feedback_groups.index_with { [ 0, 0 ] }.tap do |tally|
+      topic_module.feedback_groups(level).index_with { [ 0, 0 ] }.tap do |tally|
         recent_results.each { |result| tally_result(tally, result) }
       end
     end

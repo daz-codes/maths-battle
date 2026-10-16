@@ -32,7 +32,7 @@ module User::Trackable
   end
 
   def group_stats(topic, level)
-    (@group_stats ||= {})[[ topic, level ]] ||= mark_slow_groups(topic.groups.map { |group| tally(group, topic.group_label(group), stats_for_group(topic, level, group)) })
+    (@group_stats ||= {})[[ topic, level ]] ||= mark_slow_groups(topic.groups(level).map { |group| tally(group, topic.group_label(group), stats_for_group(topic, level, group)) })
   end
 
   # Best on accuracy, then speed

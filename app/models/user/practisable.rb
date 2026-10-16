@@ -1,11 +1,14 @@
 # Chooses a player's questions at random, weighted so that facts with a lower percentage correct,
 # and facts answered right but slowly, come up more often and drop back as the player improves.
 # A player who is struggling overall gets more easy questions and fewer hard ones, to build confidence
-# back up; that eases off by itself as their recent accuracy rises
+# back up; that eases off by itself as their recent accuracy rises.
+# Now and then a question comes from an easier level, so what was learnt there isn't forgotten
 module User::Practisable
   QUESTION_COUNT = 150
   # Extra sets sent with each game page, so games played offline don't repeat the last set
   SPARE_QUESTION_SETS = 5
+  # How often a question comes from an easier level: 2 × 9 now and then at the zeroes level
+  REVIEW_CHANCE = 0.15
   TRIVIAL_WEIGHT = 0.1
   # A fact never answered right comes up this many times as often as one always answered right
   MAX_BOOST = 5
@@ -26,8 +29,9 @@ module User::Practisable
     previous = nil
 
     Array.new(count) do
-      previous = pick_fact(topic, level, excluding: previous, random: random)
-      topic.question(previous, level: level, random: random)
+      asked_at = question_level(level, random)
+      previous = pick_fact(topic, level, from: topic.facts(asked_at), excluding: previous, random: random)
+      topic.question(previous, level: asked_at, random: random)
     end
   end
 
@@ -88,9 +92,15 @@ module User::Practisable
       attempts.in_topic(topic, level).order(created_at: :desc).limit(RECENT_GAMES).flat_map(&:results)
     end
 
+    # Mostly the level being played; sometimes an easier one
+    def question_level(level, random)
+      level > 1 && random.rand < REVIEW_CHANCE ? random.rand(1...level) : level
+    end
+
+    # Weighted by how the player does at this level, from the facts the question's level can ask.
     # Never the same fact twice in a row
-    def pick_fact(topic, level, excluding:, random:)
-      candidates = question_weights(topic, level).except(excluding)
+    def pick_fact(topic, level, from:, excluding:, random:)
+      candidates = question_weights(topic, level).slice(*from).except(excluding)
       target = random.rand * candidates.values.sum
 
       candidates.each do |fact, weight|

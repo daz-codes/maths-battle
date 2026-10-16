@@ -25,8 +25,9 @@ class EquationsTest < ApplicationSystemTestCase
   end
 
   test "a fraction answer can be typed with the on-screen keypad" do
+    unlock(users(:ada), Equations, 5)
     sign_in users(:ada)
-    visit play_path("equations")
+    visit play_path("equations", level: 5)
     assert_selector ".question var", wait: 5
 
     page.execute_script(<<~JS)

@@ -23,8 +23,12 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a.button--start[href=?]", play_path("equations")
   end
 
-  test "the equations game has a fraction key; times tables doesn't" do
+  test "the equations fractions level has a fraction key; other levels and times tables don't" do
     get play_path("equations")
+    assert_select ".keypad__key[data-digit='/']", count: 0
+
+    unlock(@user, Equations, 5)
+    get play_path("equations", level: 5)
     assert_select ".keypad__key[data-digit='/']", text: "/"
 
     get play_path("times-tables")
@@ -43,7 +47,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
 
   test "best scores and stats are per topic" do
     Attempt.record!(user: @user, results: answers(*right_answers(20)))
-    equations = Attempt.record!(user: @user, topic: "equations", results: [ { type: "ax=b", a: 12, b: 9, v: "x", flip: false, given: "3/4", ms: 2000 } ] * 6)
+    equations = Attempt.record!(user: @user, topic: "equations", results: [ { type: "ax=b", a: 3, b: 12, v: "x", flip: false, given: "4", ms: 2000 } ] * 6)
 
     assert equations.new_high_score, "a first equations game is a best, even after a bigger times tables score"
     assert_equal [ 20, 6 ], [ @user.best_score(TimesTables, 1), @user.best_score(Equations, 1) ]
@@ -56,7 +60,8 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "equations feedback names the type to practise" do
-    attempt = Attempt.record!(user: @user, topic: "equations", results: [ { type: "ax+b=c", a: 2, b: 7, c: 11, v: "y", flip: false, given: "3", ms: 2000 } ] * 6)
+    unlock(@user, Equations, 3)
+    attempt = Attempt.record!(user: @user, topic: "equations", level: 3, results: [ { type: "ax+b=c", a: 2, b: 7, c: 11, v: "y", flip: false, given: "3", ms: 2000 } ] * 6)
 
     assert_equal "Practise equations like 2x + 7 = 11", attempt.feedback_message
     assert_equal [ "2y + 7 = 11, so y = 2" ], attempt.missed_facts

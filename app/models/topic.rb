@@ -21,4 +21,8 @@ module Topic
   def self.level(topic, number)
     topic.levels.find { |level| level[:number] == number }
   end
+
+  def self.max_level(topic)
+    topic.levels.size
+  end
 end

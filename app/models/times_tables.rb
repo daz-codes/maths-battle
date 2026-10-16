@@ -91,7 +91,7 @@ module TimesTables
 
   # Groups: each times table
 
-  def groups
+  def groups(_level = nil)
     FACTORS.to_a
   end
 
@@ -117,7 +117,7 @@ module TimesTables
   end
 
   # Feedback isn't given on the trivial tables
-  def feedback_groups
+  def feedback_groups(_level)
     groups - TRIVIAL_FACTORS
   end
 
