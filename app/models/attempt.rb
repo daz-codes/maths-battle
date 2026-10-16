@@ -7,6 +7,9 @@ class Attempt < ApplicationRecord
 
   validates :topic, inclusion: { in: TOPICS.keys }
 
+  # Games long enough to count: starting a test and walking away doesn't
+  scope :counted, -> { where(answered: MIN_ANSWERS_FOR_STREAK..) }
+
   def topic_module
     TOPICS.fetch(topic)
   end

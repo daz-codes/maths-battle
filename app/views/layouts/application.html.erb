@@ -29,7 +29,8 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="<%= content_for(:body_class) %>">
+  <body class="<%= content_for(:body_class) %>"
+        <%= tag.attributes(data: { controller: "sync", sync_upload_url_value: attempts_path, sync_auto_refresh_value: !content_for?(:no_auto_refresh) }) unless content_for?(:focus_mode) %>>
     <%# The logo is the way home from every page, except mid-test where nothing should distract %>
     <% unless content_for?(:focus_mode) %>
       <header class="site-header">

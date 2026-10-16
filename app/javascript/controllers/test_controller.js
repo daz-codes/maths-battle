@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
+import { chooseQuestionSet, newGameId, postGame, saveForLater } from "lib/offline_games"
 
 const DURATION = 60_000
 const WRONG_PAUSE = 400
@@ -9,12 +10,14 @@ const COUNTDOWN = [ [ "Ready", 900 ], [ "Set", 900 ], [ "GO!", 600 ] ]
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 
 // Runs the whole one-minute test in the browser: nothing touches the network until it ends.
-// It can be stopped part way, after a warning, and then nothing is saved
+// Offline, the finished game is kept on the device and uploaded later. It can be stopped part way,
+// after a warning, and then nothing is saved
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "seconds", "status", "retry", "keypad", "stopDialog" ]
-  static values = { questions: Array, topic: String, submitUrl: String }
+  static targets = [ "question", "answer", "score", "quarter", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore" ]
+  static values = { questionSets: Array, topic: String, submitUrl: String }
 
   connect() {
+    this.questions = chooseQuestionSet(this.questionSetsValue).questions
     this.state = "countdown"
     this.index = 0
     this.typed = ""
@@ -133,7 +136,7 @@ export default class extends Controller {
   // Questions
 
   get current() {
-    return this.questionsValue[this.index]
+    return this.questions[this.index]
   }
 
   get correctAnswer() {
@@ -252,29 +255,29 @@ export default class extends Controller {
   }
 
   async submit() {
-    this.retryTarget.hidden = true
     this.status("Saving…")
+    const game = { client_id: newGameId(), played_at: new Date().toISOString(), topic: this.topicValue, results: this.results }
+    const { outcome, url } = await postGame(this.submitUrlValue, game)
 
-    try {
-      const response = await fetch(this.submitUrlValue, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "X-CSRF-Token": document.querySelector("meta[name=csrf-token]")?.content
-        },
-        body: JSON.stringify({ attempt: { topic: this.topicValue, results: this.results } })
-      })
-      if (!response.ok) throw new Error(`Saving failed (${response.status})`)
-
-      const { url } = await response.json()
+    if (outcome === "saved") {
       this.state = "saved"
       Turbo.visit(url, { action: "replace" })
-    } catch (error) {
-      console.error(error)
-      this.status("Couldn't save your score. Check your internet and try again.")
-      this.retryTarget.hidden = false
+    } else if (outcome === "failed") {
+      saveForLater(game)
+      this.showOfflineResult()
+    } else {
+      this.status("Sorry, this game couldn't be saved.")
     }
+  }
+
+  // No connection: the game waits on this device and uploads when the app is next online
+  showOfflineResult() {
+    this.state = "saved"
+    this.statusTarget.hidden = true
+    this.questionTarget.hidden = true
+    this.answerTarget.hidden = true
+    this.offlineScoreTarget.textContent = this.score
+    this.offlineResultTarget.hidden = false
   }
 
   status(message) {

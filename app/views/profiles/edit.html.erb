@@ -1,4 +1,5 @@
 <% content_for :title, "Settings · MatheMinute" %>
+<% content_for :no_auto_refresh, true %>
 
 <main class="page page--narrow">
   <h1 class="heading">Settings</h1>
@@ -47,6 +48,7 @@
     <p class="aside"><%= link_to "Make an account", new_registration_path %> to keep your streak safe.</p>
   <% else %>
     <p class="aside">Signed in as <strong><%= @user.username %></strong></p>
-    <%= button_to "Sign out", session_path, method: :delete, class: "button button--wide", form_class: "wide-form" %>
+    <%= button_to "Sign out", session_path, method: :delete, class: "button button--wide", form_class: "wide-form",
+          data: { action: "sync#forget" } %>
   <% end %>
 </main>

@@ -1,4 +1,6 @@
-# A streak counts the days in a row a player has practised, in their own time zone
+# A streak counts the days in a row a player has practised, in their own time zone.
+# Games played offline can reach the server days later and out of order, so the streak is worked out
+# again from the days that have games, rather than counted up as games arrive
 module User::Streakable
   extend ActiveSupport::Concern
 
@@ -10,14 +12,10 @@ module User::Streakable
     ActiveSupport::TimeZone[time_zone].today
   end
 
-  # Counts one day of practice. Practising again on the same day changes nothing
-  def record_practice!(date = today)
-    return if practised_since?(date)
-
-    self.current_streak = continues_streak?(date) ? current_streak + 1 : 1
-    self.longest_streak = [ longest_streak, current_streak ].max
-    self.last_practised_on = date
-    save!
+  def refresh_streak!
+    days = practised_days
+    runs = runs_of_days(days)
+    update!(current_streak: runs.last.to_i, longest_streak: [ longest_streak, runs.max.to_i ].max, last_practised_on: days.last)
   end
 
   # The streak as it stands today: it's lost once a whole day has been missed
@@ -38,7 +36,12 @@ module User::Streakable
       last_practised_on.present? && last_practised_on >= date
     end
 
-    def continues_streak?(date)
-      last_practised_on == date - 1
+    def practised_days
+      attempts.counted.distinct.order(:played_on).pluck(:played_on)
+    end
+
+    # [14th, 15th, 16th, 18th] → [3, 1]: the lengths of each stretch of days in a row
+    def runs_of_days(days)
+      days.slice_when { |day, next_day| next_day != day + 1 }.map(&:size)
     end
 end

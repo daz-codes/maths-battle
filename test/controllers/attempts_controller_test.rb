@@ -17,6 +17,16 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, attempt.score
   end
 
+  test "an offline game uploaded again isn't saved twice" do
+    upload = { attempt: { results: answers(*right_answers(5)), client_id: "f6b1", played_at: 1.hour.ago.iso8601 } }
+
+    assert_difference -> { Attempt.count } => 1 do
+      post attempts_path, params: upload, as: :json
+      post attempts_path, params: upload, as: :json
+    end
+    assert_response :created
+  end
+
   test "rejects a made-up attempt" do
     assert_no_difference -> { Attempt.count } do
       post attempts_path, params: { attempt: { results: answers(*Array.new(151) { [ 2, 2, 4 ] }, ms: 10) } }, as: :json

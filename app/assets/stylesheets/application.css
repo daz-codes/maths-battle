@@ -648,6 +648,11 @@ body.testing {
 
 .keypad__key--back { background: var(--paper); font-size: 1.6rem; }
 
+/* ── Finished offline ─────────────────────────────── */
+
+.offline-result { display: grid; justify-items: center; gap: 1rem; width: 100%; text-align: center; }
+.offline-result__score { margin: 0; font-size: 1.15rem; font-weight: 600; }
+
 /* ── Stopping a game ─────────────────────────────── */
 
 .test { position: relative; }

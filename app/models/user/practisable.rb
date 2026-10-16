@@ -4,6 +4,8 @@
 # back up; that eases off by itself as their recent accuracy rises
 module User::Practisable
   QUESTION_COUNT = 150
+  # Extra sets sent with each game page, so games played offline don't repeat the last set
+  SPARE_QUESTION_SETS = 5
   TRIVIAL_WEIGHT = 0.1
   # A fact never answered right comes up this many times as often as one always answered right
   MAX_BOOST = 5
@@ -27,6 +29,11 @@ module User::Practisable
       previous = pick_fact(excluding: previous, random: random)
       question_for(previous, random: random)
     end
+  end
+
+  # The set for this game, then spares for playing offline. Each has an id so the device knows which it has used
+  def question_sets(count: 1 + SPARE_QUESTION_SETS)
+    Array.new(count) { { id: SecureRandom.hex(6), questions: questions } }
   end
 
   def question_weights

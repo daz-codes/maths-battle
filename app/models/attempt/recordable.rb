@@ -8,26 +8,45 @@ module Attempt::Recordable
   # The test lasts 60 seconds; allow a little slack for the end-of-test POST
   MAX_TOTAL_MS = 65_000
   MAX_ANSWER = 999
+  # A game played offline still counts if it reaches the server within this long
+  MAX_OFFLINE_AGE = 30.days
 
   class Invalid < StandardError; end
 
   included do
-    before_create :score_results, :update_player
-    after_create :record_fact_stats
+    before_create :score_results, :set_played_on, :record_high_score
+    after_create :update_streak, :record_fact_stats
   end
 
   class_methods do
-    # Raises Attempt::Invalid when the answers couldn't have come from a real test
-    def record!(user:, results:, topic: TimesTables::TOPIC)
-      results = clean_results(topic_named(topic), results)
-
-      transaction do
-        user.lock!
-        user.attempts.create!(topic: topic, results: results)
-      end
+    # Raises Attempt::Invalid when the answers couldn't have come from a real test.
+    # A game sent again with the same client id (a retried upload) is only recorded once
+    def record!(user:, results:, topic: TimesTables::TOPIC, client_id: nil, played_at: nil)
+      already_recorded(user, client_id) || create_for!(user, client_id:, played_at:, topic:, results: clean_results(topic_named(topic), results))
+    rescue ActiveRecord::RecordNotUnique
+      already_recorded(user, client_id) || raise
     end
 
     private
+      def already_recorded(user, client_id)
+        user.attempts.find_by(client_id: client_id) if client_id.present?
+      end
+
+      def create_for!(user, client_id:, played_at:, topic:, results:)
+        transaction do
+          user.lock!
+          user.attempts.create!(topic: topic, results: results, client_id: client_id.presence, played_at: play_time(played_at))
+        end
+      end
+
+      # The device's clock can be wrong, so a time in the future, or too long ago, counts as now
+      def play_time(value)
+        time = Time.zone.parse(value.to_s) if value.present?
+        time&.between?(MAX_OFFLINE_AGE.ago, 5.minutes.from_now) ? time : Time.current
+      rescue ArgumentError
+        Time.current
+      end
+
       def topic_named(topic)
         Attempt::TOPICS.fetch(topic) { raise Invalid, "Unknown topic" }
       end
@@ -69,11 +88,20 @@ module Attempt::Recordable
       self.answered = results.size
     end
 
-    # Best score and streak, with a snapshot of the streak kept on the attempt for its results and share pages
-    def update_player
+    # The day the game counts towards, in the player's time zone
+    def set_played_on
+      self.played_at ||= Time.current
+      self.played_on = played_at.in_time_zone(user.time_zone).to_date
+    end
+
+    def record_high_score
       self.new_high_score = user.record_score!(score)
-      user.record_practice! if counts_toward_streak?
-      self.streak = user.streak
+    end
+
+    # A snapshot of the streak is kept on the attempt for its results and share pages
+    def update_streak
+      user.refresh_streak! if counts_toward_streak?
+      update_column(:streak, user.streak)
     end
 
     # Starting a test and walking away doesn't count

@@ -51,7 +51,7 @@ module User::Trackable
 
   private
     def counted_games
-      attempts.where(topic: TimesTables::TOPIC, answered: Attempt::MIN_ANSWERS_FOR_STREAK..)
+      attempts.counted.where(topic: TimesTables::TOPIC)
     end
 
     def stats_for_table(table)

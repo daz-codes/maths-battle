@@ -73,6 +73,40 @@ class AttemptTest < ActiveSupport::TestCase
     assert_equal 0, attempt.streak
   end
 
+  test "a game uploaded twice is only recorded once" do
+    first = Attempt.record!(user: @user, results: answers(*right_answers(6)), client_id: "abc-123")
+
+    assert_no_difference -> { Attempt.count } do
+      assert_equal first, Attempt.record!(user: @user, results: answers(*right_answers(6)), client_id: "abc-123")
+    end
+    assert_equal 6, @user.fact_stats.sum(:correct_count), "stats only counted once"
+  end
+
+  test "different players can use the same client id" do
+    Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), client_id: "same")
+    assert_difference -> { Attempt.count } do
+      Attempt.record!(user: users(:bob), results: answers([ 2, 2, 4 ]), client_id: "same")
+    end
+  end
+
+  test "keeps when a game was played, counting the day in the player's time zone" do
+    travel_to Time.utc(2026, 10, 16, 9) do
+      @user.update!(time_zone: "Eastern Time (US & Canada)")
+      attempt = Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), played_at: "2026-10-16T02:30:00Z")
+
+      assert_equal Time.utc(2026, 10, 16, 2, 30), attempt.played_at
+      assert_equal Date.new(2026, 10, 15), attempt.played_on, "half past ten at night on the 15th in New York"
+    end
+  end
+
+  test "a play time in the future or too long ago counts as now" do
+    travel_to Time.utc(2026, 10, 16, 9) do
+      assert_equal Time.current, Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), played_at: "2026-10-20T09:00:00Z").played_at
+      assert_equal Time.current, Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), played_at: "2026-08-01T09:00:00Z").played_at
+      assert_equal Time.current, Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), played_at: "nonsense").played_at
+    end
+  end
+
   test "records a new high score" do
     first = Attempt.record!(user: @user, results: answers(*right_answers(6)))
     worse = Attempt.record!(user: @user, results: answers(*right_answers(5)))
