@@ -15,7 +15,8 @@ module User::Avatarable
     attr_reader :avatar_upload
     attribute :remove_avatar, :boolean, default: false
 
-    validate :process_avatar_upload, if: :avatar_upload
+    validate :check_avatar_upload, if: :avatar_upload
+    before_save :process_avatar_upload, if: :avatar_upload
     after_save_commit :finish_avatar_changes
   end
 
@@ -32,25 +33,29 @@ module User::Avatarable
   end
 
   private
-    def process_avatar_upload
+    def check_avatar_upload
       if !avatar_upload.respond_to?(:tempfile)
         errors.add(:avatar, "needs to be a photo or picture")
       elsif avatar_upload.size > MAX_UPLOAD_SIZE
         errors.add(:avatar, "is too big (the most is 10 MB)")
       elsif CONTENT_TYPES.exclude?(Marcel::MimeType.for(avatar_upload.tempfile, name: avatar_upload.original_filename))
         errors.add(:avatar, "needs to be a photo or picture")
-      else
-        processed = ImageProcessing::Vips
-          .source(avatar_upload.tempfile)
-          .resize_to_fill(SIZE, SIZE)
-          .convert("webp")
-          .saver(strip: true, Q: 82)
-          .call
-        # Assigned rather than attached, so Active Storage stores it as part of this save
-        self.avatar = { io: processed, filename: "avatar.webp", content_type: "image/webp" }
       end
+    end
+
+    # A file can look like a picture and still not open, so that stops the save too
+    def process_avatar_upload
+      processed = ImageProcessing::Vips
+        .source(avatar_upload.tempfile)
+        .resize_to_fill(SIZE, SIZE)
+        .convert("webp")
+        .saver(strip: true, Q: 82)
+        .call
+      # Assigned rather than attached, so Active Storage stores it as part of this save
+      self.avatar = { io: processed, filename: "avatar.webp", content_type: "image/webp" }
     rescue ImageProcessing::Error, Vips::Error
       errors.add(:avatar, "couldn't be read. Try a different picture")
+      throw :abort
     end
 
     # A new upload replaces the old picture anyway, so removing only applies without one.

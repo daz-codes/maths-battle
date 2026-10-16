@@ -1,4 +1,4 @@
-class AddLevels < ActiveRecord::Migration[8.2]
+class AddLevels < ActiveRecord::Migration[8.1]
   def up
     add_column :attempts, :level, :integer, null: false, default: 1
     # Set when this game unlocked the next level, for its results page

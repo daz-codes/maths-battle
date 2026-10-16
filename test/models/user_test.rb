@@ -4,15 +4,15 @@ class UserTest < ActiveSupport::TestCase
   setup { @user = users(:ada) }
 
   test "usernames are stored lowercase and stripped, so sign in isn't case sensitive" do
-    user = User.create!(username: "  Charlie_9 ", password: "secret")
+    user = User.create!(username: "  Charlie_9 ", password: "a long secret phrase")
     assert_equal "charlie_9", user.username
-    assert_equal user, User.authenticate_by(username: "CHARLIE_9", password: "secret")
+    assert_equal user, User.authenticate_by(username: "CHARLIE_9", password: "a long secret phrase")
   end
 
   test "usernames must be unique and simple" do
-    assert_not User.new(username: "ADA", password: "secret").valid?
-    assert_not User.new(username: "has space", password: "secret").valid?
-    assert_not User.new(username: "ab", password: "secret").valid?
+    assert_not User.new(username: "ADA", password: "a long secret phrase").valid?
+    assert_not User.new(username: "has space", password: "a long secret phrase").valid?
+    assert_not User.new(username: "ab", password: "a long secret phrase").valid?
   end
 
   def play_on(date, played_at: nil)
@@ -92,6 +92,15 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
+  test "takes the time zone the device names, ignoring ones it doesn't know" do
+    @user.update_time_zone("America/Los_Angeles")
+    assert_equal "America/Los_Angeles", @user.reload.time_zone
+
+    [ "", "Nowhere/Special", nil, 5 ].each { |zone| @user.update_time_zone(zone) }
+    assert_equal "America/Los_Angeles", @user.reload.time_zone
+    assert_not User.new(time_zone: "Nowhere/Special").valid?
+  end
+
   test "practice just after midnight counts for the new day" do
     play_on day(14)
 
@@ -109,6 +118,18 @@ class UserTest < ActiveSupport::TestCase
 end
 
 class UserGuestTest < ActiveSupport::TestCase
+  test "new passwords must be at least fifteen characters" do
+    guest = User.create_guest!
+    assert_not guest.register(name: "Zara", username: "zara_b", password: "1234")
+    assert guest.errors.added?(:password, :too_short, count: User::MIN_PASSWORD_LENGTH)
+  end
+
+  test "passwords cannot exceed bcrypt's byte limit even with fewer than seventy two characters" do
+    guest = User.create_guest!
+    assert_not guest.register(name: "Zara", username: "zara_b", password: "é" * 37)
+    assert guest.errors.added?(:password, :password_too_long)
+  end
+
   test "guests have no username or password" do
     guest = User.create_guest!
     assert guest.guest?
@@ -121,7 +142,7 @@ class UserGuestTest < ActiveSupport::TestCase
     assert_not guest.register(name: "", username: "", password: "")
     assert_equal %i[ name password username ], guest.errors.attribute_names.sort
 
-    assert guest.register(name: "Zara", username: "Zara_B", password: "1234")
+    assert guest.register(name: "Zara", username: "Zara_B", password: "a long secret phrase")
     assert_not guest.reload.guest?
     assert_equal "Zara", guest.display_name
   end

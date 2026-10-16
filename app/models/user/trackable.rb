@@ -1,6 +1,8 @@
 # A player's all-time record in a topic, for each of its groups (each times table, each type of equation):
 # accuracy and average answer speed, and which group is their best and which needs the most practice
 module User::Trackable
+  extend ActiveSupport::Concern
+
   # A group needs this many answers before it can be called best or worst
   MIN_ANSWERS_TO_RANK = 5
 
@@ -23,12 +25,12 @@ module User::Trackable
   end
 
   def games_played(topic, level)
-    attempts.in_topic(topic, level).count
+    attempts.at_level(topic, level).count
   end
 
   # Over real games only: a test started and walked away from shouldn't drag it down
   def average_score(topic, level)
-    attempts.counted.in_topic(topic, level).average(:score)&.round
+    attempts.counted.at_level(topic, level).average(:score)&.round
   end
 
   def group_stats(topic, level)

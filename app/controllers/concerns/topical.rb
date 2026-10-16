@@ -13,7 +13,7 @@ module Topical
     end
 
     def remember_topic(topic)
-      cookies.permanent[:topic] = topic::TOPIC
+      cookies.permanent[:topic] = topic.key
     end
 
     def topic_from_slug
@@ -42,6 +42,6 @@ module Topical
     end
 
     def level_cookie(topic)
-      "level_#{topic::TOPIC}"
+      "level_#{topic.key}"
     end
 end

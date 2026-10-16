@@ -24,6 +24,15 @@ class User::AvatarableTest < ActiveSupport::TestCase
     assert_not @user.reload.avatar.attached?
   end
 
+  test "a file that looks like a photo but won't open isn't saved" do
+    broken = Tempfile.new([ "broken", ".jpg" ]).tap { |file| file.binmode.write("\xFF\xD8\xFF\xE0".b + "not really a photo" * 20).then { file.rewind } }
+
+    assert_not @user.update(name: "Ada", avatar_upload: Rack::Test::UploadedFile.new(broken.path, "image/jpeg"))
+    assert_includes @user.errors[:avatar], "couldn't be read. Try a different picture"
+    assert_not @user.reload.avatar.attached?
+    assert_nil @user.name, "nothing else is saved either"
+  end
+
   test "rejects text pretending to be an upload" do
     assert_not @user.update(avatar_upload: "photo.jpg")
     assert_not @user.avatar.attached?

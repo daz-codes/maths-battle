@@ -3,7 +3,12 @@ class AttemptsController < ApplicationController
   rate_limit to: 20, within: 1.minute, only: :create
 
   def create
-    attempt = Attempt.record!(user: player, topic: topic_param, level: level_param, results: results_param, **upload_params)
+    results = results_param
+    Attempt::GameTicket.verify!(params.dig(:attempt, :ticket), owner: player_key,
+      topic: topic_param, level: level_param, client_id: params.dig(:attempt, :client_id), results: results)
+    player.update_time_zone(params.dig(:attempt, :time_zone))
+    attempt = Attempt.record!(user: player, topic: topic_param, level: level_param, results: results, **upload_params)
+    forget_level(attempt.topic_module) if attempt.levelled_up
     render json: { url: attempt_path(attempt) }, status: :created
   rescue Attempt::Invalid => error
     render json: { error: error.message }, status: :unprocessable_entity
@@ -11,17 +16,16 @@ class AttemptsController < ApplicationController
 
   def show
     @attempt = Current.user.attempts.find(params[:id])
-    forget_level(@attempt.topic_module) if @attempt.levelled_up
   end
 
   private
     # Guests' first saved test gives them an account and a session on this device
     def player
-      resume_or_start_guest_session.user
+      @player ||= resume_or_start_guest_session.user
     end
 
     def topic_param
-      params.dig(:attempt, :topic) || Topic.default::TOPIC
+      params.dig(:attempt, :topic) || Topic.default.key
     end
 
     def level_param
@@ -33,7 +37,9 @@ class AttemptsController < ApplicationController
       params.fetch(:attempt, {}).permit(:client_id, :played_at).to_h.symbolize_keys
     end
 
+    # Anything but a list (like a hash with numbered keys) goes through as it is, to be refused as not a list
     def results_param
-      params.fetch(:attempt, {}).permit(results: Attempt::RESULT_FIELDS).fetch(:results, []).map(&:to_h)
+      results = params.fetch(:attempt, {}).permit(results: Attempt::RESULT_FIELDS).fetch(:results, [])
+      results.is_a?(Array) ? results.map(&:to_h) : results
     end
 end

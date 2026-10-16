@@ -1,4 +1,4 @@
-class AddGuestsNamesAndThemesToUsers < ActiveRecord::Migration[8.2]
+class AddGuestsNamesAndThemesToUsers < ActiveRecord::Migration[8.1]
   def change
     # Guests have an account but no username or password until they sign up
     change_column_null :users, :username, true

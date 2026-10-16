@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-GB" data-theme="<%= current_player.theme %>">
+<html lang="<%= language %>" data-theme="<%= current_player.theme %>">
   <head>
     <title><%= content_for(:title) || "MatheMinute" %></title>
     <meta name="viewport" content="<%= content_for(:viewport) || "width=device-width,initial-scale=1" %>">
@@ -12,6 +12,9 @@
     <meta name="theme-color" content="#181a32" media="(prefers-color-scheme: dark)">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <meta name="player-key" content="<%= player_key %>">
+    <meta name="player-version" content="<%= player_identity_version %>">
+    <meta name="turbo-cache-control" content="no-cache">
 
     <%= yield :head %>
 
@@ -37,6 +40,7 @@
         <%= render "logo" %>
         <%= tag.p(yield(:tagline), class: "tagline") if content_for?(:tagline) %>
       </header>
+      <p class="flash flash--alert refused-games" role="alert" data-sync-target="refused" hidden></p>
     <% end %>
     <%= yield %>
     <%= render "footer" unless content_for?(:focus_mode) %>

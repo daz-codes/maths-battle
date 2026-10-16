@@ -4,7 +4,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MatheMinute">
   <meta property="og:title" content="<%= @attempt.share_title %>">
-  <meta property="og:description" content="A MatheMinute player got <%= @attempt.score %> times tables right in 60 seconds. Can you beat it?">
+  <meta property="og:description" content="<%= @attempt.share_description %>">
   <meta property="og:url" content="<%= share_url(@attempt.share_token) %>">
   <meta name="twitter:card" content="summary">
 <% end %>

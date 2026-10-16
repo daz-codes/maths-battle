@@ -44,6 +44,9 @@ jobs:
       - name: Scan for security vulnerabilities in JavaScript dependencies
         run: bin/importmap audit
 
+      - name: Test offline storage and service worker isolation
+        run: node --test test/javascript/*.mjs
+
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 15

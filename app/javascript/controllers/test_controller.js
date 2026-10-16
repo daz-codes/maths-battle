@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
-import { chooseQuestionSet, newGameId, postGame, saveForLater } from "lib/offline_games"
+import { chooseQuestionSet, playerKey, preparePlayer, postGame, saveForLater, watchPlayer } from "lib/offline_games"
 
 const DURATION = 60_000
 const WRONG_PAUSE = 400
@@ -13,11 +13,25 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // Offline, the finished game is kept on the device and uploaded later. It can be stopped part way,
 // after a warning, and then nothing is saved
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore" ]
+  static targets = [ "question", "answer", "score", "quarter", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable" ]
   static values = { questionSets: Array, topic: String, level: Number, submitUrl: String, keys: Array }
 
   connect() {
-    this.questions = chooseQuestionSet(this.questionSetsValue).questions
+    preparePlayer()
+    this.state = "countdown"
+    this.unwatch = watchPlayer(() => { this.state = "stopped" })
+    if (this.state === "stopped") return
+    this.questionSet = chooseQuestionSet(this.questionSetsValue, `${this.topicValue}:${this.levelValue}`)
+    if (!this.questionSet) {
+      this.state = "stopped"
+      this.questionTarget.hidden = true
+      this.answerTarget.hidden = true
+      this.unavailableTarget.hidden = false
+      this.keypadTarget.hidden = true
+      return
+    }
+    this.questions = this.questionSet.questions
+    this.player = playerKey()
     this.state = "countdown"
     this.index = 0
     this.typed = ""
@@ -34,6 +48,7 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.unwatch?.()
     document.removeEventListener("keydown", this.keydown)
     window.removeEventListener("beforeunload", this.beforeUnload)
     cancelAnimationFrame(this.frame)
@@ -214,6 +229,7 @@ export default class extends Controller {
   // Stopping part way. The clock pauses while the warning is open, so keeping playing costs no time
 
   confirmStop() {
+    if (this.state === "stopped" || this.state === "rejected") return Turbo.visit("/", { action: "replace" })
     if (this.state !== "running" && this.state !== "countdown") return
 
     this.pause()
@@ -277,18 +293,39 @@ export default class extends Controller {
 
   async submit() {
     this.status("Saving…")
-    const game = { client_id: newGameId(), played_at: new Date().toISOString(), topic: this.topicValue, level: this.levelValue, results: this.results }
+    const game = this.game ||= {
+      client_id: this.questionSet.id, ticket: this.questionSet.ticket, player_key: this.player,
+      played_at: new Date().toISOString(), time_zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      topic: this.topicValue, level: this.levelValue, results: this.results
+    }
     const { outcome, url } = await postGame(this.submitUrlValue, game)
 
     if (outcome === "saved") {
       this.state = "saved"
       Turbo.visit(url, { action: "replace" })
     } else if (outcome === "failed") {
-      saveForLater(game)
-      this.showOfflineResult()
+      if (saveForLater(game)) {
+        this.showOfflineResult()
+      } else {
+        this.status("Your game couldn't be saved on this device. Keep this page open and try saving again when you're connected.")
+        this.retryButton().hidden = false
+      }
     } else {
+      this.state = "rejected"
       this.status("Sorry, this game couldn't be saved.")
     }
+  }
+
+  retryButton() {
+    if (!this.retry) {
+      this.retry = document.createElement("button")
+      this.retry.type = "button"
+      this.retry.className = "button"
+      this.retry.textContent = "Try saving again"
+      this.retry.addEventListener("click", () => { this.retry.hidden = true; this.submit() })
+      this.statusTarget.after(this.retry)
+    }
+    return this.retry
   }
 
   // No connection: the game waits on this device and uploads when the app is next online

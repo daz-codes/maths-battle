@@ -1,26 +1,15 @@
 class Attempt < ApplicationRecord
-  include Recordable, Reviewable, Shareable
+  include Gradable, Recordable, Reviewable, Shareable
 
   belongs_to :user
 
   validates :topic, inclusion: { in: Topic.keys }
 
-  # Games long enough to count: starting a test and walking away doesn't
-  scope :counted, -> { where(answered: MIN_ANSWERS_FOR_STREAK..) }
-  scope :in_topic, ->(topic, level = nil) { where(topic: topic::TOPIC, **({ level: level } if level).to_h) }
-  # Games good enough to count towards levelling up: plenty answered, nearly all right
-  scope :good, -> { where(answered: User::Levelable::GOOD_GAME_ANSWERS..).where("score >= answered * ?", User::Levelable::GOOD_GAME_ACCURACY) }
+  scope :in_topic, ->(topic) { where(topic: topic.key) }
+  scope :at_level, ->(topic, level) { in_topic(topic).where(level: level) }
 
   def topic_module
     Topic.find(topic)
-  end
-
-  def level_details
-    Topic.level(topic_module, level)
-  end
-
-  def good?
-    answered >= User::Levelable::GOOD_GAME_ANSWERS && score >= answered * User::Levelable::GOOD_GAME_ACCURACY
   end
 
   def results_by_fact

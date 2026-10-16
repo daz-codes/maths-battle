@@ -46,11 +46,8 @@ module Equations
   MAX_NUMBER = 999
   GIVEN_FORMAT = %r{\A\d{1,4}(/\d{1,4})?\z}
 
+  extend Topic::Playable
   extend self
-
-  def levels
-    LEVELS
-  end
 
   # Extra keypad keys beyond the digits: the fraction line, only at the level with fraction answers
   def keys(level)
@@ -106,7 +103,7 @@ module Equations
 
   # Groups: each type of equation
 
-  def groups(level = Topic.max_level(self))
+  def groups(level = max_level)
     facts(level)
   end
 
@@ -166,8 +163,8 @@ module Equations
   end
 
   private
-    def level_details(level)
-      Topic.level(self, level) || raise(Attempt::Invalid, "Unknown level")
+    def level_details(number)
+      level(number) || raise(Attempt::Invalid, "Unknown level")
     end
 
     # Builds the numbers from a solution chosen first, so every equation works out, within the level's limits

@@ -30,11 +30,8 @@ module TimesTables
   NEGATIVES_FROM = 5
   NUMBER_FORMAT = /\A-?\d{1,9}(\.\d{1,6})?\z/
 
+  extend Topic::Playable
   extend self
-
-  def levels
-    LEVELS
-  end
 
   # Extra keypad keys beyond the digits
   def keys(level)
@@ -72,10 +69,12 @@ module TimesTables
     { a: written(a), b: written(b), text: "#{shown(a)} × #{shown(b)}", answer: written(a * b) }
   end
 
-  # The answers the browser sent, checked and scored here rather than trusted
+  # The answers the browser sent, checked and scored here rather than trusted. The fact must be one the level
+  # asks, so level 1 only takes the 2–5 tables
   def clean_result(result, level: 1)
     a, b = result.values_at("a", "b").map { |number| decimal(number) }
     raise Attempt::Invalid, "Bad question" unless [ a, b ].all? { |number| number && allowed?(number, level) }
+    raise Attempt::Invalid, "Bad question" unless facts(level).include?(fact_key(result))
 
     given = result["given"].to_s
     raise Attempt::Invalid, "Bad answer" unless given.match?(NUMBER_FORMAT)

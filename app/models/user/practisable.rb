@@ -4,6 +4,8 @@
 # back up; that eases off by itself as their recent accuracy rises.
 # Now and then a question comes from an easier level, so what was learnt there isn't forgotten
 module User::Practisable
+  extend ActiveSupport::Concern
+
   QUESTION_COUNT = 150
   # Extra sets sent with each game page, so games played offline don't repeat the last set
   SPARE_QUESTION_SETS = 5
@@ -37,7 +39,7 @@ module User::Practisable
 
   # The set for this game, then spares for playing offline. Each has an id so the device knows which it has used
   def question_sets(topic: Topic.default, level: 1, count: 1 + SPARE_QUESTION_SETS)
-    Array.new(count) { { id: SecureRandom.hex(6), questions: questions(topic: topic, level: level) } }
+    Array.new(count) { { id: SecureRandom.hex(16), questions: questions(topic: topic, level: level) } }
   end
 
   def question_weights(topic = Topic.default, level = 1)
@@ -89,7 +91,7 @@ module User::Practisable
     end
 
     def recent_answers(topic, level)
-      attempts.in_topic(topic, level).order(created_at: :desc).limit(RECENT_GAMES).flat_map(&:results)
+      attempts.at_level(topic, level).order(created_at: :desc).limit(RECENT_GAMES).flat_map(&:results)
     end
 
     # Mostly the level being played; sometimes an easier one

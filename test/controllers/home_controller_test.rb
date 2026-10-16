@@ -17,9 +17,11 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   test "says maths to browsers set to the UK, and math to everyone else" do
     get root_path, headers: { "Accept-Language" => "en-GB,en;q=0.9" }
     assert_select ".tagline", text: "Improve your maths, one minute at a time"
+    assert_select "html[lang=en-GB]"
 
     get root_path, headers: { "Accept-Language" => "en-US,en;q=0.9" }
     assert_select ".tagline", text: "Improve your math, one minute at a time"
+    assert_select "html[lang=en-US]"
 
     get root_path, headers: { "Accept-Language" => "fr-FR" }
     assert_select ".tagline", text: /your math,/

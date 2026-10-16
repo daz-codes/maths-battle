@@ -26,7 +26,7 @@
   <% end %>
 
   <%= render "topics/chooser", choosing: :play, user: current_player, topic: current_topic, level: current_level %>
-  <%= link_to "Play", play_path(current_topic::SLUG), class: "button button--start" %>
+  <%= link_to "Play", play_path(current_topic.slug), class: "button button--start" %>
   <%= render "levels/progress", user: @user, topic: current_topic %>
 
   <% if @user.persisted? %>
@@ -36,7 +36,7 @@
       <div><dt>Average score</dt><dd><%= @user.average_score(current_topic, current_level) || "—" %></dd></div>
       <div><dt>Average time</dt><dd><%= seconds(@user.overall_stats(current_topic, current_level).average_ms) %></dd></div>
     </dl>
-    <%= link_to "See all stats", stats_path(current_topic::SLUG) %>
+    <%= link_to "See all stats", stats_path(current_topic.slug) %>
   <% end %>
 
   <% if @user.guest? && @user.persisted? %>

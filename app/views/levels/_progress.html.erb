@@ -3,6 +3,6 @@
   <p class="level-progress">
     <%= pluralize(user.good_games_to_level_up(topic), "more good game") %> at level <%= user.unlocked_level(topic) %>
     to unlock <strong>Level <%= upcoming[:number] %>: <%= upcoming[:name] %></strong>
-    <span class="level-progress__rule">A good game is <%= User::Levelable::GOOD_GAME_ANSWERS %>+ answered and <%= (User::Levelable::GOOD_GAME_ACCURACY * 100).round %>%+ right.</span>
+    <span class="level-progress__rule">A good game is <%= Attempt::GOOD_GAME_ANSWERS %>+ answered and <%= (Attempt::GOOD_GAME_ACCURACY * 100).round %>%+ right.</span>
   </p>
 <% end %>

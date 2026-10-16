@@ -20,7 +20,8 @@
     <p class="hint">You'll use this to sign in. Don't use your real name.</p>
 
     <%= form.label :password %>
-    <%= form.password_field :password, required: true, autocomplete: "new-password", minlength: 4, maxlength: 72 %>
+    <%= form.password_field :password, required: true, autocomplete: "new-password", minlength: User::MIN_PASSWORD_LENGTH, maxlength: 72 %>
+    <p class="hint">Use at least <%= User::MIN_PASSWORD_LENGTH %> characters. A few words together work well.</p>
 
     <%= form.submit "Let's go!", class: "button button--go" %>
   <% end %>

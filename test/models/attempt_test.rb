@@ -4,7 +4,7 @@ class AttemptTest < ActiveSupport::TestCase
   setup { @user = users(:ada) }
 
   test "the score is worked out on the server" do
-    attempt = Attempt.record!(user: @user, results: answers([ 7, 8, 56 ], [ 6, 7, 41 ], [ 9, 9, 81 ]).map { |r| r.merge(correct: true, score: 99) })
+    attempt = record_tables_game(@user, answers([ 7, 8, 56 ], [ 6, 7, 41 ], [ 9, 9, 81 ]).map { |r| r.merge(correct: true, score: 99) })
 
     assert_equal 2, attempt.score
     assert_equal 3, attempt.answered
@@ -40,22 +40,22 @@ class AttemptTest < ActiveSupport::TestCase
   end
 
   test "updates the fact stats, treating both orders as one fact" do
-    Attempt.record!(user: @user, results: answers([ 7, 8, 56 ], [ 8, 7, 54 ], [ 3, 4, 12 ]))
+    record_tables_game(@user, answers([ 7, 8, 56 ], [ 8, 7, 54 ], [ 3, 4, 12 ]))
 
     seven_eight = @user.fact_stats.find_by!(topic: "times_tables", fact: "7x8")
     assert_equal [ 1, 1, 50 ], [ seven_eight.correct_count, seven_eight.wrong_count, seven_eight.percent_correct ]
     assert_equal 100, @user.fact_stats.find_by!(fact: "3x4").percent_correct
 
-    Attempt.record!(user: @user, results: answers([ 8, 7, 56 ]))
+    record_tables_game(@user, answers([ 8, 7, 56 ]))
     assert_equal 67, seven_eight.reload.percent_correct
   end
 
   test "keeps the average time of right answers, capping very long ones" do
-    Attempt.record!(user: @user, results: [ { a: 7, b: 8, given: 56, ms: 2000 }, { a: 8, b: 7, given: 56, ms: 4000 }, { a: 7, b: 8, given: 1, ms: 9000 } ])
+    record_tables_game(@user, [ { a: 7, b: 8, given: 56, ms: 2000 }, { a: 8, b: 7, given: 56, ms: 4000 }, { a: 7, b: 8, given: 1, ms: 9000 } ])
     seven_eight = @user.fact_stats.find_by!(fact: "7x8")
     assert_equal 3000, seven_eight.average_correct_ms, "wrong answers aren't timed"
 
-    Attempt.record!(user: @user, results: [ { a: 7, b: 8, given: 56, ms: 30_000 } ])
+    record_tables_game(@user, [ { a: 7, b: 8, given: 56, ms: 30_000 } ])
     assert_equal 16_000, seven_eight.reload.correct_ms, "a 30 second answer counts as 10"
   end
 
@@ -114,5 +114,13 @@ class AttemptTest < ActiveSupport::TestCase
     assert first.new_high_score
     assert_not worse.new_high_score
     assert_equal 6, @user.best_score(TimesTables, 1)
+  end
+
+  test "keeps the best score as it was when the game was played" do
+    first = Attempt.record!(user: @user, results: answers(*right_answers(6)))
+    Attempt.record!(user: @user, results: answers(*right_answers(9)))
+
+    assert_equal 6, first.reload.best_score
+    assert_equal "🔥 1 day streak  🏆 Best: 6", first.share_stats, "a later, better game doesn't change an old share"
   end
 end

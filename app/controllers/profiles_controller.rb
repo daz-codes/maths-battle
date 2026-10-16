@@ -1,5 +1,7 @@
 class ProfilesController < ApplicationController
   allow_unauthenticated_access
+  # Saving settings before playing makes a guest account, so this stops anyone making them by the thousand
+  rate_limit to: 10, within: 3.minutes, only: :update, with: -> { redirect_to edit_profile_path, alert: "Try again later." }
 
   def edit
     @user = current_player

@@ -4,6 +4,7 @@ module User::Registerable
   extend ActiveSupport::Concern
 
   USERNAME_FORMAT = /\A[a-z0-9_]+\z/
+  MIN_PASSWORD_LENGTH = 15
 
   included do
     has_secure_password validations: false
@@ -19,7 +20,8 @@ module User::Registerable
     end
     validates :name, presence: true, on: :registration
     validates :name, length: { maximum: 30 }
-    validates :password, length: { in: 4..72 }, allow_nil: true
+    validates :password, length: { in: MIN_PASSWORD_LENGTH..72 }, allow_nil: true
+    validate :password_fits_bcrypt
   end
 
   class_methods do
@@ -48,5 +50,9 @@ module User::Registerable
 
     def password_set
       errors.add(:password, :blank) if password_digest.blank?
+    end
+
+    def password_fits_bcrypt
+      errors.add(:password, :password_too_long) if password && password.bytesize > ActiveModel::SecurePassword::MAX_PASSWORD_LENGTH_ALLOWED
     end
 end

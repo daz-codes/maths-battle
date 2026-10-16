@@ -1,4 +1,4 @@
-class CreateFactStats < ActiveRecord::Migration[8.2]
+class CreateFactStats < ActiveRecord::Migration[8.1]
   def change
     create_table :fact_stats do |t|
       t.references :user, null: false, foreign_key: true

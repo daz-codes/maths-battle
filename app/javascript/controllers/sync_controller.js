@@ -1,24 +1,31 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
-import { forgetEverything, sendUnsentGames } from "lib/offline_games"
+import { preparePlayer, sendUnsentGames, takeRefusedGames, watchPlayer } from "lib/offline_games"
 
 // Coming back to the app after this long reloads the page
 const STALE_AFTER = 60_000
 
 // On every page but the game: uploads games played offline, and reloads the page when the app comes back
-// after a while, since a home screen app can sit in the background for hours still showing yesterday's streak
+// after a while, since a home screen app can sit in the background for hours still showing yesterday's streak.
+// If the server refused any of those games, it says so, rather than letting them vanish
 export default class extends Controller {
+  static targets = [ "refused" ]
   static values = { uploadUrl: String, autoRefresh: { type: Boolean, default: true } }
 
   connect() {
+    preparePlayer()
+    this.unwatch = watchPlayer()
+
     this.visibilityChanged = this.visibilityChanged.bind(this)
     this.upload = this.upload.bind(this)
     document.addEventListener("visibilitychange", this.visibilityChanged)
     window.addEventListener("online", this.upload)
+    this.showRefused()
     this.upload()
   }
 
   disconnect() {
+    this.unwatch?.()
     document.removeEventListener("visibilitychange", this.visibilityChanged)
     window.removeEventListener("online", this.upload)
   }
@@ -40,18 +47,28 @@ export default class extends Controller {
     if (!navigator.onLine || this.uploading) return
 
     this.uploading = true
-    const saved = await sendUnsentGames(this.uploadUrlValue)
-    this.uploading = false
-    if (saved > 0) this.reload()
+    let saved
+    try {
+      saved = await sendUnsentGames(this.uploadUrlValue)
+    } finally {
+      this.uploading = false
+    }
+    // Reloading shows any refusals on the new page
+    saved > 0 && this.autoRefreshValue ? this.reload() : this.showRefused()
+  }
+
+  showRefused() {
+    const count = takeRefusedGames()
+    if (count === 0 || !this.hasRefusedTarget) return
+
+    this.refusedTarget.textContent = count === 1
+      ? "Sorry, a game played offline couldn't be saved."
+      : `Sorry, ${count} games played offline couldn't be saved.`
+    this.refusedTarget.hidden = false
   }
 
   reload() {
     Turbo.visit(window.location.href, { action: "replace" })
   }
 
-  // Signing out: nothing of this player's should stay on the device for the next one
-  forget() {
-    forgetEverything()
-    navigator.serviceWorker?.controller?.postMessage("forget-pages")
-  }
 }

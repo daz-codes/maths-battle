@@ -4,7 +4,7 @@
   <% Topic::ALL.each do |choice| %>
     <% url, options = topic_choice(choosing, choice) %>
     <%= button_to url, **options, class: "switcher__option", form_class: "switcher__form", aria: { current: (choice == topic) } do %>
-      <span aria-hidden="true"><%= choice::EMOJI %></span> <%= choice::NAME %>
+      <span aria-hidden="true"><%= choice.emoji %></span> <%= choice.title %>
     <% end %>
   <% end %>
 </nav>
@@ -26,5 +26,5 @@
       <% end %>
     <% end %>
   </nav>
-  <p class="levels__name">Level <%= level %>: <%= Topic.level(topic, level)[:name] %></p>
+  <p class="levels__name">Level <%= level %>: <%= topic.level(level)[:name] %></p>
 <% end %>

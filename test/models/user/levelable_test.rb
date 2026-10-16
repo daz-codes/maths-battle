@@ -36,6 +36,14 @@ class User::LevelableTest < ActiveSupport::TestCase
     assert_equal NEEDED, @user.good_games_to_level_up(TimesTables)
   end
 
+  test "games saved elsewhere show once the player is reloaded" do
+    assert_equal 1, @user.unlocked_level(TimesTables)
+    elsewhere = User.find(@user.id)
+    NEEDED.times { Attempt.record!(user: elsewhere, level: 1, results: answers(*Array.new(20) { [ 2, 3, 6 ] })) }
+
+    assert_equal 2, @user.reload.unlocked_level(TimesTables)
+  end
+
   test "a locked level can't be played" do
     assert_raises(Attempt::Invalid) { play(level: 2, right: 20) }
   end

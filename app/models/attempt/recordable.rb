@@ -4,7 +4,6 @@ module Attempt::Recordable
   extend ActiveSupport::Concern
 
   MAX_ANSWERS = 150
-  MIN_ANSWERS_FOR_STREAK = 5
   # The test lasts 60 seconds; allow a little slack for the end-of-test POST
   MAX_TOTAL_MS = 65_000
   # Every field a result can have in any topic. Each topic checks its own fields strictly
@@ -16,13 +15,13 @@ module Attempt::Recordable
 
   included do
     before_create :score_results, :set_played_on, :record_high_score
-    after_create :update_streak, :record_fact_stats, :check_level_up
+    after_create :update_streak, :record_fact_stats, :check_level_up, :forget_unlocked_levels
   end
 
   class_methods do
     # Raises Attempt::Invalid when the answers couldn't have come from a real test.
     # A game sent again with the same client id (a retried upload) is only recorded once
-    def record!(user:, results:, topic: Topic.default::TOPIC, level: 1, client_id: nil, played_at: nil)
+    def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil)
       topic_module, level = topic_named(topic), Integer(level, exception: false)
       check_unlocked(user, topic_module, level)
 
@@ -96,20 +95,18 @@ module Attempt::Recordable
       self.played_on = played_at.in_time_zone(user.time_zone).to_date
     end
 
-    # Best in this topic and level: a good times tables score shouldn't make equations look bad
+    # Best in this topic and level: a good times tables score shouldn't make equations look bad.
+    # Kept on the attempt as it stood then, like the streak, so a shared result doesn't change later
     def record_high_score
-      self.new_high_score = score.positive? && score > user.best_score(topic_module, level)
+      best_before = user.best_score(topic_module, level)
+      self.new_high_score = score.positive? && score > best_before
+      self.best_score = [ score, best_before ].max
     end
 
     # A snapshot of the streak is kept on the attempt for its results and share pages
     def update_streak
-      user.refresh_streak! if counts_toward_streak?
+      user.refresh_streak! if counted?
       update_column(:streak, user.streak)
-    end
-
-    # Starting a test and walking away doesn't count
-    def counts_toward_streak?
-      answered >= MIN_ANSWERS_FOR_STREAK
     end
 
     def record_fact_stats
@@ -118,7 +115,12 @@ module Attempt::Recordable
 
     # The good game that brings the count to what's needed unlocks the next level
     def check_level_up
-      levelled_up = good? && user.good_games(topic_module, level) == User::Levelable::GOOD_GAMES_TO_LEVEL_UP && Topic.level(topic_module, level + 1)
+      levelled_up = good? && user.good_games(topic_module, level) == User::Levelable::GOOD_GAMES_TO_LEVEL_UP && topic_module.level(level + 1)
       update_column(:levelled_up, true) if levelled_up
+    end
+
+    # This game may have unlocked a level, or been the first played at one
+    def forget_unlocked_levels
+      user.forget_unlocked_levels
     end
 end

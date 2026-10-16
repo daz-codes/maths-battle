@@ -7,22 +7,14 @@ module Topic
   end
 
   def self.find(key)
-    ALL.find { |topic| topic::TOPIC == key }
+    ALL.find { |topic| topic.key == key }
   end
 
   def self.find_by_slug(slug)
-    ALL.find { |topic| topic::SLUG == slug }
+    ALL.find { |topic| topic.slug == slug }
   end
 
   def self.keys
-    ALL.map { |topic| topic::TOPIC }
-  end
-
-  def self.level(topic, number)
-    topic.levels.find { |level| level[:number] == number }
-  end
-
-  def self.max_level(topic)
-    topic.levels.size
+    ALL.map(&:key)
   end
 end

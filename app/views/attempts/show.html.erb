@@ -2,7 +2,7 @@
 
 <main class="page results">
   <% if @attempt.levelled_up %>
-    <p class="banner banner--level" data-controller="confetti">⬆️ Level up! You've unlocked Level <%= @attempt.level + 1 %>: <%= Topic.level(@attempt.topic_module, @attempt.level + 1)[:name] %></p>
+    <p class="banner banner--level" data-controller="confetti">⬆️ Level up! You've unlocked Level <%= @attempt.level + 1 %>: <%= @attempt.topic_module.level(@attempt.level + 1)[:name] %></p>
   <% elsif @attempt.new_high_score %>
     <p class="banner" data-controller="confetti">🎉 New high score! 🎉</p>
   <% end %>
@@ -34,8 +34,8 @@
   <% unless @attempt.levelled_up || @attempt.level < @attempt.user.unlocked_level(@attempt.topic_module) %>
     <%= render "levels/progress", user: @attempt.user, topic: @attempt.topic_module %>
   <% end %>
-  <%= link_to "Play again", play_path(@attempt.topic_module::SLUG, level: @attempt.level), class: "button button--blue button--wide" %>
-  <%= link_to "See your stats", stats_path(@attempt.topic_module::SLUG) %>
+  <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue button--wide" %>
+  <%= link_to "See your stats", stats_path(@attempt.topic_module.slug) %>
 
   <% if @attempt.user.guest? %>
     <p class="save-nudge">

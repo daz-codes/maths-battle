@@ -1,70 +1,92 @@
-// Lets MatheMinute open and be played offline.
-// Pages always come from the network when there is one, so they're never stale online. The home page,
-// each topic's game and stats pages are kept each time they load, so they open offline, and the game page carries spare
-// question sets for offline games. Assets are fingerprinted, so they're kept and served from here.
-const CACHE = "matheminute-v5"
-const PAGES = "matheminute-pages-v2"
+// Personalized pages belong to the player identified by the server. Identity updates and cache writes
+// are serialized so a late response cannot restore the previous player's pages after sign out.
+const CACHE = "matheminute-v6"
+const PAGES = "matheminute-pages-v4-"
+const STATE = "matheminute-player-v1"
 const OFFLINE_URL = "/offline.html"
+const PLAYER_URL = "/offline-player"
+let updates = Promise.resolve()
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.add(OFFLINE_URL)).then(() => self.skipWaiting()))
+self.addEventListener("install", event => {
+  event.waitUntil(caches.open(CACHE).then(cache => cache.add(OFFLINE_URL)).then(() => self.skipWaiting()))
 })
 
-self.addEventListener("activate", (event) => {
+self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => ![ CACHE, PAGES ].includes(key)).map((key) => caches.delete(key))))
+      .then(keys => Promise.all(keys.filter(key => key !== CACHE && key !== STATE && !key.startsWith(PAGES)).map(key => caches.delete(key))))
       .then(() => self.clients.claim())
   )
 })
 
-// Signing out: drop the kept pages, which show that player's streak and stats
-self.addEventListener("message", (event) => {
-  if (event.data === "forget-pages") event.waitUntil(caches.delete(PAGES))
-})
-
-self.addEventListener("fetch", (event) => {
+self.addEventListener("fetch", event => {
   const { request } = event
   const url = new URL(request.url)
-  if (request.method !== "GET" || url.origin !== self.location.origin) return
+  if (url.origin !== self.location.origin) return
 
-  if (isPage(request)) {
-    event.respondWith(pageFromNetwork(request, url))
-  } else if (url.pathname.startsWith("/assets/")) {
+  if (request.method === "GET" && url.pathname.startsWith("/assets/")) {
     event.respondWith(assetFromCache(request))
+  } else {
+    event.respondWith(fromNetwork(request, url))
   }
 })
+
+function isPage(request) {
+  return request.mode === "navigate" || (request.headers.get("Accept") || "").includes("text/html")
+}
 
 function keptForOffline(path) {
   return path === "/" || path.startsWith("/play/") || path === "/stats" || path.startsWith("/stats/")
 }
 
-// Full page loads, and Turbo's page fetches when moving between pages
-function isPage(request) {
-  return request.mode === "navigate" || (request.headers.get("Accept") || "").includes("text/html")
+async function playerState() {
+  return (await (await caches.open(STATE)).match(PLAYER_URL))?.json()
 }
 
-async function pageFromNetwork(request, url) {
-  try {
-    const response = await fetch(request)
-    if (response.ok && keptForOffline(url.pathname)) {
-      const copy = response.clone()
-      caches.open(PAGES).then((cache) => cache.put(url.pathname, copy))
+async function rememberPlayer(response, request, url) {
+  const key = response.headers.get("X-Player-Key")
+  const version = Number(response.headers.get("X-Player-Version"))
+  if (!key || !version) return
+
+  updates = updates.catch(() => {}).then(async () => {
+    const previous = await playerState()
+    if (previous && version < previous.version) return
+    if (previous?.key !== key) {
+      await Promise.all((await caches.keys()).filter(name => name.startsWith(PAGES)).map(name => caches.delete(name)))
     }
-    return response
-  } catch {
-    return (await caches.match(url.pathname, { cacheName: PAGES })) || caches.match(OFFLINE_URL)
+    const state = { key, version, expires: response.headers.get("X-Player-Expires") }
+    await (await caches.open(STATE)).put(PLAYER_URL, new Response(JSON.stringify(state)))
+    if (request.method === "GET" && isPage(request) && response.ok && keptForOffline(url.pathname)) {
+      await (await caches.open(PAGES + key)).put(url.pathname + url.search, response.clone())
+    }
+  })
+  await updates
+}
+
+async function fromNetwork(request, url) {
+  let response
+  try {
+    response = await fetch(request)
+  } catch (error) {
+    if (request.method !== "GET" || !isPage(request)) throw error
+    await updates.catch(() => {})
+    const player = await playerState()
+    if (player && Date.parse(player.expires) > Date.now()) {
+      const kept = await caches.match(url.pathname + url.search, { cacheName: PAGES + player.key })
+      if (kept) return kept
+    }
+    return caches.match(OFFLINE_URL, { cacheName: CACHE })
   }
+  // Cache failures must not turn a successful POST into an apparent network failure.
+  await rememberPlayer(response, request, url).catch(() => {})
+  return response
 }
 
 async function assetFromCache(request) {
-  const cached = await caches.match(request)
+  const cache = await caches.open(CACHE)
+  const cached = await cache.match(request)
   if (cached) return cached
-
   const response = await fetch(request)
-  if (response.ok) {
-    const copy = response.clone()
-    caches.open(CACHE).then((cache) => cache.put(request, copy))
-  }
+  if (response.ok) await cache.put(request, response.clone()).catch(() => {})
   return response
 }

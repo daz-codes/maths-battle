@@ -1,10 +1,10 @@
 <%# The result as shared: the score inside the logo's ring of four neon quarters, then streak and best.
     Nothing about who the player is %>
 <section class="result">
-  <p class="label"><%= attempt.topic_module::EMOJI %> <%= attempt.topic_and_level %></p>
+  <p class="label"><%= attempt.topic_module.emoji %> <%= attempt.topic_and_level %></p>
   <div class="result__ring">
     <%= render "clock", hands: false, class: "result__clock" %>
     <p class="result__score"><span class="card__number"><%= attempt.score %></span> in a minute!</p>
   </div>
-  <p class="result__stats">🔥 <%= attempt.streak %> day streak · 🏆 Best: <%= attempt.user.best_score(attempt.topic_module, attempt.level) %></p>
+  <p class="result__stats">🔥 <%= attempt.streak %> day streak · 🏆 Best: <%= attempt.best_score %></p>
 </section>

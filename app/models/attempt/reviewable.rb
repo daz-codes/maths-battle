@@ -1,6 +1,8 @@
 # What to say on the results page: the groups to practise (times tables, types of equation),
 # and the questions missed or slow today
 module Attempt::Reviewable
+  extend ActiveSupport::Concern
+
   MAX_WEAK_GROUPS = 3
   MAX_SLOW_FACTS = 5
   GOOD_ENOUGH = 0.9

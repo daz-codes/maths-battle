@@ -1,4 +1,4 @@
-class CreateAttempts < ActiveRecord::Migration[8.2]
+class CreateAttempts < ActiveRecord::Migration[8.1]
   def change
     create_table :attempts do |t|
       t.references :user, null: false, foreign_key: true

@@ -4,7 +4,7 @@ class Attempt::ReviewableTest < ActiveSupport::TestCase
   setup { @user = users(:ada) }
 
   def attempt_with(*triples)
-    Attempt.record!(user: @user, results: answers(*triples))
+    record_tables_game(@user, answers(*triples))
   end
 
   test "names the weakest tables" do
@@ -27,7 +27,7 @@ class Attempt::ReviewableTest < ActiveSupport::TestCase
   test "lists right answers that were much slower than usual" do
     results = right_answers(10).map { |a, b, given| { a: a, b: b, given: given, ms: 1500 } }
     results << { a: 7, b: 8, given: 56, ms: 5000 } << { a: 6, b: 9, given: 54, ms: 2000 } << { a: 4, b: 4, given: 15, ms: 6000 }
-    feedback = Attempt.record!(user: @user, results: results)
+    feedback = record_tables_game(@user, results)
 
     assert_equal [ "7 × 8 = 56" ], feedback.slow_facts, "6 × 9 was only a little slow, and 4 × 4 was wrong, not slow"
     assert_equal [ "4 × 4 = 16" ], feedback.missed_facts
@@ -35,10 +35,10 @@ class Attempt::ReviewableTest < ActiveSupport::TestCase
 
   test "includes the last two weeks of history" do
     travel_to 3.days.ago do
-      Attempt.record!(user: @user, results: answers(*Array.new(10) { [ 9, 4, 35 ] }))
+      record_tables_game(@user, answers(*Array.new(10) { [ 9, 4, 35 ] }))
     end
     travel_to 30.days.ago do
-      Attempt.record!(user: @user, results: answers(*Array.new(10) { [ 11, 4, 43 ] }))
+      record_tables_game(@user, answers(*Array.new(10) { [ 11, 4, 43 ] }))
     end
 
     feedback = attempt_with([ 9, 9, 81 ], [ 9, 3, 27 ], [ 5, 5, 25 ])

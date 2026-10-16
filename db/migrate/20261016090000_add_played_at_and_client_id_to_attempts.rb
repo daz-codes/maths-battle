@@ -1,4 +1,4 @@
-class AddPlayedAtAndClientIdToAttempts < ActiveRecord::Migration[8.2]
+class AddPlayedAtAndClientIdToAttempts < ActiveRecord::Migration[8.1]
   def up
     # When the game was played, which can be before it reaches the server if it was played offline
     add_column :attempts, :played_at, :datetime

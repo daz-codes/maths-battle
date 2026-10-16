@@ -1,12 +1,12 @@
-<% content_for :title, "#{@topic::NAME} · MatheMinute" %>
+<% content_for :title, "#{@topic.title} · MatheMinute" %>
 <% content_for :viewport, "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" %>
 <% content_for :body_class, "testing" %>
 <% content_for :focus_mode, true %>
 <% content_for :head, tag.meta(name: "turbo-cache-control", content: "no-cache") %>
 
-<main class="test test--<%= @topic::SLUG %>" data-controller="test"
+<main class="test test--<%= @topic.slug %>" data-controller="test"
       data-test-question-sets-value="<%= @question_sets.to_json %>"
-      data-test-topic-value="<%= @topic::TOPIC %>"
+      data-test-topic-value="<%= @topic.key %>"
       data-test-level-value="<%= @level %>"
       data-test-keys-value="<%= @topic.keys(@level).to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">
@@ -23,10 +23,16 @@
     <p class="answer" data-test-target="answer" aria-live="polite"></p>
     <p class="test__status" data-test-target="status" hidden></p>
 
+    <div class="offline-result" data-test-target="unavailable" hidden>
+      <p class="aside">Connect to load more games.</p>
+      <%= link_to "Try again", play_path(@topic.slug, level: @level), class: "button button--blue button--wide" %>
+      <%= link_to "Home", root_path %>
+    </div>
+
     <div class="offline-result" data-test-target="offlineResult" hidden>
       <p class="offline-result__score"><span class="card__number" data-test-target="offlineScore"></span> in a minute!</p>
       <p class="aside">You're offline, so this game is saved on this device. It'll count towards your streak as soon as you're back online.</p>
-      <%= link_to "Play again", play_path(@topic::SLUG, level: @level), class: "button button--blue button--wide" %>
+      <%= link_to "Play again", play_path(@topic.slug, level: @level), class: "button button--blue button--wide" %>
       <%= link_to "Home", root_path %>
     </div>
   </div>

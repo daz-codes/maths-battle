@@ -12,7 +12,10 @@ class RegistrationsController < ApplicationController
     @user = current_player
 
     if @user.register(registration_params)
-      start_new_session_for @user unless authenticated?
+      identity = player_identity
+      terminate_session if authenticated?
+      reset_session
+      start_new_session_for @user, identity: identity
       redirect_to root_path, notice: "You're signed up, #{@user.display_name}!"
     else
       render :new, status: :unprocessable_entity

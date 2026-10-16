@@ -1,11 +1,17 @@
 # A streak counts the days in a row a player has practised, in their own time zone.
 # Games played offline can reach the server days later and out of order, so the streak is worked out
-# again from the days that have games, rather than counted up as games arrive
+# again from the days that have games, rather than counted up as games arrive.
+# The time zone comes from the player's device with each game, so the day ends at their own midnight
 module User::Streakable
   extend ActiveSupport::Concern
 
   included do
-    validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map(&:name) }
+    validate :time_zone_known
+  end
+
+  # A zone as the browser names it, like "America/New_York". Anything unknown keeps the one there is
+  def update_time_zone(zone)
+    update(time_zone: zone) if zone.is_a?(String) && zone != time_zone && ActiveSupport::TimeZone[zone]
   end
 
   def today
@@ -32,6 +38,10 @@ module User::Streakable
   end
 
   private
+    def time_zone_known
+      errors.add(:time_zone, :inclusion) unless ActiveSupport::TimeZone[time_zone.to_s]
+    end
+
     def practised_since?(date)
       last_practised_on.present? && last_practised_on >= date
     end

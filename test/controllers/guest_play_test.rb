@@ -8,7 +8,7 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
 
   test "the first saved test makes a guest account with a session on this device" do
     assert_difference -> { User.count } => 1, -> { Session.count } => 1 do
-      post attempts_path, params: { attempt: { results: answers(*right_answers(5)) } }, as: :json
+      post attempts_path, params: game_upload(results: answers(*right_answers(5))), as: :json
     end
 
     assert_response :created
@@ -23,10 +23,10 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
   end
 
   test "later tests go to the same guest" do
-    post attempts_path, params: { attempt: { results: answers(*right_answers(5)) } }, as: :json
+    post attempts_path, params: game_upload(results: answers(*right_answers(5))), as: :json
 
     assert_no_difference -> { User.count } do
-      post attempts_path, params: { attempt: { results: answers(*right_answers(6)) } }, as: :json
+      post attempts_path, params: game_upload(results: answers(*right_answers(6))), as: :json
     end
     assert_equal 2, User.last.attempts.count
     assert_equal 6, User.last.best_score(TimesTables, 1)
@@ -41,11 +41,36 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
   end
 
   test "signing in as a real user ends the guest session" do
-    post attempts_path, params: { attempt: { results: answers(*right_answers(5)) } }, as: :json
+    post attempts_path, params: game_upload(results: answers(*right_answers(5))), as: :json
     guest_session = Session.last
 
     post session_path, params: { username: "ada", password: "password" }
     assert_not Session.exists?(guest_session.id)
     assert_equal users(:ada), Session.last.user
   end
+
+  test "saving settings over and over can't make endless guests" do
+    with_rate_limiting do
+      assert_difference -> { User.count } => 10 do
+        11.times do
+          cookies.delete("session_id")
+          patch profile_path, params: { user: { theme: "dark" } }
+        end
+      end
+    end
+
+    assert_redirected_to edit_profile_path
+    follow_redirect!
+    assert_select ".flash--alert", text: "Try again later."
+  end
+
+  private
+    # The test cache store keeps nothing, so rate limits never kick in without a real one for a moment
+    def with_rate_limiting
+      store = ActiveSupport::Cache::MemoryStore.new
+      Rails.cache.define_singleton_method(:increment) { |*args, **options| store.increment(*args, **options) }
+      yield
+    ensure
+      Rails.cache.singleton_class.remove_method(:increment)
+    end
 end

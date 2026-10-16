@@ -306,6 +306,9 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 
 .flash--alert { background: var(--pink); }
 
+/* Games played offline that the server refused, above whatever page is showing */
+.refused-games { width: calc(100% - 2rem); max-width: 28rem; margin: 1rem auto 0; text-align: center; }
+
 /* ── Home ───────────────────────────────────────── */
 
 .greeting {

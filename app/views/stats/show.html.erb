@@ -52,8 +52,8 @@
       <% if @user.group_stats(@topic, @level).any?(&:slow?) %>🐢 means slower than your usual.<% end %>
     </p>
   <% else %>
-    <p class="aside">Play a game of <%= @topic::NAME.downcase %> and your stats will show up here.</p>
+    <p class="aside">Play a game of <%= @topic.title.downcase %> and your stats will show up here.</p>
   <% end %>
 
-  <%= link_to "Play", play_path(@topic::SLUG, level: @level), class: "button button--blue button--wide" %>
+  <%= link_to "Play", play_path(@topic.slug, level: @level), class: "button button--blue button--wide" %>
 </main>

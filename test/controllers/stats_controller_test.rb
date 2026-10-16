@@ -4,7 +4,7 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
   setup { @user = users(:ada) }
 
   test "shows each table's percentage and speed" do
-    Attempt.record!(user: @user, results: [
+    record_tables_game(@user, [
       { a: 7, b: 8, given: 56, ms: 2000 }, { a: 7, b: 7, given: 48, ms: 1000 }, { a: 3, b: 4, given: 12, ms: 1000 }
     ])
     sign_in_as @user

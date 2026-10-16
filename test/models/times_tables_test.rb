@@ -15,9 +15,15 @@ class TimesTablesTest < ActiveSupport::TestCase
   end
 
   test "answers are checked on the server, and questions must be within the tables" do
-    assert TimesTables.clean_result({ "a" => 7, "b" => 8, "given" => "56" })["correct"]
-    assert_not TimesTables.clean_result({ "a" => 7, "b" => 8, "given" => "54" })["correct"]
-    assert_raises(Attempt::Invalid) { TimesTables.clean_result({ "a" => 13, "b" => 8, "given" => "104" }) }
+    assert TimesTables.clean_result({ "a" => 7, "b" => 8, "given" => "56" }, level: 2)["correct"]
+    assert_not TimesTables.clean_result({ "a" => 7, "b" => 8, "given" => "54" }, level: 2)["correct"]
+    assert_raises(Attempt::Invalid) { TimesTables.clean_result({ "a" => 13, "b" => 8, "given" => "104" }, level: 2) }
+  end
+
+  test "level 1 only takes the 2–5 tables" do
+    assert TimesTables.clean_result({ "a" => 12, "b" => 5, "given" => "60" }, level: 1)["correct"]
+    assert_raises(Attempt::Invalid) { TimesTables.clean_result({ "a" => 12, "b" => 12, "given" => "144" }, level: 1) }
+    assert_raises(Attempt::Invalid) { TimesTables.clean_result({ "a" => 7, "b" => 8, "given" => "56" }, level: 1) }
   end
 
   test "groups are the tables, and 7×8 belongs to both" do

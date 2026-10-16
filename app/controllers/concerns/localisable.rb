@@ -4,12 +4,17 @@ module Localisable
   extend ActiveSupport::Concern
 
   included do
-    helper_method :maths
+    helper_method :maths, :language
   end
 
   private
     def maths
       british? ? "maths" : "math"
+    end
+
+    # For the page's lang, so it matches the spelling
+    def language
+      british? ? "en-GB" : "en-US"
     end
 
     def british?

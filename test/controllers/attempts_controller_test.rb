@@ -7,8 +7,10 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "saves an attempt and returns the results page" do
+    unlock(@user, TimesTables, 2)
+
     assert_difference -> { @user.attempts.count } do
-      post attempts_path, params: { attempt: { topic: "times_tables", results: answers([ 7, 8, 56 ], [ 6, 7, 41 ]) } }, as: :json
+      post attempts_path, params: game_upload(topic: "times_tables", level: 2, results: answers([ 7, 8, 56 ], [ 6, 7, 41 ])), as: :json
     end
 
     assert_response :created
@@ -18,7 +20,7 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "an offline game uploaded again isn't saved twice" do
-    upload = { attempt: { results: answers(*right_answers(5)), client_id: "f6b1", played_at: 1.hour.ago.iso8601 } }
+    upload = game_upload(results: answers(*right_answers(5)), client_id: "f6b1", played_at: 1.hour.ago.iso8601)
 
     assert_difference -> { Attempt.count } => 1 do
       post attempts_path, params: upload, as: :json
@@ -27,12 +29,28 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_response :created
   end
 
+  test "the device's time zone decides which day a game counts for" do
+    travel_to Time.utc(2026, 10, 16, 2, 30) do
+      post attempts_path, params: game_upload(time_zone: "America/New_York", results: answers(*right_answers(5))), as: :json
+    end
+
+    assert_equal "America/New_York", @user.reload.time_zone
+    assert_equal Date.new(2026, 10, 15), @user.attempts.last.played_on, "half past ten at night on the 15th in New York"
+  end
+
+  test "an unknown time zone from the device is ignored" do
+    post attempts_path, params: game_upload(time_zone: "Mars/Olympus_Mons", results: answers(*right_answers(5))), as: :json
+
+    assert_response :created
+    assert_equal "London", @user.reload.time_zone
+  end
+
   test "saves an equations game, checking the answers itself" do
     unlock(@user, Equations, 5)
     results = [ { type: "ax=b", a: 12, b: 9, v: "x", flip: false, given: "3/4", ms: 2000 },
                 { type: "a(x+b)=c", a: 4, b: 2, c: 30, v: "t", flip: true, given: "6", ms: 3000 } ]
 
-    post attempts_path, params: { attempt: { topic: "equations", level: 5, results: results } }, as: :json
+    post attempts_path, params: game_upload(topic: "equations", level: 5, results: results), as: :json
 
     assert_response :created
     attempt = @user.attempts.last
@@ -42,13 +60,23 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
 
   test "rejects a made-up attempt" do
     assert_no_difference -> { Attempt.count } do
-      post attempts_path, params: { attempt: { results: answers(*Array.new(151) { [ 2, 2, 4 ] }, ms: 10) } }, as: :json
+      post attempts_path, params: game_upload(results: answers(*Array.new(151) { [ 2, 2, 4 ] }, ms: 10)), as: :json
     end
     assert_response :unprocessable_entity
   end
 
+  test "rejects results that aren't a list" do
+    numbered = { "0" => { a: 2, b: 3, given: "6", ms: 900 } }
+
+    assert_no_difference -> { Attempt.count } do
+      post attempts_path, params: game_upload(results: numbered), as: :json
+    end
+    assert_response :unprocessable_entity
+    assert_equal "Results must be a list", response.parsed_body["error"]
+  end
+
   test "results page shows the score, feedback and missed facts" do
-    attempt = Attempt.record!(user: @user, results: answers([ 7, 8, 54 ], [ 6, 7, 42 ], [ 3, 3, 9 ]))
+    attempt = record_tables_game(@user, answers([ 7, 8, 54 ], [ 6, 7, 42 ], [ 3, 3, 9 ]))
 
     get attempt_path(attempt)
     assert_response :success
@@ -58,7 +86,7 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".missed li", text: "7 × 8 = 56"
     assert_select ".missed__slow", count: 0
     assert_select "a[href=?]", stats_path("times-tables"), text: "See your stats"
-    assert_select "a.button--blue[href=?]", play_path("times-tables", level: 1), text: "Play again"
+    assert_select "a.button--blue[href=?]", play_path("times-tables", level: 2), text: "Play again"
     assert_select "[data-controller=share][data-share-text-value*=?]", share_url(attempt.share_token)
     assert_select "header a.logo[href=?]", root_path
     assert_select "a.button", text: "Home", count: 0
