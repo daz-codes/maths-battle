@@ -30,6 +30,6 @@ class TimesTablesTest < ApplicationSystemTestCase
 
     assert_selector ".card__number", text: "2", wait: 8
     assert_text "#{a} × #{b} = #{a * b}"
-    assert_equal 2, users(:ada).best_score(TimesTables)
+    assert_equal 2, users(:ada).best_score(TimesTables, 1)
   end
 end

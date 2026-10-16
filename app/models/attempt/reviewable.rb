@@ -82,6 +82,6 @@ module Attempt::Reviewable
     end
 
     def recent_results
-      user.attempts.where(topic: topic, created_at: (created_at - HISTORY)..created_at).flat_map(&:results)
+      user.attempts.where(topic: topic, level: level, created_at: (created_at - HISTORY)..created_at).flat_map(&:results)
     end
 end

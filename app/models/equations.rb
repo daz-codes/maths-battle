@@ -10,17 +10,18 @@ module Equations
   # Each type of equation is a "fact": accuracy and speed are tracked per type, and the weighting picks types.
   # Fractions can only come out of types where the letter is multiplied
   TYPES = {
-    "x+a=b"      => { difficulty: 0, fractions: false, example: "x + 5 = 9" },
-    "x-a=b"      => { difficulty: 0, fractions: false, example: "x − 3 = 8" },
-    "x/a=b"      => { difficulty: 0, fractions: false, example: "x/4 = 3" },
-    "ax=b"       => { difficulty: 1, fractions: true,  example: "3x = 12" },
-    "ax+b=c"     => { difficulty: 1, fractions: true,  example: "2x + 7 = 11" },
-    "ax-b=c"     => { difficulty: 1, fractions: true,  example: "5x − 2 = 13" },
-    "x/a+b=c"    => { difficulty: 2, fractions: false, example: "x/3 + 1 = 5" },
-    "x/a-b=c"    => { difficulty: 2, fractions: false, example: "x/3 − 1 = 2" },
-    "a(x+b)=c"   => { difficulty: 2, fractions: true,  example: "4(x + 2) = 30" },
-    "(x+a)/b=c"  => { difficulty: 2, fractions: false, example: "(x + 3)/5 = 2" }
+    "x+a=b"      => { difficulty: 0, form: "x + a = b",     example: "x + 5 = 9" },
+    "x-a=b"      => { difficulty: 0, form: "x − a = b",     example: "x − 3 = 8" },
+    "x/a=b"      => { difficulty: 0, form: "x/a = b",       example: "x/4 = 3" },
+    "ax=b"       => { difficulty: 1, form: "ax = b",        example: "3x = 12" },
+    "ax+b=c"     => { difficulty: 1, form: "ax + b = c",    example: "2x + 7 = 11" },
+    "ax-b=c"     => { difficulty: 1, form: "ax − b = c",    example: "5x − 2 = 13" },
+    "x/a+b=c"    => { difficulty: 2, form: "x/a + b = c",   example: "x/3 + 1 = 5" },
+    "x/a-b=c"    => { difficulty: 2, form: "x/a − b = c",   example: "x/3 − 1 = 2" },
+    "a(x+b)=c"   => { difficulty: 2, form: "a(x + b) = c",  example: "4(x + 2) = 30" },
+    "(x+a)/b=c"  => { difficulty: 2, form: "(x + a)/b = c", example: "(x + 3)/5 = 2" }
   }
+  LEVELS = [ { number: 1, name: "Equations", example: "2x + 7 = 11" } ]
   # Letters that can't be mistaken for a number or for each other (no i, l, o, s)
   VARIABLES = %w[ x y a b c d k m n p t w z h g r ]
   FRACTION_CHANCE = 0.35
@@ -32,13 +33,18 @@ module Equations
 
   extend self
 
-  def fractions?
-    true
+  def levels
+    LEVELS
+  end
+
+  # Extra keypad keys beyond the digits
+  def keys(_level)
+    [ "/" ]
   end
 
   # Facts: equation types
 
-  def facts
+  def facts(_level = 1)
     TYPES.keys
   end
 
@@ -56,14 +62,14 @@ module Equations
 
   # Questions
 
-  def question(type, random:)
+  def question(type, level: 1, random:)
     numbers = build(type, random)
     question = { type: type, **numbers, v: VARIABLES.sample(random: random), flip: random.rand < FLIP_CHANCE }
     question.merge(text: html(question), answer: written(solve(question)))
   end
 
   # Re-solves the equation from its numbers, so the score never depends on the browser
-  def clean_result(result)
+  def clean_result(result, level: 1)
     question = question_from(result)
     solution = solve(question)
     raise Attempt::Invalid, "Bad question" unless solution.positive?
@@ -90,7 +96,12 @@ module Equations
     [ type ]
   end
 
+  # The form, ax + b = c, with an example to make it concrete
   def group_label(type)
+    TYPES.fetch(type)[:form]
+  end
+
+  def group_example(type)
     TYPES.fetch(type)[:example]
   end
 
@@ -107,7 +118,7 @@ module Equations
   end
 
   def practise_message(types)
-    "Practise equations like #{types.map { |type| group_label(type) }.to_sentence}"
+    "Practise equations like #{types.map { |type| group_example(type) }.to_sentence}"
   end
 
   def summary(best:, needs:)

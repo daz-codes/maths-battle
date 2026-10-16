@@ -9,7 +9,7 @@ class TimesTablesTest < ActiveSupport::TestCase
 
   test "questions carry their text and answer" do
     question = TimesTables.question("7x8", random: Random.new(1))
-    assert_includes [ [ 7, 8 ], [ 8, 7 ] ], question.values_at(:a, :b)
+    assert_includes [ %w[ 7 8 ], %w[ 8 7 ] ], question.values_at(:a, :b)
     assert_equal "56", question[:answer]
     assert_match(/\A[78] × [78]\z/, question[:text])
   end

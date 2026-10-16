@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_16_120000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_16_150000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -53,6 +53,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_120000) do
     t.datetime "played_at"
     t.date "played_on"
     t.string "client_id"
+    t.integer "level", default: 1, null: false
+    t.boolean "levelled_up", default: false, null: false
     t.index ["share_token"], name: "index_attempts_on_share_token", unique: true
     t.index ["user_id", "client_id"], name: "index_attempts_on_user_id_and_client_id", unique: true
     t.index ["user_id", "created_at"], name: "index_attempts_on_user_id_and_created_at"
@@ -69,7 +71,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "correct_ms", default: 0, null: false
-    t.index ["user_id", "topic", "fact"], name: "index_fact_stats_on_user_id_and_topic_and_fact", unique: true
+    t.integer "level", default: 1, null: false
+    t.index ["user_id", "topic", "level", "fact"], name: "index_fact_stats_on_user_id_and_topic_and_level_and_fact", unique: true
     t.index ["user_id"], name: "index_fact_stats_on_user_id"
   end
 

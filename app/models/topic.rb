@@ -17,4 +17,8 @@ module Topic
   def self.keys
     ALL.map { |topic| topic::TOPIC }
   end
+
+  def self.level(topic, number)
+    topic.levels.find { |level| level[:number] == number }
+  end
 end

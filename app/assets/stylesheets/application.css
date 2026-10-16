@@ -500,6 +500,35 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 
 .switcher__option[aria-current="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 4px rgb(0 0 0 / 0.12); }
 
+/* Levels: unlocked ones can be picked, locked ones show a padlock */
+.levels { display: flex; justify-content: center; gap: 0.4rem; margin-top: -0.5rem; }
+.levels__form { display: contents; }
+
+.levels__level {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ink) 7%, var(--paper));
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  touch-action: manipulation;
+}
+
+.levels__level[aria-current="true"] { background: var(--blue-deep); color: #fff; box-shadow: 0 0 14px color-mix(in srgb, var(--blue) var(--glow-strength), transparent); }
+.levels__level--locked { cursor: default; font-size: 0.9rem; opacity: 0.55; }
+.levels__name { margin: -0.6rem 0 0; color: var(--muted); font-size: 0.95rem; font-weight: 600; }
+
+.level-progress { margin: 0; color: var(--muted); font-size: 0.95rem; }
+.level-progress strong { color: var(--ink); }
+.level-progress__rule { display: block; margin-top: 0.2rem; font-size: 0.8rem; }
+
+.banner--level { background: var(--green); }
+
 /* Topic tabs on the stats page */
 .tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
 
@@ -512,6 +541,10 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__sta
 }
 
 .tabs .tabs__tab[aria-current="page"] { background: var(--ink); color: var(--paper); }
+.tabs--levels { margin-top: -0.5rem; }
+.tabs--levels .tabs__tab { padding: 0.25rem 0.75rem; font-size: 0.9rem; }
+
+.tables__example { display: block; color: var(--muted); font-size: 0.75rem; font-weight: 500; }
 
 /* ── Stats ──────────────────────────────────────── */
 
@@ -643,8 +676,10 @@ body.testing {
 
 .question--done { font-size: clamp(2.75rem, 12vw, 5rem); }
 
-/* Equations are longer than times tables, so smaller; the letter is italic, fractions are stacked */
-.test--equations .question { font-size: clamp(2.4rem, 11vw, 4.75rem); }
+/* Longer questions (equations, decimals and negatives) are smaller, so they fit on one line.
+   The letter in an equation is italic, and fractions are stacked */
+.test--equations .question, .question.question--long { font-size: clamp(2.2rem, 10.5vw, 4.5rem); }
+.question.question--longer { font-size: clamp(1.9rem, 9vw, 3.75rem); }
 .question var { font-style: italic; font-weight: 600; padding-right: 0.04em; }
 
 .frac {
@@ -660,7 +695,11 @@ body.testing {
 .frac > span:first-child { padding: 0 0.15em 0.04em; border-bottom: 0.08em solid currentColor; }
 .frac > span:last-child { padding-top: 0.04em; }
 
-.keypad__key--slash { background: var(--paper); }
+.keypad__key--extra { background: var(--paper); }
+
+/* Two extra keys (− and .): four columns, with a wide 0 along the bottom */
+.keypad.keypad--wide { grid-template-columns: repeat(4, 1fr); }
+.keypad--wide .keypad__key--zero { grid-column: 1 / -1; }
 
 /* Fixed height so the layout never shifts as digits appear */
 .answer {

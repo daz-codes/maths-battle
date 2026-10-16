@@ -25,11 +25,10 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
 
   test "the equations game has a fraction key; times tables doesn't" do
     get play_path("equations")
-    assert_select ".keypad__key--slash", text: "/"
-    assert_select "[data-test-fractions-value=true]"
+    assert_select ".keypad__key[data-digit='/']", text: "/"
 
     get play_path("times-tables")
-    assert_select ".keypad__key--slash", count: 0
+    assert_select ".keypad__key[data-digit='/']", count: 0
   end
 
   test "unknown topics aren't found" do
@@ -47,12 +46,12 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     equations = Attempt.record!(user: @user, topic: "equations", results: [ { type: "ax=b", a: 12, b: 9, v: "x", flip: false, given: "3/4", ms: 2000 } ] * 6)
 
     assert equations.new_high_score, "a first equations game is a best, even after a bigger times tables score"
-    assert_equal [ 20, 6 ], [ @user.best_score(TimesTables), @user.best_score(Equations) ]
+    assert_equal [ 20, 6 ], [ @user.best_score(TimesTables, 1), @user.best_score(Equations, 1) ]
 
     get stats_path("equations")
     assert_select ".tabs__tab[aria-current=page]", text: /Equations/
     assert_select "thead th", text: "Type"
-    assert_select "tbody th", text: "3x = 12"
+    assert_select "tbody th", text: /ax = b\s+e\.g\. 3x = 12/
     assert_select ".stats dd", text: "100%"
   end
 

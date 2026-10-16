@@ -18,11 +18,16 @@ module Attempt::Shareable
   end
 
   def share_headline
-    "MatheMinute #{topic_module::EMOJI} #{topic_module::NAME}: #{score} in 60s"
+    "MatheMinute #{topic_module::EMOJI} #{topic_and_level}: #{score} in 60s"
   end
 
   def share_stats
-    "🔥 #{streak} day streak  🏆 Best: #{user.best_score(topic_module)}"
+    "🔥 #{streak} day streak  🏆 Best: #{user.best_score(topic_module, level)}"
+  end
+
+  # "Times tables, level 3" where a topic has levels
+  def topic_and_level
+    topic_module.levels.many? ? "#{topic_module::NAME}, level #{level}" : topic_module::NAME
   end
 
   def emoji_row

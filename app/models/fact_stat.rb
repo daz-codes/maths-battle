@@ -6,7 +6,7 @@ class FactStat < ApplicationRecord
   # Adds each answer in an attempt to the player's running totals for that fact
   def self.record(attempt)
     attempt.results_by_fact.each do |fact, answers|
-      find_or_initialize_by(topic: attempt.topic, fact: fact).add(answers)
+      find_or_initialize_by(topic: attempt.topic, level: attempt.level, fact: fact).add(answers)
     end
   end
 

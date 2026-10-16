@@ -9,19 +9,28 @@
     <% end %>
   </nav>
 
-  <% if @user.tracked?(@topic) %>
-    <% if (best = @user.best_group(@topic)) %>
-      <% needs = @user.group_needing_practice(@topic) %>
+  <% if @topic.levels.many? %>
+    <nav class="tabs tabs--levels" aria-label="Level">
+      <% @user.unlocked_levels(@topic).each do |level| %>
+        <%= link_to "Level #{level[:number]}", stats_path(@topic::SLUG, level: level[:number]), class: "tabs__tab", title: level[:name],
+              aria: { current: ("page" if level[:number] == @level) } %>
+      <% end %>
+    </nav>
+  <% end %>
+
+  <% if @user.tracked?(@topic, @level) %>
+    <% if (best = @user.best_group(@topic, @level)) %>
+      <% needs = @user.group_needing_practice(@topic, @level) %>
       <p class="summary">
         <%= sanitize @topic.summary(best: tag.strong(best.label), needs: (tag.strong(needs.label) if needs)), tags: %w[ strong ] %>
       </p>
     <% end %>
 
-    <% overall = @user.overall_stats(@topic) %>
+    <% overall = @user.overall_stats(@topic, @level) %>
     <dl class="stats stats--three">
       <div><dt>Accuracy</dt><dd><%= percent(overall.percent) %></dd></div>
       <div><dt>Average</dt><dd><%= seconds(overall.average_ms) %></dd></div>
-      <div><dt>Games</dt><dd><%= @user.games_played(@topic) %></dd></div>
+      <div><dt>Games</dt><dd><%= @user.games_played(@topic, @level) %></dd></div>
     </dl>
 
     <table class="tables">
@@ -35,9 +44,12 @@
         </tr>
       </thead>
       <tbody>
-        <% @user.group_stats(@topic).each do |row| %>
+        <% @user.group_stats(@topic, @level).each do |row| %>
           <tr title="<%= row.label %>: <%= row.answered.positive? ? "#{row.right} of #{row.answered} right, average #{seconds(row.average_ms)}" : "not asked yet" %>">
-            <th scope="row"><%= row.label %></th>
+            <th scope="row">
+              <%= row.label %>
+              <% if (example = @topic.group_example(row.group)) %><span class="tables__example">e.g. <%= example %></span><% end %>
+            </th>
             <td class="tables__bar">
               <span class="bar"><span class="bar__fill" style="width: <%= row.percent || 0 %>%"></span></span>
             </td>
@@ -50,11 +62,11 @@
 
     <p class="hint hint--centre">
       Speed is the average time for a right answer.
-      <% if @user.group_stats(@topic).any?(&:slow?) %>🐢 means slower than your usual.<% end %>
+      <% if @user.group_stats(@topic, @level).any?(&:slow?) %>🐢 means slower than your usual.<% end %>
     </p>
   <% else %>
     <p class="aside">Play a game of <%= @topic::NAME.downcase %> and your stats will show up here.</p>
   <% end %>
 
-  <%= link_to "Play", play_path(@topic::SLUG), class: "button button--blue button--wide" %>
+  <%= link_to "Play", play_path(@topic::SLUG, level: @level), class: "button button--blue button--wide" %>
 </main>

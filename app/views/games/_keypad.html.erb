@@ -1,0 +1,18 @@
+<%# Digits, delete, and any extra keys the level needs: / for fractions, . for decimals, − for negatives.
+    With two extra keys it goes to four columns, so it still fits small phones %>
+<div class="keypad <%= "keypad--wide" if keys.many? %>" data-test-target="keypad">
+  <% if keys.many? %>
+    <% %w[1 2 3].each do |digit| %><%= keypad_key digit %><% end %>
+    <%= delete_key %>
+    <% %w[4 5 6].each do |digit| %><%= keypad_key digit %><% end %>
+    <%= extra_keypad_key keys.first %>
+    <% %w[7 8 9].each do |digit| %><%= keypad_key digit %><% end %>
+    <%= extra_keypad_key keys.second %>
+    <%= keypad_key "0", modifier: "zero" %>
+  <% else %>
+    <% %w[1 2 3 4 5 6 7 8 9].each do |digit| %><%= keypad_key digit %><% end %>
+    <%= keys.one? ? extra_keypad_key(keys.first) : tag.span %>
+    <%= keypad_key "0" %>
+    <%= delete_key %>
+  <% end %>
+</div>

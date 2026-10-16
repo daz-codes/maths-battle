@@ -14,40 +14,40 @@ module User::Trackable
     end
   end
 
-  def tracked?(topic)
-    overall_stats(topic).answered.positive?
+  def tracked?(topic, level)
+    overall_stats(topic, level).answered.positive?
   end
 
-  def overall_stats(topic)
-    tally(nil, "All", stats_for(topic).values)
+  def overall_stats(topic, level)
+    tally(nil, "All", stats_for(topic, level).values)
   end
 
-  def games_played(topic)
-    attempts.in_topic(topic).count
+  def games_played(topic, level)
+    attempts.in_topic(topic, level).count
   end
 
   # Over real games only: a test started and walked away from shouldn't drag it down
-  def average_score(topic)
-    attempts.counted.in_topic(topic).average(:score)&.round
+  def average_score(topic, level)
+    attempts.counted.in_topic(topic, level).average(:score)&.round
   end
 
-  def group_stats(topic)
-    (@group_stats ||= {})[topic] ||= mark_slow_groups(topic.groups.map { |group| tally(group, topic.group_label(group), stats_for_group(topic, group)) })
+  def group_stats(topic, level)
+    (@group_stats ||= {})[[ topic, level ]] ||= mark_slow_groups(topic.groups.map { |group| tally(group, topic.group_label(group), stats_for_group(topic, level, group)) })
   end
 
   # Best on accuracy, then speed
-  def best_group(topic)
-    ranked_groups(topic).first
+  def best_group(topic, level)
+    ranked_groups(topic, level).first
   end
 
-  def group_needing_practice(topic)
-    ranked = ranked_groups(topic)
+  def group_needing_practice(topic, level)
+    ranked = ranked_groups(topic, level)
     ranked.last if ranked.many?
   end
 
   private
-    def stats_for_group(topic, group)
-      stats_for(topic).values.select { |stat| topic.groups_of(stat.fact).include?(group) }
+    def stats_for_group(topic, level, group)
+      stats_for(topic, level).values.select { |stat| topic.groups_of(stat.fact).include?(group) }
     end
 
     def tally(group, label, stats)
@@ -61,8 +61,8 @@ module User::Trackable
       tallies.map { |tally| tally.with(slow: tally.average_ms.present? && FactStat.slow?(tally.average_ms, typical)) }
     end
 
-    def ranked_groups(topic)
-      group_stats(topic).select { |tally| rankable?(topic, tally) }.sort_by { |tally| [ -tally.percent, tally.average_ms || Float::INFINITY ] }
+    def ranked_groups(topic, level)
+      group_stats(topic, level).select { |tally| rankable?(topic, tally) }.sort_by { |tally| [ -tally.percent, tally.average_ms || Float::INFINITY ] }
     end
 
     def rankable?(topic, tally)

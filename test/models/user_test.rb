@@ -104,7 +104,7 @@ class UserTest < ActiveSupport::TestCase
   test "best score is the highest in a topic" do
     Attempt.record!(user: @user, results: answers(*right_answers(10)))
     Attempt.record!(user: @user, results: answers(*right_answers(8)))
-    assert_equal 10, @user.best_score(TimesTables)
+    assert_equal 10, @user.best_score(TimesTables, 1)
   end
 end
 

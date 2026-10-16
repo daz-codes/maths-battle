@@ -16,14 +16,18 @@ module Attempt::Recordable
 
   included do
     before_create :score_results, :set_played_on, :record_high_score
-    after_create :update_streak, :record_fact_stats
+    after_create :update_streak, :record_fact_stats, :check_level_up
   end
 
   class_methods do
     # Raises Attempt::Invalid when the answers couldn't have come from a real test.
     # A game sent again with the same client id (a retried upload) is only recorded once
-    def record!(user:, results:, topic: Topic.default::TOPIC, client_id: nil, played_at: nil)
-      already_recorded(user, client_id) || create_for!(user, client_id:, played_at:, topic:, results: clean_results(topic_named(topic), results))
+    def record!(user:, results:, topic: Topic.default::TOPIC, level: 1, client_id: nil, played_at: nil)
+      topic_module, level = topic_named(topic), Integer(level, exception: false)
+      check_unlocked(user, topic_module, level)
+
+      already_recorded(user, client_id) ||
+        create_for!(user, client_id:, played_at:, topic:, level:, results: clean_results(topic_module, level, results))
     rescue ActiveRecord::RecordNotUnique
       already_recorded(user, client_id) || raise
     end
@@ -33,11 +37,15 @@ module Attempt::Recordable
         user.attempts.find_by(client_id: client_id) if client_id.present?
       end
 
-      def create_for!(user, client_id:, played_at:, topic:, results:)
+      def create_for!(user, client_id:, played_at:, topic:, level:, results:)
         transaction do
           user.lock!
-          user.attempts.create!(topic: topic, results: results, client_id: client_id.presence, played_at: play_time(played_at))
+          user.attempts.create!(topic: topic, level: level, results: results, client_id: client_id.presence, played_at: play_time(played_at))
         end
+      end
+
+      def check_unlocked(user, topic, level)
+        raise Invalid, "Level not unlocked" unless level&.between?(1, user.unlocked_level(topic))
       end
 
       # The device's clock can be wrong, so a time in the future, or too long ago, counts as now
@@ -52,19 +60,19 @@ module Attempt::Recordable
         Topic.find(topic) || raise(Invalid, "Unknown topic")
       end
 
-      def clean_results(topic, results)
+      def clean_results(topic, level, results)
         raise Invalid, "Results must be a list" unless results.is_a?(Array)
         raise Invalid, "Too many answers" if results.size > MAX_ANSWERS
 
-        results.map { |result| clean_result(topic, result) }.tap { |cleaned| check_total_time(cleaned) }
+        results.map { |result| clean_result(topic, level, result) }.tap { |cleaned| check_total_time(cleaned) }
       end
 
       # The topic checks and scores each answer; the timing check is the same for every topic
-      def clean_result(topic, result)
+      def clean_result(topic, level, result)
         raise Invalid, "Bad answer" unless result.is_a?(Hash)
 
         result = result.stringify_keys
-        topic.clean_result(result).merge("ms" => clean_ms(result["ms"]))
+        topic.clean_result(result, level: level).merge("ms" => clean_ms(result["ms"]))
       end
 
       def clean_ms(ms)
@@ -88,9 +96,9 @@ module Attempt::Recordable
       self.played_on = played_at.in_time_zone(user.time_zone).to_date
     end
 
-    # Best in this topic: a good times tables score shouldn't make equations look bad
+    # Best in this topic and level: a good times tables score shouldn't make equations look bad
     def record_high_score
-      self.new_high_score = score.positive? && score > user.best_score(topic_module)
+      self.new_high_score = score.positive? && score > user.best_score(topic_module, level)
     end
 
     # A snapshot of the streak is kept on the attempt for its results and share pages
@@ -106,5 +114,11 @@ module Attempt::Recordable
 
     def record_fact_stats
       user.fact_stats.record(self)
+    end
+
+    # The good game that brings the count to what's needed unlocks the next level
+    def check_level_up
+      levelled_up = good? && user.good_games(topic_module, level) == User::Levelable::GOOD_GAMES_TO_LEVEL_UP && Topic.level(topic_module, level + 1)
+      update_column(:levelled_up, true) if levelled_up
     end
 end

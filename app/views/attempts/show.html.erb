@@ -1,7 +1,9 @@
 <% content_for :title, "#{@attempt.score} in a minute! · MatheMinute" %>
 
 <main class="page results">
-  <% if @attempt.new_high_score %>
+  <% if @attempt.levelled_up %>
+    <p class="banner banner--level" data-controller="confetti">⬆️ Level up! You've unlocked Level <%= @attempt.level + 1 %>: <%= Topic.level(@attempt.topic_module, @attempt.level + 1)[:name] %></p>
+  <% elsif @attempt.new_high_score %>
     <p class="banner" data-controller="confetti">🎉 New high score! 🎉</p>
   <% end %>
 
@@ -29,7 +31,10 @@
     </section>
   <% end %>
 
-  <%= link_to "Play again", play_path(@attempt.topic_module::SLUG), class: "button button--blue button--wide" %>
+  <% unless @attempt.levelled_up || @attempt.level < @attempt.user.unlocked_level(@attempt.topic_module) %>
+    <%= render "levels/progress", user: @attempt.user, topic: @attempt.topic_module %>
+  <% end %>
+  <%= link_to "Play again", play_path(@attempt.topic_module::SLUG, level: @attempt.level), class: "button button--blue button--wide" %>
   <%= link_to "See your stats", stats_path(@attempt.topic_module::SLUG) %>
 
   <% if @attempt.user.guest? %>

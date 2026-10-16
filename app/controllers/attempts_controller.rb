@@ -3,7 +3,7 @@ class AttemptsController < ApplicationController
   rate_limit to: 20, within: 1.minute, only: :create
 
   def create
-    attempt = Attempt.record!(user: player, topic: topic_param, results: results_param, **upload_params)
+    attempt = Attempt.record!(user: player, topic: topic_param, level: level_param, results: results_param, **upload_params)
     render json: { url: attempt_path(attempt) }, status: :created
   rescue Attempt::Invalid => error
     render json: { error: error.message }, status: :unprocessable_entity
@@ -11,6 +11,7 @@ class AttemptsController < ApplicationController
 
   def show
     @attempt = Current.user.attempts.find(params[:id])
+    forget_level(@attempt.topic_module) if @attempt.levelled_up
   end
 
   private
@@ -21,6 +22,10 @@ class AttemptsController < ApplicationController
 
     def topic_param
       params.dig(:attempt, :topic) || Topic.default::TOPIC
+    end
+
+    def level_param
+      params.dig(:attempt, :level) || 1
     end
 
     # Games played offline arrive later, with an id made on the device and the time they were played

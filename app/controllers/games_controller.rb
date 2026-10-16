@@ -3,7 +3,8 @@ class GamesController < ApplicationController
 
   def show
     @topic = topic_from_slug
+    @level = level_from_params(@topic) || current_level(@topic)
     remember_topic @topic
-    @question_sets = current_player.question_sets(topic: @topic)
+    @question_sets = current_player.question_sets(topic: @topic, level: @level)
   end
 end

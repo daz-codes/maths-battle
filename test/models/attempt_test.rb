@@ -9,7 +9,7 @@ class AttemptTest < ActiveSupport::TestCase
     assert_equal 2, attempt.score
     assert_equal 3, attempt.answered
     assert_equal [ true, false, true ], attempt.results.map { |r| r["correct"] }
-    assert_equal({ "a" => 6, "b" => 7, "given" => 41, "correct" => false, "ms" => 1000 }, attempt.results[1])
+    assert_equal({ "a" => "6", "b" => "7", "given" => "41", "correct" => false, "ms" => 1000 }, attempt.results[1])
   end
 
   test "each attempt gets an unguessable share token" do
@@ -113,6 +113,6 @@ class AttemptTest < ActiveSupport::TestCase
 
     assert first.new_high_score
     assert_not worse.new_high_score
-    assert_equal 6, @user.best_score(TimesTables)
+    assert_equal 6, @user.best_score(TimesTables, 1)
   end
 end

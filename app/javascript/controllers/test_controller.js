@@ -14,7 +14,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // after a warning, and then nothing is saved
 export default class extends Controller {
   static targets = [ "question", "answer", "score", "quarter", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore" ]
-  static values = { questionSets: Array, topic: String, submitUrl: String, fractions: Boolean }
+  static values = { questionSets: Array, topic: String, level: Number, submitUrl: String, keys: Array }
 
   connect() {
     this.questions = chooseQuestionSet(this.questionSetsValue).questions
@@ -104,7 +104,7 @@ export default class extends Controller {
   keydown(event) {
     if (event.metaKey || event.ctrlKey || event.altKey) return
 
-    if (/^[0-9]$/.test(event.key) || (event.key === "/" && this.fractionsValue)) {
+    if (/^[0-9]$/.test(event.key) || this.keysValue.includes(event.key)) {
       event.preventDefault()
       this.type(event.key)
     } else if (event.key === "Backspace") {
@@ -117,21 +117,28 @@ export default class extends Controller {
     if (!this.accepting || !this.allowed(key)) return
 
     this.typed += key
-    this.answerTarget.textContent = this.typed
-    // Check as soon as the answer is as long as the right one ("56", "3/4"), so there's no Enter to press
+    this.showTyped()
+    // Check as soon as the answer is as long as the right one ("56", "3/4", "-2100"), so there's no Enter to press
     if (this.typed.length >= this.correctAnswer.length) this.check()
   }
 
-  // One fraction line, and only after a number: 11/9
+  // Digits always. A minus sign first, a decimal point or fraction line once and after a digit: -0.42, 11/9
   allowed(key) {
-    return key !== "/" || (this.fractionsValue && this.typed.length > 0 && !this.typed.includes("/"))
+    if (/^[0-9]$/.test(key)) return true
+    if (!this.keysValue.includes(key)) return false
+    if (key === "-") return this.typed === ""
+    return /[0-9]$/.test(this.typed) && !/[./]/.test(this.typed)
+  }
+
+  showTyped() {
+    this.answerTarget.textContent = this.typed.replace("-", "−")
   }
 
   backspace() {
     if (!this.accepting) return
 
     this.typed = this.typed.slice(0, -1)
-    this.answerTarget.textContent = this.typed
+    this.showTyped()
   }
 
   get accepting() {
@@ -152,9 +159,17 @@ export default class extends Controller {
   // The question text is built on the server from numbers and letters (equations use HTML for fractions)
   show() {
     this.questionTarget.innerHTML = this.current.text
+    this.fitQuestion()
     this.typed = ""
     this.answerTarget.textContent = ""
     this.shownAt = performance.now()
+  }
+
+  // 0.7 × −3000 is longer than 7 × 8, so it's shown smaller to stay on one line
+  fitQuestion() {
+    const length = this.questionTarget.textContent.length
+    this.questionTarget.classList.toggle("question--long", length > 8 && length <= 12)
+    this.questionTarget.classList.toggle("question--longer", length > 12)
   }
 
   // The question's own details go back with the answer, so the server can check it for itself
@@ -175,7 +190,7 @@ export default class extends Controller {
   // Show the right answer briefly so it sticks, then carry on
   showCorrection() {
     this.showingCorrection = true
-    this.answerTarget.textContent = this.correctAnswer
+    this.answerTarget.textContent = this.correctAnswer.replace("-", "−")
     this.answerTarget.classList.add("answer--wrong")
     this.correctionTimer = setTimeout(() => {
       this.showingCorrection = false
@@ -252,6 +267,7 @@ export default class extends Controller {
     this.fillRing(1)
     this.secondsTarget.textContent = 0
     this.questionTarget.textContent = "Time's up!"
+    this.questionTarget.classList.remove("question--long", "question--longer")
     this.questionTarget.classList.add("question--done")
     this.answerTarget.textContent = ""
     this.answerTarget.classList.remove("answer--wrong")
@@ -261,7 +277,7 @@ export default class extends Controller {
 
   async submit() {
     this.status("Saving…")
-    const game = { client_id: newGameId(), played_at: new Date().toISOString(), topic: this.topicValue, results: this.results }
+    const game = { client_id: newGameId(), played_at: new Date().toISOString(), topic: this.topicValue, level: this.levelValue, results: this.results }
     const { outcome, url } = await postGame(this.submitUrlValue, game)
 
     if (outcome === "saved") {

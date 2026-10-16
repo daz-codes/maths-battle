@@ -29,7 +29,7 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
       post attempts_path, params: { attempt: { results: answers(*right_answers(6)) } }, as: :json
     end
     assert_equal 2, User.last.attempts.count
-    assert_equal 6, User.last.best_score(TimesTables)
+    assert_equal 6, User.last.best_score(TimesTables, 1)
   end
 
   test "visiting pages doesn't create guests" do

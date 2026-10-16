@@ -26,14 +26,16 @@
   <% end %>
 
   <%= render "topics/switcher" %>
+  <%= render "levels/picker" %>
   <%= link_to "Play", play_path(current_topic::SLUG), class: "button button--start" %>
+  <%= render "levels/progress", user: @user, topic: current_topic %>
 
   <% if @user.persisted? %>
     <dl class="stats">
-      <div><dt>Best</dt><dd>🏆 <%= @user.best_score(current_topic) %></dd></div>
+      <div><dt>Best</dt><dd>🏆 <%= @user.best_score(current_topic, current_level) %></dd></div>
       <div><dt>Longest streak</dt><dd><%= @user.longest_streak %></dd></div>
-      <div><dt>Average score</dt><dd><%= @user.average_score(current_topic) || "—" %></dd></div>
-      <div><dt>Average time</dt><dd><%= seconds(@user.overall_stats(current_topic).average_ms) %></dd></div>
+      <div><dt>Average score</dt><dd><%= @user.average_score(current_topic, current_level) || "—" %></dd></div>
+      <div><dt>Average time</dt><dd><%= seconds(@user.overall_stats(current_topic, current_level).average_ms) %></dd></div>
     </dl>
     <%= link_to "See all stats", stats_path(current_topic::SLUG) %>
   <% end %>

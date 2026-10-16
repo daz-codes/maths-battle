@@ -22,44 +22,44 @@ module User::Practisable
   # At full strength easy facts come up 3× as often, medium 1.5×, and hard ones 0.4×
   EASING = { 0 => 2.0, 1 => 0.5, 2 => -0.6 }
 
-  def questions(topic: Topic.default, count: QUESTION_COUNT, random: Random.new)
+  def questions(topic: Topic.default, level: 1, count: QUESTION_COUNT, random: Random.new)
     previous = nil
 
     Array.new(count) do
-      previous = pick_fact(topic, excluding: previous, random: random)
-      topic.question(previous, random: random)
+      previous = pick_fact(topic, level, excluding: previous, random: random)
+      topic.question(previous, level: level, random: random)
     end
   end
 
   # The set for this game, then spares for playing offline. Each has an id so the device knows which it has used
-  def question_sets(topic: Topic.default, count: 1 + SPARE_QUESTION_SETS)
-    Array.new(count) { { id: SecureRandom.hex(6), questions: questions(topic: topic) } }
+  def question_sets(topic: Topic.default, level: 1, count: 1 + SPARE_QUESTION_SETS)
+    Array.new(count) { { id: SecureRandom.hex(6), questions: questions(topic: topic, level: level) } }
   end
 
-  def question_weights(topic = Topic.default)
-    (@question_weights ||= {})[topic] ||= topic.facts.index_with { |fact| question_weight(topic, fact) }
+  def question_weights(topic = Topic.default, level = 1)
+    (@question_weights ||= {})[[ topic, level ]] ||= topic.facts(level).index_with { |fact| question_weight(topic, level, fact) }
   end
 
-  # 0 for a player doing fine in a topic (or new to it), rising to 1 for one getting half or fewer right recently
-  def easing(topic = Topic.default)
-    (@easing ||= {})[topic] ||= begin
-      accuracy = recent_accuracy(topic)
+  # 0 for a player doing fine at a level (or new to it), rising to 1 for one getting half or fewer right recently
+  def easing(topic = Topic.default, level = 1)
+    (@easing ||= {})[[ topic, level ]] ||= begin
+      accuracy = recent_accuracy(topic, level)
       accuracy ? ((STRUGGLING_BELOW - accuracy) / (STRUGGLING_BELOW - FULLY_EASED_AT)).clamp(0.0, 1.0) : 0.0
     end
   end
 
   private
-    def question_weight(topic, fact)
-      stat = stats_for(topic)[fact]
-      base_weight(topic, fact) * (1 + accuracy_boost(stat) + slow_boost(topic, stat)) * difficulty_factor(topic, fact)
+    def question_weight(topic, level, fact)
+      stat = stats_for(topic, level)[fact]
+      base_weight(topic, fact) * (1 + accuracy_boost(stat) + slow_boost(topic, level, stat)) * difficulty_factor(topic, level, fact)
     end
 
     def base_weight(topic, fact)
       topic.trivial?(fact) ? TRIVIAL_WEIGHT : 1.0
     end
 
-    def difficulty_factor(topic, fact)
-      1 + EASING.fetch(topic.difficulty(fact)) * easing(topic)
+    def difficulty_factor(topic, level, fact)
+      1 + EASING.fetch(topic.difficulty(fact)) * easing(topic, level)
     end
 
     # 0 for a fact always answered right (or not asked yet), up to MAX_BOOST - 1 for one never answered right
@@ -67,30 +67,30 @@ module User::Practisable
       (MAX_BOOST - 1) * (1 - (stat&.fraction_correct || 1.0))
     end
 
-    def slow_boost(topic, stat)
-      timed?(stat) ? SLOW_BOOST * FactStat.slowness(stat.average_correct_ms, typical_answer_ms(topic)) : 0
+    def slow_boost(topic, level, stat)
+      timed?(stat) ? SLOW_BOOST * FactStat.slowness(stat.average_correct_ms, typical_answer_ms(topic, level)) : 0
     end
 
     def timed?(stat)
       stat.present? && stat.correct_count >= MIN_TIMED_ANSWERS
     end
 
-    def typical_answer_ms(topic)
-      (@typical_answer_ms ||= {})[topic] ||= FactStat.typical_ms(stats_for(topic).values.select { |stat| timed?(stat) }.map(&:average_correct_ms))
+    def typical_answer_ms(topic, level)
+      (@typical_answer_ms ||= {})[[ topic, level ]] ||= FactStat.typical_ms(stats_for(topic, level).values.select { |stat| timed?(stat) }.map(&:average_correct_ms))
     end
 
-    def recent_accuracy(topic)
-      answers = recent_answers(topic)
+    def recent_accuracy(topic, level)
+      answers = recent_answers(topic, level)
       answers.count { |answer| answer["correct"] }.fdiv(answers.size) if answers.size >= MIN_RECENT_ANSWERS
     end
 
-    def recent_answers(topic)
-      attempts.in_topic(topic).order(created_at: :desc).limit(RECENT_GAMES).flat_map(&:results)
+    def recent_answers(topic, level)
+      attempts.in_topic(topic, level).order(created_at: :desc).limit(RECENT_GAMES).flat_map(&:results)
     end
 
     # Never the same fact twice in a row
-    def pick_fact(topic, excluding:, random:)
-      candidates = question_weights(topic).except(excluding)
+    def pick_fact(topic, level, excluding:, random:)
+      candidates = question_weights(topic, level).except(excluding)
       target = random.rand * candidates.values.sum
 
       candidates.each do |fact, weight|

@@ -8,7 +8,7 @@ class Attempt::ShareableTest < ActiveSupport::TestCase
     text = attempt.share_text("https://matheminute.app/s/abc")
 
     assert_equal <<~TEXT.chomp, text
-      MatheMinute ✖️ Times tables: 4 in 60s
+      MatheMinute ✖️ Times tables, level 1: 4 in 60s
       🔥 1 day streak  🏆 Best: 4
       🟩🟥🟩🟩🟩
       https://matheminute.app/s/abc
