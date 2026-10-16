@@ -7,7 +7,7 @@ module Attempt::Recordable
   # The test lasts 60 seconds; allow a little slack for the end-of-test POST
   MAX_TOTAL_MS = 65_000
   # Every field a result can have in any topic. Each topic checks its own fields strictly
-  RESULT_FIELDS = %i[ a b c type v flip given ms ]
+  RESULT_FIELDS = %i[ a b c d n type v flip given ms ]
   # A game played offline still counts if it reaches the server within this long
   MAX_OFFLINE_AGE = 30.days
 

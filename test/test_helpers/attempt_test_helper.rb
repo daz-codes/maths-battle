@@ -23,9 +23,15 @@ module AttemptTestHelper
     Attempt.record!(user: user, level: 2, results: results, **options)
   end
 
+  EASY_QUESTIONS = {
+    TimesTables => { a: 2, b: 3, given: 6, ms: 1000 },
+    Equations => { type: "x+a=b", a: 2, b: 5, v: "x", flip: false, given: "3", ms: 1000 },
+    Functions => { type: "x+a", a: 2, n: 3, given: "5", ms: 1000 }
+  }
+
   # Plays enough good games at each level below to unlock this one. The questions are ones every level asks
   def unlock(user, topic, level)
-    easy = topic == Equations ? { type: "x+a=b", a: 2, b: 5, v: "x", flip: false, given: "3", ms: 1000 } : { a: 2, b: 3, given: 6, ms: 1000 }
+    easy = EASY_QUESTIONS.fetch(topic)
 
     (1...level).each do |below|
       User::Levelable::GOOD_GAMES_TO_LEVEL_UP.times do

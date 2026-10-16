@@ -1,13 +1,15 @@
 <%# Picks a topic and one of its unlocked levels, the same on every page that needs it.
-    choosing: :play on the home page (changes what Play plays), or :stats on the stats page %>
-<nav class="switcher" aria-label="Topic">
-  <% Topic::ALL.each do |choice| %>
-    <% url, options = topic_choice(choosing, choice) %>
-    <%= button_to url, **options, class: "switcher__option", form_class: "switcher__form", aria: { current: (choice == topic) } do %>
-      <span aria-hidden="true"><%= choice.emoji %></span> <%= choice.title %>
-    <% end %>
-  <% end %>
-</nav>
+    choosing: :play on the home page (changes what Play plays), or :stats on the stats page.
+    Topics are a dropdown, so there's room for as many as there are %>
+<% url, method = topic_choice(choosing) %>
+<%= form_with url: url, method: method, class: "topic-picker", data: { controller: "auto-submit" } do |form| %>
+  <%= form.label :topic, "Topic", class: "visually-hidden" %>
+  <span class="topic-picker__field">
+    <%= form.select :topic, Topic::ALL.map { |choice| [ "#{choice.emoji} #{choice.title}", choice.slug ] }, { selected: topic.slug },
+          class: "topic-picker__select", data: { action: "auto-submit#submit" } %>
+  </span>
+  <noscript><%= form.submit "Go", class: "button" %></noscript>
+<% end %>
 
 <% if topic.levels.many? %>
   <% unlocked = user.unlocked_level(topic) %>

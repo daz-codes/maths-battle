@@ -4,6 +4,7 @@ class TopicTest < ActiveSupport::TestCase
   test "every topic answers the same questions about itself" do
     assert_equal [ "times_tables", "times-tables", "Times tables", "✖️" ], [ TimesTables.key, TimesTables.slug, TimesTables.title, TimesTables.emoji ]
     assert_equal [ "equations", "equations", "Equations", "⚖️" ], [ Equations.key, Equations.slug, Equations.title, Equations.emoji ]
+    assert_equal [ "functions", "functions", "Functions", "⚙️" ], [ Functions.key, Functions.slug, Functions.title, Functions.emoji ]
   end
 
   test "levels are found by number" do
@@ -16,7 +17,7 @@ class TopicTest < ActiveSupport::TestCase
     assert_equal TimesTables, Topic.find("times_tables")
     assert_equal TimesTables, Topic.find_by_slug("times-tables")
     assert_nil Topic.find("spelling")
-    assert_equal %w[ times_tables equations ], Topic.keys
+    assert_equal %w[ times_tables equations functions ], Topic.keys
   end
 
   test "a topic keeps its own module name" do

@@ -8,7 +8,7 @@ class PwaTest < ActionDispatch::IntegrationTest
     manifest = response.parsed_body
     assert_equal "standalone", manifest["display"]
     assert_equal %w[192x192 512x512], manifest["icons"].map { _1["sizes"] }.uniq
-    assert_equal "One minute of times tables or equations a day. Keep your streak going!", manifest["description"]
+    assert_equal "One minute of times tables, equations or functions a day. Keep your streak going!", manifest["description"]
   end
 
   test "service worker" do

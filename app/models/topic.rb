@@ -1,6 +1,6 @@
 # Every topic that can be played. Each one is a module answering the same questions (see TimesTables)
 module Topic
-  ALL = [ TimesTables, Equations ]
+  ALL = [ TimesTables, Equations, Functions ]
 
   def self.default
     TimesTables

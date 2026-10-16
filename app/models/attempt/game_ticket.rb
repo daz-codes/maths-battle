@@ -1,7 +1,7 @@
 # Authorizes the questions issued for one game. Tickets work offline, expire after 30 days, and are
 # bound to the browser's player. Their id is also the attempt's unique client id, preventing replay.
 class Attempt::GameTicket
-  QUESTION_FIELDS = %w[ a b c type v flip ].freeze
+  QUESTION_FIELDS = %w[ a b c d n type v flip ].freeze
 
   def self.issue(owner:, topic:, level:, id:, questions:)
     verifier.generate({ "owner" => owner, "topic" => topic, "level" => level, "id" => id,

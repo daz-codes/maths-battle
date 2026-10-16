@@ -14,7 +14,18 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     follow_redirect!
     assert_select "a.button--start[href=?]", play_path("equations")
-    assert_select ".switcher__option[aria-current=true]", text: /Equations/
+    assert_select "form.topic-picker[action=?] select[name=topic] option[selected][value=equations]", topic_path, text: "⚖️ Equations"
+  end
+
+  test "the dropdown lists every topic, and on the stats page goes to that topic's stats" do
+    get root_path
+    assert_select ".topic-picker select[data-action='auto-submit#submit'] option", Topic::ALL.size
+    assert_select ".topic-picker option[value=functions]", text: "⚙️ Functions"
+
+    get stats_path, params: { topic: "functions" }
+    assert_response :success
+    assert_select ".topic-picker option[selected][value=functions]"
+    assert_select ".aside", text: "Play a game of functions and your stats will show up here."
   end
 
   test "playing a topic makes it the current one" do
@@ -53,7 +64,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ 20, 6 ], [ @user.best_score(TimesTables, 1), @user.best_score(Equations, 1) ]
 
     get stats_path("equations")
-    assert_select ".switcher__option[aria-current=true]", text: /Equations/
+    assert_select ".topic-picker option[selected][value=equations]"
     assert_select "thead th", text: "Type"
     assert_select "tbody th", text: /ax = b\s+e\.g\. 3x = 12/
     assert_select ".stats dd", text: "100%"

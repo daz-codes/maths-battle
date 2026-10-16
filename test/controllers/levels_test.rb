@@ -74,8 +74,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     good_games(NEEDED, level: 1)
     get stats_path("times-tables", level: 1)
 
-    assert_select ".switcher__option[aria-current=true]", text: /Times tables/
-    assert_select "form[action=?][method=get] .switcher__option", stats_path("equations")
+    assert_select "form.topic-picker[action=?][method=get] select[name=topic] option[selected]", stats_path, text: /Times tables/
     assert_select "form[action=?][method=get] input[name=level][value=2]", stats_path("times-tables")
     assert_select ".levels .levels__level[aria-current=true]", text: "1"
     assert_select ".levels__level--locked", 3

@@ -75,6 +75,9 @@ class Attempt::BadgeableTest < ActiveSupport::TestCase
     assert_not_includes earned, "all_topics"
 
     Attempt.record!(user: @user, topic: "equations", results: [ { type: "x+a=b", a: 2, b: 5, v: "x", flip: false, given: "3", ms: 1000 } ] * 5)
+    assert_not_includes earned, "all_topics"
+
+    Attempt.record!(user: @user, topic: "functions", results: [ { type: "x+a", a: 2, n: 5, given: "7", ms: 1000 } ] * 5)
     assert_includes earned, "all_topics"
   end
 
