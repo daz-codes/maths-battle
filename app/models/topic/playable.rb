@@ -38,6 +38,11 @@ module Topic::Playable
     [ question(fact, level: level, random: random) ]
   end
 
+  # Under how many ms a right answer earns the quick and lightning stars
+  def star_times
+    self::STAR_TIMES
+  end
+
   def badge_scores
     self::BADGE_SCORES
   end

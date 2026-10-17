@@ -8,6 +8,17 @@
   <% end %>
 
   <%= render "card", attempt: @attempt %>
+
+  <section class="stars-earned" aria-label="Stars">
+    <span class="stars-earned__total">+<%= number_with_delimiter @attempt.stars %> ⭐</span>
+    <% if @attempt.star_bonuses.any? %>
+      <ul class="stars-earned__bonuses">
+        <% @attempt.star_bonuses.each do |bonus, stars| %>
+          <li><%= Attempt::BONUS_NAMES[bonus] %> +<%= stars %></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </section>
   <%= render "badges/earned", badges: @attempt.badges, celebrate: !(@attempt.levelled_up || @attempt.new_high_score) %>
 
   <button type="button" class="button button--share button--wide" data-controller="share"

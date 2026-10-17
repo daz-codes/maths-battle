@@ -29,6 +29,8 @@ module SimultaneousEquations
     { number: 4, name: "Mixed", example: "3x − 2y = 5, x − 2y = −1", types: [ "subtract", "subtract and divide", "add" ], negatives: true, max_total: 25 },
     { number: 5, name: "Double one", example: "x + y = 5, 3x + 2y = 12", types: [ "subtract", "subtract and divide", "add", "multiply" ], negatives: true, max_total: 25 }
   ]
+  # Quick and lightning stars: each answer is a few steps of working out
+  STAR_TIMES = { lightning: 5_000, quick: 10_000 }
   # Scores in one game that earn a badge. Lower than the other topics: each pair of equations is two answers
   BADGE_SCORES = [ 5, 10, 15, 20, 30 ]
   SOLUTIONS = 1..5

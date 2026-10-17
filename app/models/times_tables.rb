@@ -23,6 +23,8 @@ module TimesTables
     { number: 5, name: "Negatives", example: "0.7 × −3000" }
   ]
   FIRST_TABLES = 2..5
+  # A right answer under 1 second earns the lightning stars, under 2 the quick ones
+  STAR_TIMES = { lightning: 1_000, quick: 2_000 }
   # Scores in one game that earn a badge
   BADGE_SCORES = [ 5, 10, 25, 50, 75, 100 ]
   # The powers of ten each level can scale a number by: 3 means ×1000, −2 means ÷100

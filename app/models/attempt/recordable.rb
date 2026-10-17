@@ -15,8 +15,8 @@ module Attempt::Recordable
 
   included do
     before_create :score_results, :set_played_on, :record_high_score
-    # Badges come last, as they look at the streak and any level up
-    after_create :update_streak, :record_fact_stats, :check_level_up, :forget_unlocked_levels, :award_badges
+    # Stars and badges come last, as they look at the streak and any level up
+    after_create :update_streak, :record_fact_stats, :check_level_up, :forget_unlocked_levels, :award_stars, :award_badges
   end
 
   class_methods do

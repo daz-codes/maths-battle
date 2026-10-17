@@ -44,6 +44,8 @@ module Functions
     { number: 4, name: "Composite", example: "f(g(5))", types: LINEAR + DIVIDED + SQUARES + COMPOSITE, limits: BIG, negatives: true },
     { number: 5, name: "Inverse", example: "f⁻¹(11)", types: LINEAR + DIVIDED + SQUARES + COMPOSITE + INVERSE, limits: BIG, negatives: true }
   ]
+  # Quick and lightning stars, allowing for working out a function taking longer than a times table
+  STAR_TIMES = { lightning: 3_000, quick: 6_000 }
   # Scores in one game that earn a badge. Like equations: each question takes some reading
   BADGE_SCORES = [ 5, 10, 20, 30, 50 ]
   # The largest number the server accepts in a question sent back (well above anything generated)

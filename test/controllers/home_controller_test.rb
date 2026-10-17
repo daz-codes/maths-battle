@@ -27,6 +27,14 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".tagline", text: "Improve your math in minutes"
   end
 
+  test "shows the player's stars" do
+    sign_in_as users(:ada)
+    Attempt.record!(user: users(:ada), results: answers(*right_answers(5), ms: 2_500))
+
+    get root_path
+    assert_select ".stars-total", text: "100 ⭐ stars"
+  end
+
   test "greets the player by name" do
     @user.update!(name: "Ada")
     sign_in_as @user

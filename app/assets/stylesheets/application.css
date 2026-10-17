@@ -95,14 +95,14 @@ a {
 
 /* Text links (and the sign out button, styled as one): green underline and a faint wash on hover.
    The wash is a touch of ink mixed into the paper, so it's slightly darker in light mode and lighter in dark */
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .badge-summary), .link-button {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary), .link-button {
   margin: 0 -0.2em;
   padding: 0.05em 0.2em;
   border-radius: 4px;
   transition: background-color 120ms, text-decoration-color 120ms;
 }
 
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .badge-summary):hover, .link-button:hover {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary):hover, .link-button:hover {
   background-color: color-mix(in srgb, var(--ink) 5%, var(--paper));
   text-decoration-color: var(--green);
 }
@@ -357,7 +357,6 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 .nudge--risk {
   padding: 0.35rem 0.9rem;
-  border: 2px solid var(--on-neon);
   border-radius: 999px;
   background: var(--pink);
   color: var(--on-neon);
@@ -416,7 +415,11 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   font-size: 0.9rem;
 }
 
-.site-footer__start { display: flex; flex: 0 1 auto; align-items: center; gap: 0.6rem; min-width: 0; }
+.site-footer__start { display: flex; flex: 0 1 auto; align-items: center; gap: 0.5rem; min-width: 0; }
+/* Name (or sign in and sign up) over the player's stars */
+.site-footer__who { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.site-footer__name { overflow: hidden; color: inherit; font-weight: 700; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+.site-footer__stars { color: var(--muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
 .site-footer__tab { flex: none; }
 
 .site-footer__player, .site-footer__tab {
@@ -435,7 +438,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .site-footer__player { min-width: 0; }
 .site-footer__player:hover, .site-footer__tab:hover { background: color-mix(in srgb, var(--ink) 5%, var(--paper)); }
 .site-footer__player span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.site-footer__auth { display: flex; flex-direction: column; gap: 0.1rem; font-size: 0.8rem; line-height: 1.2; white-space: nowrap; }
+.site-footer__auth { color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
 
 /* Icon above its label, like a tab bar, so three fit on a small phone */
 .site-footer__tab { flex-direction: column; justify-content: center; gap: 0.1rem; font-size: 0.75rem; }
@@ -562,20 +565,70 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 .tables__example { display: block; color: var(--muted); font-size: 0.75rem; font-weight: 500; }
 
+/* ── Stars ──────────────────────────────────────── */
+
+/* Each right answer's stars float up from the answer line and fade, bigger and brighter the quicker it was */
+.star-pop {
+  --drift: 0px;
+  position: absolute;
+  top: 66%;
+  left: 50%;
+  z-index: 2;
+  color: var(--green-deep);
+  font-size: 1.5rem;
+  font-weight: 800;
+  pointer-events: none;
+  white-space: nowrap;
+  animation: star-float 1.1s ease-out forwards;
+}
+
+.star-pop--quick { color: var(--blue-deep); font-size: 1.8rem; }
+.star-pop--lightning { color: var(--pink-text); font-size: 2.1rem; }
+
+:root[data-theme="dark"] .star-pop--right { color: var(--green); }
+:root[data-theme="dark"] .star-pop--quick { color: var(--blue); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .star-pop--right { color: var(--green); }
+  :root:not([data-theme="light"]) .star-pop--quick { color: var(--blue); }
+}
+
+@keyframes star-float {
+  0% { opacity: 0; transform: translate(calc(-50% + var(--drift) * 0.3), 0) scale(0.6); }
+  15% { opacity: 1; transform: translate(calc(-50% + var(--drift) * 0.5), -12px) scale(1.1); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--drift)), -110px) scale(1); }
+}
+
+/* Without motion they just fade where they appear */
+@media (prefers-reduced-motion: reduce) {
+  .star-pop { animation: star-fade 1.1s ease-out forwards !important; transform: translateX(-50%); }
+}
+
+@keyframes star-fade { 0%, 40% { opacity: 1; } 100% { opacity: 0; } }
+
+/* What a game earned, on its results page */
+.stars-earned { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; margin: 0; }
+.stars-earned__total { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
+.stars-earned__bonuses { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
+.stars-earned__bonuses li { padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--paper-alt); color: var(--muted); font-size: 0.85rem; font-weight: 700; }
+
+/* The player's collection, on the home page under the streak */
+.stars-total { margin: -0.5rem 0 0; color: var(--muted); font-weight: 700; }
+.stars-total strong { color: var(--ink); font-size: 1.15rem; }
+
 /* ── Badges ─────────────────────────────────────── */
 
 .badges { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; }
 .badges__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
 
+/* Tiles like the stats ones: earned badges have a yellow stripe along the top */
 .badge {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.2rem;
-  padding: 0.75rem 0.5rem;
-  border: 2px solid var(--line);
+  padding: 0.95rem 0.5rem 0.75rem;
   border-radius: var(--radius);
-  background: var(--paper);
+  background: linear-gradient(var(--yellow) 0 6px, var(--paper-alt) 6px);
 }
 
 .badge__emoji { font-size: 2rem; line-height: 1.1; }
@@ -583,11 +636,12 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .badge__how { color: var(--muted); font-size: 0.75rem; line-height: 1.3; }
 
 /* Not earned yet: faded, so the earned ones stand out */
-.badge--locked { border-style: dashed; background: var(--paper-alt); }
+.badge--locked { background: color-mix(in srgb, var(--paper-alt) 55%, var(--paper)); }
 .badge--locked .badge__emoji { filter: grayscale(1); opacity: 0.45; }
 .badge--locked .badge__name { color: var(--muted); }
 
-.badges--new .badge { border-color: var(--on-neon); background: var(--yellow); color: var(--on-neon); }
+/* A new badge, on its results page: all yellow, glowing in the dark */
+.badges--new .badge { padding-top: 0.75rem; background: var(--yellow); box-shadow: 0 0 20px color-mix(in srgb, var(--yellow) var(--glow-strength), transparent); color: var(--on-neon); }
 
 /* On the stats page: a tile like the stats above it, with a pink stripe */
 .badge-summary {
@@ -717,6 +771,7 @@ body.testing {
 }
 
 .test__stage {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -900,7 +955,6 @@ body.testing {
 .banner {
   margin: 0;
   padding: 0.45rem 1.1rem;
-  border: 2px solid var(--on-neon);
   border-radius: var(--radius);
   background: var(--yellow);
   box-shadow: 0 0 24px color-mix(in srgb, var(--yellow) var(--glow-strength), transparent);

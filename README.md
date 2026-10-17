@@ -50,6 +50,14 @@ celebrated on that game's results page. `User#catch_up_badges!` replays a player
 how existing players got their badges, and how a newly added badge can reach players who already earned it.
 Badges never name the player, so shared results can show them.
 
+## Stars
+
+Every right answer earns stars: 10, 20 if quick and 30 if lightning fast. Each topic sets what counts as
+quick in `STAR_TIMES`, since an equation takes longer than a times table. A game can also earn bonuses for a
+perfect game, a new high score or levelling up. The +10s that float up during a game are only for show:
+the server works out the stars from the checked answers (`Attempt::Starrable`) and keeps them on the game,
+so a player's total is the sum of their games.
+
 ## Authentication and offline play
 
 New passwords require 15–72 characters, with bcrypt's additional 72-byte limit. Existing passwords

@@ -75,6 +75,14 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Results must be a list", response.parsed_body["error"]
   end
 
+  test "results page shows the stars the game earned, with its bonuses" do
+    attempt = Attempt.record!(user: @user, results: answers(*right_answers(5), ms: 500))
+
+    get attempt_path(attempt)
+    assert_select ".stars-earned__total", text: "+200 ⭐"
+    assert_select ".stars-earned__bonuses li", text: "New high score +50"
+  end
+
   test "results page shows the score, feedback and missed facts" do
     attempt = record_tables_game(@user, answers([ 7, 8, 54 ], [ 6, 7, 42 ], [ 3, 3, 9 ]))
 

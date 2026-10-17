@@ -45,7 +45,9 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
 
   test "the footer shows the player and links to settings and stats" do
     get root_path
-    assert_select ".site-footer a.site-footer__player[href=?]", edit_profile_path, text: /ada/
+    assert_select ".site-footer a.site-footer__player[href=?][aria-label=Settings]", edit_profile_path
+    assert_select ".site-footer a.site-footer__name[href=?]", edit_profile_path, text: "ada"
+    assert_select ".site-footer .site-footer__stars", text: "0 ⭐"
     assert_select ".site-footer a.site-footer__player .avatar"
     assert_select ".site-footer a.site-footer__stats[href=?] svg.stats-icon", stats_path
     assert_select ".site-footer a.site-footer__home[href=?]", root_path, text: "Home"

@@ -9,6 +9,7 @@
       data-test-topic-value="<%= @topic.key %>"
       data-test-level-value="<%= @level %>"
       data-test-keys-value="<%= @topic.keys(@level).to_json %>"
+      data-test-star-times-value="<%= @topic.star_times.to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">
   <button type="button" class="test__stop" data-action="test#confirmStop" aria-label="Stop the game">✕</button>
 
@@ -18,7 +19,7 @@
     <span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span>
   </header>
 
-  <div class="test__stage">
+  <div class="test__stage" data-test-target="stage">
     <p class="question" data-test-target="question" aria-live="off">Ready</p>
     <p class="answer" data-test-target="answer" aria-live="polite"></p>
     <p class="test__status" data-test-target="status" hidden></p>

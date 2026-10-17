@@ -3,6 +3,7 @@ import { Turbo } from "@hotwired/turbo-rails"
 import { chooseQuestionSet, playerKey, preparePlayer, postGame, saveForLater, watchPlayer } from "lib/offline_games"
 
 const DURATION = 60_000
+const STARS = { right: 10, quick: 20, lightning: 30 }
 const WRONG_PAUSE = 400
 // Each quarter of the clock ring is 23 of 100 units long, leaving small gaps between them
 const QUARTER_LENGTH = 23
@@ -13,8 +14,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // Offline, the finished game is kept on the device and uploaded later. It can be stopped part way,
 // after a warning, and then nothing is saved
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable" ]
-  static values = { questionSets: Array, topic: String, level: Number, submitUrl: String, keys: Array }
+  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage" ]
+  static values = { questionSets: Array, topic: String, level: Number, submitUrl: String, keys: Array, starTimes: Object }
 
   connect() {
     preparePlayer()
@@ -192,16 +193,32 @@ export default class extends Controller {
   // The question's own details go back with the answer, so the server can check it for itself
   check() {
     const { text, answer, ...question } = this.current
-    this.results.push({ ...question, given: this.typed, ms: Math.round(performance.now() - this.shownAt) })
+    const ms = Math.round(performance.now() - this.shownAt)
+    this.results.push({ ...question, given: this.typed, ms })
 
     if (this.typed === answer) {
       this.score++
       this.scoreTarget.textContent = this.score
       this.flash(this.scoreTarget, "--right")
+      this.popStars(ms)
       this.next()
     } else {
       this.showCorrection()
     }
+  }
+
+  // Stars for a right answer float up and fade: +10, +20 if quick, +30 if lightning fast. The server works
+  // out the stars that count from the answers, with the same rules (Attempt::Starrable)
+  popStars(ms) {
+    const { lightning, quick } = this.starTimesValue
+    const [ stars, tier ] = ms < lightning ? [ STARS.lightning, "lightning" ] : ms < quick ? [ STARS.quick, "quick" ] : [ STARS.right, "right" ]
+    const pop = Object.assign(document.createElement("span"), { className: `star-pop star-pop--${tier}`, textContent: `+${stars} ⭐` })
+    pop.setAttribute("aria-hidden", "true")
+    // Spread out a little, so quick answers in a row don't land on top of each other
+    pop.style.setProperty("--drift", `${Math.round((Math.random() - 0.5) * 120)}px`)
+    pop.addEventListener("animationend", () => pop.remove())
+    setTimeout(() => pop.remove(), 1_500)
+    this.stageTarget.append(pop)
   }
 
   // Show the right answer briefly so it sticks, then carry on

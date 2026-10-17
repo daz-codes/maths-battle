@@ -32,4 +32,15 @@ class TimesTablesTest < ApplicationSystemTestCase
     assert_text "#{a} × #{b} = #{a * b}"
     assert_equal 2, users(:ada).best_score(TimesTables, 1)
   end
+
+  test "each right answer's stars float up and fade away" do
+    sign_in users(:ada)
+    click_on "Play"
+    assert_selector ".question", text: "×", wait: 5
+
+    a, b = find(".question").text.split(" × ").map(&:to_i)
+    find("body").send_keys((a * b).to_s)
+    assert_selector ".star-pop.star-pop--lightning", text: "+30 ⭐"
+    assert_no_selector ".star-pop", wait: 3
+  end
 end
