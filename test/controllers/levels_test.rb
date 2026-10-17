@@ -88,6 +88,9 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_select ".levels__level--locked", 3
     assert_select ".levels__name", text: "Level 1: Tables 2–5"
 
+    assert_select ".levels-panel > a.button--start[href=?]", play_path("times-tables", level: 1), text: "Play"
+    assert_select "a.button--blue", count: 0, message: "the same pink Play as the home page"
+
     get stats_path("times-tables", level: 2)
     assert_select ".levels .levels__level[aria-current=true]", text: "2"
     assert_equal 2, @user.unlocked_level(TimesTables), "looking at stats doesn't change anything"

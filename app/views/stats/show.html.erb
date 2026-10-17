@@ -60,6 +60,4 @@
     <span class="badge-summary__count"><strong><%= @user.badges_by_kind.size %></strong> of <%= Badge.catalogue.size %> unlocked</span>
     <span class="badge-summary__emojis" aria-hidden="true"><%= @user.badges_by_kind.values.sort_by(&:earned_at).last(8).map(&:emoji).join %></span>
   <% end %>
-
-  <%= link_to "Play", play_path(@topic.slug, level: @level), class: "button button--blue button--wide" %>
 </main>

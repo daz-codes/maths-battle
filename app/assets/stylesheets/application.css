@@ -318,10 +318,13 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* ── Home ───────────────────────────────────────── */
 
 .greeting {
+  min-width: 0;
+  max-width: 100%;
   margin: 0.5rem 0 -0.75rem;
   font-size: clamp(2rem, 9vw, 2.6rem);
   font-weight: 700;
   letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
 }
 
 .streak {
@@ -397,14 +400,14 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* ── Footer: fixed to the bottom like an app's tab bar ── */
 
-/* Three columns, so achievements sits in the middle whatever is either side of it */
+/* Spread evenly like a phone's tab bar: who's playing, then home, achievements and stats */
 .site-footer {
   position: fixed;
   inset: auto 0 0;
   z-index: 10;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
   padding: 0.55rem max(1rem, calc((100% - 30rem) / 2 + 1rem)) calc(0.55rem + env(safe-area-inset-bottom));
   border-top: 1.5px solid var(--line);
@@ -413,7 +416,8 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   font-size: 0.9rem;
 }
 
-.site-footer__start { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+.site-footer__start { display: flex; flex: 0 1 auto; align-items: center; gap: 0.6rem; min-width: 0; }
+.site-footer__tab { flex: none; }
 
 .site-footer__player, .site-footer__tab {
   display: inline-flex;
@@ -435,7 +439,6 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* Icon above its label, like a tab bar, so three fit on a small phone */
 .site-footer__tab { flex-direction: column; justify-content: center; gap: 0.1rem; font-size: 0.75rem; }
-.site-footer__stats { justify-self: end; }
 
 .footer-icon { width: 1.5rem; height: 1.5rem; }
 

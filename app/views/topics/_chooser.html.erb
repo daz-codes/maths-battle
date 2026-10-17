@@ -1,7 +1,7 @@
 <%# Picks a topic and one of its unlocked levels, the same on every page that needs it.
     choosing: :play on the home page (changes what Play plays), or :stats on the stats page.
-    Topics are a dropdown, so there's room for as many as there are. An action (the home page's Play)
-    goes under the levels, as wide as they are %>
+    Topics are a dropdown, so there's room for as many as there are. Play goes under the levels, as wide
+    as they are: on the home page it plays the current level, on the stats page the level being looked at %>
 <% url, method = topic_choice(choosing) %>
 <%= form_with url: url, method: method, class: "topic-picker", data: { controller: "auto-submit" } do |form| %>
   <%= form.label :topic, "Topic", class: "visually-hidden" %>
@@ -32,5 +32,5 @@
   </nav>
   <p class="levels__name">Level <%= level %>: <%= topic.level(level)[:name] %></p>
 <% end %>
-<%= local_assigns[:action] %>
+<%= link_to "Play", play_path(topic.slug, level: (level if choosing == :stats)), class: "button button--start" %>
 </div>

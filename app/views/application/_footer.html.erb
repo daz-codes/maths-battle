@@ -1,5 +1,5 @@
-<%# Fixed to the bottom of every page except the test: who's playing (tap for settings), achievements, and stats.
-    Guests get sign in and sign up links in place of a name %>
+<%# Fixed to the bottom of every page except the test: who's playing (tap for settings), then home, achievements
+    and stats. Guests get sign in and sign up links in place of a name %>
 <% player = current_player %>
 <footer class="site-footer">
   <div class="site-footer__start">
@@ -15,6 +15,21 @@
       </span>
     <% end %>
   </div>
+
+  <%= link_to root_path, class: "site-footer__tab site-footer__home" do %>
+    <%# A house, in the neons, drawn like the stats icon %>
+    <svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="5" y="10" width="14" height="11" rx="1.5" fill="var(--green)"/>
+      <path d="M2.5 11.5 12 3l9.5 8.5z" fill="var(--pink)"/>
+      <rect x="10" y="14.5" width="4" height="6.5" rx="1" fill="var(--yellow)"/>
+      <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+        <rect x="5" y="10" width="14" height="11" rx="1.5"/>
+        <path d="M2.5 11.5 12 3l9.5 8.5z"/>
+        <rect x="10" y="14.5" width="4" height="6.5" rx="1"/>
+      </g>
+    </svg>
+    <span>Home</span>
+  <% end %>
 
   <%= link_to achievements_path, class: "site-footer__tab site-footer__achievements" do %>
     <%# A medal on two ribbons, in the neons, drawn like the stats icon %>
