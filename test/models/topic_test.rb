@@ -17,7 +17,7 @@ class TopicTest < ActiveSupport::TestCase
     assert_equal TimesTables, Topic.find("times_tables")
     assert_equal TimesTables, Topic.find_by_slug("times-tables")
     assert_nil Topic.find("spelling")
-    assert_equal %w[ times_tables equations functions ], Topic.keys
+    assert_equal %w[ times_tables equations functions simultaneous ], Topic.keys
   end
 
   test "a topic keeps its own module name" do

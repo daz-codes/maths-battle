@@ -755,6 +755,27 @@ body.testing {
 }
 
 .test--functions .question.question--done { font-size: clamp(2.75rem, 12vw, 5rem); }
+
+/* Simultaneous equations: the two lined up in columns (x term, sign, y term, =, total), then y given if
+   it's been found, then what's asked */
+.test--simultaneous-equations .question,
+.test--simultaneous-equations .question.question--long,
+.test--simultaneous-equations .question.question--longer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4em;
+  font-size: clamp(1.9rem, 10vw, 3.2rem);
+  letter-spacing: -0.02em;
+}
+
+.test--simultaneous-equations .question.question--done { font-size: clamp(2.75rem, 12vw, 5rem); }
+.system { display: inline-grid; grid-template-columns: repeat(5, auto); gap: 0.15em 0.3em; align-items: baseline; }
+.system__row { display: contents; }
+.system__row > span:nth-child(1), .system__row > span:nth-child(3) { text-align: right; }
+.system__row > span:nth-child(5) { text-align: left; }
+.system__known { color: var(--muted); font-size: 0.8em; }
+.system__ask { font-size: 1.3em; }
 .function { color: var(--muted); }
 .function--ask { color: var(--ink); font-size: 1.6em; }
 

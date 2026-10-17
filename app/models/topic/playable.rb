@@ -32,6 +32,12 @@ module Topic::Playable
     levels.size
   end
 
+  # What one pick of a fact asks: one question, unless a topic asks several about the same thing
+  # (simultaneous equations asks for y, then x)
+  def questions_for(fact, level:, random:)
+    [ question(fact, level: level, random: random) ]
+  end
+
   def badge_scores
     self::BADGE_SCORES
   end

@@ -28,13 +28,14 @@ module User::Practisable
   EASING = { 0 => 2.0, 1 => 0.5, 2 => -0.6 }
 
   def questions(topic: Topic.default, level: 1, count: QUESTION_COUNT, random: Random.new)
-    previous = nil
+    previous, questions = nil, []
 
-    Array.new(count) do
+    while questions.size < count
       asked_at = question_level(level, random)
       previous = pick_fact(topic, level, from: topic.facts(asked_at), excluding: previous, random: random)
-      topic.question(previous, level: asked_at, random: random)
+      questions.concat(topic.questions_for(previous, level: asked_at, random: random))
     end
+    questions.first(count)
   end
 
   # The set for this game, then spares for playing offline. Each has an id so the device knows which it has used
@@ -100,9 +101,10 @@ module User::Practisable
     end
 
     # Weighted by how the player does at this level, from the facts the question's level can ask.
-    # Never the same fact twice in a row
+    # Never the same fact twice in a row, unless the level only has one
     def pick_fact(topic, level, from:, excluding:, random:)
-      candidates = question_weights(topic, level).slice(*from).except(excluding)
+      candidates = question_weights(topic, level).slice(*from)
+      candidates = candidates.except(excluding) if candidates.size > 1
       target = random.rand * candidates.values.sum
 
       candidates.each do |fact, weight|

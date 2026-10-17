@@ -152,4 +152,15 @@ class User::PractisableTest < ActiveSupport::TestCase
     stat.update!(correct_count: 9)
     assert_operator weights["7x8"], :<, before
   end
+
+  test "a topic can ask more than one question at a time, kept together" do
+    questions = User.new.questions(topic: SimultaneousEquations, level: 1, count: 10, random: Random.new(1))
+    assert_equal 10, questions.size
+    assert_equal %w[ y x ] * 5, questions.map { _1[:v] }
+  end
+
+  test "a level with only one fact still has questions" do
+    questions = User.new.questions(topic: SimultaneousEquations, level: 1, count: 6, random: Random.new(1))
+    assert questions.all? { _1[:type] == "subtract" }
+  end
 end
