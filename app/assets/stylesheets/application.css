@@ -11,6 +11,7 @@
   --green: #5dff7a;
   --wrong: #ff2d6f;
   --pink-text: #e5139a;
+  --on-pink-text: #fff;
 
   /* A soft dark grey rather than black for the main text */
   --ink: #3a3b35;
@@ -44,6 +45,7 @@
   --grey-deep: #3c405d;
   --glow-strength: 55%;
   --pink-text: var(--pink);
+  --on-pink-text: var(--on-neon);
   color-scheme: dark;
 }
 
@@ -60,6 +62,7 @@
     --grey-deep: #3c405d;
     --glow-strength: 55%;
     --pink-text: var(--pink);
+    --on-pink-text: var(--on-neon);
   }
 }
 
@@ -92,14 +95,14 @@ a {
 
 /* Text links (and the sign out button, styled as one): green underline and a faint wash on hover.
    The wash is a touch of ink mixed into the paper, so it's slightly darker in light mode and lighter in dark */
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab), .link-button {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .badge-summary), .link-button {
   margin: 0 -0.2em;
   padding: 0.05em 0.2em;
   border-radius: 4px;
   transition: background-color 120ms, text-decoration-color 120ms;
 }
 
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab):hover, .link-button:hover {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .badge-summary):hover, .link-button:hover {
   background-color: color-mix(in srgb, var(--ink) 5%, var(--paper));
   text-decoration-color: var(--green);
 }
@@ -216,10 +219,12 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .button--share { --fill: var(--pink-deep); --glow: var(--pink); }
 .button--cta { --fill: var(--blue-deep); --glow: var(--blue); min-height: 4rem; font-size: 1.5rem; }
 
+/* In the logo's pink, as wide as the levels above it */
 .button--start {
-  --fill: var(--blue-deep);
-  --glow: var(--blue);
+  --fill: var(--pink-text);
+  --glow: var(--pink);
   width: 100%;
+  color: var(--on-pink-text);
   min-height: 4.25rem;
   border-radius: var(--radius-big);
   font-size: clamp(1.75rem, 8.5vw, 2.25rem);
@@ -518,6 +523,11 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 }
 
 /* Levels: unlocked ones can be picked, locked ones show a padlock */
+/* The levels with their name and any action under them, as wide as the row of levels: the name is
+   kept from widening it */
+.levels-panel { display: grid; gap: 1.25rem; }
+.levels-panel .levels__name { width: 0; min-width: 100%; }
+
 .levels { display: flex; justify-content: center; gap: 0.4rem; margin-top: -0.5rem; }
 .levels__form { display: contents; }
 
@@ -576,20 +586,28 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 .badges--new .badge { border-color: var(--on-neon); background: var(--yellow); color: var(--on-neon); }
 
+/* On the stats page: a tile like the stats above it, with a pink stripe */
 .badge-summary {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0.3rem;
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid var(--line);
+  padding: 0.85rem 0.7rem 0.8rem;
   border-radius: var(--radius);
+  background: linear-gradient(var(--pink) 0 6px, var(--paper-alt) 6px);
   color: inherit;
   text-decoration: none;
+  transition: transform 100ms;
 }
 
+.badge-summary:hover { background: linear-gradient(var(--pink) 0 6px, color-mix(in srgb, var(--ink) 6%, var(--paper-alt)) 6px); }
+.badge-summary__label { color: var(--muted); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.badge-summary__count { color: var(--muted); font-weight: 600; }
+.badge-summary__count strong { color: var(--ink); font-size: 1.75rem; letter-spacing: -0.03em; }
+.badge-summary__count::after { content: " ›"; }
 .badge-summary__emojis { font-size: 1.5rem; letter-spacing: 0.1em; }
+.badge-summary__emojis:empty { display: none; }
 
 /* ── Stats ──────────────────────────────────────── */
 

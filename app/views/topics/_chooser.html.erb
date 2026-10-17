@@ -1,6 +1,7 @@
 <%# Picks a topic and one of its unlocked levels, the same on every page that needs it.
     choosing: :play on the home page (changes what Play plays), or :stats on the stats page.
-    Topics are a dropdown, so there's room for as many as there are %>
+    Topics are a dropdown, so there's room for as many as there are. An action (the home page's Play)
+    goes under the levels, as wide as they are %>
 <% url, method = topic_choice(choosing) %>
 <%= form_with url: url, method: method, class: "topic-picker", data: { controller: "auto-submit" } do |form| %>
   <%= form.label :topic, "Topic", class: "visually-hidden" %>
@@ -11,6 +12,7 @@
   <noscript><%= form.submit "Go", class: "button" %></noscript>
 <% end %>
 
+<div class="levels-panel">
 <% if topic.levels.many? %>
   <% unlocked = user.unlocked_level(topic) %>
   <nav class="levels" aria-label="Level">
@@ -30,3 +32,5 @@
   </nav>
   <p class="levels__name">Level <%= level %>: <%= topic.level(level)[:name] %></p>
 <% end %>
+<%= local_assigns[:action] %>
+</div>

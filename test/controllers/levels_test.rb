@@ -19,8 +19,16 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_select ".levels .levels__level[aria-current=true]", text: "1"
     assert_select ".levels__level--locked", 4
     assert_select ".levels__name", text: "Level 1: Tables 2–5"
-    assert_select ".level-progress", text: /#{NEEDED - 1} more good games at level 1 to unlock\s+Level 2: Tables 2–12/
+    assert_select ".level-progress", count: 0, message: "how close the next level is shows on the results page"
+    assert_select ".levels-panel > a.button--start[href=?]", play_path("times-tables")
     assert_select ".levels__level--locked svg.icon", 4
+  end
+
+  test "the results page says how close the next level is" do
+    good_games(1, level: 1)
+    get attempt_path(@user.attempts.last)
+
+    assert_select ".level-progress", text: /#{NEEDED - 1} more good games at level 1 to unlock\s+Level 2: Tables 2–12/
   end
 
   test "levelling up is celebrated, and Play moves up to the new level" do

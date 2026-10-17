@@ -13,7 +13,7 @@
   <% end %>
 
   <section class="streak <%= "streak--done" if @user.practised_today? %>" aria-label="Streak">
-    <span class="streak__number">🔥 <%= @user.streak %></span>
+    <span class="streak__number"><%= @user.streak %> 🔥</span>
     <span class="streak__label">day streak</span>
   </section>
 
@@ -25,9 +25,8 @@
     <p class="nudge">Click play to start your streak</p>
   <% end %>
 
-  <%= render "topics/chooser", choosing: :play, user: current_player, topic: current_topic, level: current_level %>
-  <%= link_to "Play", play_path(current_topic.slug), class: "button button--start" %>
-  <%= render "levels/progress", user: @user, topic: current_topic %>
+  <%= render "topics/chooser", choosing: :play, user: current_player, topic: current_topic, level: current_level,
+        action: link_to("Play", play_path(current_topic.slug), class: "button button--start") %>
 
   <% if @user.persisted? %>
     <dl class="stats">
