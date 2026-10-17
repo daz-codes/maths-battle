@@ -58,6 +58,14 @@ perfect game, a new high score or levelling up. The +10s that float up during a 
 the server works out the stars from the checked answers (`Attempt::Starrable`) and keeps them on the game,
 so a player's total is the sum of their games.
 
+## Streak freezes
+
+A freeze keeps a streak going through a missed day: the day doesn't add to the streak, but doesn't end it.
+Players hold up to two, bought for 500 stars or given free when a streak reaches 7 or 30 days. Coming back
+after missed days uses them up by themselves (`StreakKeeping`, before any page shows the streak), but only if
+there are enough to cover every missed day. Covered days are kept as frozen days so the streak can be worked
+out again later; a game played offline that turns up for a frozen day gives its freeze back.
+
 ## Authentication and offline play
 
 New passwords require 15–72 characters, with bcrypt's additional 72-byte limit. Existing passwords

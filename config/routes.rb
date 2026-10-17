@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   resource :profile, only: %i[edit update]
   resource :topic, only: :update
   resource :level, only: :update
+  resource :streak_freeze, only: :create
 
   get "play/:topic", to: "games#show", as: :play
   # Where the times tables game used to be, still linked from copies kept on devices

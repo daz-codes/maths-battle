@@ -35,6 +35,36 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".stars-total", text: "100 ⭐ stars"
   end
 
+  test "shows streak freezes, and buys one with stars" do
+    sign_in_as users(:ada)
+    get root_path
+    assert_select ".freezes__held", text: /No streak freezes/
+    assert_select ".freezes__hint", text: /Get 500 more ⭐ to buy one/
+
+    users(:ada).attempts.create!(topic: "times_tables", results: []).update_column(:stars, 600)
+    get root_path
+    assert_select "form[action=?] button", streak_freeze_path, text: "Buy one for 500 ⭐"
+
+    post streak_freeze_path
+    assert_redirected_to root_path
+    follow_redirect!
+    assert_select ".flash", text: /You bought a streak freeze/
+    assert_select ".freezes__held", text: /1 streak freeze/
+    assert_select ".stars-total", text: "100 ⭐ stars"
+  end
+
+  test "coming back after a missed day says a freeze kept the streak" do
+    user = users(:ada)
+    [ 4, 3, 2 ].each { |ago| travel_to(ago.days.ago) { Attempt.record!(user: user, results: answers(*right_answers(5))) } }
+    user.update!(streak_freezes: 1)
+    sign_in_as user
+
+    get root_path
+    assert_select ".flash", text: "🧊 A streak freeze kept your 3 day streak going!"
+    assert_select ".streak__number", text: /3/
+    assert_equal 0, user.reload.streak_freezes
+  end
+
   test "greets the player by name" do
     @user.update!(name: "Ada")
     sign_in_as @user
@@ -44,9 +74,9 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "shows the streak, best score and start button" do
-    @user.update!(current_streak: 12, last_practised_on: @user.today)
+    @user.update!(current_streak: 12, last_practised_on: @user.today, streak_kept_on: @user.today)
     Attempt.record!(user: @user, results: answers(*right_answers(41), ms: 1000))
-    @user.update!(current_streak: 12, last_practised_on: @user.today)
+    @user.update!(current_streak: 12, last_practised_on: @user.today, streak_kept_on: @user.today)
     sign_in_as @user
 
     get root_path
@@ -58,7 +88,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "after a missed day the streak starts again" do
-    @user.update!(current_streak: 5, last_practised_on: @user.today - 2)
+    @user.update!(current_streak: 5, last_practised_on: @user.today - 2, streak_kept_on: @user.today - 2)
     sign_in_as @user
 
     get root_path
@@ -66,7 +96,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "warns when the streak is at risk" do
-    @user.update!(current_streak: 3, last_practised_on: @user.today - 1)
+    @user.update!(current_streak: 3, last_practised_on: @user.today - 1, streak_kept_on: @user.today - 1)
     sign_in_as @user
 
     get root_path

@@ -9,6 +9,10 @@
 
   <%= render "card", attempt: @attempt %>
 
+  <% if @attempt.earned_streak_freeze %>
+    <p class="freeze-earned">🧊 <%= @attempt.streak %> day streak! You earned a free streak freeze.</p>
+  <% end %>
+
   <section class="stars-earned" aria-label="Stars">
     <span class="stars-earned__total">+<%= number_with_delimiter @attempt.stars %> ⭐</span>
     <% if @attempt.star_bonuses.any? %>

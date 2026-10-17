@@ -104,9 +104,11 @@ module Attempt::Recordable
       self.best_score = [ score, best_before ].max
     end
 
-    # A snapshot of the streak is kept on the attempt for its results and share pages
+    # A snapshot of the streak is kept on the attempt for its results and share pages. Reaching 7 or 30 days
+    # can earn a streak freeze
     def update_streak
-      user.refresh_streak! if counted?
+      grew = counted? ? user.refresh_streak! : 0
+      update_column(:earned_streak_freeze, true) if grew.positive? && user.earn_streak_freeze(grew)
       update_column(:streak, user.streak)
     end
 

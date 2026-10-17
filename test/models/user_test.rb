@@ -68,7 +68,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "the live streak drops to zero once a whole day is missed" do
-    @user.update!(current_streak: 4, last_practised_on: Date.new(2026, 10, 14))
+    @user.update!(current_streak: 4, last_practised_on: Date.new(2026, 10, 14), streak_kept_on: Date.new(2026, 10, 14))
 
     travel_to Time.zone.local(2026, 10, 15, 12) do
       assert_equal 4, @user.streak

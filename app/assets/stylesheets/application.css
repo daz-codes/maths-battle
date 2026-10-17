@@ -567,11 +567,12 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* ── Stars ──────────────────────────────────────── */
 
-/* Each right answer's stars float up from the answer line and fade, bigger and brighter the quicker it was */
+/* Each right answer's stars start on the question, float up above it and fade slowly, so a fast run leaves
+   several on screen at once. Bigger and brighter the quicker the answer was */
 .star-pop {
   --drift: 0px;
   position: absolute;
-  top: 66%;
+  top: 38%;
   left: 50%;
   z-index: 2;
   color: var(--green-deep);
@@ -579,7 +580,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   font-weight: 800;
   pointer-events: none;
   white-space: nowrap;
-  animation: star-float 1.1s ease-out forwards;
+  animation: star-float 2.2s ease-out forwards;
 }
 
 .star-pop--quick { color: var(--blue-deep); font-size: 1.8rem; }
@@ -594,16 +595,17 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 @keyframes star-float {
   0% { opacity: 0; transform: translate(calc(-50% + var(--drift) * 0.3), 0) scale(0.6); }
-  15% { opacity: 1; transform: translate(calc(-50% + var(--drift) * 0.5), -12px) scale(1.1); }
-  100% { opacity: 0; transform: translate(calc(-50% + var(--drift)), -110px) scale(1); }
+  10% { opacity: 1; transform: translate(calc(-50% + var(--drift) * 0.5), -14px) scale(1.1); }
+  65% { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--drift)), -170px) scale(1); }
 }
 
 /* Without motion they just fade where they appear */
 @media (prefers-reduced-motion: reduce) {
-  .star-pop { animation: star-fade 1.1s ease-out forwards !important; transform: translateX(-50%); }
+  .star-pop { animation: star-fade 2.2s ease-out forwards !important; transform: translateX(-50%); }
 }
 
-@keyframes star-fade { 0%, 40% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes star-fade { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
 
 /* What a game earned, on its results page */
 .stars-earned { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; margin: 0; }
@@ -614,6 +616,17 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* The player's collection, on the home page under the streak */
 .stars-total { margin: -0.5rem 0 0; color: var(--muted); font-weight: 700; }
 .stars-total strong { color: var(--ink); font-size: 1.15rem; }
+
+/* Streak freezes on the home page: those held, and buying another */
+.freezes { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: -0.5rem; }
+.freezes__held { display: flex; align-items: center; gap: 0.5rem; margin: 0; color: var(--muted); font-weight: 700; }
+.freezes__icons { color: var(--muted); font-size: 1.3rem; letter-spacing: 0.1em; }
+.freezes__form { display: contents; }
+.freezes__buy { --fill: var(--blue-deep); --glow: var(--blue); min-height: 2.6rem; padding: 0.4rem 1.1rem; font-size: 0.9rem; }
+.freezes__hint { max-width: 22rem; margin: 0; color: var(--muted); font-size: 0.85rem; }
+
+/* A freeze earned in a game, on its results page */
+.freeze-earned { margin: 0; padding: 0.45rem 1rem; border-radius: 999px; background: var(--blue); color: var(--on-neon); font-weight: 700; }
 
 /* ── Badges ─────────────────────────────────────── */
 

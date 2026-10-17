@@ -19,6 +19,7 @@
 
   <% if @user.persisted? %>
     <p class="stars-total"><strong><%= number_with_delimiter @user.stars %></strong> ⭐ stars</p>
+    <%= render "streak_freezes/status", user: @user %>
   <% end %>
 
   <% if @user.practised_today? %>

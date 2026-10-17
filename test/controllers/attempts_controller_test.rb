@@ -83,6 +83,14 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".stars-earned__bonuses li", text: "New high score +50"
   end
 
+  test "results page says when the game earned a free streak freeze" do
+    attempt = Attempt.record!(user: @user, results: answers(*right_answers(5)))
+    attempt.update_columns(earned_streak_freeze: true, streak: 7)
+
+    get attempt_path(attempt)
+    assert_select ".freeze-earned", text: "🧊 7 day streak! You earned a free streak freeze."
+  end
+
   test "results page shows the score, feedback and missed facts" do
     attempt = record_tables_game(@user, answers([ 7, 8, 54 ], [ 6, 7, 42 ], [ 3, 3, 9 ]))
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_17_100001) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -57,6 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_100001) do
     t.boolean "levelled_up", default: false, null: false
     t.integer "best_score", default: 0, null: false
     t.integer "stars", default: 0, null: false
+    t.boolean "earned_streak_freeze", default: false, null: false
     t.index ["share_token"], name: "index_attempts_on_share_token", unique: true
     t.index ["user_id", "client_id"], name: "index_attempts_on_user_id_and_client_id", unique: true
     t.index ["user_id", "created_at"], name: "index_attempts_on_user_id_and_created_at"
@@ -90,6 +91,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_100001) do
     t.index ["user_id"], name: "index_fact_stats_on_user_id"
   end
 
+  create_table "frozen_days", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.date "day", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "day"], name: "index_frozen_days_on_user_id_and_day", unique: true
+    t.index ["user_id"], name: "index_frozen_days_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -110,6 +120,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_100001) do
     t.datetime "updated_at", null: false
     t.string "name"
     t.string "theme", default: "system", null: false
+    t.integer "streak_freezes", default: 0, null: false
+    t.integer "stars_spent", default: 0, null: false
+    t.date "streak_kept_on"
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
@@ -119,5 +132,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_100001) do
   add_foreign_key "badges", "attempts", on_delete: :nullify
   add_foreign_key "badges", "users"
   add_foreign_key "fact_stats", "users"
+  add_foreign_key "frozen_days", "users"
   add_foreign_key "sessions", "users"
 end

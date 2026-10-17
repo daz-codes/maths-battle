@@ -41,6 +41,6 @@ class TimesTablesTest < ApplicationSystemTestCase
     a, b = find(".question").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
     assert_selector ".star-pop.star-pop--lightning", text: "+30 ⭐"
-    assert_no_selector ".star-pop", wait: 3
+    assert_no_selector ".star-pop", wait: 4
   end
 end

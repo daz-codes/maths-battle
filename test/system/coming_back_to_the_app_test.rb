@@ -9,7 +9,7 @@ class ComingBackToTheAppTest < ApplicationSystemTestCase
 
   test "the page reloads when the app comes back after a while, so the streak is current" do
     leave_the_app
-    @user.update!(current_streak: 4, last_practised_on: @user.today)
+    @user.update!(current_streak: 4, last_practised_on: @user.today, streak_kept_on: @user.today)
     come_back(after: 2.minutes)
 
     assert_selector ".streak__number", text: "4", wait: 5
@@ -17,7 +17,7 @@ class ComingBackToTheAppTest < ApplicationSystemTestCase
 
   test "a quick look away doesn't reload" do
     leave_the_app
-    @user.update!(current_streak: 4, last_practised_on: @user.today)
+    @user.update!(current_streak: 4, last_practised_on: @user.today, streak_kept_on: @user.today)
     come_back(after: 5.seconds)
 
     sleep 1

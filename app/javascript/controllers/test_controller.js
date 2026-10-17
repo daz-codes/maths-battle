@@ -215,9 +215,9 @@ export default class extends Controller {
     const pop = Object.assign(document.createElement("span"), { className: `star-pop star-pop--${tier}`, textContent: `+${stars} ⭐` })
     pop.setAttribute("aria-hidden", "true")
     // Spread out a little, so quick answers in a row don't land on top of each other
-    pop.style.setProperty("--drift", `${Math.round((Math.random() - 0.5) * 120)}px`)
+    pop.style.setProperty("--drift", `${Math.round((Math.random() - 0.5) * 180)}px`)
     pop.addEventListener("animationend", () => pop.remove())
-    setTimeout(() => pop.remove(), 1_500)
+    setTimeout(() => pop.remove(), 2_600)
     this.stageTarget.append(pop)
   }
 
