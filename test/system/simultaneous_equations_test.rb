@@ -1,17 +1,17 @@
 require "application_system_test_case"
 
 class SimultaneousEquationsTest < ApplicationSystemTestCase
-  test "pick simultaneous equations, find y then x for each pair, and see the results" do
+  test "pick simultaneous equations, find x then y for each pair, and see the results" do
     sign_in users(:ada)
     select "🔗 Simultaneous equations", from: "Topic"
     assert_selector ".levels__name", text: "Level 1: Subtract"
     click_on "Play"
-    assert_selector ".question .system__ask", text: "y =", wait: 5
+    assert_selector ".question .system__ask", text: "x =", wait: 5
     end_game_in(6_000)
 
     find("body").send_keys(current_answer)
-    assert_selector ".question .system__known", text: "y ="
-    assert_selector ".question .system__ask", text: "x ="
+    assert_selector ".question .system__known", text: "x ="
+    assert_selector ".question .system__ask", text: "y ="
     find("body").send_keys(current_answer)
     assert_selector ".test__score", text: "2"
 

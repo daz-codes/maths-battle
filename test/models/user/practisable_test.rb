@@ -156,7 +156,7 @@ class User::PractisableTest < ActiveSupport::TestCase
   test "a topic can ask more than one question at a time, kept together" do
     questions = User.new.questions(topic: SimultaneousEquations, level: 1, count: 10, random: Random.new(1))
     assert_equal 10, questions.size
-    assert_equal %w[ y x ] * 5, questions.map { _1[:v] }
+    assert_equal %w[ x y ] * 5, questions.map { _1[:v] }
   end
 
   test "a level with only one fact still has questions" do

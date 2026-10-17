@@ -27,8 +27,8 @@ module AttemptTestHelper
     TimesTables => { a: 2, b: 3, given: 6, ms: 1000 },
     Equations => { type: "x+a=b", a: 2, b: 5, v: "x", flip: false, given: "3", ms: 1000 },
     Functions => { type: "x+a", a: 2, n: 3, given: "5", ms: 1000 },
-    # x + 2y = 4 and x + y = 3: y = 1
-    SimultaneousEquations => { type: "subtract", a: 1, b: 2, c: 4, d: 1, e: 1, f: 3, v: "y", given: "1", ms: 1000 }
+    # 2x + y = 5 and x + y = 3: x = 2
+    SimultaneousEquations => { type: "subtract", a: 2, b: 1, c: 5, d: 1, e: 1, f: 3, v: "x", given: "2", ms: 1000 }
   }
 
   # Plays enough good games at each level below to unlock this one. The questions are ones every level asks
