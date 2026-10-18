@@ -14,17 +14,48 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     follow_redirect!
     assert_select "a.button--practise[href=?]", play_path("equations", level: 1)
-    assert_select "form.topic-picker[action=?] select[name=topic] option[selected][value=equations]", topic_path, text: "⚖️ Equations"
+    assert_select ".current-topic__name", text: "⚖️ Equations"
   end
 
-  test "the dropdown lists every topic, and on the stats page goes to that topic's stats" do
+  test "the home page says which topic, with a quiet link to change it" do
     get root_path
-    assert_select ".topic-picker select[data-action='auto-submit#submit'] option", Topic::ALL.size
-    assert_select ".topic-picker option[value=functions]", text: "⚙️ Functions"
+    assert_select ".current-topic__name", text: "✖️ Times tables"
+    assert_select ".current-topic a.current-topic__change[href=?]", topics_path, text: "Change topic"
+    assert_select "select", count: 0
+  end
 
+  test "changing topic is a page of every topic with the player's progress, the current one marked" do
+    Attempt.record!(user: @user, results: answers(*Array.new(22) { [ 2, 3, 6 ] }))
+    Attempt.record!(user: @user, topic: "functions", level: 1, mode: "challenge", results: [ { type: "x+a", a: 2, n: 3, given: "5", ms: 1000 } ] * 5)
+    get topics_path
+
+    assert_select ".topic-card", Topic::ALL.size
+    assert_select ".topic-card--current[aria-current=true]", 1 do
+      assert_select ".topic-card__title", text: /Times tables · On it now/
+      assert_select ".topic-card__level", text: "Level 2 of 5"
+      assert_select ".topic-card__medal", text: "🥈"
+      assert_select ".topic-card__medal--locked", 3
+    end
+    assert_select "form[action=?]:has(input[name=topic][value=functions]) .topic-card__done", topic_path, text: "✅ Challenge done today"
+  end
+
+  test "picking a topic makes it the current one, back where the player came from" do
+    patch topic_path, params: { topic: "functions" }
+    assert_redirected_to root_path
+
+    get topics_path(from: "stats")
+    assert_select "form input[name=from][value=stats]", Topic::ALL.size
+    patch topic_path, params: { topic: "equations", from: "stats" }
+    assert_redirected_to stats_path
+    follow_redirect!
+    assert_select ".current-topic__name", text: "⚖️ Equations"
+    assert_select ".current-topic__change[href=?]", topics_path(from: "stats")
+  end
+
+  test "a stats page for a topic can still be linked to" do
     get stats_path, params: { topic: "functions" }
     assert_response :success
-    assert_select ".topic-picker option[selected][value=functions]"
+    assert_select ".current-topic__name", text: "⚙️ Functions"
     assert_select ".aside", text: "Play a game of functions and your stats will show up here."
   end
 
@@ -64,7 +95,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ 20, 6 ], [ @user.best_score(TimesTables, 1), @user.best_score(Equations, 1) ]
 
     get stats_path("equations", level: 1)
-    assert_select ".topic-picker option[selected][value=equations]"
+    assert_select ".current-topic__name", text: "⚖️ Equations"
     assert_select "thead th", text: "Type"
     assert_select "tbody th", text: /ax = b\s+e\.g\. 3x = 12/
     assert_select ".stats dd", text: "100%"

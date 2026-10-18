@@ -1,16 +1,11 @@
-<%# Picks a topic and one of its unlocked levels, the same on every page that needs it.
+<%# The topic the player is on, and one of its unlocked levels, the same on every page that needs it.
     choosing: :play on the home page (changes what Play plays), or :stats on the stats page.
-    Topics are a dropdown, so there's room for as many as there are. Play goes under the levels, as wide
-    as they are: on the home page it plays the current level, on the stats page the level being looked at %>
-<% url, method = topic_choice(choosing) %>
-<%= form_with url: url, method: method, class: "topic-picker", data: { controller: "auto-submit" } do |form| %>
-  <%= form.label :topic, "Topic", class: "visually-hidden" %>
-  <span class="topic-picker__field">
-    <%= form.select :topic, Topic::ALL.map { |choice| [ "#{choice.emoji} #{choice.title}", choice.slug ] }, { selected: topic.slug },
-          class: "topic-picker__select", data: { action: "auto-submit#submit" } %>
-  </span>
-  <noscript><%= form.submit "Go", class: "button" %></noscript>
-<% end %>
+    Like a language in Duolingo, the topic is just shown: changing it is on its own page, with the player's
+    progress in each. Practise goes under the levels, as wide as they are %>
+<p class="current-topic">
+  <span class="current-topic__name"><span aria-hidden="true"><%= topic.emoji %></span> <%= topic.title %></span>
+  <%= link_to "Change topic", topics_path(from: (choosing if choosing == :stats)), class: "current-topic__change" %>
+</p>
 
 <div class="levels-panel">
 <% if topic.levels.many? %>
@@ -41,4 +36,7 @@
 <% end %>
 <%= render "topics/daily_challenge", user: user, topic: topic %>
 <%= link_to "Practise level #{level}", play_path(topic.slug, level: level), class: "button button--blue button--practise" %>
+<% if (review = user.review_questions(topic)).any? %>
+  <%= link_to "🔁 Review mistakes (#{review.size})", play_path(topic.slug, review: 1), class: "button button--review" %>
+<% end %>
 </div>

@@ -495,38 +495,41 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* ── Topics ─────────────────────────────────────── */
 
-/* The topic dropdown: on the home page what Play plays, on the stats page which stats */
-.topic-picker { display: flex; gap: 0.5rem; width: 100%; }
-.topic-picker__field { position: relative; flex: 1; }
+/* The topic the player is on, with a quiet way to change it */
+.current-topic { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 0.25rem 0.75rem; margin: 0; }
+.current-topic__name { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; }
+.current-topic__change { color: var(--muted); font-size: 0.9rem; font-weight: 600; text-decoration-color: color-mix(in srgb, var(--muted) 45%, transparent); }
 
-.topic-picker__select {
+/* Changing topic: a tile for each, with the player's progress in it */
+.topic-cards { display: grid; gap: 0.75rem; width: 100%; margin: 0; padding: 0; list-style: none; }
+.topic-card__form { display: contents; }
+
+.topic-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   width: 100%;
-  min-height: 3rem;
-  padding: 0 2.75rem 0 1rem;
-  border: 2px solid var(--line);
+  padding: 1rem;
+  border: 0;
   border-radius: var(--radius);
-  background: var(--paper);
+  background: var(--paper-alt);
   color: var(--ink);
   cursor: pointer;
   font: inherit;
-  font-size: 1.1rem;
-  font-weight: 700;
-  appearance: none;
+  text-align: left;
 }
 
-/* The arrow, drawn as a turned corner, since the browser's own is hidden */
-.topic-picker__field::after {
-  position: absolute;
-  top: 50%;
-  right: 1.1rem;
-  width: 0.55rem;
-  height: 0.55rem;
-  border: solid var(--ink);
-  border-width: 0 2.5px 2.5px 0;
-  content: "";
-  pointer-events: none;
-  transform: translateY(-70%) rotate(45deg);
-}
+.topic-card:hover { background: color-mix(in srgb, var(--ink) 6%, var(--paper-alt)); }
+.topic-card--current { background: linear-gradient(90deg, var(--pink) 0 6px, var(--paper-alt) 6px); }
+.topic-card__emoji { font-size: 2.2rem; line-height: 1; }
+.topic-card__body { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.topic-card__title { font-size: 1.15rem; font-weight: 800; }
+.topic-card__now { color: var(--pink-text); font-size: 0.85rem; font-weight: 700; }
+.topic-card__level { color: var(--muted); font-size: 0.9rem; font-weight: 600; }
+.topic-card__medals { display: flex; gap: 0.35rem; font-size: 1.15rem; }
+.topic-card__medal { display: inline-grid; place-items: center; width: 1.5rem; color: var(--muted); }
+.topic-card__medal--locked .icon { width: 0.9rem; height: 0.9rem; }
+.topic-card__done { color: var(--green-deep); font-size: 0.85rem; font-weight: 700; }
 
 /* Levels: unlocked ones can be picked, locked ones show a padlock */
 /* The levels with their name and any action under them, as wide as the row of levels: the name is
@@ -566,6 +569,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .daily-done { color: var(--muted); font-weight: 600; text-align: center; text-decoration: none; }
 .daily-done strong { color: var(--ink); }
 .button--practise { width: 100%; margin-top: -0.5rem; }
+.button--review { --fill: var(--paper-alt); width: 100%; margin-top: -0.5rem; color: var(--ink); }
 
 /* Under the level's name, kept close to it, and kept from widening the levels like the name */
 .levels__learn { width: 0; min-width: 100%; margin: -1rem 0 0; font-size: 0.95rem; font-weight: 600; white-space: nowrap; }

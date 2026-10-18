@@ -3,7 +3,8 @@ require "application_system_test_case"
 class SimultaneousEquationsTest < ApplicationSystemTestCase
   test "pick simultaneous equations, find x then y for each pair, and see the results" do
     sign_in users(:ada)
-    select "🔗 Simultaneous equations", from: "Topic"
+    click_on "Change topic"
+    find(".topic-card", text: "Simultaneous equations").click
     assert_selector ".levels__name", text: "Level 1: Subtract"
     click_on "Practise level 1"
     assert_selector ".question .system__ask", text: "x =", wait: 5

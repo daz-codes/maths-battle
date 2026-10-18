@@ -18,7 +18,7 @@ class DailyChallengeTest < ActionDispatch::IntegrationTest
 
   test "the daily challenge is at the player's highest level, mixing every level up to it" do
     get play_path("times-tables", challenge: 1)
-    assert_select "[data-test-daily-challenge-value=true][data-test-level-value=2]"
+    assert_select "[data-test-mode-value=challenge][data-test-level-value=2]"
     assert_select "title", text: /Times tables daily challenge/
   end
 
@@ -27,16 +27,16 @@ class DailyChallengeTest < ActionDispatch::IntegrationTest
     assert_response :created
 
     challenge = @user.attempts.last
-    assert challenge.daily_challenge
+    assert challenge.daily_challenge?
     assert_nil challenge.medal
     assert_equal 0, @user.best_score(TimesTables, 2), "a daily challenge isn't a level 2 game"
     assert_equal 12, @user.best_daily_challenge(TimesTables)
   end
 
   test "a level's practice can't be passed off as the daily challenge" do
-    post attempts_path, params: game_upload(level: 2, results: answers([ 7, 8, 56 ]), daily_challenge: true), as: :json
+    post attempts_path, params: game_upload(level: 2, results: answers([ 7, 8, 56 ]), mode: "challenge"), as: :json
     assert_response :created
-    assert_not @user.attempts.last.daily_challenge
+    assert_not @user.attempts.last.daily_challenge?
   end
 
   test "once a day: the home page then shows how it went, and the game won't start again" do
@@ -78,10 +78,10 @@ class DailyChallengeTest < ActionDispatch::IntegrationTest
     post attempts_path, params: challenge_upload(score: 12), as: :json
 
     get play_path("equations", challenge: 1)
-    assert_select "[data-test-daily-challenge-value=true][data-test-level-value=1]", message: "times tables' doesn't use up equations'"
+    assert_select "[data-test-mode-value=challenge][data-test-level-value=1]", message: "times tables' doesn't use up equations'"
   end
 
   test "the model only takes a daily challenge at the player's highest level" do
-    assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, level: 1, results: answers([ 2, 3, 6 ]), daily_challenge: true) }
+    assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, level: 1, results: answers([ 2, 3, 6 ]), mode: "challenge") }
   end
 end

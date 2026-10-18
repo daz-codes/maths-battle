@@ -84,7 +84,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
 
     get play_path("times-tables")
     assert_select "[data-test-level-value=1]"
-    assert_select "[data-test-daily-challenge-value=false]"
+    assert_select "[data-test-mode-value=practice]"
   end
 
   test "a locked level can't be picked or played" do
@@ -97,7 +97,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     practise(level: 1, score: 10)
     get stats_path("times-tables", level: 1)
 
-    assert_select "form.topic-picker[action=?][method=get] select[name=topic] option[selected]", stats_path, text: /Times tables/
+    assert_select ".current-topic__name", text: "✖️ Times tables"
     assert_select "form[action=?][method=get] input[name=level][value=2]", stats_path("times-tables")
     assert_select ".levels .levels__level[aria-current=true]", text: /1/
     assert_select ".levels__level--locked", 3

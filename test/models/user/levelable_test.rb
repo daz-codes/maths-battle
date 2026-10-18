@@ -48,7 +48,7 @@ class User::LevelableTest < ActiveSupport::TestCase
   end
 
   test "a daily challenge earns no medal and unlocks nothing" do
-    challenge = practise(level: 1, score: 25, daily_challenge: true)
+    challenge = practise(level: 1, score: 25, mode: "challenge")
     assert_nil challenge.medal
     assert_not challenge.levelled_up
     assert_equal 1, @user.unlocked_level(TimesTables)

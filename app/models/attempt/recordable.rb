@@ -25,14 +25,14 @@ module Attempt::Recordable
   class_methods do
     # Raises Attempt::Invalid when the answers couldn't have come from a real test.
     # A game sent again with the same client id (a retried upload) is only recorded once
-    # A daily challenge is at the player's highest level, whose checks take questions from any level up to it
-    def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil, daily_challenge: false)
+    # A daily challenge or review is at the player's highest level, whose checks take questions from any level up to it
+    def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil, mode: "practice")
       topic_module, level = topic_named(topic), Integer(level, exception: false)
       check_unlocked(user, topic_module, level)
-      check_daily_challenge(user, topic_module, level) if daily_challenge
+      check_mixed_level(user, topic_module, level) unless mode == "practice"
 
       already_recorded(user, client_id) ||
-        create_for!(user, client_id:, played_at:, topic:, level:, daily_challenge:, results: clean_results(topic_module, level, results))
+        create_for!(user, client_id:, played_at:, topic:, level:, mode:, results: clean_results(topic_module, level, results))
     rescue ActiveRecord::RecordNotUnique
       already_recorded(user, client_id) || raise
     end
@@ -42,18 +42,18 @@ module Attempt::Recordable
         user.attempts.find_by(client_id: client_id) if client_id.present?
       end
 
-      def create_for!(user, client_id:, played_at:, topic:, level:, daily_challenge:, results:)
+      def create_for!(user, client_id:, played_at:, topic:, level:, mode:, results:)
         transaction do
           user.lock!
           played_at = play_time(played_at)
-          raise Invalid, "Today's daily challenge is already done" if daily_challenge && user.daily_challenge_on(topic_named(topic), played_at.in_time_zone(user.time_zone).to_date)
+          raise Invalid, "Today's daily challenge is already done" if mode == "challenge" && user.daily_challenge_on(topic_named(topic), played_at.in_time_zone(user.time_zone).to_date)
 
-          user.attempts.create!(topic: topic, level: level, results: results, client_id: client_id.presence, played_at: played_at, daily_challenge: daily_challenge)
+          user.attempts.create!(topic: topic, level: level, results: results, client_id: client_id.presence, played_at: played_at, mode: mode)
         end
       end
 
-      def check_daily_challenge(user, topic, level)
-        raise Invalid, "The daily challenge is at the highest level" unless level == user.unlocked_level(topic)
+      def check_mixed_level(user, topic, level)
+        raise Invalid, "A mixed game is at the highest level" unless level == user.unlocked_level(topic)
       end
 
       def check_unlocked(user, topic, level)
@@ -111,9 +111,13 @@ module Attempt::Recordable
     # Best in this topic and level: a good times tables score shouldn't make equations look bad.
     # Kept on the attempt as it stood then, like the streak, so a shared result doesn't change later
     def record_high_score
-      best_before = daily_challenge ? user.best_daily_challenge(topic_module) : user.best_score(topic_module, level)
+      best_before =
+        if daily_challenge? then user.best_daily_challenge(topic_module)
+        elsif review? then Float::INFINITY # a review is about the mistakes, not a score to beat
+        else user.best_score(topic_module, level)
+        end
       self.new_high_score = score.positive? && score > best_before
-      self.best_score = [ score, best_before ].max
+      self.best_score = review? ? score : [ score, best_before ].max
     end
 
     # A snapshot of the streak is kept on the attempt for its results and share pages. Reaching 7 or 30 days
@@ -129,9 +133,9 @@ module Attempt::Recordable
     end
 
     # The game that unlocks the next level: the level's first bronze, unless the next level was already reached.
-    # Never a daily challenge
+    # Only practice
     def check_level_up
-      return if daily_challenge || !topic_module.level(level + 1)
+      return unless practice? && topic_module.level(level + 1)
 
       update_column(:levelled_up, true) if first_bronze? && user.attempts.at_level(topic_module, level + 1).none?
     end

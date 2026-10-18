@@ -59,7 +59,7 @@ class TimesTablesTest < ApplicationSystemTestCase
     find("body").send_keys((a * b).to_s)
 
     assert_text "TIMES TABLES, DAILY CHALLENGE", wait: 8
-    assert users(:ada).attempts.last.daily_challenge
+    assert users(:ada).attempts.last.daily_challenge?
 
     visit root_path
     assert_selector "a.daily-done", text: "Challenge done today: 1"

@@ -16,15 +16,15 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // after a warning, and then nothing is saved
 export default class extends Controller {
   static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage" ]
-  static values = { questionSets: Array, topic: String, level: Number, dailyChallenge: Boolean, submitUrl: String, keys: Array, starTimes: Object }
+  static values = { questionSets: Array, topic: String, level: Number, mode: String, submitUrl: String, keys: Array, starTimes: Object }
 
   connect() {
     preparePlayer()
     this.state = "countdown"
     this.unwatch = watchPlayer(() => { this.state = "stopped" })
     if (this.state === "stopped") return
-    // A daily challenge's spares are its own, as its questions are mixed from every level
-    this.questionSet = chooseQuestionSet(this.questionSetsValue, `${this.topicValue}:${this.dailyChallengeValue ? "challenge" : this.levelValue}`)
+    // A daily challenge's or review's spares are its own, as its questions are mixed from every level
+    this.questionSet = chooseQuestionSet(this.questionSetsValue, `${this.topicValue}:${this.modeValue === "practice" ? this.levelValue : this.modeValue}`)
     if (!this.questionSet) {
       this.state = "stopped"
       this.questionTarget.hidden = true

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_140000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -58,12 +58,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_120000) do
     t.integer "best_score", default: 0, null: false
     t.integer "stars", default: 0, null: false
     t.boolean "earned_streak_freeze", default: false, null: false
-    t.boolean "daily_challenge", default: false, null: false
+    t.string "mode", default: "practice", null: false
     t.index ["share_token"], name: "index_attempts_on_share_token", unique: true
     t.index ["user_id", "client_id"], name: "index_attempts_on_user_id_and_client_id", unique: true
     t.index ["user_id", "created_at"], name: "index_attempts_on_user_id_and_created_at"
     t.index ["user_id", "played_on"], name: "index_attempts_on_user_id_and_played_on"
-    t.index ["user_id", "topic", "daily_challenge", "played_on"], name: "idx_on_user_id_topic_daily_challenge_played_on_c5350cbd84"
+    t.index ["user_id", "topic", "mode", "played_on"], name: "index_attempts_on_user_id_and_topic_and_mode_and_played_on"
     t.index ["user_id"], name: "index_attempts_on_user_id"
   end
 

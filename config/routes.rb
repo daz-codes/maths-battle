@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resource :registration, only: %i[new create]
   resource :profile, only: %i[edit update]
   resource :topic, only: :update
+  get "topics", to: "topics#index", as: :topics
   resource :level, only: :update
   resource :streak_freeze, only: :create
 

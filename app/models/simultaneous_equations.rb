@@ -72,9 +72,10 @@ module SimultaneousEquations
     UNKNOWNS.map { |unknown| ask(pair.merge(v: unknown)) }
   end
 
-  # A lesson's one to try, written and answered as the game would: the pair, asking for x
+  # A question written and answered as the game would: a lesson's one to try (the pair, asking for x) or one
+  # asked again in a review (for whichever it asked)
   def worked(pair)
-    ask(pair.merge(v: "x"))
+    ask({ v: "x", **pair })
   end
 
   # Solves the pair again from its numbers, so the score never depends on the browser. The way of solving

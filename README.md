@@ -34,7 +34,7 @@ sequentially because concurrent browser workers can contend for SQLite writes.
 
 ## Application flow
 
-Home → choose a topic and unlocked level → learn it, practise it for a medal, or play the daily challenge →
+Home (showing the current topic, changed on its own page with progress in each) → choose an unlocked level → learn it, practise it for a medal, or play the daily challenge →
 score and practice feedback → stats or play again.
 The server generates questions weighted towards facts the player finds difficult. Five answers make a
 game count towards a streak, and a bronze medal unlocks the next level.
@@ -48,6 +48,10 @@ a level asks only that level's questions and earns bronze, silver or gold; a lev
 first bronze unlocks the next level. Each topic's daily challenge, once a day, mixes questions from every level
 up to the player's; it has its own best, earns no medal and unlocks nothing. Whether a game is a daily
 challenge is in its signed ticket, so the browser can't decide. A new topic needs `MEDALS` and gets all this.
+
+Review mode asks again, exactly, the questions a player recently got wrong or was slowest at in a topic (from
+their last 10 games, `User::Reviewable`), round and round for a minute. Like the daily challenge it's at the
+player's highest level and earns no medal; a game's mode (practice, challenge or review) is in its ticket.
 
 A day counts towards the streak when a game long enough is played or a lesson is finished.
 

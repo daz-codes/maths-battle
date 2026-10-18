@@ -3,7 +3,8 @@ require "application_system_test_case"
 class EquationsTest < ApplicationSystemTestCase
   test "switch to equations, answer with the keyboard including fractions, and see the results" do
     sign_in users(:ada)
-    select "⚖️ Equations", from: "Topic"
+    click_on "Change topic"
+    find(".topic-card", text: "Equations").click
     assert_selector ".levels__name", text: "Level 1: One step"
     click_on "Practise level 1"
     assert_selector ".question var", wait: 5

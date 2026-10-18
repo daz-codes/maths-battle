@@ -1,10 +1,4 @@
 module TopicsHelper
-  # Where picking a topic or level in the chooser goes. On the home page it changes what Play plays
-  # (remembered on the device); on the stats page it shows that topic's or level's stats
-  def topic_choice(choosing)
-    choosing == :stats ? [ stats_path, :get ] : [ topic_path, :patch ]
-  end
-
   # Under a medal level's name: its best medal and the next to aim for, or what earns the first one
   # (which unlocks the next level). "🥈 Silver · best 24 · 30 for gold"
   def medal_progress(user, topic, level)
@@ -21,6 +15,8 @@ module TopicsHelper
     end
   end
 
+  # Where picking a level in the chooser goes. On the home page it changes what Practise plays (remembered on
+  # the device); on the stats page it shows that level's stats
   def level_choice(choosing, topic, number)
     if choosing == :stats
       [ stats_path(topic.slug), { method: :get, params: { level: number } } ]

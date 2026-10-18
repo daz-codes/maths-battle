@@ -3,12 +3,20 @@ class Attempt < ApplicationRecord
 
   belongs_to :user
 
+  # A level's practice; the daily challenge, mixing every level up to the player's; or a review of their recent
+  # mistakes and slow answers. Only practice belongs to a level: earning medals and unlocking the next one
+  MODES = %w[ practice challenge review ]
+
   validates :topic, inclusion: { in: Topic.keys }
+  validates :mode, inclusion: { in: MODES }
 
   scope :in_topic, ->(topic) { where(topic: topic.key) }
-  # A daily challenge mixes levels, so it doesn't count as a game at any one of them
-  scope :at_level, ->(topic, level) { in_topic(topic).where(level: level, daily_challenge: false) }
-  scope :daily_challenges, -> { where(daily_challenge: true) }
+  scope :at_level, ->(topic, level) { in_topic(topic).where(level: level, mode: "practice") }
+  scope :daily_challenges, -> { where(mode: "challenge") }
+
+  def practice? = mode == "practice"
+  def daily_challenge? = mode == "challenge"
+  def review? = mode == "review"
 
   def topic_module
     Topic.find(topic)
