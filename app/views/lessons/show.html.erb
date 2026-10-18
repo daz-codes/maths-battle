@@ -1,0 +1,52 @@
+<% content_for :title, "Learn #{@topic.title.downcase}, level #{@level} · MatheMinute" %>
+<% content_for :viewport, "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" %>
+<% content_for :focus_mode, true %>
+<% try = @lesson[:try] %>
+
+<main class="lesson" data-controller="tutorial"
+      data-tutorial-answer-value="<%= try[:answer] %>" data-tutorial-keys-value="<%= @topic.keys(@level).to_json %>">
+  <%= link_to "✕", root_path, class: "lesson__close", aria: { label: "Close the lesson" } %>
+
+  <header class="lesson__header">
+    <p class="label"><%= @topic.emoji %> <%= @topic.title %>, level <%= @level %></p>
+    <h1 class="lesson__title"><%= @topic.level(@level)[:name] %></h1>
+    <ol class="lesson__dots" aria-hidden="true">
+      <% (@lesson[:steps].size + 1).times do |i| %>
+        <li class="lesson__dot <%= "lesson__dot--done" if i.zero? %>" data-tutorial-target="dot"></li>
+      <% end %>
+    </ol>
+  </header>
+
+  <div class="lesson__stage">
+    <% @lesson[:steps].each_with_index do |step, i| %>
+      <section class="lesson__step" data-tutorial-target="step" <%= "hidden" unless i.zero? %>>
+        <p class="lesson__show"><%= step[:show] %></p>
+        <p class="lesson__say"><%= step[:say] %></p>
+      </section>
+    <% end %>
+
+    <section class="lesson__step lesson__try" data-tutorial-target="try" hidden>
+      <p class="label">Your turn</p>
+      <p class="lesson__show"><%= try[:question] %></p>
+      <p class="answer" data-tutorial-target="answer" aria-live="polite"></p>
+      <p class="lesson__feedback" data-tutorial-target="feedback" aria-live="polite"></p>
+      <p class="lesson__hint" data-tutorial-target="hint" hidden>💡 <%= try[:hint] %></p>
+    </section>
+
+    <section class="lesson__step lesson__done" data-tutorial-target="done" hidden>
+      <p class="lesson__show">🎉 That's it!</p>
+      <p class="lesson__say"><%= try[:question] %> = <%= try[:answer].sub("-", "−") %></p>
+      <%= link_to "Play level #{@level}", play_path(@topic.slug, level: @level), class: "button button--start" %>
+      <%= link_to "Home", root_path %>
+    </section>
+  </div>
+
+  <div class="lesson__controls">
+    <button type="button" class="button button--blue button--wide" data-tutorial-target="next" data-action="tutorial#next">Next</button>
+    <button type="button" class="button button--wide lesson__hint-button" data-tutorial-target="hintButton" data-action="tutorial#showHint" hidden>💡 Hint</button>
+  </div>
+
+  <div class="lesson__keypad" data-tutorial-target="keypadArea" hidden>
+    <%= render "games/keypad", keys: @topic.keys(@level), controller: "tutorial" %>
+  </div>
+</main>

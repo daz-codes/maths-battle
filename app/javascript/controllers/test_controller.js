@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 import { chooseQuestionSet, playerKey, preparePlayer, postGame, saveForLater, watchPlayer } from "lib/offline_games"
+import { allowedKey, shown } from "lib/answer_input"
 
 const DURATION = 60_000
 const STARS = { right: 10, quick: 20, lightning: 30 }
@@ -140,16 +141,12 @@ export default class extends Controller {
     if (this.typed.length >= this.correctAnswer.length) this.check()
   }
 
-  // Digits always. A minus sign first, a decimal point or fraction line once and after a digit: -0.42, 11/9
   allowed(key) {
-    if (/^[0-9]$/.test(key)) return true
-    if (!this.keysValue.includes(key)) return false
-    if (key === "-") return this.typed === ""
-    return /[0-9]$/.test(this.typed) && !/[./]/.test(this.typed)
+    return allowedKey(this.typed, key, this.keysValue)
   }
 
   showTyped() {
-    this.answerTarget.textContent = this.typed.replace("-", "−")
+    this.answerTarget.textContent = shown(this.typed)
   }
 
   backspace() {
@@ -224,7 +221,7 @@ export default class extends Controller {
   // Show the right answer briefly so it sticks, then carry on
   showCorrection() {
     this.showingCorrection = true
-    this.answerTarget.textContent = this.correctAnswer.replace("-", "−")
+    this.answerTarget.textContent = shown(this.correctAnswer)
     this.answerTarget.classList.add("answer--wrong")
     this.correctionTimer = setTimeout(() => {
       this.showingCorrection = false

@@ -31,6 +31,9 @@
     <% end %>
   </nav>
   <p class="levels__name">Level <%= level %>: <%= topic.level(level)[:name] %></p>
+  <% if topic.lesson(level) %>
+    <p class="levels__learn"><%= link_to "📖 Learn how", lesson_path(topic.slug, level) %></p>
+  <% end %>
 <% end %>
 <%= link_to "Play", play_path(topic.slug, level: (level if choosing == :stats)), class: "button button--start" %>
 </div>

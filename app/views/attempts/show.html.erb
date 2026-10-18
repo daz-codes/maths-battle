@@ -3,6 +3,7 @@
 <main class="page results">
   <% if @attempt.levelled_up %>
     <p class="banner banner--level" data-controller="confetti">⬆️ Level up! You've unlocked Level <%= @attempt.level + 1 %>: <%= @attempt.topic_module.level(@attempt.level + 1)[:name] %></p>
+    <%= link_to "📖 Learn how to do level #{@attempt.level + 1}", lesson_path(@attempt.topic_module.slug, @attempt.level + 1), class: "button button--blue" if @attempt.topic_module.lesson(@attempt.level + 1) %>
   <% elsif @attempt.new_high_score %>
     <p class="banner" data-controller="confetti">🎉 New high score! 🎉</p>
   <% end %>

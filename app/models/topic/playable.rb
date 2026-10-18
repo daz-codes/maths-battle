@@ -43,6 +43,11 @@ module Topic::Playable
     self::STAR_TIMES
   end
 
+  # A level's tutorial, if the topic has them: steps to tap through, then one to try (see TimesTables::Lessons)
+  def lesson(number)
+    self::Lessons::ALL[number] if const_defined?(:Lessons, false)
+  end
+
   def badge_scores
     self::BADGE_SCORES
   end

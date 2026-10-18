@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   resource :streak_freeze, only: :create
 
   get "play/:topic", to: "games#show", as: :play
+  get "learn/:topic/:level", to: "lessons#show", as: :lesson
   # Where the times tables game used to be, still linked from copies kept on devices
   get "times-tables", to: redirect("/play/times-tables")
   resources :attempts, only: %i[create show]

@@ -40,6 +40,13 @@ game count towards a streak. Three games with at least 20 answers and 90% accura
 The first saved game creates a guest account; registering preserves that guest's history. Signing into
 an existing account switches accounts without merging guest history.
 
+## Lessons
+
+Each level can have a minute's tutorial: a worked example in 3–4 steps tapped through one at a time, then one
+to try on the game's keypad, with a hint after a wrong answer. Lessons are content in each topic
+(`TimesTables::Lessons`, so far for times tables only) and are offered under the level's name and after
+levelling up. Nothing in a lesson is saved.
+
 ## Achievements
 
 Players collect achievements (badges, in the code) for their first game, scores in each topic, streaks, unlocking levels, perfect
