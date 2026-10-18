@@ -24,7 +24,7 @@ class LevellingUpTest < ApplicationSystemTestCase
       test.questions[test.index] = { a: "0.4", b: "0.6", text: "0.4 × 0.6", answer: "0.24" }
       test.show()
     JS
-    find("body").send_keys(".0.24") # a point before any digit is ignored
+    find("body").send_keys(".24") # a point before any digit starts the number with 0
     assert_selector ".test__score", text: "2"
   end
 end

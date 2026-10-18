@@ -36,7 +36,6 @@ module SimultaneousEquations
   SOLUTIONS = 1..5
   UNKNOWNS = %w[ x y ]
   MAX_NUMBER = 999
-  ANSWER_FORMAT = /\A-?\d{1,4}\z/
 
   extend Topic::Playable
   extend self
@@ -78,7 +77,7 @@ module SimultaneousEquations
     raise Attempt::Invalid, "Bad question" unless facts(level).include?(question[:type]) && way_of_solving(question) == question[:type]
 
     given = result["given"].to_s
-    raise Attempt::Invalid, "Bad answer" unless given.match?(ANSWER_FORMAT)
+    raise Attempt::Invalid, "Bad answer" unless given.match?(Attempt::TYPED_ANSWER)
 
     question.transform_keys(&:to_s).merge("given" => given, "correct" => given == solution(question).fetch(question[:v]).to_s)
   end

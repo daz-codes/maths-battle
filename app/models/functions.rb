@@ -50,7 +50,6 @@ module Functions
   BADGE_SCORES = [ 5, 10, 20, 30, 50 ]
   # The largest number the server accepts in a question sent back (well above anything generated)
   MAX_NUMBER = 999
-  ANSWER_FORMAT = /\A-?\d{1,6}\z/
 
   extend Topic::Playable
   extend self
@@ -93,7 +92,7 @@ module Functions
     raise Attempt::Invalid, "Bad question" unless level_details(level)[:negatives] || (question.values_at(*numbers_used(question[:type])) + [ value(question) ]).all?(&:positive?)
 
     given = result["given"].to_s
-    raise Attempt::Invalid, "Bad answer" unless given.match?(ANSWER_FORMAT)
+    raise Attempt::Invalid, "Bad answer" unless given.match?(Attempt::TYPED_ANSWER)
 
     question.transform_keys(&:to_s).merge("given" => given, "correct" => given == value(question).to_s)
   end

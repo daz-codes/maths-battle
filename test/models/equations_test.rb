@@ -55,7 +55,8 @@ class EquationsTest < ActiveSupport::TestCase
     assert_raises(Attempt::Invalid) { answer("x^2=b", "2", a: 1, b: 4) }
     assert_raises(Attempt::Invalid) { Equations.clean_result({ "type" => "ax=b", "v" => "o", "a" => 2, "b" => 4, "given" => "2" }, level: 5) }
     assert_raises(Attempt::Invalid) { answer("x+a=b", "0", a: 5, b: 5) }
-    assert_raises(Attempt::Invalid) { answer("ax=b", "1/2/3", a: 2, b: 1) }
+    assert_not answer("ax=b", "1/", a: 2, b: 1)["correct"], "unfinished, so just wrong"
+    assert_raises(Attempt::Invalid) { answer("ax=b", "half", a: 2, b: 1) }
   end
 
   test "levels go from one step with small numbers to two step, bigger numbers, then fractions" do

@@ -81,7 +81,7 @@ module TimesTables
     raise Attempt::Invalid, "Bad question" unless facts(level).include?(fact_key(result))
 
     given = result["given"].to_s
-    raise Attempt::Invalid, "Bad answer" unless given.match?(NUMBER_FORMAT)
+    raise Attempt::Invalid, "Bad answer" unless given.match?(Attempt::TYPED_ANSWER)
 
     { "a" => written(a), "b" => written(b), "given" => given, "correct" => given == written(a * b) }
   end

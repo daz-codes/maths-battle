@@ -8,6 +8,9 @@ module Attempt::Recordable
   MAX_TOTAL_MS = 65_000
   # Every field a result can have in any topic. Each topic checks its own fields strictly
   RESULT_FIELDS = %i[ a b c d e f n type v flip given ms ]
+  # Anything the keypad can type, unfinished answers like "0." or "−" included: those are just wrong.
+  # Each topic checks a typed answer against this, and anything else can't have come from the game
+  TYPED_ANSWER = %r{\A-?[0-9./]{0,12}\z}
   # A game played offline still counts if it reaches the server within this long
   MAX_OFFLINE_AGE = 30.days
 

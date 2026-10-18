@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 import { chooseQuestionSet, playerKey, preparePlayer, postGame, saveForLater, watchPlayer } from "lib/offline_games"
-import { allowedKey, shown } from "lib/answer_input"
+import { finished, shown, typedWith } from "lib/answer_input"
 
 const DURATION = 60_000
 const STARS = { right: 10, quick: 20, lightning: 30 }
@@ -133,16 +133,14 @@ export default class extends Controller {
   }
 
   type(key) {
-    if (!this.accepting || !this.allowed(key)) return
+    const typed = typedWith(this.typed, key, this.keysValue)
+    if (!this.accepting || typed === null) return
 
-    this.typed += key
+    this.typed = typed
     this.showTyped()
-    // Check as soon as the answer is as long as the right one ("56", "3/4", "-2100"), so there's no Enter to press
-    if (this.typed.length >= this.correctAnswer.length) this.check()
-  }
-
-  allowed(key) {
-    return allowedKey(this.typed, key, this.keysValue)
+    // Check as soon as the answer is as long as the right one ("56", "3/4", "-2100"), so there's no Enter to press,
+    // but not while it ends in −, . or /, which a finished answer never does
+    if (this.typed.length >= this.correctAnswer.length && finished(this.typed)) this.check()
   }
 
   showTyped() {

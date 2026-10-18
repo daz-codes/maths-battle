@@ -88,7 +88,8 @@ class SimultaneousEquationsTest < ActiveSupport::TestCase
     assert_raises(Attempt::Invalid) { answer("2", c: 12) }
     # 4x + 3y = 31 and 2x + 3y = 17: x = 7, which is out of range
     assert_raises(Attempt::Invalid) { answer("7", type: "subtract and divide", a: 4, b: 3, c: 31, d: 2, e: 3, f: 17) }
-    assert_raises(Attempt::Invalid) { answer("2.5") }
+    assert_not answer("2.5")["correct"], "an answer the keypad could type is just wrong"
+    assert_raises(Attempt::Invalid) { answer("two") }
   end
 
   test "written out for the results page, including pairs from before the levels changed" do

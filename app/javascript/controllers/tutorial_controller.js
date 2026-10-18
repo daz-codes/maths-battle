@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { allowedKey, shown } from "lib/answer_input"
+import { finished, shown, typedWith } from "lib/answer_input"
 
 const WRONG_PAUSE = 900
 
@@ -67,11 +67,12 @@ export default class extends Controller {
   }
 
   type(key) {
-    if (!this.trying || this.waiting || !allowedKey(this.typed, key, this.keysValue)) return
+    const typed = typedWith(this.typed, key, this.keysValue)
+    if (!this.trying || this.waiting || typed === null) return
 
-    this.typed += key
+    this.typed = typed
     this.answerTarget.textContent = shown(this.typed)
-    if (this.typed.length >= this.answerValue.length) this.check()
+    if (this.typed.length >= this.answerValue.length && finished(this.typed)) this.check()
   }
 
   backspace() {

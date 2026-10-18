@@ -33,6 +33,15 @@ class AttemptTest < ActiveSupport::TestCase
     assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), topic: "spelling") }
   end
 
+  test "an unfinished answer, like 0. or a lone minus, is just wrong: the rest of the game still saves" do
+    unlock(@user, TimesTables, 5)
+    results = [ { a: "-0.9", b: "-20", given: "0.", ms: 2_000 }, { a: "-3", b: "6", given: "-18", ms: 2_000 }, { a: "2", b: "4", given: "-", ms: 2_000 } ]
+
+    attempt = Attempt.record!(user: @user, level: 5, results: results)
+    assert_equal [ false, true, false ], attempt.results.map { _1["correct"] }
+    assert_equal 1, attempt.score
+  end
+
   test "an invalid attempt saves nothing" do
     assert_no_difference -> { Attempt.count } do
       assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, results: answers([ 2, 2, 4 ], [ 0, 2, 0 ])) }

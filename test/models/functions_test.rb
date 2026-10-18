@@ -72,7 +72,8 @@ class FunctionsTest < ActiveSupport::TestCase
     assert_raises(Attempt::Invalid) { answer("x/a+b", "3", a: 2, b: 1, n: 5) }
     assert_raises(Attempt::Invalid) { answer("inv:ax+b", "3", a: 3, b: 1, n: 9) }
     assert_raises(Attempt::Invalid) { answer("ax", "0", a: 0, n: 4) }
-    assert_raises(Attempt::Invalid) { answer("ax+b", "1.5", a: 2, b: 3, n: 4) }
+    assert_not answer("ax+b", "-", a: 2, b: 3, n: 4)["correct"], "unfinished, so just wrong"
+    assert_raises(Attempt::Invalid) { answer("ax+b", "11!", a: 2, b: 3, n: 4) }
     assert_raises(Attempt::Invalid) { answer("ax+b", "11", a: 2, b: 3, n: 4000) }
   end
 

@@ -48,7 +48,6 @@ module Equations
   FLIP_CHANCE = 0.25
   # The largest number the server accepts in a question sent back (well above anything generated)
   MAX_NUMBER = 999
-  GIVEN_FORMAT = %r{\A\d{1,4}(/\d{1,4})?\z}
 
   extend Topic::Playable
   extend self
@@ -94,7 +93,7 @@ module Equations
     raise Attempt::Invalid, "Bad question" unless solution.denominator == 1 || level_details(level)[:fractions]
 
     given = result["given"].to_s
-    raise Attempt::Invalid, "Bad answer" unless given.match?(GIVEN_FORMAT)
+    raise Attempt::Invalid, "Bad answer" unless given.match?(Attempt::TYPED_ANSWER)
 
     question.transform_keys(&:to_s).merge("given" => given, "correct" => given == written(solution))
   end
