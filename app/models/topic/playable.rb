@@ -48,13 +48,10 @@ module Topic::Playable
     self::Lessons::ALL[number] if const_defined?(:Lessons, false)
   end
 
-  # Scores for each medal, best first, if the topic plays by medals (see TimesTables::MEDALS)
+  # The scores for bronze, silver and gold: a level's practice earns a medal, and the first bronze unlocks the
+  # next level (Attempt::Medallable). Each topic sets its own, as some questions take longer
   def medals
-    self::MEDALS if const_defined?(:MEDALS, false)
-  end
-
-  def medals?
-    medals.present?
+    self::MEDALS
   end
 
   def badge_scores

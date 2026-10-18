@@ -8,5 +8,6 @@ class LessonsController < ApplicationController
     return redirect_to(root_path, alert: "Unlock that level first.") unless @level
 
     @lesson = @topic.lesson(@level) || raise(ActionController::RoutingError, "No lesson")
+    @try = @topic.worked(@lesson[:try][:question])
   end
 end

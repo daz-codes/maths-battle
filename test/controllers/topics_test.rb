@@ -13,7 +13,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     patch topic_path, params: { topic: "equations" }
     assert_redirected_to root_path
     follow_redirect!
-    assert_select "a.button--start[href=?]", play_path("equations")
+    assert_select "a.button--practise[href=?]", play_path("equations", level: 1)
     assert_select "form.topic-picker[action=?] select[name=topic] option[selected][value=equations]", topic_path, text: "⚖️ Equations"
   end
 
@@ -31,7 +31,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
   test "playing a topic makes it the current one" do
     get play_path("equations")
     get root_path
-    assert_select "a.button--start[href=?]", play_path("equations")
+    assert_select "a.button--practise[href=?]", play_path("equations", level: 1)
   end
 
   test "the equations fractions level has a fraction key; other levels and times tables don't" do
@@ -63,7 +63,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert equations.new_high_score, "a first equations game is a best, even after a bigger times tables score"
     assert_equal [ 20, 6 ], [ @user.best_score(TimesTables, 1), @user.best_score(Equations, 1) ]
 
-    get stats_path("equations")
+    get stats_path("equations", level: 1)
     assert_select ".topic-picker option[selected][value=equations]"
     assert_select "thead th", text: "Type"
     assert_select "tbody th", text: /ax = b\s+e\.g\. 3x = 12/

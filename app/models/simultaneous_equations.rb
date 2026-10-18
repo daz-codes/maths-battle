@@ -31,6 +31,8 @@ module SimultaneousEquations
   ]
   # Quick and lightning stars: each answer is a few steps of working out
   STAR_TIMES = { lightning: 5_000, quick: 10_000 }
+  # A level's practice earns a medal for its score; bronze unlocks the next level. Each pair is two answers
+  MEDALS = { gold: 12, silver: 8, bronze: 4 }
   # Scores in one game that earn a badge. Lower than the other topics: each pair of equations is two answers
   BADGE_SCORES = [ 5, 10, 15, 20, 30 ]
   SOLUTIONS = 1..5
@@ -68,6 +70,11 @@ module SimultaneousEquations
   def questions_for(type, level: 1, random:)
     pair = build(type, level_details(level), random)
     UNKNOWNS.map { |unknown| ask(pair.merge(v: unknown)) }
+  end
+
+  # A lesson's one to try, written and answered as the game would: the pair, asking for x
+  def worked(pair)
+    ask(pair.merge(v: "x"))
   end
 
   # Solves the pair again from its numbers, so the score never depends on the browser. The way of solving

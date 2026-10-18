@@ -53,7 +53,7 @@ module Attempt::Recordable
       end
 
       def check_daily_challenge(user, topic, level)
-        raise Invalid, "No daily challenge" unless topic.medals? && level == user.unlocked_level(topic)
+        raise Invalid, "The daily challenge is at the highest level" unless level == user.unlocked_level(topic)
       end
 
       def check_unlocked(user, topic, level)
@@ -128,15 +128,12 @@ module Attempt::Recordable
       user.fact_stats.record(self)
     end
 
-    # The game that unlocks the next level: in a topic that plays by medals the level's first bronze, unless the
-    # next level was already reached; otherwise the good game that brings the count to what's needed.
+    # The game that unlocks the next level: the level's first bronze, unless the next level was already reached.
     # Never a daily challenge
     def check_level_up
       return if daily_challenge || !topic_module.level(level + 1)
 
-      levelled_up = topic_module.medals? ? first_bronze? && user.attempts.at_level(topic_module, level + 1).none? :
-        good? && user.good_games(topic_module, level) == User::Levelable::GOOD_GAMES_TO_LEVEL_UP
-      update_column(:levelled_up, true) if levelled_up
+      update_column(:levelled_up, true) if first_bronze? && user.attempts.at_level(topic_module, level + 1).none?
     end
 
     # This game may have unlocked a level, or been the first played at one

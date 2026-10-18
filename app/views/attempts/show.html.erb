@@ -57,11 +57,7 @@
     </section>
   <% end %>
 
-  <% if @attempt.topic_module.medals? %>
-    <%= tag.p(medal_progress(@attempt.user, @attempt.topic_module, @attempt.level), class: "level-progress") unless @attempt.daily_challenge %>
-  <% elsif !(@attempt.levelled_up || @attempt.level < @attempt.user.unlocked_level(@attempt.topic_module)) %>
-    <%= render "levels/progress", user: @attempt.user, topic: @attempt.topic_module %>
-  <% end %>
+  <%= tag.p(medal_progress(@attempt.user, @attempt.topic_module, @attempt.level), class: "level-progress") unless @attempt.daily_challenge %>
   <%= link_to "See your stats", stats_path(@attempt.topic_module.slug) %>
   <%= link_to "See your achievements", achievements_path if @attempt.badges.any? %>
 

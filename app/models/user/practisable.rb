@@ -2,15 +2,14 @@
 # and facts answered right but slowly, come up more often and drop back as the player improves.
 # A player who is struggling overall gets more easy questions and fewer hard ones, to build confidence
 # back up; that eases off by itself as their recent accuracy rises.
-# Now and then a question comes from an easier level, so what was learnt there isn't forgotten
+# A level's practice asks only that level; the daily challenge mixes in every level up to it, so what was
+# learnt at the easier ones isn't forgotten
 module User::Practisable
   extend ActiveSupport::Concern
 
   QUESTION_COUNT = 150
   # Extra sets sent with each game page, so games played offline don't repeat the last set
   SPARE_QUESTION_SETS = 5
-  # How often a question comes from an easier level: 2 × 9 now and then at the zeroes level
-  REVIEW_CHANCE = 0.15
   TRIVIAL_WEIGHT = 0.1
   # A fact never answered right comes up this many times as often as one always answered right
   MAX_BOOST = 5
@@ -27,9 +26,9 @@ module User::Practisable
   # At full strength easy facts come up 3× as often, medium 1.5×, and hard ones 0.4×
   EASING = { 0 => 2.0, 1 => 0.5, 2 => -0.6 }
 
-  # mix: :review for the level with some from easier ones now and then, :level_only for a medal level's practice,
-  # :all_levels for a daily challenge, spread evenly over every level up to this one
-  def questions(topic: Topic.default, level: 1, count: QUESTION_COUNT, random: Random.new, mix: :review)
+  # mix: :level_only for a level's practice, or :all_levels for a daily challenge, spread evenly over every
+  # level up to this one
+  def questions(topic: Topic.default, level: 1, count: QUESTION_COUNT, random: Random.new, mix: :level_only)
     previous, questions = nil, []
 
     while questions.size < count
@@ -41,7 +40,7 @@ module User::Practisable
   end
 
   # The set for this game, then spares for playing offline. Each has an id so the device knows which it has used
-  def question_sets(topic: Topic.default, level: 1, count: 1 + SPARE_QUESTION_SETS, mix: :review)
+  def question_sets(topic: Topic.default, level: 1, count: 1 + SPARE_QUESTION_SETS, mix: :level_only)
     Array.new(count) { { id: SecureRandom.hex(16), questions: questions(topic: topic, level: level, mix: mix) } }
   end
 
@@ -98,11 +97,7 @@ module User::Practisable
     end
 
     def question_level(level, random, mix)
-      case mix
-      when :level_only then level
-      when :all_levels then random.rand(1..level)
-      else level > 1 && random.rand < REVIEW_CHANCE ? random.rand(1...level) : level
-      end
+      mix == :all_levels ? random.rand(1..level) : level
     end
 
     # Weighted by how the player does at this level, from the facts the question's level can ask.

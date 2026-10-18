@@ -45,7 +45,8 @@ class DailyChallengeTest < ActionDispatch::IntegrationTest
     challenge = @user.attempts.last
 
     get root_path
-    assert_select "a.button--done[href=?]", attempt_path(challenge), text: /Done today: 12/
+    assert_select "a.daily-done[href=?]", attempt_path(challenge), text: "✅ Challenge done today: 12"
+    assert_select "a.button--start", text: /Daily challenge/, count: 0
 
     get play_path("times-tables", challenge: 1)
     assert_redirected_to root_path
@@ -73,13 +74,14 @@ class DailyChallengeTest < ActionDispatch::IntegrationTest
     assert_select ".level-progress", count: 0
   end
 
-  test "topics without medals have no daily challenge" do
+  test "every topic has its own daily challenge" do
+    post attempts_path, params: challenge_upload(score: 12), as: :json
+
     get play_path("equations", challenge: 1)
-    assert_select "[data-test-daily-challenge-value=false]"
+    assert_select "[data-test-daily-challenge-value=true][data-test-level-value=1]", message: "times tables' doesn't use up equations'"
   end
 
   test "the model only takes a daily challenge at the player's highest level" do
     assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, level: 1, results: answers([ 2, 3, 6 ]), daily_challenge: true) }
-    assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, topic: "equations", level: 1, daily_challenge: true, results: [ { type: "x+a=b", a: 2, b: 5, v: "x", flip: false, given: "3", ms: 1000 } ]) }
   end
 end

@@ -1,7 +1,7 @@
-<%# Once a day: the button to play it, or how it went %>
+<%# Once a day: the button to play it, or, once it's played, a quiet line saying how it went %>
 <% if (done = user.daily_challenge_on(topic)) %>
-  <%= link_to attempt_path(done), class: "button button--start button--done" do %>
-    ✅ Done today: <%= done.score %>
+  <%= link_to attempt_path(done), class: "daily-done" do %>
+    ✅ Challenge done today: <strong><%= done.score %></strong>
   <% end %>
 <% else %>
   <%= link_to "⭐ Daily challenge", play_path(topic.slug, challenge: 1), class: "button button--start" %>

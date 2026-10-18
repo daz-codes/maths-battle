@@ -95,14 +95,14 @@ a {
 
 /* Text links (and the sign out button, styled as one): green underline and a faint wash on hover.
    The wash is a touch of ink mixed into the paper, so it's slightly darker in light mode and lighter in dark */
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary), .link-button {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary, .daily-done), .link-button {
   margin: 0 -0.2em;
   padding: 0.05em 0.2em;
   border-radius: 4px;
   transition: background-color 120ms, text-decoration-color 120ms;
 }
 
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary):hover, .link-button:hover {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary, .daily-done):hover, .link-button:hover {
   background-color: color-mix(in srgb, var(--ink) 5%, var(--paper));
   text-decoration-color: var(--green);
 }
@@ -563,7 +563,8 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* Medal topics have the daily challenge and practising the level picked */
 .levels-panel .button--start { min-height: 3.6rem; font-size: clamp(1.3rem, 6vw, 1.6rem); }
-.button--done { --fill: var(--green-deep); --glow: var(--green); color: #fff; }
+.daily-done { color: var(--muted); font-weight: 600; text-align: center; text-decoration: none; }
+.daily-done strong { color: var(--ink); }
 .button--practise { width: 100%; margin-top: -0.5rem; }
 
 /* Under the level's name, kept close to it, and kept from widening the levels like the name */
@@ -686,6 +687,12 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .lesson__stage { display: grid; place-items: center; min-height: 0; }
 .lesson__step { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
 .lesson__show { margin: 0; font-size: clamp(2.2rem, 11vw, 3.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.lesson__line { display: block; }
+/* The one to try, written by the topic: a function on each line, the equations of a pair in columns */
+.lesson__show .function { display: block; color: var(--muted); font-size: 0.6em; }
+.lesson__show .function--ask { color: var(--ink); font-size: 1em; }
+.lesson__show--simultaneous-equations { font-size: clamp(1.7rem, 8vw, 2.6rem); }
+.lesson__show .system__ask { display: block; margin-top: 0.3em; }
 .lesson__say { max-width: 20rem; margin: 0; color: var(--muted); font-size: 1.15rem; font-weight: 600; }
 .lesson__feedback { min-height: 1.4em; margin: 0; color: var(--pink-text); font-weight: 700; }
 .lesson__hint { max-width: 20rem; margin: 0; padding: 0.5rem 0.9rem; border-radius: var(--radius); background: var(--paper-alt); font-weight: 600; }

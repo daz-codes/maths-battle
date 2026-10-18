@@ -38,6 +38,9 @@ module Equations
   ]
   # Quick and lightning stars, allowing for an equation taking longer than a times table
   STAR_TIMES = { lightning: 3_000, quick: 6_000 }
+  # A level's practice earns a medal for its score; bronze unlocks the next level. Lower than times tables,
+  # as each equation takes some working out
+  MEDALS = { gold: 20, silver: 12, bronze: 6 }
   # Scores in one game that earn a badge. Lower than times tables: each equation takes longer
   BADGE_SCORES = [ 5, 10, 20, 30, 50 ]
   # Letters that can't be mistaken for a number or for each other (no i, l, o, s)
@@ -96,6 +99,12 @@ module Equations
     raise Attempt::Invalid, "Bad answer" unless given.match?(Attempt::TYPED_ANSWER)
 
     question.transform_keys(&:to_s).merge("given" => given, "correct" => given == written(solution))
+  end
+
+  # A lesson's one to try, written and answered as the game would. The letter is x unless it says
+  def worked(question)
+    question = { v: "x", flip: false, **question }
+    question.merge(text: html(question), answer: written(solve(question)))
   end
 
   # "2y + 7 = 11, so y = 2"

@@ -1,10 +1,9 @@
 <% content_for :title, "Learn #{@topic.title.downcase}, level #{@level} · MatheMinute" %>
 <% content_for :viewport, "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" %>
 <% content_for :focus_mode, true %>
-<% try = @lesson[:try] %>
 
 <main class="lesson" data-controller="tutorial"
-      data-tutorial-answer-value="<%= try[:answer] %>" data-tutorial-keys-value="<%= @topic.keys(@level).to_json %>"
+      data-tutorial-answer-value="<%= @try[:answer] %>" data-tutorial-keys-value="<%= @topic.keys(@level).to_json %>"
       data-tutorial-done-url-value="<%= lesson_completion_path(@topic.slug, @level) %>">
   <%= link_to "✕", root_path, class: "lesson__close", aria: { label: "Close the lesson" } %>
 
@@ -21,22 +20,25 @@
   <div class="lesson__stage">
     <% @lesson[:steps].each_with_index do |step, i| %>
       <section class="lesson__step" data-tutorial-target="step" <%= "hidden" unless i.zero? %>>
-        <p class="lesson__show"><%= step[:show] %></p>
+        <p class="lesson__show">
+          <% Array(step[:show]).each do |line| %><span class="lesson__line"><%= line %></span><% end %>
+        </p>
         <p class="lesson__say"><%= step[:say] %></p>
       </section>
     <% end %>
 
     <section class="lesson__step lesson__try" data-tutorial-target="try" hidden>
       <p class="label">Your turn</p>
-      <p class="lesson__show"><%= try[:question] %></p>
+      <%# Written by the topic, as in the game: stacked fractions, a function on each line, equations in columns %>
+      <p class="lesson__show lesson__show--<%= @topic.slug %>"><%= sanitize @try[:text], tags: %w[ span var ], attributes: %w[ class ] %></p>
       <p class="answer" data-tutorial-target="answer" aria-live="polite"></p>
       <p class="lesson__feedback" data-tutorial-target="feedback" aria-live="polite"></p>
-      <p class="lesson__hint" data-tutorial-target="hint" hidden>💡 <%= try[:hint] %></p>
+      <p class="lesson__hint" data-tutorial-target="hint" hidden>💡 <%= @lesson[:try][:hint] %></p>
     </section>
 
     <section class="lesson__step lesson__done" data-tutorial-target="done" hidden>
       <p class="lesson__show">🎉 That's it!</p>
-      <p class="lesson__say"><%= try[:question] %> = <%= try[:answer].sub("-", "−") %></p>
+      <p class="lesson__say"><%= @topic.label(@try.except(:text, :answer).transform_keys(&:to_s).merge("given" => @try[:answer])) %></p>
       <p class="lesson__streak" data-tutorial-target="streak" hidden></p>
       <%= link_to "Play level #{@level}", play_path(@topic.slug, level: @level), class: "button button--start" %>
       <%= link_to "Home", root_path %>

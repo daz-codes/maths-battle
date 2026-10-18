@@ -5,7 +5,7 @@ class FunctionsTest < ApplicationSystemTestCase
     sign_in users(:ada)
     select "⚙️ Functions", from: "Topic"
     assert_selector ".levels__name", text: "Level 1: Linear"
-    click_on "Play"
+    click_on "Practise level 1"
     assert_selector ".question .function--ask", wait: 5
     end_game_in(6_000)
 

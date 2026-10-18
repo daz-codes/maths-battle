@@ -122,20 +122,19 @@ class User::PractisableTest < ActiveSupport::TestCase
     assert generate(count: 2000, level: 1).all? { |q| [ q[:a], q[:b] ].map(&:to_i).intersect?([ 2, 3, 4, 5 ]) }
   end
 
-  test "now and then a question comes from an easier level" do
-    questions = generate(count: 3000, level: 3)
-    plain = questions.count { |q| q[:text].match?(/\A\d+ × \d+\z/) && !q[:text].match?(/\d0/) }
+  test "a level's practice asks only that level; a daily challenge mixes in the easier ones" do
+    plain = ->(questions) { questions.count { |q| q[:text].match?(/\A\d+ × \d+\z/) && !q[:text].match?(/\d0/) }.fdiv(questions.size) }
 
-    assert_in_delta 0.15, plain.fdiv(questions.size), 0.04, "the zeroes level always has a zero, so plain ones are from easier levels"
-    assert generate(count: 500, level: 1).all? { |q| [ q[:a], q[:b] ].map(&:to_i).intersect?([ 2, 3, 4, 5 ]) }, "nothing easier than level 1"
+    assert_equal 0, plain.(generate(count: 1000, level: 3)), "the zeroes level always has a zero"
+    mixed = @user.questions(topic: TimesTables, level: 3, count: 3000, random: Random.new(1), mix: :all_levels)
+    assert_in_delta 2.0 / 3, plain.(mixed), 0.05, "plain ones are from levels 1 and 2"
   end
 
-  test "easier equations levels are mixed in too" do
-    questions = @user.questions(topic: Equations, level: 3, count: 3000, random: Random.new(2))
-    one_step = questions.count { Equations::ONE_STEP.include?(_1[:type]) }
+  test "a daily challenge's mixed questions are all ones its level accepts" do
+    questions = @user.questions(topic: Equations, level: 5, count: 3000, random: Random.new(2), mix: :all_levels)
 
-    assert_operator one_step, :>, 0
-    assert questions.all? { |q| Equations.clean_result(q.except(:text, :answer).transform_keys(&:to_s).merge("given" => q[:answer]), level: 3)["correct"] }
+    assert_operator questions.count { Equations::ONE_STEP.include?(_1[:type]) }, :>, 0
+    assert questions.all? { |q| Equations.clean_result(q.except(:text, :answer).transform_keys(&:to_s).merge("given" => q[:answer]), level: 5)["correct"] }
   end
 
   test "stats are kept per level, so a hard fact at one level doesn't weigh on another" do
@@ -168,6 +167,5 @@ class User::PractisableTest < ActiveSupport::TestCase
     random = Random.new(1)
     assert Array.new(200) { User.new.send(:question_level, 3, random, :level_only) }.all? { _1 == 3 }
     assert_equal [ 1, 2, 3 ], Array.new(300) { User.new.send(:question_level, 3, random, :all_levels) }.uniq.sort
-    assert_operator Array.new(300) { User.new.send(:question_level, 3, random, :review) }.count(3), :>, 200, "mostly the level, sometimes easier"
   end
 end

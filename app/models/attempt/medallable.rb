@@ -1,6 +1,6 @@
-# Medals, for topics that play by them (times tables): a level's practice game earns bronze, silver or gold
-# for its score, the level keeps the best medal its games have earned, and the first bronze unlocks the next
-# level. A daily challenge mixes levels, so it earns no medal
+# Medals: a level's practice game earns bronze, silver or gold for its score (each topic sets the scores),
+# the level keeps the best medal its games have earned, and the first bronze unlocks the next level.
+# A daily challenge mixes levels, so it earns no medal
 module Attempt::Medallable
   extend ActiveSupport::Concern
 
@@ -10,7 +10,7 @@ module Attempt::Medallable
   class_methods do
     # The best medal a score earns in a topic, or nil
     def medal_for(score, topic)
-      topic.medals&.find { |_, needed| score >= needed }&.first
+      topic.medals.find { |_, needed| score >= needed }&.first
     end
 
     def medal_rank(medal)
@@ -30,7 +30,7 @@ module Attempt::Medallable
   private
     # The first bronze at a level unlocks the next one
     def first_bronze?
-      topic_module.medals? && !daily_challenge && score >= topic_module.medals[:bronze] && best_before_this < topic_module.medals[:bronze]
+      !daily_challenge && score >= topic_module.medals[:bronze] && best_before_this < topic_module.medals[:bronze]
     end
 
     # The level's best from the games recorded before this one

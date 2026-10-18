@@ -5,7 +5,7 @@ class EquationsTest < ApplicationSystemTestCase
     sign_in users(:ada)
     select "⚖️ Equations", from: "Topic"
     assert_selector ".levels__name", text: "Level 1: One step"
-    click_on "Play"
+    click_on "Practise level 1"
     assert_selector ".question var", wait: 5
     end_game_in(6_000)
 

@@ -31,18 +31,27 @@ class LessonsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
   end
 
-  test "topics without lessons aren't found" do
-    get lesson_path("equations", 1)
-    assert_response :not_found
+  test "every topic's lesson is written by the topic, as in its game" do
+    sign_in_as @user
+    unlock(@user, Equations, 2)
+    get lesson_path("equations", 2)
+    assert_select ".lesson__try .lesson__show", text: /\A\s*7 = x\s*6\s*\z/ do
+      assert_select ".frac", 1
+    end
+
+    get lesson_path("simultaneous-equations", 1)
+    assert_select ".lesson__try .system__row", 2
+    assert_select ".lesson__step .lesson__line", text: "3x + 5y = 11"
+    assert_select ".lesson__done .lesson__say", text: "4x + 3y = 18 and 3x + 3y = 15, so x = 3"
   end
 
-  test "the home page offers the lesson for the level picked, where there is one" do
+  test "the home page offers the lesson for the level picked, in every topic" do
     get root_path
     assert_select ".levels__learn a[href=?]", lesson_path("times-tables", 1), text: "📖 Learn how"
 
-    patch topic_path, params: { topic: "equations" }
+    patch topic_path, params: { topic: "functions" }
     get root_path
-    assert_select ".levels__learn", count: 0
+    assert_select ".levels__learn a[href=?]", lesson_path("functions", 1)
   end
 
   test "levelling up offers the new level's lesson" do

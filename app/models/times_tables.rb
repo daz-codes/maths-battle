@@ -23,8 +23,7 @@ module TimesTables
     { number: 5, name: "Negatives", example: "0.7 × −3000" }
   ]
   FIRST_TABLES = 2..5
-  # Times tables play by medals: a level's practice game earns one for its score, and bronze unlocks the next
-  # level. There's also a daily challenge mixing every level up to the player's (Attempt::Medallable)
+  # A level's practice earns a medal for its score; bronze unlocks the next level
   MEDALS = { gold: 30, silver: 20, bronze: 10 }
   # A right answer under 1 second earns the lightning stars, under 2 the quick ones
   STAR_TIMES = { lightning: 1_000, quick: 2_000 }
@@ -87,6 +86,12 @@ module TimesTables
     raise Attempt::Invalid, "Bad answer" unless given.match?(Attempt::TYPED_ANSWER)
 
     { "a" => written(a), "b" => written(b), "given" => given, "correct" => given == written(a * b) }
+  end
+
+  # A lesson's one to try, written and answered as the game would
+  def worked(question)
+    a, b = question.values_at(:a, :b).map { |number| decimal(number) }
+    { a: written(a), b: written(b), text: "#{shown(a)} × #{shown(b)}", answer: written(a * b) }
   end
 
   # "7 × 8 = 56", "0.7 × −3000 = −2100"

@@ -109,13 +109,13 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_equal 2, @user.unlocked_level(TimesTables), "looking at stats doesn't change anything"
   end
 
-  test "topics without medals keep a single Play" do
+  test "every topic has medals, practice and a daily challenge, with its own medal scores" do
     patch topic_path, params: { topic: "equations" }
     get root_path
 
-    assert_select ".levels-panel > a.button--start[href=?]", play_path("equations"), text: "Play"
-    assert_select ".levels__medal-line", count: 0
-    assert_select "a.button--practise", count: 0
+    assert_select ".levels__medal-line", text: "Score 6 for 🥉 bronze and unlock level 2"
+    assert_select ".levels-panel > a.button--start[href=?]", play_path("equations", challenge: 1)
+    assert_select ".levels-panel > a.button--practise[href=?]", play_path("equations", level: 1)
   end
 
   test "the keypad grows a decimal point, then a minus sign" do

@@ -31,14 +31,10 @@ module AttemptTestHelper
     SimultaneousEquations => { type: "subtract", a: 2, b: 1, c: 5, d: 1, e: 1, f: 3, v: "x", given: "2", ms: 1000 }
   }
 
-  # Plays enough good games at each level below to unlock this one. The questions are ones every level asks
+  # Plays a bronze at each level below to unlock this one. The questions are ones every level asks
   def unlock(user, topic, level)
-    easy = EASY_QUESTIONS.fetch(topic)
-
     (1...level).each do |below|
-      User::Levelable::GOOD_GAMES_TO_LEVEL_UP.times do
-        Attempt.record!(user: user, topic: topic.key, level: below, results: [ easy ] * Attempt::GOOD_GAME_ANSWERS)
-      end
+      Attempt.record!(user: user, topic: topic.key, level: below, results: [ EASY_QUESTIONS.fetch(topic) ] * topic.medals[:bronze])
     end
   end
 end

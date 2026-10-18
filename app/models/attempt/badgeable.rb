@@ -37,7 +37,7 @@ module Attempt::Badgeable
   end
 
   def perfect_game?
-    perfect? && answered >= Attempt::GOOD_GAME_ANSWERS
+    perfect? && answered >= Attempt::PERFECT_GAME_ANSWERS
   end
 
   def speedy?(average_ms)

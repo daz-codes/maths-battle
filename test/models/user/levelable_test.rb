@@ -1,68 +1,19 @@
 require "test_helper"
 
+# Every topic levels up by medals: a level's practice earns one for its score, and a bronze unlocks the next
 class User::LevelableTest < ActiveSupport::TestCase
-  NEEDED = User::Levelable::GOOD_GAMES_TO_LEVEL_UP
-
   setup { @user = users(:ada) }
 
-  # Functions levels up by good games: 20 answered, good when 18 or more are right
-  def play(level:, right:)
-    results = Array.new(20) { |i| { type: "x+a", a: 2, n: 3, given: i < right ? "5" : "6", ms: 1000 } }
-    Attempt.record!(user: @user, topic: "functions", level: level, results: results)
-  end
-
-  # Times tables levels up by medals: a score of 10 is bronze
-  def practise(level:, score:, **options)
-    Attempt.record!(user: @user, level: level, results: answers(*Array.new(score) { [ 2, 3, 6 ] }), **options)
+  def practise(level:, score:, topic: TimesTables, **options)
+    Attempt.record!(user: @user, topic: topic.key, level: level, results: [ EASY_QUESTIONS.fetch(topic) ] * score, **options)
   end
 
   test "new players start at level 1" do
-    assert_equal 1, @user.unlocked_level(Functions)
-    assert_equal "Negatives", @user.next_level(Functions)[:name]
-    assert_equal NEEDED, @user.good_games_to_level_up(Functions)
+    assert_equal 1, @user.unlocked_level(TimesTables)
+    assert_equal "Tables 2–12", @user.next_level(TimesTables)[:name]
   end
 
-  test "three good games unlock the next level, and the last one says so" do
-    (NEEDED - 1).times { play(level: 1, right: 19) }
-    assert_equal 1, @user.unlocked_level(Functions)
-    assert_equal 1, @user.good_games_to_level_up(Functions)
-
-    last = play(level: 1, right: 18)
-    assert last.levelled_up
-    assert_equal 2, @user.unlocked_level(Functions)
-    assert_equal NEEDED, @user.good_games_to_level_up(Functions), "counting starts again at the new level"
-  end
-
-  test "games under 90% right or with fewer than 10 answered don't count" do
-    NEEDED.times { play(level: 1, right: 17) }
-    3.times { Attempt.record!(user: @user, topic: "functions", results: [ { type: "x+a", a: 2, n: 3, given: "5", ms: 1000 } ] * 9) }
-
-    assert_equal 1, @user.unlocked_level(Functions)
-    assert_equal NEEDED, @user.good_games_to_level_up(Functions)
-  end
-
-  test "games saved elsewhere show once the player is reloaded" do
-    assert_equal 1, @user.unlocked_level(Functions)
-    elsewhere = User.find(@user.id)
-    NEEDED.times { Attempt.record!(user: elsewhere, topic: "functions", results: [ { type: "x+a", a: 2, n: 3, given: "5", ms: 1000 } ] * 20) }
-
-    assert_equal 2, @user.reload.unlocked_level(Functions)
-  end
-
-  test "a locked level can't be played" do
-    assert_raises(Attempt::Invalid) { play(level: 2, right: 20) }
-    assert_raises(Attempt::Invalid) { practise(level: 2, score: 20) }
-  end
-
-  test "unlocked levels can be played again, without unlocking anything twice" do
-    NEEDED.times { play(level: 1, right: 20) }
-    another = play(level: 1, right: 20)
-
-    assert_not another.levelled_up
-    assert_equal 2, @user.unlocked_level(Functions)
-  end
-
-  test "times tables: a bronze unlocks the next level, and the game that earns it says so" do
+  test "a bronze unlocks the next level, and the game that earns it says so" do
     assert_not practise(level: 1, score: 9).levelled_up
     assert_equal 1, @user.unlocked_level(TimesTables)
     assert_nil @user.medal(TimesTables, 1)
@@ -73,7 +24,19 @@ class User::LevelableTest < ActiveSupport::TestCase
     assert_equal 2, @user.unlocked_level(TimesTables)
   end
 
-  test "times tables: a level keeps its best medal, and a better one is new" do
+  test "each topic sets its own medal scores" do
+    assert_not practise(topic: Functions, level: 1, score: 5).levelled_up
+    assert practise(topic: Functions, level: 1, score: 6).levelled_up, "6 is bronze for functions"
+    assert practise(topic: SimultaneousEquations, level: 1, score: 4).levelled_up, "4 is bronze for simultaneous equations"
+    assert_equal 2, @user.unlocked_level(Functions)
+
+    Topic::ALL.each do |topic|
+      assert_operator topic.medals[:bronze], :<, topic.medals[:silver], topic.title
+      assert_operator topic.medals[:silver], :<, topic.medals[:gold], topic.title
+    end
+  end
+
+  test "a level keeps its best medal, and a better one is new" do
     practise(level: 1, score: 12)
     silver = practise(level: 1, score: 22)
     worse = practise(level: 1, score: 15)
@@ -84,14 +47,25 @@ class User::LevelableTest < ActiveSupport::TestCase
     assert_equal :gold, @user.medal(TimesTables, 1)
   end
 
-  test "times tables: a daily challenge earns no medal and unlocks nothing" do
+  test "a daily challenge earns no medal and unlocks nothing" do
     challenge = practise(level: 1, score: 25, daily_challenge: true)
     assert_nil challenge.medal
     assert_not challenge.levelled_up
     assert_equal 1, @user.unlocked_level(TimesTables)
   end
 
-  test "players who'd already played the 2–12 tables keep level 2" do
+  test "games saved elsewhere show once the player is reloaded" do
+    assert_equal 1, @user.unlocked_level(TimesTables)
+    Attempt.record!(user: User.find(@user.id), results: answers(*Array.new(10) { [ 2, 3, 6 ] }))
+
+    assert_equal 2, @user.reload.unlocked_level(TimesTables)
+  end
+
+  test "a locked level can't be played" do
+    assert_raises(Attempt::Invalid) { practise(level: 2, score: 20) }
+  end
+
+  test "players who'd already played a level keep it" do
     @user.attempts.create!(topic: "times_tables", level: 2, results: [], score: 0, answered: 0)
     assert_equal 2, @user.unlocked_level(TimesTables)
   end

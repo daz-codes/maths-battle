@@ -62,7 +62,7 @@ module Badge::Catalogued
 
       def special_kinds
         [
-          Kind.new("perfect", :special, "💯", "Perfect game", "Get every answer right, with at least #{Attempt::GOOD_GAME_ANSWERS} answered", [ :perfect_game? ]),
+          Kind.new("perfect", :special, "💯", "Perfect game", "Get every answer right, with at least #{Attempt::PERFECT_GAME_ANSWERS} answered", [ :perfect_game? ]),
           Kind.new("speedy", :special, "⚡", "Speedy", "Average under 2 seconds an answer, with at least #{Attempt::SPEEDY_GAME_ANSWERS} answered", [ :speedy?, 2_000 ]),
           Kind.new("lightning", :special, "🚀", "Lightning", "Average under 1 second an answer, with at least #{Attempt::SPEEDY_GAME_ANSWERS} answered", [ :speedy?, 1_000 ]),
           Kind.new("comeback", :special, "💪", "Comeback", "Beat your best score after a week or more away", [ :comeback? ])

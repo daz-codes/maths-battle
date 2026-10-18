@@ -27,11 +27,11 @@ class LessonCompletionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 3, @user.reload.streak
   end
 
-  test "only for an unlocked level with a lesson" do
+  test "only for an unlocked level" do
     sign_in_as @user
     post lesson_completion_path("times-tables", 3), as: :json
     assert_response :unprocessable_entity
-    post lesson_completion_path("equations", 1), as: :json
+    post lesson_completion_path("equations", 9), as: :json
     assert_response :unprocessable_entity
   end
 

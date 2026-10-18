@@ -62,6 +62,6 @@ class TimesTablesTest < ApplicationSystemTestCase
     assert users(:ada).attempts.last.daily_challenge
 
     visit root_path
-    assert_selector "a.button--done", text: /done today: 1/i
+    assert_selector "a.daily-done", text: "Challenge done today: 1"
   end
 end

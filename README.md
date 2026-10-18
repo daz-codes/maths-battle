@@ -34,28 +34,30 @@ sequentially because concurrent browser workers can contend for SQLite writes.
 
 ## Application flow
 
-Home → choose a topic and unlocked level → 60-second game → score and practice feedback → stats or play again.
+Home → choose a topic and unlocked level → learn it, practise it for a medal, or play the daily challenge →
+score and practice feedback → stats or play again.
 The server generates questions weighted towards facts the player finds difficult. Five answers make a
-game count towards a streak. Three games with at least 20 answers and 90% accuracy unlock the next level.
+game count towards a streak, and a bronze medal unlocks the next level.
 The first saved game creates a guest account; registering preserves that guest's history. Signing into
 an existing account switches accounts without merging guest history.
 
-## Times tables: medals and the daily challenge
+## Medals and the daily challenge
 
-Times tables play by medals (`TimesTables::MEDALS`). Practising a level asks only that level's questions and
-earns bronze, silver or gold for 10, 20 or 30; a level shows its best, and the first bronze unlocks the next
-level. The daily challenge, once a day, mixes questions from every level up to the player's; it has its own
-best, earns no medal and unlocks nothing. Whether a game is a daily challenge is in its signed ticket, so the
-browser can't decide. Other topics keep a single Play, and unlock a level after three good games.
+Every topic plays by medals, each setting its own scores in `MEDALS` (times tables 10, 20 and 30). Practising
+a level asks only that level's questions and earns bronze, silver or gold; a level shows its best, and the
+first bronze unlocks the next level. Each topic's daily challenge, once a day, mixes questions from every level
+up to the player's; it has its own best, earns no medal and unlocks nothing. Whether a game is a daily
+challenge is in its signed ticket, so the browser can't decide. A new topic needs `MEDALS` and gets all this.
 
 A day counts towards the streak when a game long enough is played or a lesson is finished.
 
 ## Lessons
 
-Each level can have a minute's tutorial: a worked example in 3–4 steps tapped through one at a time, then one
-to try on the game's keypad, with a hint after a wrong answer. Lessons are content in each topic
-(`TimesTables::Lessons`, so far for times tables only) and are offered under the level's name and after
-levelling up. Nothing in a lesson is saved.
+Every level has a minute's tutorial: a worked example in 3–4 steps tapped through one at a time, then one to
+try on the game's keypad, with a hint after a wrong answer. Each topic keeps its lessons in its own `Lessons`
+module (`TimesTables::Lessons`, `Equations::Lessons`, …). The one to try is a question in the topic's own form,
+so the topic writes it out as the game would and works out its answer (`worked`). Lessons are offered under
+the level's name and after levelling up, and finishing one counts towards the day's streak.
 
 ## Achievements
 

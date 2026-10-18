@@ -46,6 +46,8 @@ module Functions
   ]
   # Quick and lightning stars, allowing for working out a function taking longer than a times table
   STAR_TIMES = { lightning: 3_000, quick: 6_000 }
+  # A level's practice earns a medal for its score; bronze unlocks the next level
+  MEDALS = { gold: 20, silver: 12, bronze: 6 }
   # Scores in one game that earn a badge. Like equations: each question takes some reading
   BADGE_SCORES = [ 5, 10, 20, 30, 50 ]
   # The largest number the server accepts in a question sent back (well above anything generated)
@@ -95,6 +97,11 @@ module Functions
     raise Attempt::Invalid, "Bad answer" unless given.match?(Attempt::TYPED_ANSWER)
 
     question.transform_keys(&:to_s).merge("given" => given, "correct" => given == value(question).to_s)
+  end
+
+  # A lesson's one to try, written and answered as the game would
+  def worked(question)
+    question.merge(text: html(question), answer: value(question).to_s)
   end
 
   # "f(x) = 2x + 3, so f(4) = 11"
