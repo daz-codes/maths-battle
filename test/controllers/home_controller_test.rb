@@ -8,7 +8,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".site-header .tagline", text: "Improve your math in minutes"
-    assert_select "a[href=?]", play_path("times-tables"), text: "Play"
+    assert_select "a[href=?]", play_path("times-tables", challenge: 1), text: "⭐ Daily challenge"
+    assert_select "a[href=?]", play_path("times-tables", level: 1), text: "Practise level 1"
     assert_select ".streak__number", text: /0/
     assert_select ".nudge", text: "Click play to start your streak"
     assert_select "a[href=?]", new_registration_path
@@ -62,12 +63,14 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     Attempt.record!(user: @user, results: answers(*right_answers(41), ms: 1000))
     @user.update!(current_streak: 12, last_practised_on: @user.today, streak_kept_on: @user.today)
     sign_in_as @user
+    patch level_path, params: { level: 1 }
 
     get root_path
     assert_select ".streak__number", text: /12/
     assert_select ".stats", text: /41/
     assert_select "a[href=?]", stats_path("times-tables"), text: "See all stats"
-    assert_select "a[href=?]", play_path("times-tables"), text: "Play"
+    assert_select "a[href=?]", play_path("times-tables", challenge: 1), text: "⭐ Daily challenge"
+    assert_select "a[href=?]", play_path("times-tables", level: 1), text: "Practise level 1"
     assert_select ".nudge", text: "Your streak is safe for today, but you can keep playing to practise more."
   end
 

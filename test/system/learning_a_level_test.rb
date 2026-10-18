@@ -19,6 +19,7 @@ class LearningALevelTest < ApplicationSystemTestCase
     assert_no_selector ".answer--wrong", wait: 2
     find("body").send_keys("15")
     assert_selector ".lesson__done", text: "That's it!"
+    assert_selector ".lesson__streak", text: "🔥 1 day streak: that counts for today!"
     assert_selector ".lesson__dot--done", count: 5
 
     click_on "Play level 1"

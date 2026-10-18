@@ -10,6 +10,7 @@ Rails.application.routes.draw do
 
   get "play/:topic", to: "games#show", as: :play
   get "learn/:topic/:level", to: "lessons#show", as: :lesson
+  post "learn/:topic/:level/done", to: "lesson_completions#create", as: :lesson_completion
   # Where the times tables game used to be, still linked from copies kept on devices
   get "times-tables", to: redirect("/play/times-tables")
   resources :attempts, only: %i[create show]

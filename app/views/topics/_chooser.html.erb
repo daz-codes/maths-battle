@@ -22,6 +22,9 @@
         <%= button_to url, **options, class: "levels__level", form_class: "levels__form",
               title: "Level #{details[:number]}: #{details[:name]}", aria: { current: (details[:number] == level) } do %>
           <%= details[:number] %>
+          <% if topic.medals? && (medal = user.medal(topic, details[:number])) %>
+            <span class="levels__medal" aria-label="<%= Attempt::MEDAL_NAMES[medal] %>"><%= Attempt::MEDAL_EMOJI[medal] %></span>
+          <% end %>
         <% end %>
       <% else %>
         <span class="levels__level levels__level--locked" title="Level <%= details[:number] %>: <%= details[:name] %> (locked)">
@@ -31,9 +34,17 @@
     <% end %>
   </nav>
   <p class="levels__name">Level <%= level %>: <%= topic.level(level)[:name] %></p>
+  <% if topic.medals? %>
+    <p class="levels__medal-line"><%= medal_progress(user, topic, level) %></p>
+  <% end %>
   <% if topic.lesson(level) %>
     <p class="levels__learn"><%= link_to "📖 Learn how", lesson_path(topic.slug, level) %></p>
   <% end %>
 <% end %>
-<%= link_to "Play", play_path(topic.slug, level: (level if choosing == :stats)), class: "button button--start" %>
+<% if topic.medals? %>
+  <%= render "topics/daily_challenge", user: user, topic: topic %>
+  <%= link_to "Practise level #{level}", play_path(topic.slug, level: level), class: "button button--blue button--practise" %>
+<% else %>
+  <%= link_to "Play", play_path(topic.slug, level: (level if choosing == :stats)), class: "button button--start" %>
+<% end %>
 </div>

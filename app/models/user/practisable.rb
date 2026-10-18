@@ -27,11 +27,13 @@ module User::Practisable
   # At full strength easy facts come up 3× as often, medium 1.5×, and hard ones 0.4×
   EASING = { 0 => 2.0, 1 => 0.5, 2 => -0.6 }
 
-  def questions(topic: Topic.default, level: 1, count: QUESTION_COUNT, random: Random.new)
+  # mix: :review for the level with some from easier ones now and then, :level_only for a medal level's practice,
+  # :all_levels for a daily challenge, spread evenly over every level up to this one
+  def questions(topic: Topic.default, level: 1, count: QUESTION_COUNT, random: Random.new, mix: :review)
     previous, questions = nil, []
 
     while questions.size < count
-      asked_at = question_level(level, random)
+      asked_at = question_level(level, random, mix)
       previous = pick_fact(topic, level, from: topic.facts(asked_at), excluding: previous, random: random)
       questions.concat(topic.questions_for(previous, level: asked_at, random: random))
     end
@@ -39,8 +41,8 @@ module User::Practisable
   end
 
   # The set for this game, then spares for playing offline. Each has an id so the device knows which it has used
-  def question_sets(topic: Topic.default, level: 1, count: 1 + SPARE_QUESTION_SETS)
-    Array.new(count) { { id: SecureRandom.hex(16), questions: questions(topic: topic, level: level) } }
+  def question_sets(topic: Topic.default, level: 1, count: 1 + SPARE_QUESTION_SETS, mix: :review)
+    Array.new(count) { { id: SecureRandom.hex(16), questions: questions(topic: topic, level: level, mix: mix) } }
   end
 
   def question_weights(topic = Topic.default, level = 1)
@@ -95,9 +97,12 @@ module User::Practisable
       attempts.at_level(topic, level).order(created_at: :desc).limit(RECENT_GAMES).flat_map(&:results)
     end
 
-    # Mostly the level being played; sometimes an easier one
-    def question_level(level, random)
-      level > 1 && random.rand < REVIEW_CHANCE ? random.rand(1...level) : level
+    def question_level(level, random, mix)
+      case mix
+      when :level_only then level
+      when :all_levels then random.rand(1..level)
+      else level > 1 && random.rand < REVIEW_CHANCE ? random.rand(1...level) : level
+      end
     end
 
     # Weighted by how the player does at this level, from the facts the question's level can ask.

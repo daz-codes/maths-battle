@@ -163,4 +163,11 @@ class User::PractisableTest < ActiveSupport::TestCase
     questions = User.new.questions(topic: SimultaneousEquations, level: 1, count: 6, random: Random.new(1))
     assert questions.all? { _1[:type] == "subtract" }
   end
+
+  test "a medal level's practice only asks that level; a daily challenge spreads over every level up to it" do
+    random = Random.new(1)
+    assert Array.new(200) { User.new.send(:question_level, 3, random, :level_only) }.all? { _1 == 3 }
+    assert_equal [ 1, 2, 3 ], Array.new(300) { User.new.send(:question_level, 3, random, :all_levels) }.uniq.sort
+    assert_operator Array.new(300) { User.new.send(:question_level, 3, random, :review) }.count(3), :>, 200, "mostly the level, sometimes easier"
+  end
 end

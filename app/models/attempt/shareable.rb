@@ -31,7 +31,10 @@ module Attempt::Shareable
 
   # "Times tables, level 3" where a topic has levels
   def topic_and_level
-    topic_module.levels.many? ? "#{topic_module.title}, level #{level}" : topic_module.title
+    if daily_challenge then "#{topic_module.title}, daily challenge"
+    elsif topic_module.levels.many? then "#{topic_module.title}, level #{level}"
+    else topic_module.title
+    end
   end
 
   def emoji_row

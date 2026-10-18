@@ -1,4 +1,4 @@
-<% content_for :title, "#{@topic.title} · MatheMinute" %>
+<% content_for :title, "#{@topic.title}#{" daily challenge" if @daily_challenge} · MatheMinute" %>
 <% content_for :viewport, "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" %>
 <% content_for :body_class, "testing" %>
 <% content_for :focus_mode, true %>
@@ -8,6 +8,7 @@
       data-test-question-sets-value="<%= @question_sets.to_json %>"
       data-test-topic-value="<%= @topic.key %>"
       data-test-level-value="<%= @level %>"
+      data-test-daily-challenge-value="<%= @daily_challenge %>"
       data-test-keys-value="<%= @topic.keys(@level).to_json %>"
       data-test-star-times-value="<%= @topic.star_times.to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">
@@ -33,7 +34,7 @@
     <div class="offline-result" data-test-target="offlineResult" hidden>
       <p class="offline-result__score"><span class="card__number" data-test-target="offlineScore"></span> in a minute!</p>
       <p class="aside">You're offline, so this game is saved on this device. It'll count towards your streak as soon as you're back online.</p>
-      <%= link_to "Play again", play_path(@topic.slug, level: @level), class: "button button--blue button--wide" %>
+      <%= link_to "Play again", play_path(@topic.slug, level: @level), class: "button button--blue button--wide" unless @daily_challenge %>
       <%= link_to "Home", root_path %>
     </div>
   </div>

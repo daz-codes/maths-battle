@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -58,10 +58,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_100000) do
     t.integer "best_score", default: 0, null: false
     t.integer "stars", default: 0, null: false
     t.boolean "earned_streak_freeze", default: false, null: false
+    t.boolean "daily_challenge", default: false, null: false
     t.index ["share_token"], name: "index_attempts_on_share_token", unique: true
     t.index ["user_id", "client_id"], name: "index_attempts_on_user_id_and_client_id", unique: true
     t.index ["user_id", "created_at"], name: "index_attempts_on_user_id_and_created_at"
     t.index ["user_id", "played_on"], name: "index_attempts_on_user_id_and_played_on"
+    t.index ["user_id", "topic", "daily_challenge", "played_on"], name: "idx_on_user_id_topic_daily_challenge_played_on_c5350cbd84"
     t.index ["user_id"], name: "index_attempts_on_user_id"
   end
 
@@ -100,6 +102,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_100000) do
     t.index ["user_id"], name: "index_frozen_days_on_user_id"
   end
 
+  create_table "lesson_completions", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "topic", null: false
+    t.integer "level", null: false
+    t.date "completed_on", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "topic", "level", "completed_on"], name: "idx_on_user_id_topic_level_completed_on_544e031b58", unique: true
+    t.index ["user_id"], name: "index_lesson_completions_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -133,5 +146,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_100000) do
   add_foreign_key "badges", "users"
   add_foreign_key "fact_stats", "users"
   add_foreign_key "frozen_days", "users"
+  add_foreign_key "lesson_completions", "users"
   add_foreign_key "sessions", "users"
 end

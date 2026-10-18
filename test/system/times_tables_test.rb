@@ -3,7 +3,7 @@ require "application_system_test_case"
 class TimesTablesTest < ApplicationSystemTestCase
   test "plays a test with the keyboard and sees the results" do
     sign_in users(:ada)
-    click_on "Play"
+    click_on "Practise level 1"
 
     # Shorten the minute so the test runs quickly; the countdown still plays first
     page.execute_script(<<~JS)
@@ -35,12 +35,33 @@ class TimesTablesTest < ApplicationSystemTestCase
 
   test "each right answer's stars float up and fade away" do
     sign_in users(:ada)
-    click_on "Play"
+    click_on "Practise level 1"
     assert_selector ".question", text: "×", wait: 5
 
     a, b = find(".question").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
     assert_selector ".star-pop.star-pop--lightning", text: "+30 ⭐"
     assert_no_selector ".star-pop", wait: 4
+  end
+
+  test "the daily challenge: play it once, and the home page says how it went" do
+    sign_in users(:ada)
+    click_on "⭐ Daily challenge"
+    page.execute_script(<<~JS)
+      const waitForStart = setInterval(() => {
+        const element = document.querySelector("[data-controller=test]")
+        const test = element && window.Stimulus.getControllerForElementAndIdentifier(element, "test")
+        if (test?.state === "running") { test.endsAt = performance.now() + 3000; clearInterval(waitForStart) }
+      }, 10)
+    JS
+    assert_selector ".question", text: "×", wait: 5
+    a, b = find(".question").text.split(" × ").map(&:to_i)
+    find("body").send_keys((a * b).to_s)
+
+    assert_text "TIMES TABLES, DAILY CHALLENGE", wait: 8
+    assert users(:ada).attempts.last.daily_challenge
+
+    visit root_path
+    assert_selector "a.button--done", text: /done today: 1/i
   end
 end

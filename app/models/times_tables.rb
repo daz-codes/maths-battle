@@ -23,6 +23,9 @@ module TimesTables
     { number: 5, name: "Negatives", example: "0.7 × −3000" }
   ]
   FIRST_TABLES = 2..5
+  # Times tables play by medals: a level's practice game earns one for its score, and bronze unlocks the next
+  # level. There's also a daily challenge mixing every level up to the player's (Attempt::Medallable)
+  MEDALS = { gold: 30, silver: 20, bronze: 10 }
   # A right answer under 1 second earns the lightning stars, under 2 the quick ones
   STAR_TIMES = { lightning: 1_000, quick: 2_000 }
   # Scores in one game that earn a badge

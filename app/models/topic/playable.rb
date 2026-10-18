@@ -48,6 +48,15 @@ module Topic::Playable
     self::Lessons::ALL[number] if const_defined?(:Lessons, false)
   end
 
+  # Scores for each medal, best first, if the topic plays by medals (see TimesTables::MEDALS)
+  def medals
+    self::MEDALS if const_defined?(:MEDALS, false)
+  end
+
+  def medals?
+    medals.present?
+  end
+
   def badge_scores
     self::BADGE_SCORES
   end

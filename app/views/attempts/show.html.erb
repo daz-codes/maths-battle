@@ -4,6 +4,8 @@
   <% if @attempt.levelled_up %>
     <p class="banner banner--level" data-controller="confetti">⬆️ Level up! You've unlocked Level <%= @attempt.level + 1 %>: <%= @attempt.topic_module.level(@attempt.level + 1)[:name] %></p>
     <%= link_to "📖 Learn how to do level #{@attempt.level + 1}", lesson_path(@attempt.topic_module.slug, @attempt.level + 1), class: "button button--blue" if @attempt.topic_module.lesson(@attempt.level + 1) %>
+  <% elsif (medal = @attempt.new_medal) %>
+    <p class="banner banner--medal" data-controller="confetti"><%= Attempt::MEDAL_EMOJI[medal] %> <%= Attempt::MEDAL_NAMES[medal] %> medal for level <%= @attempt.level %>!</p>
   <% elsif @attempt.new_high_score %>
     <p class="banner" data-controller="confetti">🎉 New high score! 🎉</p>
   <% end %>
@@ -29,7 +31,11 @@
   <div class="results__actions">
     <button type="button" class="button button--share" data-controller="share"
             data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>
-    <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
+    <% if @attempt.daily_challenge %>
+      <%= link_to "Practise level #{@attempt.level}", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
+    <% else %>
+      <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
+    <% end %>
   </div>
 
   <p class="feedback"><%= @attempt.feedback_message %></p>
@@ -51,7 +57,9 @@
     </section>
   <% end %>
 
-  <% unless @attempt.levelled_up || @attempt.level < @attempt.user.unlocked_level(@attempt.topic_module) %>
+  <% if @attempt.topic_module.medals? %>
+    <%= tag.p(medal_progress(@attempt.user, @attempt.topic_module, @attempt.level), class: "level-progress") unless @attempt.daily_challenge %>
+  <% elsif !(@attempt.levelled_up || @attempt.level < @attempt.user.unlocked_level(@attempt.topic_module)) %>
     <%= render "levels/progress", user: @attempt.user, topic: @attempt.topic_module %>
   <% end %>
   <%= link_to "See your stats", stats_path(@attempt.topic_module.slug) %>

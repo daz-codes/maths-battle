@@ -4,7 +4,8 @@
 <% try = @lesson[:try] %>
 
 <main class="lesson" data-controller="tutorial"
-      data-tutorial-answer-value="<%= try[:answer] %>" data-tutorial-keys-value="<%= @topic.keys(@level).to_json %>">
+      data-tutorial-answer-value="<%= try[:answer] %>" data-tutorial-keys-value="<%= @topic.keys(@level).to_json %>"
+      data-tutorial-done-url-value="<%= lesson_completion_path(@topic.slug, @level) %>">
   <%= link_to "✕", root_path, class: "lesson__close", aria: { label: "Close the lesson" } %>
 
   <header class="lesson__header">
@@ -36,6 +37,7 @@
     <section class="lesson__step lesson__done" data-tutorial-target="done" hidden>
       <p class="lesson__show">🎉 That's it!</p>
       <p class="lesson__say"><%= try[:question] %> = <%= try[:answer].sub("-", "−") %></p>
+      <p class="lesson__streak" data-tutorial-target="streak" hidden></p>
       <%= link_to "Play level #{@level}", play_path(@topic.slug, level: @level), class: "button button--start" %>
       <%= link_to "Home", root_path %>
     </section>

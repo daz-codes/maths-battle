@@ -7,7 +7,7 @@ class LevellingUpTest < ApplicationSystemTestCase
     sign_in user
 
     assert_selector ".levels__name", text: "Level 5: Negatives"
-    click_on "Play"
+    click_on "Practise level 5"
     assert_selector ".keypad--wide", wait: 5
     assert_selector ".question", text: "×", wait: 5
 

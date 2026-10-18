@@ -8,7 +8,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
 
   test "the switcher changes what Play plays, and is remembered" do
     get root_path
-    assert_select "a.button--start[href=?]", play_path("times-tables")
+    assert_select "a.button--practise[href=?]", play_path("times-tables", level: 1)
 
     patch topic_path, params: { topic: "equations" }
     assert_redirected_to root_path

@@ -2,6 +2,7 @@
 # Games played offline can reach the server days later and out of order, so the streak is worked out
 # again from the days that have games, rather than counted up as games arrive.
 # The time zone comes from the player's device with each game, so the day ends at their own midnight.
+# A day counts when a game long enough was played, or a lesson finished (User::Learnable).
 # A day covered by a streak freeze (User::StreakFreezable) keeps the streak going, but doesn't add to it
 module User::Streakable
   extend ActiveSupport::Concern
@@ -57,7 +58,7 @@ module User::Streakable
     end
 
     def practised_days
-      attempts.counted.distinct.order(:played_on).pluck(:played_on)
+      (attempts.counted.distinct.pluck(:played_on) + lesson_completions.distinct.pluck(:completed_on)).uniq.sort
     end
 
     # Practised days and frozen ones, in order

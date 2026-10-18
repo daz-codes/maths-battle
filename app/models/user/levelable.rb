@@ -1,5 +1,5 @@
 # Topics can have levels (times tables: tables 2–5, 2–12, zeroes, decimals, negatives). A level unlocks after
-# enough good games at the one before. Unlocked levels can always be played again, and Play defaults to the highest
+# enough good games at the one before, or, in a topic that plays by medals, a bronze there. Unlocked levels can always be played again, and Play defaults to the highest
 module User::Levelable
   extend ActiveSupport::Concern
 
@@ -37,8 +37,13 @@ module User::Levelable
     attempts.at_level(topic, level).good.count
   end
 
+  # The best medal a level's games have earned, or nil
+  def medal(topic, level)
+    Attempt.medal_for(best_score(topic, level), topic)
+  end
+
   private
     def unlocked?(topic, number)
-      attempts.at_level(topic, number).exists? || good_games(topic, number - 1) >= GOOD_GAMES_TO_LEVEL_UP
+      attempts.at_level(topic, number).exists? || (topic.medals? ? medal(topic, number - 1).present? : good_games(topic, number - 1) >= GOOD_GAMES_TO_LEVEL_UP)
     end
 end

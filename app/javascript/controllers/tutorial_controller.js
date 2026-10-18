@@ -4,10 +4,10 @@ import { finished, shown, typedWith } from "lib/answer_input"
 const WRONG_PAUSE = 900
 
 // A level's tutorial: tap Next through the worked example, then type an answer to the one to try, with the
-// game's keypad. Nothing is saved; it's just for learning
+// game's keypad. Finishing it counts towards the day's streak
 export default class extends Controller {
-  static targets = [ "step", "try", "done", "dot", "next", "hint", "hintButton", "answer", "feedback", "keypadArea" ]
-  static values = { answer: String, keys: Array }
+  static targets = [ "step", "try", "done", "dot", "next", "hint", "hintButton", "answer", "feedback", "keypadArea", "streak" ]
+  static values = { answer: String, keys: Array, doneUrl: String }
 
   connect() {
     this.index = 0
@@ -105,6 +105,23 @@ export default class extends Controller {
     this.keypadAreaTarget.hidden = true
     this.doneTarget.hidden = false
     this.markDot(this.dotTargets.length - 1)
+    this.recordDone()
+  }
+
+  // Offline, it just doesn't count: there's nothing to catch up later, unlike a game
+  async recordDone() {
+    try {
+      const response = await fetch(this.doneUrlValue, {
+        method: "POST",
+        headers: { "Accept": "application/json", "Content-Type": "application/json", "X-CSRF-Token": document.querySelector("meta[name=csrf-token]")?.content },
+        body: JSON.stringify({ time_zone: Intl.DateTimeFormat().resolvedOptions().timeZone })
+      })
+      if (!response.ok) return
+
+      const { streak } = await response.json()
+      this.streakTarget.textContent = `🔥 ${streak} day streak: that counts for today!`
+      this.streakTarget.hidden = false
+    } catch {}
   }
 
   markDot(index) {

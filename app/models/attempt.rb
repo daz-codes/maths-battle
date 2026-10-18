@@ -1,12 +1,14 @@
 class Attempt < ApplicationRecord
-  include Badgeable, Gradable, Recordable, Reviewable, Shareable, Starrable
+  include Badgeable, Gradable, Medallable, Recordable, Reviewable, Shareable, Starrable
 
   belongs_to :user
 
   validates :topic, inclusion: { in: Topic.keys }
 
   scope :in_topic, ->(topic) { where(topic: topic.key) }
-  scope :at_level, ->(topic, level) { in_topic(topic).where(level: level) }
+  # A daily challenge mixes levels, so it doesn't count as a game at any one of them
+  scope :at_level, ->(topic, level) { in_topic(topic).where(level: level, daily_challenge: false) }
+  scope :daily_challenges, -> { where(daily_challenge: true) }
 
   def topic_module
     Topic.find(topic)

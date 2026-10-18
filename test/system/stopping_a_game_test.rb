@@ -3,7 +3,7 @@ require "application_system_test_case"
 class StoppingAGameTest < ApplicationSystemTestCase
   setup do
     sign_in users(:ada)
-    click_on "Play"
+    click_on "Practise level 1"
     assert_selector ".question", text: "×", wait: 5
   end
 

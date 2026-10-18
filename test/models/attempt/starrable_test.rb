@@ -26,13 +26,15 @@ class Attempt::StarrableTest < ActiveSupport::TestCase
     assert_equal({ high_score: 50 }, attempt.star_bonuses)
   end
 
-  test "bonuses for a perfect game and levelling up" do
-    unlock(@user, TimesTables, 1)
-    games = Array.new(User::Levelable::GOOD_GAMES_TO_LEVEL_UP) { Attempt.record!(user: @user, results: answers(*Array.new(20) { [ 2, 3, 6 ] }, ms: 2_500)) }
+  test "bonuses for a perfect game, a new high score and levelling up" do
+    first = Attempt.record!(user: @user, results: answers(*Array.new(9) { [ 2, 3, 6 ] }, ms: 2_500))
+    bronze = Attempt.record!(user: @user, results: answers(*Array.new(20) { [ 2, 3, 6 ] }, ms: 2_500))
+    again = Attempt.record!(user: @user, results: answers(*Array.new(20) { [ 2, 3, 6 ] }, ms: 2_500))
 
-    assert_equal({ perfect: 50, high_score: 50 }, games.first.star_bonuses)
-    assert_equal({ perfect: 50, level_up: 100 }, games.last.star_bonuses)
-    assert_equal 20 * 10 + 50 + 100, games.last.stars
+    assert_equal({ high_score: 50 }, first.star_bonuses, "9 answers is too few for a perfect game")
+    assert_equal({ perfect: 50, high_score: 50, level_up: 100 }, bronze.star_bonuses)
+    assert_equal({ perfect: 50 }, again.star_bonuses)
+    assert_equal 20 * 10 + 50 + 50 + 100, bronze.stars
   end
 
   test "a player's stars are all their games' stars" do

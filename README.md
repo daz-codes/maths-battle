@@ -40,6 +40,16 @@ game count towards a streak. Three games with at least 20 answers and 90% accura
 The first saved game creates a guest account; registering preserves that guest's history. Signing into
 an existing account switches accounts without merging guest history.
 
+## Times tables: medals and the daily challenge
+
+Times tables play by medals (`TimesTables::MEDALS`). Practising a level asks only that level's questions and
+earns bronze, silver or gold for 10, 20 or 30; a level shows its best, and the first bronze unlocks the next
+level. The daily challenge, once a day, mixes questions from every level up to the player's; it has its own
+best, earns no medal and unlocks nothing. Whether a game is a daily challenge is in its signed ticket, so the
+browser can't decide. Other topics keep a single Play, and unlock a level after three good games.
+
+A day counts towards the streak when a game long enough is played or a lesson is finished.
+
 ## Lessons
 
 Each level can have a minute's tutorial: a worked example in 3–4 steps tapped through one at a time, then one
