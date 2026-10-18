@@ -5,6 +5,13 @@
   <h1 class="heading">Settings</h1>
   <%= render "flash" %>
 
+  <% if @user.persisted? %>
+    <section class="collection" aria-label="Stars and streak freezes">
+      <p class="stars-total"><strong><%= number_with_delimiter @user.stars %></strong> ⭐ stars</p>
+      <%= render "streak_freezes/status", user: @user %>
+    </section>
+  <% end %>
+
   <%= form_with model: @user, url: profile_path, method: :patch, class: "form" do |form| %>
     <%= render "errors", user: @user %>
 

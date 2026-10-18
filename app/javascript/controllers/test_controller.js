@@ -5,8 +5,8 @@ import { chooseQuestionSet, playerKey, preparePlayer, postGame, saveForLater, wa
 const DURATION = 60_000
 const STARS = { right: 10, quick: 20, lightning: 30 }
 const WRONG_PAUSE = 400
-// Each quarter of the clock ring is 23 of 100 units long, leaving small gaps between them
-const QUARTER_LENGTH = 23
+// Each quarter of the clock ring is a full 25 of 100 units; the clock's cut makes the gaps between them
+const QUARTER_LENGTH = 25
 const COUNTDOWN = [ [ "Ready", 900 ], [ "Set", 900 ], [ "GO!", 600 ] ]
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 

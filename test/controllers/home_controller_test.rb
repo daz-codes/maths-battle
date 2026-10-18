@@ -27,30 +27,14 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".tagline", text: "Improve your math in minutes"
   end
 
-  test "shows the player's stars" do
+  test "stars stay in the footer, and stars and freezes are on the settings page, not here" do
     sign_in_as users(:ada)
     Attempt.record!(user: users(:ada), results: answers(*right_answers(5), ms: 2_500))
 
     get root_path
-    assert_select ".stars-total", text: "100 ⭐ stars"
-  end
-
-  test "shows streak freezes, and buys one with stars" do
-    sign_in_as users(:ada)
-    get root_path
-    assert_select ".freezes__held", text: /No streak freezes/
-    assert_select ".freezes__hint", text: /Get 500 more ⭐ to buy one/
-
-    users(:ada).attempts.create!(topic: "times_tables", results: []).update_column(:stars, 600)
-    get root_path
-    assert_select "form[action=?] button", streak_freeze_path, text: "Buy one for 500 ⭐"
-
-    post streak_freeze_path
-    assert_redirected_to root_path
-    follow_redirect!
-    assert_select ".flash", text: /You bought a streak freeze/
-    assert_select ".freezes__held", text: /1 streak freeze/
-    assert_select ".stars-total", text: "100 ⭐ stars"
+    assert_select ".site-footer__stars", text: "100 ⭐"
+    assert_select "main .stars-total", count: 0
+    assert_select "main .freezes", count: 0
   end
 
   test "coming back after a missed day says a freeze kept the streak" do

@@ -11,13 +11,13 @@ class User::StreakFreezableTest < ActiveSupport::TestCase
 
   def on(date, &) = travel_to(date.in_time_zone.change(hour: 12), &)
 
-  test "a freeze costs 500 stars, and two is the most you can hold" do
-    @user.attempts.create!(topic: "times_tables", results: []).update_column(:stars, 1_200)
+  test "a freeze costs 10,000 stars, and two is the most you can hold" do
+    @user.attempts.create!(topic: "times_tables", results: []).update_column(:stars, 30_500)
 
     @user.buy_streak_freeze!
-    assert_equal [ 1, 700 ], [ @user.streak_freezes, @user.stars ]
+    assert_equal [ 1, 20_500 ], [ @user.streak_freezes, @user.stars ]
     @user.buy_streak_freeze!
-    assert_equal [ 2, 200 ], [ @user.streak_freezes, @user.stars ]
+    assert_equal [ 2, 10_500 ], [ @user.streak_freezes, @user.stars ]
     assert_raises(User::StreakFreezable::NotAllowed) { @user.buy_streak_freeze! }
   end
 

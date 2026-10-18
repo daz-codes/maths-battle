@@ -5,7 +5,7 @@ module Attempt::Gradable
   extend ActiveSupport::Concern
 
   MIN_ANSWERS_FOR_STREAK = 5
-  GOOD_GAME_ANSWERS = 20
+  GOOD_GAME_ANSWERS = 10
   GOOD_GAME_ACCURACY = 0.9
 
   included do

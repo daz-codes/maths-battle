@@ -10,7 +10,7 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
     get achievements_path
     assert_response :success
     assert_select "h1", text: "Achievements"
-    assert_select ".aside", text: "3 of #{Badge.catalogue.size} unlocked"
+    assert_select ".aside", text: "4 of #{Badge.catalogue.size} unlocked", message: "first game, 5 and 10 in a minute, and a perfect game"
     assert_select ".badge:not(.badge--locked) .badge__name", text: "First minute"
     assert_select ".badge--locked .badge__name", text: "1 week streak"
     assert_select ".badge--locked .badge__how", text: /Play 7 days in a row/

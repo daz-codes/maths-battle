@@ -15,8 +15,8 @@ class Attempt::GradableTest < ActiveSupport::TestCase
     assert_equal [ long ], @user.attempts.counted
   end
 
-  test "a good game has 20 or more answered and 90% or more right" do
-    good, too_few, too_many_wrong = game(right: 18, wrong: 2), game(right: 19), game(right: 17, wrong: 3)
+  test "a good game has 10 or more answered and 90% or more right" do
+    good, too_few, too_many_wrong = game(right: 9, wrong: 1), game(right: 9), game(right: 8, wrong: 2)
 
     assert good.good?
     assert_not too_few.good?

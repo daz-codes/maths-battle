@@ -13,14 +13,9 @@
   <% end %>
 
   <section class="streak <%= "streak--done" if @user.practised_today? %>" aria-label="Streak">
-    <span class="streak__number"><%= @user.streak %> 🔥</span>
+    <span class="streak__number">🔥 <%= @user.streak %></span>
     <span class="streak__label">day streak</span>
   </section>
-
-  <% if @user.persisted? %>
-    <p class="stars-total"><strong><%= number_with_delimiter @user.stars %></strong> ⭐ stars</p>
-    <%= render "streak_freezes/status", user: @user %>
-  <% end %>
 
   <% if @user.practised_today? %>
     <p class="nudge">Your streak is safe for today, but you can keep playing to practise more.</p>

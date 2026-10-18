@@ -7,7 +7,8 @@ module User::StreakFreezable
   extend ActiveSupport::Concern
 
   MAX_STREAK_FREEZES = 2
-  STREAK_FREEZE_PRICE = 500
+  # Dear enough to be worth saving up for: a good times tables game earns a few hundred
+  STREAK_FREEZE_PRICE = 10_000
   FREE_STREAK_FREEZES_AT = [ 7, 30 ]
 
   class NotAllowed < StandardError; end

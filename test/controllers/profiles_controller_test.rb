@@ -56,6 +56,24 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".site-footer", text: /Settings/, count: 0
   end
 
+  test "shows the player's stars and streak freezes, and buys a freeze with stars" do
+    get edit_profile_path
+    assert_select ".collection .stars-total", text: "0 ⭐ stars"
+    assert_select ".freezes__held", text: /No streak freezes/
+    assert_select ".freezes__hint", text: /Get 10,000 more ⭐ to buy one/
+
+    @user.attempts.create!(topic: "times_tables", results: []).update_column(:stars, 10_100)
+    get edit_profile_path
+    assert_select "form[action=?] button", streak_freeze_path, text: "Buy one for 10,000 ⭐"
+
+    post streak_freeze_path
+    assert_redirected_to edit_profile_path
+    follow_redirect!
+    assert_select ".flash", text: /You bought a streak freeze/
+    assert_select ".freezes__held", text: /1 streak freeze/
+    assert_select ".collection .stars-total", text: "100 ⭐ stars"
+  end
+
   test "rejects unknown themes" do
     patch profile_path, params: { user: { theme: "purple" } }
     assert_response :unprocessable_entity

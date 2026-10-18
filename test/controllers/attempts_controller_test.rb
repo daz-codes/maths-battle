@@ -102,7 +102,8 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".missed li", text: "7 × 8 = 56"
     assert_select ".missed__slow", count: 0
     assert_select "a[href=?]", stats_path("times-tables"), text: "See your stats"
-    assert_select "a.button--blue[href=?]", play_path("times-tables", level: 2), text: "Play again"
+    assert_select ".results__actions > a.button--blue[href=?]", play_path("times-tables", level: 2), text: "Play again"
+    assert_select ".results__actions > button.button--share", text: "Share"
     assert_select "[data-controller=share][data-share-text-value*=?]", share_url(attempt.share_token)
     assert_select "header a.logo[href=?]", root_path
     assert_select "a.button", text: "Home", count: 0

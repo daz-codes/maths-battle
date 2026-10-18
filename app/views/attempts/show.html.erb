@@ -25,8 +25,11 @@
   </section>
   <%= render "badges/earned", badges: @attempt.badges, celebrate: !(@attempt.levelled_up || @attempt.new_high_score) %>
 
-  <button type="button" class="button button--share button--wide" data-controller="share"
-          data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>
+  <div class="results__actions">
+    <button type="button" class="button button--share" data-controller="share"
+            data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>
+    <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
+  </div>
 
   <p class="feedback"><%= @attempt.feedback_message %></p>
 
@@ -50,7 +53,6 @@
   <% unless @attempt.levelled_up || @attempt.level < @attempt.user.unlocked_level(@attempt.topic_module) %>
     <%= render "levels/progress", user: @attempt.user, topic: @attempt.topic_module %>
   <% end %>
-  <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue button--wide" %>
   <%= link_to "See your stats", stats_path(@attempt.topic_module.slug) %>
   <%= link_to "See your achievements", achievements_path if @attempt.badges.any? %>
 

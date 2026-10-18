@@ -49,12 +49,12 @@ class Attempt::BadgeableTest < ActiveSupport::TestCase
     assert_not_includes earned, "level_3_times_tables"
   end
 
-  test "a perfect game needs every answer right, with at least 20 answered" do
-    play(right: 19)
+  test "a perfect game needs every answer right, with at least 10 answered" do
+    play(right: 9)
     play(right: 25, wrong: 1)
     assert_not_includes earned, "perfect"
 
-    play(right: 20)
+    play(right: 10)
     assert_includes earned, "perfect"
   end
 

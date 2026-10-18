@@ -28,9 +28,9 @@ class User::LevelableTest < ActiveSupport::TestCase
     assert_equal NEEDED, @user.good_games_to_level_up(TimesTables), "counting starts again at the new level"
   end
 
-  test "games under 90% right or with fewer than 20 answered don't count" do
+  test "games under 90% right or with fewer than 10 answered don't count" do
     NEEDED.times { play(level: 1, right: 17) }
-    3.times { Attempt.record!(user: @user, results: answers(*Array.new(19) { [ 2, 3, 6 ] })) }
+    3.times { Attempt.record!(user: @user, results: answers(*Array.new(9) { [ 2, 3, 6 ] })) }
 
     assert_equal 1, @user.unlocked_level(TimesTables)
     assert_equal NEEDED, @user.good_games_to_level_up(TimesTables)
