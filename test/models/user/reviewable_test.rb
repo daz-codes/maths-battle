@@ -10,13 +10,27 @@ class User::ReviewableTest < ActiveSupport::TestCase
   def right(a, b, ms: 1_000) = { a: a, b: b, given: a * b, ms: ms }
   def wrong(a, b) = { a: a, b: b, given: a * b + 1, ms: 1_000 }
 
-  test "recent mistakes first, then the slowest right answers, each asked again exactly" do
+  test "recent mistakes first, latest first, then the slowest right answers, each asked again exactly" do
     play(right(2, 3), right(2, 4), right(4, 4, ms: 9_000), wrong(3, 5), right(5, 5, ms: 6_000))
     play(wrong(3, 5), wrong(2, 5))
 
     review = @user.review_questions(TimesTables)
-    assert_equal [ "3 × 5", "2 × 5", "4 × 4", "5 × 5" ], review.map { _1[:text] }
-    assert_equal [ "15", "10", "16", "25" ], review.map { _1[:answer] }
+    assert_equal [ "2 × 5", "3 × 5", "4 × 4", "5 × 5" ], review.map { _1[:text] }
+    assert_equal [ "10", "15", "16", "25" ], review.map { _1[:answer] }
+  end
+
+  test "getting a question right and quick, in a review or any game, takes it off the list" do
+    play(wrong(3, 5), wrong(2, 5), right(4, 4, ms: 9_000), right(2, 3), right(2, 4), right(3, 4))
+    Attempt.record!(user: @user, mode: "review", results: [ wrong(3, 5), right(3, 5), right(2, 5), wrong(2, 5), right(4, 4) ])
+
+    assert_equal [ "2 × 5" ], User.find(@user.id).review_questions(TimesTables).map { _1[:text] }, "3 × 5 and 4 × 4 were last answered right and quick"
+  end
+
+  test "a right answer that's still slow keeps it on the list" do
+    play(wrong(3, 5), right(2, 3), right(2, 4), right(3, 4))
+    play(right(3, 5, ms: 9_000))
+
+    assert_equal [ "3 × 5" ], User.find(@user.id).review_questions(TimesTables).map { _1[:text] }
   end
 
   test "nothing to review without mistakes or slow answers" do
