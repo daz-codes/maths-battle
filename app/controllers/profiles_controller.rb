@@ -10,10 +10,15 @@ class ProfilesController < ApplicationController
   def update
     @user = resume_or_start_guest_session.user
 
-    if @user.update(profile_params)
-      redirect_to root_path, notice: "Saved!"
-    else
-      render :edit, status: :unprocessable_entity
+    # App settings save as they're changed, from the page (autosave controller), so they get no page back
+    respond_to do |format|
+      if @user.update(profile_params)
+        format.html { redirect_to root_path, notice: "Saved!" }
+        format.json { head :no_content }
+      else
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { head :unprocessable_entity }
+      end
     end
   end
 

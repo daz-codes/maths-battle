@@ -1,70 +1,90 @@
 <% content_for :title, "Settings · MatheMinute" %>
 <% content_for :no_auto_refresh, true %>
 
-<main class="page page--narrow">
+<%# Three parts: about the player (saved with its button), their game, and how the app behaves on this
+    device, which saves as it's changed %>
+<main class="page page--narrow settings">
   <h1 class="heading">Settings</h1>
   <%= render "flash" %>
 
-  <%= render "topics/current", topic: current_topic, from: :profile %>
+  <section class="settings__section" aria-labelledby="about-you">
+    <h2 class="settings__heading" id="about-you">About you</h2>
 
-  <% if @user.persisted? %>
-    <section class="collection" aria-label="Stars and streak freezes">
-      <p class="stars-total"><strong><%= number_with_delimiter @user.stars %></strong> ⭐ stars</p>
-      <%= render "streak_freezes/status", user: @user %>
-    </section>
-  <% end %>
+    <%= form_with model: @user, url: profile_path, method: :patch, class: "form" do |form| %>
+      <%= render "errors", user: @user %>
 
-  <%= render "reminders/settings", user: @user %>
-
-  <%= form_with model: @user, url: profile_path, method: :patch, class: "form" do |form| %>
-    <%= render "errors", user: @user %>
-
-    <fieldset class="avatar-field" data-controller="avatar-preview">
-      <legend>Your picture</legend>
-      <div class="avatar-field__row">
-        <%= render "avatar", user: @user, size: "large", data: { avatar_preview_target: "current" } %>
-        <img class="avatar avatar--large" alt="" hidden data-avatar-preview-target="preview">
-        <div class="avatar-field__controls">
-          <label class="button">
-            <%= @user.avatar.attached? ? "Change picture" : "Add a picture" %>
-            <%= form.file_field :avatar_upload, accept: "image/*", class: "visually-hidden",
-                  data: { action: "avatar-preview#show" } %>
-          </label>
-          <% if @user.avatar.attached? %>
-            <label class="avatar-field__remove">
-              <%= form.check_box :remove_avatar %> Remove picture
+      <fieldset class="avatar-field" data-controller="avatar-preview">
+        <legend>Your picture</legend>
+        <div class="avatar-field__row">
+          <%= render "avatar", user: @user, size: "large", data: { avatar_preview_target: "current" } %>
+          <img class="avatar avatar--large" alt="" hidden data-avatar-preview-target="preview">
+          <div class="avatar-field__controls">
+            <label class="button">
+              <%= @user.avatar.attached? ? "Change picture" : "Add a picture" %>
+              <%= form.file_field :avatar_upload, accept: "image/*", class: "visually-hidden",
+                    data: { action: "avatar-preview#show" } %>
             </label>
-          <% end %>
+            <% if @user.avatar.attached? %>
+              <label class="avatar-field__remove">
+                <%= form.check_box :remove_avatar %> Remove picture
+              </label>
+            <% end %>
+          </div>
         </div>
+        <p class="hint">Only you can see it. It's never shown on shared results.</p>
+      </fieldset>
+
+      <%= form.label :name, "What should we call you?" %>
+      <%= form.text_field :name, autocomplete: "given-name", maxlength: 30 %>
+
+      <%= form.submit "Save", class: "button button--go" %>
+    <% end %>
+  </section>
+
+  <section class="settings__section" aria-labelledby="your-game">
+    <h2 class="settings__heading" id="your-game">Game</h2>
+
+    <%= render "topics/current", topic: current_topic, from: :profile %>
+
+    <% if @user.persisted? %>
+      <div class="collection">
+        <p class="stars-total"><strong><%= number_with_delimiter @user.stars %></strong> ⭐ stars</p>
+        <%= render "streak_freezes/status", user: @user %>
       </div>
-      <p class="hint">Only you can see it. It's never shown on shared results.</p>
-    </fieldset>
+    <% end %>
+  </section>
 
-    <%= form.label :name, "What should we call you?" %>
-    <%= form.text_field :name, autocomplete: "given-name", maxlength: 30 %>
+  <section class="settings__section" aria-labelledby="app-settings">
+    <h2 class="settings__heading" id="app-settings">App settings</h2>
 
-    <fieldset class="choice" data-controller="theme">
-      <legend>Colours</legend>
-      <% { "system" => "Same as device", "light" => "Light", "dark" => "Dark" }.each do |theme, label| %>
-        <label class="choice__option">
-          <%= form.radio_button :theme, theme, data: { action: "theme#preview" } %>
-          <span><%= label %></span>
-        </label>
-      <% end %>
-    </fieldset>
+    <%= render "reminders/settings", user: @user %>
 
-    <fieldset class="choice" data-controller="sounds">
-      <legend>Sounds and vibration</legend>
-      <% { true => "On", false => "Off" }.each do |on, label| %>
-        <label class="choice__option">
-          <%= form.radio_button :sounds, on, data: { action: "sounds#preview" } %>
-          <span><%= label %></span>
-        </label>
-      <% end %>
-    </fieldset>
+    <%= form_with model: @user, url: profile_path, method: :patch, class: "form",
+          data: { controller: "autosave", action: "change->autosave#save" } do |form| %>
+      <fieldset class="choice" data-controller="theme">
+        <legend>Colours</legend>
+        <% { "system" => "Same as device", "light" => "Light", "dark" => "Dark" }.each do |theme, label| %>
+          <label class="choice__option">
+            <%= form.radio_button :theme, theme, data: { action: "theme#preview" } %>
+            <span><%= label %></span>
+          </label>
+        <% end %>
+      </fieldset>
 
-    <%= form.submit "Save", class: "button button--go" %>
-  <% end %>
+      <fieldset class="choice" data-controller="sounds">
+        <legend>Sounds and vibration</legend>
+        <% { true => "On", false => "Off" }.each do |on, label| %>
+          <label class="choice__option">
+            <%= form.radio_button :sounds, on, data: { action: "sounds#preview" } %>
+            <span><%= label %></span>
+          </label>
+        <% end %>
+      </fieldset>
+
+      <p class="settings__saved" data-autosave-target="status" aria-live="polite"></p>
+      <noscript><%= form.submit "Save", class: "button button--go" %></noscript>
+    <% end %>
+  </section>
 
   <% if @user.guest? %>
     <p class="aside"><%= link_to "Make an account", new_registration_path %> to keep your streak safe.</p>

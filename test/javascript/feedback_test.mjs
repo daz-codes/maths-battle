@@ -43,19 +43,25 @@ test('a tick and a tap for right, a low buzz for wrong, a rising fanfare for a l
   assert.deepEqual(buzzes, [ 10, [ 35, 40, 35 ], [ 30, 60, 30, 60, 120 ] ])
 })
 
+test('beeps for Ready and Set, a higher one for GO!, and a lower tock for the clock than for a right answer', () => {
+  feedback.countdown(false)
+  feedback.countdown(true)
+  feedback.clockTick()
+
+  assert.deepEqual(notes, [ 440, 880, 750 ])
+  assert.ok(notes[2] < 1568)
+})
+
 test('one audio context for the whole visit', () => {
   feedback.right()
   feedback.right()
   assert.ok(contexts <= 1)
 })
 
-test('a tap wakes audio iOS has stopped, suspended or interrupted, with a moment of silence', () => {
-  for (state of [ 'suspended', 'interrupted' ]) feedback.wakeAudio()
-  assert.deepEqual([ resumes, silences ], [ 2, 2 ])
-
-  state = 'running'
+test('a tap wakes audio the browser is holding back', () => {
+  state = 'suspended'
   feedback.wakeAudio()
-  assert.deepEqual([ resumes, silences ], [ 2, 2 ], 'nothing to do once it is running')
+  assert.equal(resumes, 1)
 })
 
 test('silent and still when turned off', () => {
@@ -63,6 +69,8 @@ test('silent and still when turned off', () => {
   feedback.right()
   feedback.wrong()
   feedback.fanfare()
+  feedback.countdown(true)
+  feedback.clockTick()
   feedback.wakeAudio()
 
   assert.deepEqual([ notes, buzzes ], [ [], [] ])

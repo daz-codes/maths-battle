@@ -3,7 +3,7 @@
 <div class="levels-panel">
 <% if topic.levels.many? %>
   <% unlocked = user.unlocked_level(topic) %>
-  <nav class="levels" aria-label="Level">
+  <nav class="levels" aria-label="Level" data-controller="keep-scroll" data-action="submit->keep-scroll#remember">
     <% topic.levels.each do |details| %>
       <% if details[:number] <= unlocked %>
         <% url, options = level_choice(choosing, topic, details[:number]) %>

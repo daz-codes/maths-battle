@@ -12,6 +12,36 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type=radio][name='user[theme]']", 3
   end
 
+  test "in three parts: about you, the game, and app settings" do
+    get edit_profile_path
+
+    assert_equal [ "About you", "Game", "App settings" ], css_select(".settings__heading").map(&:text)
+    assert_select "section[aria-labelledby=about-you] form" do
+      assert_select "input[name='user[name]']"
+      assert_select "input[name='user[avatar_upload]']"
+      assert_select "input[type=submit][value=Save]"
+    end
+    assert_select "section[aria-labelledby=your-game]" do
+      assert_select "a.current-topic"
+      assert_select ".collection .freezes"
+    end
+    assert_select "section[aria-labelledby=app-settings]" do
+      assert_select ".reminder"
+      assert_select "form[data-controller=autosave] input[name='user[theme]']", 3
+      assert_select "form[data-controller=autosave] input[name='user[sounds]']", 2
+    end
+  end
+
+  test "app settings save as they're changed, staying on the page" do
+    patch profile_path, params: { user: { theme: "dark" } }, as: :json
+    assert_response :no_content
+    assert_equal "dark", @user.reload.theme
+
+    patch profile_path, params: { user: { theme: "purple" } }, as: :json
+    assert_response :unprocessable_entity
+    assert_equal "dark", @user.reload.theme
+  end
+
   test "sounds and vibration are on until turned off, and every page says which" do
     get edit_profile_path
     assert_select "html[data-sounds=on]"

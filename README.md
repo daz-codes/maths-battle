@@ -95,9 +95,16 @@ it earns a bonus. The +10s that float up during a game are only for show:
 the server works out the stars from the checked answers (`Attempt::Starrable`) and keeps them on the game,
 so a player's total is the sum of their games.
 
+## Settings
+
+The settings page has three parts: about you (picture and name, saved with its button), the game (the topic,
+stars and streak freezes) and app settings (the daily reminder, colours, and sounds and vibration, which save as
+they're changed).
+
 ## Sounds and vibration
 
-A tick for a right answer, a soft buzz for a wrong one and a fanfare for a level up, in games and lessons
+A tick for a right answer, a soft buzz for a wrong one and a fanfare for a level up, in games and lessons,
+plus beeps for Ready, Set, GO! and a clock ticking through a game's last 5 seconds
 (`lib/feedback.js`). They're made with the Web Audio API, so there are no sound files to load or keep for
 offline, and vibrate where the browser allows it (not iPhones). They're on until the player turns them off
 in settings; the page says which on `<html data-sounds>`.

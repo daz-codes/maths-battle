@@ -12,6 +12,8 @@ const REVIEW_WRONG_PAUSE = 1_500
 // Each quarter of the clock ring is a full 25 of 100 units; the clock's cut makes the gaps between them
 const QUARTER_LENGTH = 25
 const COUNTDOWN = [ [ "Ready", 900 ], [ "Set", 900 ], [ "GO!", 600 ] ]
+// The clock ticks out loud for the last seconds
+const TICKING_FROM = 5
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 
 // Runs the whole one-minute test in the browser: nothing touches the network until it ends.
@@ -74,6 +76,7 @@ export default class extends Controller {
 
     const [ [ word, ms ], ...rest ] = steps
     this.questionTarget.textContent = word
+    feedback.countdown(rest.length === 0)
     this.countdownTimer = setTimeout(() => this.countdown(rest), ms)
   }
 
@@ -114,6 +117,7 @@ export default class extends Controller {
       this.seconds = seconds
       this.secondsTarget.textContent = seconds
       this.element.dataset.quarter = Math.min(3, Math.floor((60 - seconds) / 15))
+      if (seconds <= TICKING_FROM) feedback.clockTick()
     }
     this.frame = requestAnimationFrame(this.tick)
   }
