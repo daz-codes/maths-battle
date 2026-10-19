@@ -2,7 +2,7 @@ class GamesController < ApplicationController
   allow_unauthenticated_access
 
   # A level's practice (that level's questions only), the daily challenge (?challenge=1: every level up to the
-  # player's, once a day), or a review (?review=1: their recent mistakes and slowest answers, asked again)
+  # player's, once a day), or a review (?review=1: their recent mistakes, asked again)
   def show
     @topic = topic_from_slug
     @mode = params[:challenge].present? ? "challenge" : params[:review].present? ? "review" : "practice"

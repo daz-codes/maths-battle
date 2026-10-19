@@ -50,9 +50,9 @@ first bronze unlocks the next level. Each topic's daily challenge, once a day, m
 up to the player's; it has its own best, earns no medal and unlocks nothing. Whether a game is a daily
 challenge is in its signed ticket, so the browser can't decide. A new topic needs `MEDALS` and gets all this.
 
-Review mode asks again, exactly, the questions a player recently got wrong or was slowest at in a topic (from
-their last 10 games, `User::Reviewable`), round and round for a minute. Only the latest answer to each question
-counts, so getting it right and quick takes it off the list. Like the daily challenge it's at the
+Review mode asks again, exactly, the questions a player recently got wrong in a topic (from their last 10 games,
+`User::Reviewable`), round and round for a minute. Only the latest answer to each question counts, so getting
+it right takes it off the list. Like the daily challenge it's at the
 player's highest level and earns no medal; a game's mode (practice, challenge or review) is in its ticket.
 
 A day counts towards the streak when any topic's daily challenge is played. Until 20 October 2026 a game of five
