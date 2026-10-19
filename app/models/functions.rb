@@ -47,7 +47,7 @@ module Functions
   # Quick and lightning stars, allowing for working out a function taking longer than a times table
   STAR_TIMES = { lightning: 3_000, quick: 6_000 }
   # A level's practice earns a medal for its score; bronze unlocks the next level
-  MEDALS = { gold: 20, silver: 12, bronze: 6 }
+  MEDALS = { gold: 20, silver: 10, bronze: 5 }
   # Scores in one game that earn a badge. Like equations: each question takes some reading
   BADGE_SCORES = [ 5, 10, 20, 30, 50 ]
   # The largest number the server accepts in a question sent back (well above anything generated)

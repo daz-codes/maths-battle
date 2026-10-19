@@ -145,13 +145,20 @@ export function forgetEverything() {
   } catch {}
 }
 
+// A connection that's there but not working can leave a request waiting forever, so a game that hasn't been
+// saved by then is treated as offline: kept on the device and sent later
+const UPLOAD_TIMEOUT = 8_000
+
 // Posts a game. Resolves to "saved" (with the results url), "rejected" (the server will never accept it)
-// or "failed" (offline or a hiccup: try again later)
-export async function postGame(url, game) {
+// or "failed" (offline, too slow or a hiccup: try again later)
+export async function postGame(url, game, { timeout = UPLOAD_TIMEOUT } = {}) {
   if (!currentPlayer(game.player_key)) return { outcome: "rejected" }
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeout)
   try {
     const response = await fetch(url, {
       method: "POST",
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
@@ -167,6 +174,8 @@ export async function postGame(url, game) {
     return { outcome: "failed" }
   } catch {
     return { outcome: "failed" }
+  } finally {
+    clearTimeout(timer)
   }
 }
 

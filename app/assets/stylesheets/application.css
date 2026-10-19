@@ -565,7 +565,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .levels__level[aria-current="true"] { background: var(--blue-deep); color: #fff; box-shadow: 0 0 14px color-mix(in srgb, var(--blue) var(--glow-strength), transparent); }
 .levels__level--locked { cursor: default; color: var(--ink); }
 .levels__level--locked .icon { width: 1.15rem; height: 1.15rem; }
-.levels__name { margin: -0.6rem 0 0; color: var(--muted); font-size: 1.15rem; font-weight: 700; }
+.levels__name { margin: -0.25rem 0 0; color: var(--ink); font-size: clamp(1.5rem, 7vw, 1.8rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
 /* A medal level's best medal, on its circle and under its name */
 .levels__level { position: relative; }
 .levels__medal { position: absolute; right: -0.4rem; bottom: -0.4rem; font-size: 1.3rem; line-height: 1; }

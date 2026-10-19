@@ -6,6 +6,18 @@ const STATE = "matheminute-player-v1"
 const OFFLINE_URL = "/offline.html"
 const PLAYER_URL = "/offline-player"
 let updates = Promise.resolve()
+// A phone can stall a download or a cache write indefinitely: on a connection that's there but not working,
+// or when the app is closed part way through. Nothing waits on either for longer than this, or the app opens to
+// nothing. A page with a copy kept for offline (home, games, stats) gives way to it quickly, so the app opens
+// even then; one without waits longer before the offline page. A copy that's slow to keep is given up on
+const TIMEOUTS = { withCopy: 3_000, network: 10_000, keeping: 3_000 }
+const TIMED_OUT = Symbol("timed out")
+
+function within(promise, ms) {
+  let timer
+  const timeout = new Promise(resolve => { timer = setTimeout(() => resolve(TIMED_OUT), ms) })
+  return Promise.race([ promise, timeout ]).finally(() => clearTimeout(timer))
+}
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.add(OFFLINE_URL)).then(() => self.skipWaiting()))
@@ -74,28 +86,38 @@ async function rememberPlayer(response, request, url) {
     await (await caches.open(STATE)).put(PLAYER_URL, new Response(JSON.stringify(state)))
     // A redirect's page isn't the one asked for: a new player's home goes to the topics page
     if (request.method === "GET" && isPage(request) && response.ok && !response.redirected && keptForOffline(url.pathname)) {
-      await (await caches.open(PAGES + key)).put(url.pathname + url.search, response.clone())
+      await within((await caches.open(PAGES + key)).put(url.pathname + url.search, response.clone()), TIMEOUTS.keeping)
     }
   })
   await updates
 }
 
+// This player's copy of the page, unless their session has run out
+async function keptCopy(url) {
+  const player = await playerState()
+  if (!player || Date.parse(player.expires) <= Date.now()) return null
+
+  return caches.match(url.pathname + url.search, { cacheName: PAGES + player.key })
+}
+
 async function fromNetwork(request, url) {
+  const page = request.method === "GET" && isPage(request)
   let response
   try {
-    response = await fetch(request)
-  } catch (error) {
-    if (request.method !== "GET" || !isPage(request)) throw error
-    await updates.catch(() => {})
-    const player = await playerState()
-    if (player && Date.parse(player.expires) > Date.now()) {
-      const kept = await caches.match(url.pathname + url.search, { cacheName: PAGES + player.key })
-      if (kept) return kept
+    if (page) {
+      const waitFor = await keptCopy(url) ? TIMEOUTS.withCopy : TIMEOUTS.network
+      response = await within(fetch(request), waitFor)
+      if (response === TIMED_OUT) throw new Error("The page took too long")
+    } else {
+      response = await fetch(request)
     }
-    return caches.match(OFFLINE_URL, { cacheName: CACHE })
+  } catch (error) {
+    if (!page) throw error
+    await within(updates.catch(() => {}), TIMEOUTS.keeping)
+    return await keptCopy(url) || caches.match(OFFLINE_URL, { cacheName: CACHE })
   }
   // Cache failures must not turn a successful POST into an apparent network failure.
-  await rememberPlayer(response, request, url).catch(() => {})
+  await within(rememberPlayer(response, request, url).catch(() => {}), TIMEOUTS.keeping)
   return response
 }
 

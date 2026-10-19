@@ -22,7 +22,7 @@ class PlayingOfflineTest < ApplicationSystemTestCase
     go_online
     assert_difference -> { @user.attempts.count }, 1 do
       visit root_path
-      assert_selector ".stats dd", text: "🏆 5", wait: 8
+      assert_selector ".levels__name", text: "Level 2", wait: 8 # the 5 right was a bronze
     end
     assert_equal 0, unsent_games
   end

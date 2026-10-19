@@ -31,8 +31,8 @@ module SimultaneousEquations
   ]
   # Quick and lightning stars: each answer is a few steps of working out
   STAR_TIMES = { lightning: 5_000, quick: 10_000 }
-  # A level's practice earns a medal for its score; bronze unlocks the next level. Each pair is two answers
-  MEDALS = { gold: 12, silver: 8, bronze: 4 }
+  # A level's practice earns a medal for its score; bronze unlocks the next level
+  MEDALS = { gold: 20, silver: 10, bronze: 5 }
   # Scores in one game that earn a badge. Lower than the other topics: each pair of equations is two answers
   BADGE_SCORES = [ 5, 10, 15, 20, 30 ]
   SOLUTIONS = 1..5

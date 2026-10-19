@@ -55,6 +55,11 @@ test('online play still works when the browser cannot write player state', async
   assert.equal(offline.saveForLater(game()), false)
 })
 
+test('a game the server never answers for is treated as offline, to send again later', async () => {
+  globalThis.fetch = (url, { signal }) => new Promise((resolve, reject) => signal.addEventListener('abort', () => reject(new Error('aborted'))))
+  assert.equal((await offline.postGame('/attempts', game(), { timeout: 20 })).outcome, 'failed')
+})
+
 test('switching accounts during an upload cannot modify the new queue', async () => {
   offline.saveForLater(game())
   let finish

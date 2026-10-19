@@ -14,33 +14,32 @@ class User::LevelableTest < ActiveSupport::TestCase
   end
 
   test "a bronze unlocks the next level, and the game that earns it says so" do
-    assert_not practise(level: 1, score: 9).levelled_up
+    assert_not practise(level: 1, score: 4).levelled_up
     assert_equal 1, @user.unlocked_level(TimesTables)
     assert_nil @user.medal(TimesTables, 1)
 
-    bronze = practise(level: 1, score: 10)
+    bronze = practise(level: 1, score: 5)
     assert bronze.levelled_up
     assert_equal :bronze, bronze.new_medal
     assert_equal 2, @user.unlocked_level(TimesTables)
   end
 
-  test "each topic sets its own medal scores" do
-    assert_not practise(topic: Functions, level: 1, score: 5).levelled_up
-    assert practise(topic: Functions, level: 1, score: 6).levelled_up, "6 is bronze for functions"
-    assert practise(topic: SimultaneousEquations, level: 1, score: 4).levelled_up, "4 is bronze for simultaneous equations"
+  test "every topic has 5 for bronze, 10 for silver and 20 for gold" do
+    assert_not practise(topic: Functions, level: 1, score: 4).levelled_up
+    assert practise(topic: Functions, level: 1, score: 5).levelled_up
+    assert practise(topic: SimultaneousEquations, level: 1, score: 5).levelled_up
     assert_equal 2, @user.unlocked_level(Functions)
 
     Topic::ALL.each do |topic|
-      assert_operator topic.medals[:bronze], :<, topic.medals[:silver], topic.title
-      assert_operator topic.medals[:silver], :<, topic.medals[:gold], topic.title
+      assert_equal({ gold: 20, silver: 10, bronze: 5 }, topic.medals, topic.title)
     end
   end
 
   test "a level keeps its best medal, and a better one is new" do
-    practise(level: 1, score: 12)
-    silver = practise(level: 1, score: 22)
-    worse = practise(level: 1, score: 15)
-    gold = practise(level: 1, score: 31)
+    practise(level: 1, score: 6)
+    silver = practise(level: 1, score: 12)
+    worse = practise(level: 1, score: 8)
+    gold = practise(level: 1, score: 21)
 
     assert_equal [ :silver, nil, :gold ], [ silver.new_medal, worse.new_medal, gold.new_medal ]
     assert_not silver.levelled_up, "only the first bronze unlocks the next level"
@@ -71,7 +70,7 @@ class User::LevelableTest < ActiveSupport::TestCase
   end
 
   test "the top level has nothing after it" do
-    (1..4).each { |level| practise(level: level, score: 10) }
+    (1..4).each { |level| practise(level: level, score: 5) }
     assert_equal 5, @user.unlocked_level(TimesTables)
     assert_nil @user.next_level(TimesTables)
   end

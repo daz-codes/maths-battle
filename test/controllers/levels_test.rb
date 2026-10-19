@@ -12,37 +12,37 @@ class LevelsTest < ActionDispatch::IntegrationTest
   end
 
   test "home shows the levels, with locked ones padlocked, medals on the ones that have them, and what's next" do
-    practise(level: 1, score: 22)
+    practise(level: 1, score: 12)
     get root_path
 
     assert_select ".levels .levels__level[aria-current=true]", text: /2/, message: "the bronze unlocked level 2, which Play goes to"
     assert_select ".levels .levels__level .levels__medal[aria-label=Silver]", text: "🥈"
     assert_select ".levels__level--locked", 3
     assert_select ".levels__name", text: "Level 2: Tables 2–12"
-    assert_select ".levels__medal-line", text: "Score 10 for 🥉 bronze and unlock level 3"
+    assert_select ".levels__medal-line", text: "Score 5 for 🥉 bronze and unlock level 3"
     assert_select "a.button--challenge[href=?]", play_path("times-tables", challenge: 1), text: /⭐ Daily challenge/
     assert_select ".levels-panel > a.button--practise[href=?]", play_path("times-tables", level: 2), text: "Practise level 2"
   end
 
   test "a level's best medal and the next to aim for" do
-    practise(level: 1, score: 22)
+    practise(level: 1, score: 12)
     patch level_path, params: { level: 1 }
     get root_path
-    assert_select ".levels__medal-line", text: "🥈 Silver · best 22 · 30 for gold"
+    assert_select ".levels__medal-line", text: "🥈 Silver · best 12 · 20 for gold"
   end
 
   test "the results page says what the next medal needs" do
-    practise(level: 1, score: 12)
+    practise(level: 1, score: 7)
     get attempt_path(@user.attempts.last)
 
-    assert_select ".level-progress", text: "🥉 Bronze · best 12 · 20 for silver"
+    assert_select ".level-progress", text: "🥉 Bronze · best 7 · 10 for silver"
   end
 
   test "a bronze is celebrated as a level up, and Play moves up to the new level" do
-    practise(level: 1, score: 9)
+    practise(level: 1, score: 4)
     patch level_path, params: { level: 1 }
 
-    post attempts_path, params: game_upload(level: 1, results: answers(*Array.new(10) { [ 2, 3, 6 ] }, ms: 1000)), as: :json
+    post attempts_path, params: game_upload(level: 1, results: answers(*Array.new(5) { [ 2, 3, 6 ] }, ms: 1000)), as: :json
     get response.parsed_body["url"]
     assert_select ".banner--level[data-controller~=fanfare]", text: /Level up! You've unlocked Level 2: Tables 2–12/
 
@@ -51,8 +51,8 @@ class LevelsTest < ActionDispatch::IntegrationTest
   end
 
   test "a better medal at a level is celebrated" do
-    practise(level: 1, score: 12)
-    post attempts_path, params: game_upload(level: 1, results: answers(*Array.new(21) { [ 2, 3, 6 ] }, ms: 1000)), as: :json
+    practise(level: 1, score: 6)
+    post attempts_path, params: game_upload(level: 1, results: answers(*Array.new(11) { [ 2, 3, 6 ] }, ms: 1000)), as: :json
     get response.parsed_body["url"]
 
     assert_select ".banner--medal", text: "🥈 Silver medal for level 1!"
@@ -114,7 +114,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     patch topic_path, params: { topic: "equations" }
     get root_path
 
-    assert_select ".levels__medal-line", text: "Score 6 for 🥉 bronze and unlock level 2"
+    assert_select ".levels__medal-line", text: "Score 5 for 🥉 bronze and unlock level 2"
     assert_select "a.button--challenge[href=?]", play_path("equations", challenge: 1)
     assert_select ".levels-panel > a.button--practise[href=?]", play_path("equations", level: 1)
   end

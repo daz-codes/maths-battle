@@ -36,7 +36,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "changing topic is a page of every topic with the player's progress, the current one marked" do
-    Attempt.record!(user: @user, results: answers(*Array.new(22) { [ 2, 3, 6 ] }))
+    Attempt.record!(user: @user, results: answers(*Array.new(12) { [ 2, 3, 6 ] }))
     Attempt.record!(user: @user, topic: "functions", level: 1, mode: "challenge", results: [ { type: "x+a", a: 2, n: 3, given: "5", ms: 1000 } ] * 5)
     get topics_path
 

@@ -16,7 +16,7 @@ class Attempt::BadgeableTest < ActiveSupport::TestCase
     assert_not_includes earned, "first_game"
 
     game = play(right: 5)
-    assert_equal [ "first_game" ], game.badges.map(&:kind) - [ "score_5_times_tables" ]
+    assert_equal [ "first_game" ], game.badges.map(&:kind) - [ "score_5_times_tables", "level_2_times_tables" ]
   end
 
   test "score badges are for the topic played" do

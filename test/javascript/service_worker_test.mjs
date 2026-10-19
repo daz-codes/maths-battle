@@ -20,7 +20,7 @@ function worker() {
     },
     match: async (key, { cacheName } = {}) => (await caches.open(cacheName)).match(key)
   }
-  const context = vm.createContext({ caches, Response, Date, URL, self: { addEventListener() {} } })
+  const context = vm.createContext({ caches, Response, Date, URL, setTimeout, clearTimeout, self: { addEventListener() {} } })
   vm.runInContext(source, context)
   return { context, stores, caches, ...vm.runInContext('({ fromNetwork })', context) }
 }
@@ -39,8 +39,11 @@ test('account changes erase private pages and a late response cannot restore the
   const w = worker()
   await load(w, '/stats', page('ada', 1))
   let finish
-  w.context.fetch = () => new Promise(resolve => { finish = resolve })
+  const fetching = new Promise(started => {
+    w.context.fetch = () => new Promise(resolve => { finish = resolve; started() })
+  })
   const oldRequest = w.fromNetwork(request('/stats'), new URL('https://example.test/stats'))
+  await fetching
   await load(w, '/', page('bob', 2))
   finish(page('ada', 1))
   await oldRequest
@@ -75,4 +78,38 @@ test('expired sessions cannot open private cached pages offline', async () => {
   w.context.fetch = async () => { throw new Error('offline') }
   const response = await w.fromNetwork(request('/stats'), new URL('https://example.test/stats'))
   assert.equal(await response.text(), 'offline')
+})
+
+test('on a connection that never answers, the app opens to the copy kept for offline, quickly', async () => {
+  const w = worker()
+  vm.runInContext('TIMEOUTS.withCopy = 20; TIMEOUTS.network = 60_000', w.context)
+  await load(w, '/', page('ada', 1, 'kept home'))
+  w.context.fetch = () => new Promise(() => {})
+
+  const response = await w.fromNetwork(request('/'), new URL('https://example.test/'))
+  assert.equal(await response.text(), 'kept home')
+})
+
+test('a page with no copy waits longer, then shows the offline page', async () => {
+  const w = worker()
+  vm.runInContext('TIMEOUTS.withCopy = 60_000; TIMEOUTS.network = 20', w.context)
+  await load(w, '/', page('ada', 1, 'kept home'))
+  await (await w.caches.open('matheminute-v6')).put('/offline.html', new Response('offline'))
+  w.context.fetch = () => new Promise(() => {})
+
+  const response = await w.fromNetwork(request('/topics'), new URL('https://example.test/topics'))
+  assert.equal(await response.text(), 'offline')
+})
+
+test('a copy that never finishes keeping doesn\'t hold up this page or the next', async () => {
+  const w = worker()
+  vm.runInContext('TIMEOUTS.keeping = 20', w.context)
+  const stuck = w.caches.open
+  w.caches.open = async name => {
+    const cache = await stuck(name)
+    return name.startsWith('matheminute-pages') ? { ...cache, put: () => new Promise(() => {}) } : cache
+  }
+
+  assert.equal(await (await load(w, '/', page('ada', 1, 'home'))).text(), 'home')
+  assert.equal(await (await load(w, '/stats', page('ada', 1, 'stats'))).text(), 'stats')
 })

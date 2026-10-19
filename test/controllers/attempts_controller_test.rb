@@ -79,8 +79,9 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     attempt = Attempt.record!(user: @user, results: answers(*right_answers(5), ms: 500))
 
     get attempt_path(attempt)
-    assert_select ".stars-earned__total", text: "+200 ⭐"
+    assert_select ".stars-earned__total", text: "+300 ⭐"
     assert_select ".stars-earned__bonuses li", text: "New high score +50"
+    assert_select ".stars-earned__bonuses li", text: "Level up +100"
   end
 
   test "results page says when the game earned a free streak freeze" do

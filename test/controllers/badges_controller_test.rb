@@ -37,16 +37,16 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
 
     get attempt_path(attempt)
     assert_select ".badges--new[data-controller=confetti] .badge__name", text: "5 times tables in a minute"
-    assert_select ".badges--new .label", text: "New achievement!"
+    assert_select ".badges--new .label", text: "New achievements!", message: "5 times tables, and level 2"
     assert_select "a[href=?]", achievements_path, text: "See your achievements"
   end
 
-  test "one lot of confetti: a new high score already has it" do
+  test "one lot of confetti: a level up already has it" do
     sign_in_as @user
     attempt = Attempt.record!(user: @user, results: answers(*right_answers(5)))
 
     get attempt_path(attempt)
-    assert_select ".banner[data-controller=confetti]", text: /New high score/
+    assert_select ".banner[data-controller~=confetti]", text: /Level up/
     assert_select ".badges--new .badge__name", text: "First minute"
     assert_select ".badges--new[data-controller]", count: 0
   end
@@ -66,7 +66,7 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get stats_path
-    assert_select "a.badge-summary[href=?]", achievements_path, text: /2 of #{Badge.catalogue.size} unlocked/
-    assert_select ".badge-summary__emojis", text: "🎉🎯"
+    assert_select "a.badge-summary[href=?]", achievements_path, text: /3 of #{Badge.catalogue.size} unlocked/
+    assert_equal %w[ ⭐ 🎉 🎯 ], css_select(".badge-summary__emojis").first.text.chars.sort, "first game, 5 right and level 2"
   end
 end

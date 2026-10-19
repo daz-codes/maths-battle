@@ -45,7 +45,7 @@ an existing account switches accounts without merging guest history.
 
 ## Medals and the daily challenge
 
-Every topic plays by medals, each setting its own scores in `MEDALS` (times tables 10, 20 and 30). Practising
+Every topic plays by medals, with 5 right for bronze, 10 for silver and 20 for gold (`MEDALS`). Practising
 a level asks only that level's questions and earns bronze, silver or gold; a level shows its best, and the
 first bronze unlocks the next level. Each topic's daily challenge, once a day, mixes questions from every level
 up to the player's; it has its own best, earns no medal and unlocks nothing. Whether a game is a daily

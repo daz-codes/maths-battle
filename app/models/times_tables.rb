@@ -24,7 +24,7 @@ module TimesTables
   ]
   FIRST_TABLES = 2..5
   # A level's practice earns a medal for its score; bronze unlocks the next level
-  MEDALS = { gold: 30, silver: 20, bronze: 10 }
+  MEDALS = { gold: 20, silver: 10, bronze: 5 }
   # A right answer under 1 second earns the lightning stars, under 2 the quick ones
   STAR_TIMES = { lightning: 1_000, quick: 2_000 }
   # Scores in one game that earn a badge
