@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_150000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -113,6 +113,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_140000) do
     t.index ["user_id"], name: "index_lesson_completions_on_user_id"
   end
 
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "endpoint", null: false
+    t.string "p256dh_key", null: false
+    t.string "auth_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -136,6 +147,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_140000) do
     t.integer "streak_freezes", default: 0, null: false
     t.integer "stars_spent", default: 0, null: false
     t.date "streak_kept_on"
+    t.integer "reminder_minute"
+    t.date "reminded_on"
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
@@ -147,5 +160,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_140000) do
   add_foreign_key "fact_stats", "users"
   add_foreign_key "frozen_days", "users"
   add_foreign_key "lesson_completions", "users"
+  add_foreign_key "push_subscriptions", "users"
   add_foreign_key "sessions", "users"
 end

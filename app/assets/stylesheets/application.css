@@ -651,6 +651,14 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .collection { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; padding: 1rem; border-radius: var(--radius); background: linear-gradient(var(--blue) 0 6px, var(--paper-alt) 6px); }
 .collection .stars-total, .collection .freezes { margin: 0; }
 
+/* Daily reminders on the settings page: a time, and turning them on or off */
+.reminder { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; width: 100%; padding: 1rem; border-radius: var(--radius); background: linear-gradient(var(--pink) 0 6px, var(--paper-alt) 6px); }
+.reminder .label { margin: 0; }
+.reminder__about, .reminder__status { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.reminder__status:empty { display: none; }
+.reminder__row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+.reminder__time { min-height: 3.25rem; padding: 0 0.75rem; border: 0; border-radius: var(--radius); background: var(--paper); color: var(--ink); font: inherit; font-weight: 700; }
+
 /* Share and Play again side by side on the results page */
 .results__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; width: 100%; }
 .results__actions--one { grid-template-columns: 1fr; }

@@ -49,6 +49,39 @@ class User::ReviewableTest < ActiveSupport::TestCase
     assert_empty User.find(@user.id).review_questions(TimesTables)
   end
 
+  test "an older offline mistake cannot undo a more recent correction in a review" do
+    Attempt.record!(user: @user, results: [ wrong(3, 5) ], played_at: 2.hours.ago.iso8601)
+    Attempt.record!(user: @user, mode: "review", results: [ right(3, 5) ], played_at: 1.hour.ago.iso8601)
+    Attempt.record!(user: @user, results: [ wrong(3, 5) ], played_at: 3.hours.ago.iso8601)
+
+    assert_empty User.find(@user.id).review_questions(TimesTables)
+  end
+
+  test "an older offline correction cannot clear a more recent mistake" do
+    Attempt.record!(user: @user, results: [ wrong(3, 5) ], played_at: 1.hour.ago.iso8601)
+    Attempt.record!(user: @user, results: [ right(3, 5) ], played_at: 2.hours.ago.iso8601)
+
+    assert_equal [ "3 × 5" ], User.find(@user.id).review_questions(TimesTables).map { _1[:text] }
+  end
+
+  test "the last 10 games are chosen by play time, even when an older game arrives later" do
+    Attempt.record!(user: @user, results: [ wrong(3, 5) ], played_at: 1.day.ago.iso8601)
+    (2..User::Reviewable::REVIEW_GAMES).each do |days|
+      Attempt.record!(user: @user, results: [ right(2, 3) ], played_at: days.days.ago.iso8601)
+    end
+    Attempt.record!(user: @user, results: [ right(3, 5) ], played_at: 20.days.ago.iso8601)
+
+    assert_equal [ "3 × 5" ], User.find(@user.id).review_questions(TimesTables).map { _1[:text] }
+  end
+
+  test "games with the same play time use the last recorded game's last answer" do
+    played_at = 1.hour.ago.iso8601
+    Attempt.record!(user: @user, results: [ right(3, 5) ], played_at: played_at)
+    Attempt.record!(user: @user, results: [ right(3, 5), wrong(3, 5) ], played_at: played_at)
+
+    assert_equal [ "3 × 5" ], User.find(@user.id).review_questions(TimesTables).map { _1[:text] }
+  end
+
   test "at most 20 questions" do
     play(*(2..12).flat_map { |a| [ wrong(a, 2), wrong(a, 3) ] }.first(22))
     assert_equal User::Reviewable::MAX_REVIEW_QUESTIONS, @user.review_questions(TimesTables).size

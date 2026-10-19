@@ -52,10 +52,12 @@ up to the player's; it has its own best, earns no medal and unlocks nothing. Whe
 challenge is in its signed ticket, so the browser can't decide. A new topic needs `MEDALS` and gets all this.
 
 Review mode asks again, exactly, the questions a player recently got wrong in a topic (from their last 10 games,
-`User::Reviewable`), up to 10, each once and with no clock. Only the latest answer to each question counts, so
-getting it right takes it off the list. Like the daily challenge it's at the player's highest level and earns
+`User::Reviewable`), up to 10, each once and with no clock. Games are ordered by play time, so a late offline
+upload can't override a more recent answer. Only the latest answer to each question counts, so getting it
+right takes it off the list. Like the daily challenge it's at the player's highest level and earns
 no medal; a game's mode (practice, challenge or review) is in its ticket. With no clock, its answers earn no
-stars, badges or question stats; finishing one earns a 50 star bonus.
+stars, badges or question stats; finishing one earns a 50 star bonus. Every question in its signed set must
+be answered before a review can be saved.
 
 A daily challenge needs at least one submitted answer; an unanswered game leaves it available to try again.
 A day counts towards the streak when any topic's daily challenge is played. Until 20 October 2026 a game of five
@@ -92,6 +94,16 @@ perfect game, a new high score or levelling up. A review's answers earn none, as
 it earns a bonus. The +10s that float up during a game are only for show:
 the server works out the stars from the checked answers (`Attempt::Starrable`) and keeps them on the game,
 so a player's total is the sum of their games.
+
+## Reminders
+
+Players can turn on a daily reminder in settings, at a half hour they pick from 7am to 9pm. If they haven't
+done a daily challenge by then (in their own time zone), each device they turned it on from gets a web push
+notification like "🔥 Your 12 day streak is waiting", once that day (`User::Remindable`, checked every 15
+minutes by `config/recurring.yml`). Each device is a `PushSubscription`, sent to only at the browsers' own push
+services; one that unsubscribes is forgotten. Notifications are signed with VAPID keys kept in the credentials
+(`web_push.public_key`, `web_push.private_key`). On an iPhone or iPad, web push only works once the app is on
+the Home Screen.
 
 ## Streak freezes
 

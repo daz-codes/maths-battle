@@ -23,6 +23,10 @@ class Attempt::GameTicket
     unless results.size <= questions.size && results.each_with_index.all? { |result, index| result.is_a?(Hash) && result.stringify_keys.slice(*QUESTION_FIELDS) == questions[index] }
       raise Attempt::Invalid, "The answers don't match this game's questions"
     end
+    # Timed games can finish part way through their set; a review finishes after every issued question.
+    if game["mode"] == "review" && results.size != questions.size
+      raise Attempt::Invalid, "Answer every question to finish the review"
+    end
     game["mode"] || (game["daily_challenge"] ? "challenge" : "practice")
   end
 

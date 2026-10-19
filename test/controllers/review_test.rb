@@ -33,6 +33,51 @@ class ReviewTest < ActionDispatch::IntegrationTest
     assert_select "[data-test-target=seconds]", count: 0, message: "no clock"
   end
 
+  test "an incomplete review cannot be saved or earn stars, even with a different requested mode" do
+    Attempt.record!(user: @user, results: answers([ 3, 5, 14 ], [ 2, 5, 11 ]))
+    upload = review_upload(score: 2)
+    upload[:attempt][:mode] = "practice"
+    complete_results = upload[:attempt][:results]
+
+    [ [], complete_results.first(1), complete_results.first(1).map { _1.merge("given" => "1") } ].each do |partial_results|
+      upload[:attempt][:results] = partial_results
+      assert_no_difference -> { @user.attempts.count } do
+        assert_no_changes -> { @user.reload.stars } do
+          post attempts_path, params: upload, as: :json
+        end
+      end
+      assert_response :unprocessable_entity
+      assert_equal "Answer every question to finish the review", response.parsed_body["error"]
+    end
+
+    upload[:attempt][:results] = complete_results
+    post attempts_path, params: upload, as: :json
+    assert_response :created
+    assert @user.attempts.last.review?
+    assert_equal 50, @user.attempts.last.stars
+  end
+
+  test "a complete review earns its bonus even with wrong answers, and a retry earns nothing extra" do
+    Attempt.record!(user: @user, results: answers([ 3, 5, 14 ], [ 2, 5, 11 ]))
+    upload = review_upload(score: 2)
+    upload[:attempt][:results].each { _1["given"] = "1" }
+
+    assert_difference -> { @user.reload.stars }, 50 do
+      post attempts_path, params: upload, as: :json
+    end
+    assert_response :created
+    url = response.parsed_body["url"]
+    assert_equal 0, @user.attempts.last.score
+
+    assert_no_difference -> { @user.attempts.count } do
+      assert_no_changes -> { @user.reload.stars } do
+        post attempts_path, params: upload, as: :json
+      end
+    end
+    assert_response :created
+    assert_equal url, response.parsed_body["url"]
+  end
+
   test "it's saved as a review: no medal, no level up, no high score to beat" do
     Attempt.record!(user: @user, results: answers([ 3, 5, 14 ], [ 2, 5, 11 ]))
     post attempts_path, params: review_upload(score: 12), as: :json

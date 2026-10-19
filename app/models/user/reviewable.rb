@@ -17,9 +17,10 @@ module User::Reviewable
   end
 
   private
-    # Each question's latest answer, newest first: the last game's last answer leads
+    # Each question's latest answer, newest first: the last played game's last answer leads, even if an
+    # older offline game was uploaded later. An equal play time is settled by the last recorded game
     def latest_answers(topic)
-      attempts.in_topic(topic).order(created_at: :desc, id: :desc).limit(REVIEW_GAMES)
+      attempts.in_topic(topic).order(played_at: :desc, id: :desc).limit(REVIEW_GAMES)
         .flat_map { |game| game.results.reverse }.uniq { |result| result.except(*ANSWER_FIELDS) }
     end
 

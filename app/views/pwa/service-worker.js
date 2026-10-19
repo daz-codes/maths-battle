@@ -31,6 +31,22 @@ self.addEventListener("fetch", event => {
   }
 })
 
+// A daily reminder from the server (User::Remindable). A push always shows something, as browsers expect
+self.addEventListener("push", event => {
+  const { title = "MatheMinute", body = "Your daily challenge is ready.", url = "/" } = event.data?.json() ?? {}
+  event.waitUntil(self.registration.showNotification(title, { body, icon: "/icon-192.png", tag: "daily-reminder", data: { url } }))
+})
+
+// Tapping it opens the app, or brings it forward if it's already open
+self.addEventListener("notificationclick", event => {
+  event.notification.close()
+  const url = new URL(event.notification.data?.url || "/", self.location.origin).href
+  event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(windows => {
+    const open = windows.find(client => new URL(client.url).origin === self.location.origin)
+    return open ? open.focus() : self.clients.openWindow(url)
+  }))
+})
+
 function isPage(request) {
   return request.mode === "navigate" || (request.headers.get("Accept") || "").includes("text/html")
 }

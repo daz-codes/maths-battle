@@ -1,0 +1,16 @@
+<%# Daily reminders: whether they're on for this device too only the browser knows (reminder controller) %>
+<section class="reminder" aria-labelledby="reminder-heading" data-controller="reminder"
+         data-reminder-key-value="<%= PushSubscription.public_key %>" data-reminder-url-value="<%= reminder_path %>"
+         data-reminder-on-value="<%= user.reminders_on? %>">
+  <h2 class="label" id="reminder-heading">🔔 Daily reminder</h2>
+  <p class="reminder__about">A notification if you haven't done your daily challenge by then.</p>
+  <div class="reminder__row">
+    <label class="visually-hidden" for="reminder_minute">Remind me at</label>
+    <select id="reminder_minute" class="reminder__time" data-reminder-target="time" data-action="reminder#changeTime">
+      <%= options_for_select User::REMINDER_MINUTES.map { [ reminder_time(_1), _1 ] }, user.reminder_minute || User::DEFAULT_REMINDER_MINUTE %>
+    </select>
+    <button type="button" class="button button--blue" data-reminder-target="on" data-action="reminder#turnOn">Turn on</button>
+    <button type="button" class="button" data-reminder-target="off" data-action="reminder#turnOff" hidden>Turn off</button>
+  </div>
+  <p class="reminder__status" data-reminder-target="status" aria-live="polite"></p>
+</section>

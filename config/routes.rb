@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   get "topics", to: "topics#index", as: :topics
   resource :level, only: :update
   resource :streak_freeze, only: :create
+  resource :reminder, only: %i[ update destroy ]
 
   get "play/:topic", to: "games#show", as: :play
   get "learn/:topic/:level", to: "lessons#show", as: :lesson

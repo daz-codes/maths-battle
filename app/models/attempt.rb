@@ -4,7 +4,7 @@ class Attempt < ApplicationRecord
   belongs_to :user
 
   # A level's practice; the daily challenge, mixing every level up to the player's; or a review of their recent
-  # mistakes and slow answers. Only practice belongs to a level: earning medals and unlocking the next one
+  # mistakes. Only practice belongs to a level: earning medals and unlocking the next one
   MODES = %w[ practice challenge review ]
 
   validates :topic, inclusion: { in: Topic.keys }
