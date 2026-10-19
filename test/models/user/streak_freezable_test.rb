@@ -3,10 +3,10 @@ require "test_helper"
 class User::StreakFreezableTest < ActiveSupport::TestCase
   setup { @user = users(:ada) }
 
-  def day(number) = Date.new(2026, 10, number)
+  def day(number) = Date.new(2026, 11, number)
 
   def play_on(date, **options)
-    travel_to(date.in_time_zone.change(hour: 12)) { Attempt.record!(user: @user, results: answers(*right_answers(5)), **options) }
+    travel_to(date.in_time_zone.change(hour: 12)) { play_daily_challenge(@user, **options) }
   end
 
   def on(date, &) = travel_to(date.in_time_zone.change(hour: 12), &)
@@ -32,7 +32,7 @@ class User::StreakFreezableTest < ActiveSupport::TestCase
     assert games.first(6).none?(&:earned_streak_freeze)
     assert_equal 1, @user.reload.streak_freezes
 
-    assert_not play_on(day(7)).earned_streak_freeze, "a second game the same day doesn't earn another"
+    assert_not play_on(day(7), topic: Equations).earned_streak_freeze, "a second challenge the same day doesn't earn another"
     (8..30).each { |number| play_on(day(number)) }
     assert_equal 2, @user.reload.streak_freezes
   end
@@ -94,7 +94,7 @@ class User::StreakFreezableTest < ActiveSupport::TestCase
     @user.update!(streak_freezes: 1)
     on(day(5)) { @user.use_streak_freezes! }
 
-    on(day(5)) { Attempt.record!(user: @user, results: answers(*right_answers(5)), played_at: day(4).in_time_zone.change(hour: 18).iso8601) }
+    on(day(5)) { play_daily_challenge(@user, played_at: day(4).in_time_zone.change(hour: 18).iso8601) }
     assert_equal 1, @user.reload.streak_freezes
     assert_empty @user.frozen_days
     assert_equal 4, @user.current_streak

@@ -34,10 +34,11 @@ sequentially because concurrent browser workers can contend for SQLite writes.
 
 ## Application flow
 
-Home (showing the current topic, changed on its own page with progress in each) → choose an unlocked level → learn it, practise it for a medal, or play the daily challenge →
-score and practice feedback → stats or play again.
-The server generates questions weighted towards facts the player finds difficult. Five answers make a
-game count towards a streak, and a bronze medal unlocks the next level.
+Home (the current topic, changed on its own page with progress in each, then the streak with the daily
+challenge under it) → play the daily challenge, or choose an unlocked level to learn it or practise it for a
+medal → score and practice feedback → stats or play again.
+The server generates questions weighted towards facts the player finds difficult. The daily challenge keeps
+the streak going, and a bronze medal unlocks the next level.
 The first saved game creates a guest account; registering preserves that guest's history. Signing into
 an existing account switches accounts without merging guest history.
 
@@ -53,7 +54,9 @@ Review mode asks again, exactly, the questions a player recently got wrong or wa
 their last 10 games, `User::Reviewable`), round and round for a minute. Like the daily challenge it's at the
 player's highest level and earns no medal; a game's mode (practice, challenge or review) is in its ticket.
 
-A day counts towards the streak when a game long enough is played or a lesson is finished.
+A day counts towards the streak when any topic's daily challenge is played. Until 20 October 2026 a game of five
+answers or a finished lesson counted instead (`DAILY_CHALLENGE_STREAKS_FROM`), and those days still count, so
+the change cost no one a streak.
 
 ## Lessons
 
@@ -61,7 +64,7 @@ Every level has a minute's tutorial: a worked example in 3–4 steps tapped thro
 try on the game's keypad, with a hint after a wrong answer. Each topic keeps its lessons in its own `Lessons`
 module (`TimesTables::Lessons`, `Equations::Lessons`, …). The one to try is a question in the topic's own form,
 so the topic writes it out as the game would and works out its answer (`worked`). Lessons are offered under
-the level's name and after levelling up, and finishing one counts towards the day's streak.
+the level's name and after levelling up.
 
 ## Achievements
 

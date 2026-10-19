@@ -1,12 +1,5 @@
-<%# The topic the player is on, and one of its unlocked levels, the same on every page that needs it.
-    choosing: :play on the home page (changes what Play plays), or :stats on the stats page.
-    Like a language in Duolingo, the topic is just shown: changing it is on its own page, with the player's
-    progress in each. Practise goes under the levels, as wide as they are %>
-<p class="current-topic">
-  <span class="current-topic__name"><span aria-hidden="true"><%= topic.emoji %></span> <%= topic.title %></span>
-  <%= link_to "Change topic", topics_path(from: (choosing if choosing == :stats)), class: "current-topic__change" %>
-</p>
-
+<%# One of the topic's unlocked levels, the same on every page that needs it. choosing: :play on the home page
+    (changes what Practise plays), or :stats on the stats page. Practise goes under the levels, as wide as they are %>
 <div class="levels-panel">
 <% if topic.levels.many? %>
   <% unlocked = user.unlocked_level(topic) %>
@@ -34,7 +27,6 @@
     <p class="levels__learn"><%= link_to "📖 Learn how", lesson_path(topic.slug, level) %></p>
   <% end %>
 <% end %>
-<%= render "topics/daily_challenge", user: user, topic: topic %>
 <%= link_to "Practise level #{level}", play_path(topic.slug, level: level), class: "button button--blue button--practise" %>
 <% if (review = user.review_questions(topic)).any? %>
   <%= link_to "🔁 Review mistakes (#{review.size})", play_path(topic.slug, review: 1), class: "button button--review" %>

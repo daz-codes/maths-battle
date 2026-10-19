@@ -353,15 +353,9 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   text-transform: uppercase;
 }
 
-.nudge { margin: 0; color: var(--muted); font-size: 1.05rem; font-weight: 500; }
-
-.nudge--risk {
-  padding: 0.35rem 0.9rem;
-  border-radius: 999px;
-  background: var(--pink);
-  color: var(--on-neon);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--pink) var(--glow-strength), transparent);
-}
+/* The daily challenge, right under the streak it keeps going, saying so when the streak needs it */
+.button--challenge { flex-direction: column; gap: 0.15rem; width: var(--panel-width); min-height: 3.9rem; padding-block: 0.5rem; font-size: clamp(1.4rem, 6.5vw, 1.75rem); }
+.button__note { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; opacity: 0.9; }
 
 .save-nudge {
   margin: 0;
@@ -495,9 +489,20 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* ── Topics ─────────────────────────────────────── */
 
-/* The topic the player is on, with a quiet way to change it */
-.current-topic { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 0.25rem 0.75rem; margin: 0; }
-.current-topic__name { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; }
+/* The topic the player is on, standing out, with a quiet way to change it under it */
+.current-topic { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+
+.current-topic__name {
+  margin: 0;
+  padding: 0.45rem 1.25rem;
+  border-radius: 999px;
+  background: var(--paper-alt);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--blue) calc(var(--glow-strength) / 2), transparent);
+  font-size: clamp(1.5rem, 7vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
 .current-topic__change { color: var(--muted); font-size: 0.9rem; font-weight: 600; text-decoration-color: color-mix(in srgb, var(--muted) 45%, transparent); }
 
 /* Changing topic: a tile for each, with the player's progress in it */
@@ -532,40 +537,39 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .topic-card__done { color: var(--green-deep); font-size: 0.85rem; font-weight: 700; }
 
 /* Levels: unlocked ones can be picked, locked ones show a padlock */
-/* The levels with their name and any action under them, as wide as the row of levels: the name is
-   kept from widening it */
-.levels-panel { display: grid; gap: 1.25rem; }
-.levels-panel .levels__name { width: 0; min-width: 100%; }
+/* The levels with their name and any action under them, spread across the page, with room for the medals */
+:root { --panel-width: min(100%, 22rem); }
+.levels-panel { display: grid; gap: 1.25rem; width: var(--panel-width); }
 
-.levels { display: flex; justify-content: center; gap: 0.4rem; margin-top: -0.5rem; }
+.levels { display: flex; justify-content: space-between; margin-top: 0.25rem; }
 .levels__form { display: contents; }
 
 .levels__level {
   display: grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3.1rem;
+  height: 3.1rem;
   border: 0;
   border-radius: 50%;
   background: color-mix(in srgb, var(--ink) 7%, var(--paper));
   color: var(--ink);
   cursor: pointer;
   font: inherit;
+  font-size: 1.15rem;
   font-weight: 700;
   touch-action: manipulation;
 }
 
 .levels__level[aria-current="true"] { background: var(--blue-deep); color: #fff; box-shadow: 0 0 14px color-mix(in srgb, var(--blue) var(--glow-strength), transparent); }
 .levels__level--locked { cursor: default; color: var(--ink); }
-.levels__level--locked .icon { width: 1rem; height: 1rem; }
+.levels__level--locked .icon { width: 1.15rem; height: 1.15rem; }
 .levels__name { margin: -0.6rem 0 0; color: var(--muted); font-size: 0.95rem; font-weight: 600; }
 /* A medal level's best medal, on its circle and under its name */
 .levels__level { position: relative; }
-.levels__medal { position: absolute; right: -0.35rem; bottom: -0.35rem; font-size: 1.05rem; line-height: 1; }
-.levels__medal-line { width: 0; min-width: 100%; margin: -1rem 0 0; color: var(--ink); font-size: 0.95rem; font-weight: 700; }
+.levels__medal { position: absolute; right: -0.4rem; bottom: -0.4rem; font-size: 1.3rem; line-height: 1; }
+.levels__medal-line { margin: -1rem 0 0; color: var(--ink); font-size: 0.95rem; font-weight: 700; }
 
-/* Medal topics have the daily challenge and practising the level picked */
-.levels-panel .button--start { min-height: 3.6rem; font-size: clamp(1.3rem, 6vw, 1.6rem); }
+/* Practising the level picked, and the daily challenge once it's done */
 .daily-done { color: var(--muted); font-weight: 600; text-align: center; text-decoration: none; }
 .daily-done strong { color: var(--ink); }
 .button--practise { width: 100%; margin-top: -0.5rem; }
@@ -701,7 +705,6 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .lesson__feedback { min-height: 1.4em; margin: 0; color: var(--pink-text); font-weight: 700; }
 .lesson__hint { max-width: 20rem; margin: 0; padding: 0.5rem 0.9rem; border-radius: var(--radius); background: var(--paper-alt); font-weight: 600; }
 .lesson__done .button--start { width: 100%; }
-.lesson__streak { margin: 0; color: var(--ink); font-weight: 700; }
 .lesson__hint-button { --fill: var(--paper-alt); color: var(--ink); }
 
 /* ── Badges ─────────────────────────────────────── */

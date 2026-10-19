@@ -1,0 +1,6 @@
+<%# The topic the player is on, like a language in Duolingo: just shown, with a quiet link under it to the page
+    for changing it. from: the page to come back to after changing, or nil for home %>
+<div class="current-topic">
+  <p class="current-topic__name"><span aria-hidden="true"><%= topic.emoji %></span> <%= topic.title %></p>
+  <%= link_to "Change topic", topics_path(from: from), class: "current-topic__change" %>
+</div>

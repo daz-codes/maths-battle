@@ -68,18 +68,14 @@ class AttemptTest < ActiveSupport::TestCase
     assert_equal 16_000, seven_eight.reload.correct_ms, "a 30 second answer counts as 10"
   end
 
-  test "counts toward the streak when enough questions were answered" do
-    attempt = Attempt.record!(user: @user, results: answers(*right_answers(5)))
+  test "a daily challenge keeps the streak, a level's practice doesn't, and each game keeps the streak as it stood" do
+    travel_to(User::Streakable::DAILY_CHALLENGE_STREAKS_FROM.in_time_zone.change(hour: 12)) do
+      practice = Attempt.record!(user: @user, results: answers(*right_answers(10)))
+      assert_equal [ 0, 0 ], [ @user.reload.current_streak, practice.streak ]
 
-    assert_equal 1, @user.reload.current_streak
-    assert_equal 1, attempt.streak
-  end
-
-  test "starting and walking away doesn't count toward the streak" do
-    attempt = Attempt.record!(user: @user, results: answers(*right_answers(4)))
-
-    assert_equal 0, @user.reload.current_streak
-    assert_equal 0, attempt.streak
+      challenge = play_daily_challenge(@user)
+      assert_equal [ 1, 1 ], [ @user.reload.current_streak, challenge.streak ]
+    end
   end
 
   test "a game uploaded twice is only recorded once" do
@@ -126,6 +122,7 @@ class AttemptTest < ActiveSupport::TestCase
   end
 
   test "keeps the best score as it was when the game was played" do
+    play_daily_challenge(@user)
     first = Attempt.record!(user: @user, results: answers(*right_answers(6)))
     Attempt.record!(user: @user, results: answers(*right_answers(9)))
 

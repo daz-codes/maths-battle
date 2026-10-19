@@ -12,18 +12,14 @@
     </h1>
   <% end %>
 
+  <%= render "topics/current", topic: current_topic, from: nil %>
+
   <section class="streak <%= "streak--done" if @user.practised_today? %>" aria-label="Streak">
     <span class="streak__number">🔥 <%= @user.streak %></span>
     <span class="streak__label">day streak</span>
   </section>
 
-  <% if @user.practised_today? %>
-    <p class="nudge">Your streak is safe for today, but you can keep playing to practise more.</p>
-  <% elsif @user.streak_at_risk? %>
-    <p class="nudge nudge--risk">Don't lose your streak!</p>
-  <% else %>
-    <p class="nudge">Click play to start your streak</p>
-  <% end %>
+  <%= render "topics/daily_challenge", user: @user, topic: current_topic %>
 
   <%= render "topics/chooser", choosing: :play, user: current_player, topic: current_topic, level: current_level %>
 

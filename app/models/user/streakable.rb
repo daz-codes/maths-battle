@@ -2,10 +2,13 @@
 # Games played offline can reach the server days later and out of order, so the streak is worked out
 # again from the days that have games, rather than counted up as games arrive.
 # The time zone comes from the player's device with each game, so the day ends at their own midnight.
-# A day counts when a game long enough was played, or a lesson finished (User::Learnable).
+# A day counts when one of the topics' daily challenges was played. Before DAILY_CHALLENGE_STREAKS_FROM any game
+# long enough, or a lesson finished (User::Learnable), counted, and those days still do, so no streak was lost.
 # A day covered by a streak freeze (User::StreakFreezable) keeps the streak going, but doesn't add to it
 module User::Streakable
   extend ActiveSupport::Concern
+
+  DAILY_CHALLENGE_STREAKS_FROM = Date.new(2026, 10, 20)
 
   included do
     validate :time_zone_known
@@ -58,7 +61,17 @@ module User::Streakable
     end
 
     def practised_days
-      (attempts.counted.distinct.pluck(:played_on) + lesson_completions.distinct.pluck(:completed_on)).uniq.sort
+      (challenge_days + days_practised_before_challenges).uniq.sort
+    end
+
+    def challenge_days
+      attempts.daily_challenges.where(played_on: DAILY_CHALLENGE_STREAKS_FROM..).distinct.pluck(:played_on)
+    end
+
+    def days_practised_before_challenges
+      before = ...DAILY_CHALLENGE_STREAKS_FROM
+      attempts.counted.where(played_on: before).distinct.pluck(:played_on) +
+        lesson_completions.where(completed_on: before).distinct.pluck(:completed_on)
     end
 
     # Practised days and frozen ones, in order

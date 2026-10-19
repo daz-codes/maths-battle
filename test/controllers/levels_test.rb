@@ -20,7 +20,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_select ".levels__level--locked", 3
     assert_select ".levels__name", text: "Level 2: Tables 2–12"
     assert_select ".levels__medal-line", text: "Score 10 for 🥉 bronze and unlock level 3"
-    assert_select ".levels-panel > a.button--start[href=?]", play_path("times-tables", challenge: 1), text: "⭐ Daily challenge"
+    assert_select "a.button--challenge[href=?]", play_path("times-tables", challenge: 1), text: /⭐ Daily challenge/
     assert_select ".levels-panel > a.button--practise[href=?]", play_path("times-tables", level: 2), text: "Practise level 2"
   end
 
@@ -98,6 +98,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     get stats_path("times-tables", level: 1)
 
     assert_select ".current-topic__name", text: "✖️ Times tables"
+    assert_select ".button--challenge", count: 0, message: "the daily challenge is on the home page, under the streak"
     assert_select "form[action=?][method=get] input[name=level][value=2]", stats_path("times-tables")
     assert_select ".levels .levels__level[aria-current=true]", text: /1/
     assert_select ".levels__level--locked", 3
@@ -114,7 +115,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_select ".levels__medal-line", text: "Score 6 for 🥉 bronze and unlock level 2"
-    assert_select ".levels-panel > a.button--start[href=?]", play_path("equations", challenge: 1)
+    assert_select "a.button--challenge[href=?]", play_path("equations", challenge: 1)
     assert_select ".levels-panel > a.button--practise[href=?]", play_path("equations", level: 1)
   end
 

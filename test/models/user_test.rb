@@ -15,26 +15,24 @@ class UserTest < ActiveSupport::TestCase
     assert_not User.new(username: "ab", password: "a long secret phrase").valid?
   end
 
-  def play_on(date, played_at: nil)
-    travel_to(date.in_time_zone.change(hour: 12)) do
-      Attempt.record!(user: @user, results: answers(*right_answers(5)), played_at: played_at)
-    end
+  def play_on(date, **options)
+    travel_to(date.in_time_zone.change(hour: 12)) { play_daily_challenge(@user, **options) }
   end
 
-  def day(n) = Date.new(2026, 10, n)
+  def day(n) = Date.new(2026, 11, n)
 
-  test "first practice starts a streak" do
+  test "a first daily challenge starts a streak" do
     play_on day(15)
     assert_equal [ 1, 1, day(15) ], [ @user.current_streak, @user.longest_streak, @user.last_practised_on ]
   end
 
-  test "practising twice in a day doesn't change the streak" do
+  test "another topic's daily challenge the same day doesn't change the streak" do
     play_on day(15)
-    play_on day(15)
+    play_on day(15), topic: Equations
     assert_equal 1, @user.current_streak
   end
 
-  test "practising on consecutive days grows the streak" do
+  test "daily challenges on consecutive days grow the streak" do
     play_on day(14)
     play_on day(15)
     play_on day(16)
@@ -49,11 +47,27 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 5, @user.longest_streak
   end
 
-  test "a short game doesn't count towards the streak" do
+  test "only the daily challenge keeps the streak, even a short one; practice, reviews and lessons don't" do
     travel_to(day(15).in_time_zone.change(hour: 12)) do
-      Attempt.record!(user: @user, results: answers(*right_answers(4)))
+      Attempt.record!(user: @user, results: answers(*right_answers(20)))
+      @user.complete_lesson!(TimesTables, 1)
+      assert_equal 0, @user.reload.current_streak
+      assert_not @user.practised_today?
+
+      play_daily_challenge(@user, answered: 1)
+      assert_equal 1, @user.reload.current_streak
+      assert @user.practised_today?
     end
-    assert_equal 0, @user.current_streak
+  end
+
+  test "before the daily challenge did, a game long enough or a lesson kept the streak, and those days still count" do
+    before = User::Streakable::DAILY_CHALLENGE_STREAKS_FROM
+    travel_to((before - 3).in_time_zone.change(hour: 12)) { Attempt.record!(user: @user, results: answers(*right_answers(4))) }
+    travel_to((before - 2).in_time_zone.change(hour: 12)) { Attempt.record!(user: @user, results: answers(*right_answers(5))) }
+    travel_to((before - 1).in_time_zone.change(hour: 12)) { @user.complete_lesson!(TimesTables, 1) }
+    travel_to(before.in_time_zone.change(hour: 12)) { play_daily_challenge(@user) }
+
+    assert_equal 3, @user.reload.current_streak, "a short game never counted"
   end
 
   test "a game played offline yesterday still counts when it arrives today" do
@@ -101,12 +115,10 @@ class UserTest < ActiveSupport::TestCase
     assert_not User.new(time_zone: "Nowhere/Special").valid?
   end
 
-  test "practice just after midnight counts for the new day" do
+  test "a daily challenge just after midnight counts for the new day" do
     play_on day(14)
 
-    travel_to Time.zone.local(2026, 10, 15, 0, 5) do
-      Attempt.record!(user: @user, results: answers(*right_answers(5)))
-    end
+    travel_to(Time.zone.local(2026, 11, 15, 0, 5)) { play_daily_challenge(@user) }
     assert_equal 2, @user.current_streak
   end
 

@@ -5,6 +5,8 @@
   <h1 class="heading">Settings</h1>
   <%= render "flash" %>
 
+  <%= render "topics/current", topic: current_topic, from: :profile %>
+
   <% if @user.persisted? %>
     <section class="collection" aria-label="Stars and streak freezes">
       <p class="stars-total"><strong><%= number_with_delimiter @user.stars %></strong> ⭐ stars</p>

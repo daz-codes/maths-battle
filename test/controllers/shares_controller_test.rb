@@ -3,6 +3,7 @@ require "test_helper"
 class SharesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = User.create!(username: "secret_squirrel", password: "a long secret phrase")
+    play_daily_challenge(@user)
     @attempt = Attempt.record!(user: @user, results: answers(*right_answers(6)))
   end
 

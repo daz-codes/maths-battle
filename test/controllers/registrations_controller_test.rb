@@ -30,6 +30,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     post attempts_path, params: game_upload(results: answers(*right_answers(5))), as: :json
     guest = User.last
     assert guest.guest?
+    play_daily_challenge(guest)
 
     assert_no_difference -> { User.count } do
       post registration_path, params: { user: { name: "Zara", username: "zara_b", password: "a long secret phrase" } }
@@ -38,7 +39,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     guest.reload
     assert_equal "zara_b", guest.username
     assert_equal 1, guest.current_streak
-    assert_equal 1, guest.attempts.count
+    assert_equal 2, guest.attempts.count
     assert_equal guest, User.authenticate_by(username: "zara_b", password: "a long secret phrase")
   end
 

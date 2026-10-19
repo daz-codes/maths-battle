@@ -9,6 +9,15 @@ class TopicsController < ApplicationController
 
   def update
     remember_topic topic_from_slug
-    redirect_to params[:from] == "stats" ? stats_path : root_path
+    redirect_to back_path
   end
+
+  private
+    def back_path
+      case params[:from]
+      when "stats" then stats_path
+      when "profile" then edit_profile_path
+      else root_path
+      end
+    end
 end

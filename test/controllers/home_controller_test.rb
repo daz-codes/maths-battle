@@ -8,10 +8,9 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".site-header .tagline", text: "Improve your math in minutes"
-    assert_select "a[href=?]", play_path("times-tables", challenge: 1), text: "⭐ Daily challenge"
+    assert_select "a.button--challenge[href=?]", play_path("times-tables", challenge: 1), text: /⭐ Daily challenge\s+Play it to start a streak/
     assert_select "a[href=?]", play_path("times-tables", level: 1), text: "Practise level 1"
     assert_select ".streak__number", text: /0/
-    assert_select ".nudge", text: "Click play to start your streak"
     assert_select "a[href=?]", new_registration_path
   end
 
@@ -40,7 +39,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
   test "coming back after a missed day says a freeze kept the streak" do
     user = users(:ada)
-    [ 4, 3, 2 ].each { |ago| travel_to(ago.days.ago) { Attempt.record!(user: user, results: answers(*right_answers(5))) } }
+    [ 4, 3, 2 ].each { |ago| travel_to(ago.days.ago) { play_daily_challenge(user) } }
     user.update!(streak_freezes: 1)
     sign_in_as user
 
@@ -58,6 +57,16 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".greeting", text: /Hi Ada!/
   end
 
+  test "the page goes greeting, topic with a link to change it, streak, then the daily challenge right under it" do
+    @user.update!(name: "Ada")
+    sign_in_as @user
+    get root_path
+
+    parts = %w[ greeting current-topic__name current-topic__change streak button--challenge levels ]
+    order = css_select(parts.map { ".#{_1}" }.join(", ")).map { |element| (element["class"].split & parts).first }
+    assert_equal parts, order
+  end
+
   test "shows the streak, best score and start button" do
     @user.update!(current_streak: 12, last_practised_on: @user.today, streak_kept_on: @user.today)
     Attempt.record!(user: @user, results: answers(*right_answers(41), ms: 1000))
@@ -69,9 +78,9 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".streak__number", text: /12/
     assert_select ".stats", text: /41/
     assert_select "a[href=?]", stats_path("times-tables"), text: "See all stats"
-    assert_select "a[href=?]", play_path("times-tables", challenge: 1), text: "⭐ Daily challenge"
+    assert_select "a[href=?]", play_path("times-tables", challenge: 1), text: "⭐ Daily challenge", message: "nothing more to say: the streak is safe today"
     assert_select "a[href=?]", play_path("times-tables", level: 1), text: "Practise level 1"
-    assert_select ".nudge", text: "Your streak is safe for today, but you can keep playing to practise more."
+    assert_select ".nudge", count: 0
   end
 
   test "after a missed day the streak starts again" do
@@ -79,7 +88,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
-    assert_select ".nudge", text: "Click play to start your streak"
+    assert_select ".button--challenge .button__note", text: "Play it to start a streak"
   end
 
   test "warns when the streak is at risk" do
@@ -87,6 +96,19 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
-    assert_select ".nudge--risk", text: "Don't lose your streak!"
+    assert_select ".button--challenge .button__note", text: "Don't lose your streak!"
+  end
+
+  test "a daily challenge in another topic keeps the streak, and that's done once it's played" do
+    play_daily_challenge(@user, topic: Equations)
+    sign_in_as @user
+
+    get root_path
+    assert_select ".button--challenge", text: "⭐ Daily challenge"
+    assert_select ".button__note", count: 0
+
+    play_daily_challenge(@user)
+    get root_path
+    assert_select ".daily-done", text: "✅ Challenge done today: 5"
   end
 end

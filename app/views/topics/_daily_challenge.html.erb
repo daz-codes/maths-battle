@@ -1,8 +1,16 @@
-<%# Once a day: the button to play it, or, once it's played, a quiet line saying how it went %>
+<%# Once a day: the button to play it, saying so if the streak needs it, or, once it's played, a quiet line
+    saying how it went. Any topic's daily challenge keeps the streak going %>
 <% if (done = user.daily_challenge_on(topic)) %>
   <%= link_to attempt_path(done), class: "daily-done" do %>
     ✅ Challenge done today: <strong><%= done.score %></strong>
   <% end %>
 <% else %>
-  <%= link_to "⭐ Daily challenge", play_path(topic.slug, challenge: 1), class: "button button--start" %>
+  <%= link_to play_path(topic.slug, challenge: 1), class: "button button--start button--challenge" do %>
+    ⭐ Daily challenge
+    <% if user.streak_at_risk? %>
+      <span class="button__note">Don't lose your streak!</span>
+    <% elsif !user.practised_today? %>
+      <span class="button__note">Play it to start a streak</span>
+    <% end %>
+  <% end %>
 <% end %>

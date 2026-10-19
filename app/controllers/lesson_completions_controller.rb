@@ -1,5 +1,5 @@
 # Finishing a lesson, sent by the lesson page. A visitor who hasn't played yet gets a guest account, as with a
-# first game, so the streak has somewhere to go
+# first game, so it has somewhere to go
 class LessonCompletionsController < ApplicationController
   allow_unauthenticated_access
   rate_limit to: 20, within: 1.minute
@@ -11,6 +11,7 @@ class LessonCompletionsController < ApplicationController
 
     player = resume_or_start_guest_session.user
     player.update_time_zone(params[:time_zone])
-    render json: { streak: player.complete_lesson!(topic, level) }
+    player.complete_lesson!(topic, level)
+    head :created
   end
 end

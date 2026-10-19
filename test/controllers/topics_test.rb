@@ -24,6 +24,17 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_select "select", count: 0
   end
 
+  test "the settings page says which topic too, and changing it from there comes back there" do
+    get edit_profile_path
+    assert_select ".current-topic__name", text: "✖️ Times tables"
+    assert_select ".current-topic__change[href=?]", topics_path(from: "profile")
+
+    patch topic_path, params: { topic: "functions", from: "profile" }
+    assert_redirected_to edit_profile_path
+    follow_redirect!
+    assert_select ".current-topic__name", text: "⚙️ Functions"
+  end
+
   test "changing topic is a page of every topic with the player's progress, the current one marked" do
     Attempt.record!(user: @user, results: answers(*Array.new(22) { [ 2, 3, 6 ] }))
     Attempt.record!(user: @user, topic: "functions", level: 1, mode: "challenge", results: [ { type: "x+a", a: 2, n: 3, given: "5", ms: 1000 } ] * 5)

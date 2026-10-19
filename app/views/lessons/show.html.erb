@@ -39,7 +39,6 @@
     <section class="lesson__step lesson__done" data-tutorial-target="done" hidden>
       <p class="lesson__show">🎉 That's it!</p>
       <p class="lesson__say"><%= @topic.label(@try.except(:text, :answer).transform_keys(&:to_s).merge("given" => @try[:answer])) %></p>
-      <p class="lesson__streak" data-tutorial-target="streak" hidden></p>
       <%= link_to "Play level #{@level}", play_path(@topic.slug, level: @level), class: "button button--start" %>
       <%= link_to "Home", root_path %>
     </section>

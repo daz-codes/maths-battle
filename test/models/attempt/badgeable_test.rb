@@ -36,7 +36,7 @@ class Attempt::BadgeableTest < ActiveSupport::TestCase
   end
 
   test "streak badges come with the streak" do
-    (1..3).each { |day| travel_to(Time.zone.local(2026, 10, day, 12)) { play } }
+    (1..3).each { |day| travel_to(Time.zone.local(2026, 11, day, 12)) { play(mode: "challenge") } }
     assert_includes earned, "streak_3"
     assert_not_includes earned, "streak_7"
   end

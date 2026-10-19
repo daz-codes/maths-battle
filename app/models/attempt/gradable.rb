@@ -1,5 +1,6 @@
-# Which games count. A game long enough counts towards the streak (starting a test and walking away doesn't),
-# and a perfect one needs a proper number of answers too
+# Which games count. A game long enough counts towards average scores and badges (starting a test and walking
+# away doesn't), and counted towards the streak before only daily challenges did (User::Streakable). A perfect
+# one needs a proper number of answers too
 module Attempt::Gradable
   extend ActiveSupport::Concern
 

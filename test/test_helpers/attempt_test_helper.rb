@@ -31,6 +31,12 @@ module AttemptTestHelper
     SimultaneousEquations => { type: "subtract", a: 2, b: 1, c: 5, d: 1, e: 1, f: 3, v: "x", given: "2", ms: 1000 }
   }
 
+  # A daily challenge, the game that keeps the streak going
+  def play_daily_challenge(user, topic: TimesTables, answered: 5, **options)
+    Attempt.record!(user: user, topic: topic.key, level: user.unlocked_level(topic), mode: "challenge",
+      results: [ EASY_QUESTIONS.fetch(topic) ] * answered, **options)
+  end
+
   # Plays a bronze at each level below to unlock this one. The questions are ones every level asks
   def unlock(user, topic, level)
     (1...level).each do |below|

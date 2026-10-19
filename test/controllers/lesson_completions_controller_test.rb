@@ -3,28 +3,22 @@ require "test_helper"
 class LessonCompletionsControllerTest < ActionDispatch::IntegrationTest
   setup { @user = users(:ada) }
 
-  test "finishing a lesson keeps the streak going for the day" do
+  test "finishing a lesson is recorded, but only the daily challenge keeps the streak" do
     sign_in_as @user
     post lesson_completion_path("times-tables", 1), as: :json
 
-    assert_response :success
-    assert_equal 1, response.parsed_body["streak"]
-    assert @user.reload.practised_today?
+    assert_response :created
     assert_equal 1, @user.lesson_completions.count
+    travel_to(User::Streakable::DAILY_CHALLENGE_STREAKS_FROM.in_time_zone.change(hour: 12)) do
+      @user.complete_lesson!(TimesTables, 1)
+      assert_not @user.reload.practised_today?
+    end
   end
 
   test "the same lesson again that day changes nothing" do
     sign_in_as @user
     2.times { post lesson_completion_path("times-tables", 1), as: :json }
     assert_equal 1, @user.lesson_completions.count
-  end
-
-  test "lessons on days in a row make a streak, with games too" do
-    travel_to(2.days.ago) { @user.complete_lesson!(TimesTables, 1) }
-    travel_to(1.day.ago) { Attempt.record!(user: @user, results: answers(*right_answers(5))) }
-    @user.complete_lesson!(TimesTables, 1)
-
-    assert_equal 3, @user.reload.streak
   end
 
   test "only for an unlocked level" do
@@ -35,11 +29,11 @@ class LessonCompletionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "a visitor finishing a lesson gets a guest account to keep the streak" do
+  test "a visitor finishing a lesson gets a guest account to keep it" do
     assert_difference -> { User.count } do
       post lesson_completion_path("times-tables", 1), as: :json
     end
     assert User.last.guest?
-    assert_equal 1, response.parsed_body["streak"]
+    assert_equal 1, User.last.lesson_completions.count
   end
 end

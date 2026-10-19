@@ -22,10 +22,9 @@ class PlayingOfflineTest < ApplicationSystemTestCase
     go_online
     assert_difference -> { @user.attempts.count }, 1 do
       visit root_path
-      assert_selector ".nudge", text: "Your streak is safe for today", wait: 8
+      assert_selector ".stats dd", text: "🏆 5", wait: 8
     end
     assert_equal 0, unsent_games
-    assert_equal 1, @user.reload.current_streak
   end
 
   test "uploading again doesn't save the game twice" do

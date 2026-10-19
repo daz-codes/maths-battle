@@ -1,4 +1,5 @@
-# Lessons a player has finished. Finishing one counts towards the streak for the day, like a game
+# Lessons a player has finished, once a day for each; another go the same day changes nothing.
+# Lessons used to keep the streak going, and the days they did still count (User::Streakable)
 module User::Learnable
   extend ActiveSupport::Concern
 
@@ -6,13 +7,7 @@ module User::Learnable
     has_many :lesson_completions, dependent: :destroy
   end
 
-  # Once a day for each lesson counts; another go the same day changes nothing. Returns the streak, kept for today
   def complete_lesson!(topic, level)
-    with_lock do
-      lesson_completions.find_or_create_by!(topic: topic.key, level: level, completed_on: today)
-      grew = refresh_streak!
-      earn_streak_freeze(grew) if grew.positive?
-    end
-    streak
+    lesson_completions.find_or_create_by!(topic: topic.key, level: level, completed_on: today)
   end
 end

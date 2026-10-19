@@ -46,7 +46,7 @@ class DailyChallengeTest < ActionDispatch::IntegrationTest
 
     get root_path
     assert_select "a.daily-done[href=?]", attempt_path(challenge), text: "✅ Challenge done today: 12"
-    assert_select "a.button--start", text: /Daily challenge/, count: 0
+    assert_select "a.button--challenge", count: 0
 
     get play_path("times-tables", challenge: 1)
     assert_redirected_to root_path
@@ -61,7 +61,7 @@ class DailyChallengeTest < ActionDispatch::IntegrationTest
 
     travel 1.day do
       get root_path
-      assert_select "a.button--start[href=?]", play_path("times-tables", challenge: 1), text: "⭐ Daily challenge"
+      assert_select "a.button--challenge[href=?]", play_path("times-tables", challenge: 1), text: /⭐ Daily challenge/
     end
   end
 

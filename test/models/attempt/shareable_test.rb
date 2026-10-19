@@ -4,6 +4,7 @@ class Attempt::ShareableTest < ActiveSupport::TestCase
   setup { @user = users(:ada) }
 
   test "a brag with score, streak, best, squares and link, but no questions or username" do
+    play_daily_challenge(@user)
     attempt = record_tables_game(@user, answers([ 7, 8, 56 ], [ 6, 7, 41 ], [ 9, 9, 81 ], [ 2, 2, 4 ], [ 3, 3, 9 ]))
     text = attempt.share_text("https://matheminute.app/s/abc")
 
