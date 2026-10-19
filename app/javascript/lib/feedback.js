@@ -1,7 +1,9 @@
 // Sounds and haptics: a tick for a right answer, a soft buzz for a wrong one, a fanfare for a level up.
 // Made with the Web Audio API, so there are no files to load or keep for offline. Players turn them off in
 // settings, which the page says on <html data-sounds="off">. Vibration is only where the browser allows it
-// (not iPhones). Browsers only let sound start from a tap or key press, so the first one wakes the audio up
+// (not iPhones). Browsers only let sound start from a tap or key press, so each one wakes the audio up if it
+// needs it: iOS also stops it when the app goes into the background ("interrupted"), and only really starts it
+// once something plays during the tap, so a moment of silence does. An iPhone on silent plays no web sounds
 let context
 
 const sounding = () => document.documentElement.dataset.sounds !== "off"
@@ -11,15 +13,23 @@ function audio() {
   if (!AudioContext) return null
 
   context ||= new AudioContext()
-  if (context.state === "suspended") context.resume().catch(() => {})
+  if (context.state !== "running") context.resume().catch(() => {})
   return context
 }
 
 export function wakeAudio() {
-  if (sounding()) audio()
+  if (!sounding()) return
+
+  const sound = audio()
+  if (!sound || sound.state === "running" || !sound.createBufferSource) return
+
+  const silence = sound.createBufferSource()
+  silence.buffer = sound.createBuffer(1, 1, 22_050)
+  silence.connect(sound.destination)
+  silence.start(0)
 }
 
-for (const event of [ "pointerdown", "pointerup", "keydown" ]) {
+for (const event of [ "pointerdown", "pointerup", "touchend", "keydown" ]) {
   globalThis.document?.addEventListener(event, wakeAudio, { capture: true, passive: true })
 }
 

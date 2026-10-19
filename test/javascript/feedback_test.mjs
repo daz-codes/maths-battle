@@ -3,11 +3,15 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
 // A page with a fake audio context that records each note, and a vibration motor that records each buzz
-let notes, buzzes, contexts
+let notes, buzzes, contexts, resumes, silences, state = 'running'
 globalThis.document = { documentElement: { dataset: {} }, addEventListener() {} }
 globalThis.window = {
   AudioContext: class {
-    constructor() { contexts++; this.currentTime = 0; this.state = 'running'; this.destination = {} }
+    constructor() { contexts++; this.currentTime = 0; this.destination = {} }
+    get state() { return state }
+    resume() { resumes++; return Promise.resolve() }
+    createBuffer() { return {} }
+    createBufferSource() { return { connect() {}, start() { silences++ } } }
     createOscillator() {
       const oscillator = { frequency: { setValueAtTime: hz => oscillator.hz = hz, exponentialRampToValueAtTime() {} }, connect: gain => gain, start() { notes.push(oscillator.hz) }, stop() {} }
       return oscillator
@@ -24,6 +28,9 @@ beforeEach(() => {
   notes = []
   buzzes = []
   contexts = 0
+  resumes = 0
+  silences = 0
+  state = 'running'
   document.documentElement.dataset.sounds = 'on'
 })
 
@@ -40,6 +47,15 @@ test('one audio context for the whole visit', () => {
   feedback.right()
   feedback.right()
   assert.ok(contexts <= 1)
+})
+
+test('a tap wakes audio iOS has stopped, suspended or interrupted, with a moment of silence', () => {
+  for (state of [ 'suspended', 'interrupted' ]) feedback.wakeAudio()
+  assert.deepEqual([ resumes, silences ], [ 2, 2 ])
+
+  state = 'running'
+  feedback.wakeAudio()
+  assert.deepEqual([ resumes, silences ], [ 2, 2 ], 'nothing to do once it is running')
 })
 
 test('silent and still when turned off', () => {
