@@ -12,6 +12,17 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type=radio][name='user[theme]']", 3
   end
 
+  test "sounds and vibration are on until turned off, and every page says which" do
+    get edit_profile_path
+    assert_select "html[data-sounds=on]"
+    assert_select "fieldset[data-controller=sounds] input[type=radio][name='user[sounds]'][value=true][checked]"
+
+    patch profile_path, params: { user: { sounds: "false" } }
+    assert_not @user.reload.sounds?
+    get root_path
+    assert_select "html[data-sounds=off]"
+  end
+
   test "changes name and theme" do
     patch profile_path, params: { user: { name: "Ada L", theme: "dark" } }
 

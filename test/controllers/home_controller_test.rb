@@ -86,12 +86,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".greeting", text: /Hi Ada!/
   end
 
-  test "the page goes greeting, topic with a link to change it, streak, then the daily challenge right under it" do
+  test "the page goes topic, greeting, streak, then the daily challenge right under it" do
     @user.update!(name: "Ada")
     sign_in_as @user
     get root_path
 
-    parts = %w[ greeting current-topic__name current-topic__change streak button--challenge levels ]
+    parts = %w[ current-topic greeting streak button--challenge levels ]
     order = css_select(parts.map { ".#{_1}" }.join(", ")).map { |element| (element["class"].split & parts).first }
     assert_equal parts, order
   end

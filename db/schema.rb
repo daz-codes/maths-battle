@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_170000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -149,6 +149,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_150000) do
     t.date "streak_kept_on"
     t.integer "reminder_minute"
     t.date "reminded_on"
+    t.boolean "sounds", default: true, null: false
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 

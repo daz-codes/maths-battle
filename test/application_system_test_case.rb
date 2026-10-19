@@ -10,6 +10,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     options.add_preference("profile.password_manager_enabled", false)
     options.add_preference("profile.password_manager_leak_detection", false)
     options.add_argument("--disable-features=PasswordLeakDetection,PasswordManagerOnboarding")
+    # Games tick, buzz and play fanfares (lib/feedback.js): not out loud while the tests run
+    options.add_argument("--mute-audio")
   end
 
   setup do

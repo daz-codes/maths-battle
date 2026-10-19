@@ -53,6 +53,16 @@
       <% end %>
     </fieldset>
 
+    <fieldset class="choice" data-controller="sounds">
+      <legend>Sounds and vibration</legend>
+      <% { true => "On", false => "Off" }.each do |on, label| %>
+        <label class="choice__option">
+          <%= form.radio_button :sounds, on, data: { action: "sounds#preview" } %>
+          <span><%= label %></span>
+        </label>
+      <% end %>
+    </fieldset>
+
     <%= form.submit "Save", class: "button button--go" %>
   <% end %>
 

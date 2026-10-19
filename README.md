@@ -95,6 +95,13 @@ it earns a bonus. The +10s that float up during a game are only for show:
 the server works out the stars from the checked answers (`Attempt::Starrable`) and keeps them on the game,
 so a player's total is the sum of their games.
 
+## Sounds and vibration
+
+A tick for a right answer, a soft buzz for a wrong one and a fanfare for a level up, in games and lessons
+(`lib/feedback.js`). They're made with the Web Audio API, so there are no sound files to load or keep for
+offline, and vibrate where the browser allows it (not iPhones). They're on until the player turns them off
+in settings; the page says which on `<html data-sounds>`.
+
 ## Reminders
 
 Players can turn on a daily reminder in settings, at a half hour they pick from 7am to 9pm. If they haven't

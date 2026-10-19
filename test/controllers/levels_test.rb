@@ -44,7 +44,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
 
     post attempts_path, params: game_upload(level: 1, results: answers(*Array.new(10) { [ 2, 3, 6 ] }, ms: 1000)), as: :json
     get response.parsed_body["url"]
-    assert_select ".banner--level", text: /Level up! You've unlocked Level 2: Tables 2–12/
+    assert_select ".banner--level[data-controller~=fanfare]", text: /Level up! You've unlocked Level 2: Tables 2–12/
 
     get root_path
     assert_select ".levels__name", text: "Level 2: Tables 2–12"

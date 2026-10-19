@@ -19,6 +19,6 @@ class ProfilesController < ApplicationController
 
   private
     def profile_params
-      params.expect(user: %i[ name theme avatar_upload remove_avatar ])
+      params.expect(user: %i[ name theme sounds avatar_upload remove_avatar ])
     end
 end

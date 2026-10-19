@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<%= language %>" data-theme="<%= current_player.theme %>">
+<html lang="<%= language %>" data-theme="<%= current_player.theme %>" data-sounds="<%= current_player.sounds? ? "on" : "off" %>">
   <head>
     <title><%= content_for(:title) || "MatheMinute" %></title>
     <meta name="viewport" content="<%= content_for(:viewport) || "width=device-width,initial-scale=1" %>">

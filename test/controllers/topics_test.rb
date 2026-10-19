@@ -17,17 +17,17 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".current-topic__name", text: "⚖️ Equations"
   end
 
-  test "the home page says which topic, with a quiet link to change it" do
+  test "the home page says which topic, and tapping it goes to change it" do
     get root_path
     assert_select ".current-topic__name", text: "✖️ Times tables"
-    assert_select ".current-topic a.current-topic__change[href=?]", topics_path, text: "Change topic"
+    assert_select "a.current-topic[href=?][title='Change topic'][aria-label=?]", topics_path, "Times tables. Change topic"
     assert_select "select", count: 0
   end
 
   test "the settings page says which topic too, and changing it from there comes back there" do
     get edit_profile_path
     assert_select ".current-topic__name", text: "✖️ Times tables"
-    assert_select ".current-topic__change[href=?]", topics_path(from: "profile")
+    assert_select "a.current-topic[href=?]", topics_path(from: "profile")
 
     patch topic_path, params: { topic: "functions", from: "profile" }
     assert_redirected_to edit_profile_path
@@ -60,7 +60,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to stats_path
     follow_redirect!
     assert_select ".current-topic__name", text: "⚖️ Equations"
-    assert_select ".current-topic__change[href=?]", topics_path(from: "stats")
+    assert_select "a.current-topic[href=?]", topics_path(from: "stats")
   end
 
   test "a stats page for a topic can still be linked to" do

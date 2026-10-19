@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { finished, shown, typedWith } from "lib/answer_input"
+import * as feedback from "lib/feedback"
 
 const WRONG_PAUSE = 900
 
@@ -92,8 +93,12 @@ export default class extends Controller {
 
   // Right finishes the lesson. Wrong says so, shows the hint, and lets them have another go
   check() {
-    if (this.typed === this.answerValue) return this.finish()
+    if (this.typed === this.answerValue) {
+      feedback.right()
+      return this.finish()
+    }
 
+    feedback.wrong()
     this.waiting = true
     this.feedbackTarget.textContent = "Not quite. Have another go!"
     this.answerTarget.classList.add("answer--wrong")

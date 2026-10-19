@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 import { chooseQuestionSet, playerKey, preparePlayer, postGame, saveForLater, watchPlayer } from "lib/offline_games"
 import { finished, shown, typedWith } from "lib/answer_input"
+import * as feedback from "lib/feedback"
 
 const DURATION = 60_000
 const STARS = { right: 10, quick: 20, lightning: 30 }
@@ -220,6 +221,7 @@ export default class extends Controller {
       this.score++
       this.scoreTarget.textContent = this.score
       this.flash(this.scoreTarget, "--right")
+      feedback.right()
       if (!this.review) this.popStars(ms)
       this.next()
     } else {
@@ -243,6 +245,7 @@ export default class extends Controller {
 
   // Show the right answer briefly so it sticks, then carry on
   showCorrection() {
+    feedback.wrong()
     this.showingCorrection = true
     this.answerTarget.textContent = shown(this.correctAnswer)
     this.answerTarget.classList.add("answer--wrong")
