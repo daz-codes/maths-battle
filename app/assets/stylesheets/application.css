@@ -945,6 +945,28 @@ body.testing {
 .function { color: var(--muted); }
 .function--ask { color: var(--ink); font-size: 1.6em; }
 
+/* Fractions: the fractions are the question, so they're stacked large, with "Simplify" above one on its own */
+.test--fractions .question,
+.test--fractions .question.question--long,
+.test--fractions .question.question--longer { font-size: clamp(2.6rem, 12vw, 4.75rem); letter-spacing: -0.02em; }
+.test--fractions .question.question--done { font-size: clamp(2.75rem, 12vw, 5rem); }
+.test--fractions .frac { font-size: 0.85em; margin: 0 0.12em; }
+.lesson__show--fractions { font-size: clamp(1.8rem, 8vw, 2.6rem); }
+/* A lesson has its title and dots above the keypad too, so its keys are shorter than the game's, leaving room on
+   small phones for the one to try */
+.lesson__keypad .keypad__key { min-height: 52px; height: clamp(52px, 7.5dvh, 80px); }
+
+@media (max-height: 700px) {
+  .lesson { gap: 0.6rem; }
+  .lesson__title { font-size: 1.25rem; }
+  .lesson__try > .label { display: none; }
+  .lesson__keypad .keypad__key { min-height: 44px; height: 44px; }
+  .lesson__keypad .keypad__key:not(.keypad__key--submit) { font-size: 1.6rem; }
+  .lesson__keypad .keypad { gap: 0.4rem; }
+}
+.lesson__show--fractions .frac { font-size: 0.8em; margin: 0 0.12em; }
+.question__verb { display: block; color: var(--muted); font-size: 0.45em; font-weight: 700; letter-spacing: 0.02em; }
+
 .frac {
   display: inline-flex;
   flex-direction: column;

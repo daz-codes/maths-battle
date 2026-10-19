@@ -1,7 +1,9 @@
 # MatheMinute
 
 A Rails and Hotwire app for one-minute maths practice. Players can start as guests, register to
-keep their history across devices, and practise times tables, equations, functions or simultaneous equations at progressively harder levels.
+keep their history across devices, and practise times tables, fractions, equations, functions or simultaneous equations at progressively harder levels.
+Fractions practises one skill a level (simplifying, adding and subtracting with the same or different
+denominators, multiplying, dividing), with answers in lowest terms, typed with a fraction line.
 
 ## Development
 
