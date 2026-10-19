@@ -1,7 +1,7 @@
 <%# The player's picture, or the first letter of their username on their neon colour %>
 <% size = local_assigns.fetch(:size, "medium") %>
 <% if user.avatar.attached? %>
-  <%= image_tag url_for(user.avatar), alt: "", class: "avatar avatar--#{size}", data: local_assigns[:data] %>
+  <%= image_tag avatar_path, alt: "", class: "avatar avatar--#{size}", data: local_assigns[:data] %>
 <% else %>
   <span class="avatar avatar--<%= size %> avatar--letter avatar--<%= user.avatar_colour %>" aria-hidden="true"
         <%= tag.attributes(data: local_assigns[:data]) %>><%= user.avatar_letter %></span>

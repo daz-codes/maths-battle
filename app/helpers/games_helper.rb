@@ -4,7 +4,7 @@ module GamesHelper
   # Each key taps the controller the keypad belongs to: the game's, or a tutorial's
   def keypad_key(digit, label: digit, aria: nil, modifier: nil, controller: "test")
     tag.button(label, type: "button", class: [ "keypad__key", (modifier && "keypad__key--#{modifier}") ],
-      data: { action: "pointerdown->#{controller}#tap", digit: digit }, aria: { label: aria })
+      data: { action: "pointerdown->#{controller}#tap click->#{controller}#tap", digit: digit }, aria: { label: aria })
   end
 
   def extra_keypad_key(key, controller: "test")

@@ -49,6 +49,7 @@ export default class extends Controller {
   // Typing, with the keypad or a keyboard
 
   tap(event) {
+    if (event.type === "click" && event.detail > 0) return
     event.preventDefault()
     const digit = event.currentTarget.dataset.digit
     digit === "back" ? this.backspace() : this.type(digit)
@@ -63,6 +64,9 @@ export default class extends Controller {
     } else if (event.key === "Backspace") {
       event.preventDefault()
       this.backspace()
+    } else if (event.key === "Enter" && !event.target?.closest("button, a, input, textarea, select")) {
+      event.preventDefault()
+      this.checkAnswer()
     }
   }
 
@@ -80,6 +84,10 @@ export default class extends Controller {
 
     this.typed = this.typed.slice(0, -1)
     this.answerTarget.textContent = shown(this.typed)
+  }
+
+  checkAnswer() {
+    if (this.trying && !this.waiting && finished(this.typed)) this.check()
   }
 
   // Right finishes the lesson. Wrong says so, shows the hint, and lets them have another go

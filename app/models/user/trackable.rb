@@ -16,6 +16,13 @@ module User::Trackable
     end
   end
 
+  # The topic of the last game played, if any, so a player on a new device carries on where they were
+  def last_topic
+    return @last_topic if defined?(@last_topic)
+
+    @last_topic = Topic.find(attempts.order(:created_at, :id).last&.topic)
+  end
+
   def tracked?(topic, level)
     overall_stats(topic, level).answered.positive?
   end

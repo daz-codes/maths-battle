@@ -23,6 +23,14 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
         done()
       })
     JS
+    choose_topic
+  end
+
+  # A new player picks a topic before the home page shows
+  def choose_topic(name = "Times tables")
+    assert_selector "h1", text: "What do you want to practise?"
+    click_on name
+    assert_selector ".streak"
   end
 
   def game_for_upload(client_id:)

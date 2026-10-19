@@ -1,4 +1,4 @@
-<% content_for :title, "#{@attempt.score} in a minute! · MatheMinute" %>
+<% content_for :title, "#{@attempt.review? ? "#{@attempt.score} of #{@attempt.answered} right" : "#{@attempt.score} in a minute!"} · MatheMinute" %>
 
 <main class="page results">
   <% if @attempt.levelled_up %>
@@ -28,17 +28,27 @@
   </section>
   <%= render "badges/earned", badges: @attempt.badges, celebrate: !(@attempt.levelled_up || @attempt.new_high_score) %>
 
+  <% if @attempt.review? %>
+    <%# Nothing to share without a clock: on to the mistakes still left, or back to practice %>
+    <% topic = @attempt.topic_module %>
+    <div class="results__actions results__actions--one">
+      <% if (left = @attempt.user.review_questions(topic)).any? %>
+        <%= link_to "🔁 Review #{left.size} more", play_path(topic.slug, review: 1), class: "button button--blue" %>
+      <% else %>
+        <%= link_to "Practise level #{@attempt.user.unlocked_level(topic)}", play_path(topic.slug, level: @attempt.user.unlocked_level(topic)), class: "button button--blue" %>
+      <% end %>
+    </div>
+  <% else %>
   <div class="results__actions">
     <button type="button" class="button button--share" data-controller="share"
             data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>
     <% if @attempt.daily_challenge? %>
       <%= link_to "Practise level #{@attempt.level}", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
-    <% elsif @attempt.review? %>
-      <%= link_to "Review again", play_path(@attempt.topic_module.slug, review: 1), class: "button button--blue" %>
     <% else %>
       <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
     <% end %>
   </div>
+  <% end %>
 
   <p class="feedback"><%= @attempt.feedback_message %></p>
 

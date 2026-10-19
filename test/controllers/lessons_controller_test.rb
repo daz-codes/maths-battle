@@ -13,7 +13,8 @@ class LessonsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".lesson__try .lesson__show", text: "5 × 3"
     assert_select ".lesson__hint[hidden]", text: /Count up in 3s/
     assert_select "[data-tutorial-answer-value='15']"
-    assert_select ".keypad__key[data-action='pointerdown->tutorial#tap']", 11
+    assert_select ".keypad__key[data-action~='pointerdown->tutorial#tap'][data-action~='click->tutorial#tap']", 11
+    assert_select ".keypad__key--submit[data-action='tutorial#checkAnswer']", text: "Check answer"
     assert_select ".lesson__done a[href=?]", play_path("times-tables", level: 1), text: "Play level 1"
   end
 
@@ -46,6 +47,7 @@ class LessonsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "the home page offers the lesson for the level picked, in every topic" do
+    choose_topic
     get root_path
     assert_select ".levels__learn a[href=?]", lesson_path("times-tables", 1), text: "📖 Learn how"
 

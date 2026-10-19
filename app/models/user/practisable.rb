@@ -44,11 +44,9 @@ module User::Practisable
     Array.new(count) { { id: SecureRandom.hex(16), questions: questions(topic: topic, level: level, mix: mix) } }
   end
 
-  # A review's sets: the player's review questions, round and round in a new order each time, never the same
-  # one twice in a row
+  # A review's sets: the player's review questions, each once, in a new order each time
   def review_sets(topic:, count: 1 + SPARE_QUESTION_SETS, random: Random.new)
-    review = review_questions(topic)
-    Array.new(count) { { id: SecureRandom.hex(16), questions: rounds_of(review, random).first(QUESTION_COUNT) } }
+    Array.new(count) { { id: SecureRandom.hex(16), questions: review_questions(topic).shuffle(random: random) } }
   end
 
   def question_weights(topic = Topic.default, level = 1)
@@ -101,12 +99,6 @@ module User::Practisable
 
     def recent_answers(topic, level)
       attempts.at_level(topic, level).order(created_at: :desc).limit(RECENT_GAMES).flat_map(&:results)
-    end
-
-    def rounds_of(questions, random)
-      rounds = []
-      rounds.concat(questions.shuffle(random: random).then { |round| round.first == rounds.last && round.many? ? round.rotate : round }) while rounds.size < QUESTION_COUNT
-      rounds
     end
 
     def question_level(level, random, mix)

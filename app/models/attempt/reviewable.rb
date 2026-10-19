@@ -9,7 +9,9 @@ module Attempt::Reviewable
   HISTORY = 14.days
 
   def feedback_message
-    if answered.zero?
+    if review?
+      perfect? ? "Every one right. Those mistakes are fixed#{with_name}!" : "Good work#{with_name}. The ones you missed are still there to review."
+    elsif answered.zero?
       "Have another go — type your answers as fast as you can!"
     elsif weak_groups.any?
       topic_module.practise_message(weak_groups)
@@ -26,7 +28,10 @@ module Attempt::Reviewable
   end
 
   # Today's right answers that took much longer than this player usually takes, slowest first
+  # Not in a review, which has no clock
   def slow_facts
+    return [] if review?
+
     slow_answers
       .sort_by { |result| -result["ms"] }
       .uniq { |result| fact_key(result) }

@@ -99,4 +99,17 @@ class User::StreakFreezableTest < ActiveSupport::TestCase
     assert_empty @user.frozen_days
     assert_equal 4, @user.current_streak
   end
+
+  test "a second request with stale user state cannot consume the same freeze twice" do
+    play_on(day(1))
+    @user.update!(streak_freezes: 1)
+    first, second = User.find(@user.id), User.find(@user.id)
+
+    on(day(3)) do
+      assert_equal 1, first.use_streak_freezes!
+      assert_equal 0, second.use_streak_freezes!
+    end
+    assert_equal 0, @user.reload.streak_freezes
+    assert_equal [ day(2) ], @user.frozen_days.pluck(:day)
+  end
 end

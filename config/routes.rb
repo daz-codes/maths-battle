@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resource :session, only: %i[new create destroy]
   resource :registration, only: %i[new create]
   resource :profile, only: %i[edit update]
+  resource :avatar, only: :show
   resource :topic, only: :update
   get "topics", to: "topics#index", as: :topics
   resource :level, only: :update

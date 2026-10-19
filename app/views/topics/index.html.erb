@@ -1,12 +1,17 @@
 <% content_for :title, "Topics · MatheMinute" %>
 
 <main class="page">
-  <h1 class="heading">Topics</h1>
-  <p class="aside">Pick what to practise. Your progress in each is kept.</p>
+  <% if topic_chosen? %>
+    <h1 class="heading">Topics</h1>
+    <p class="aside">Pick what to practise. Your progress in each is kept.</p>
+  <% else %>
+    <h1 class="heading">What do you want to practise?</h1>
+    <p class="aside">Pick a topic to start. You can change it any time.</p>
+  <% end %>
 
   <ul class="topic-cards">
     <% Topic::ALL.each do |topic| %>
-      <% current = topic == current_topic %>
+      <% current = topic_chosen? && topic == current_topic %>
       <li>
         <%= button_to topic_path, method: :patch, params: { topic: topic.slug, from: params[:from] }.compact,
               class: [ "topic-card", ("topic-card--current" if current) ], form_class: "topic-card__form", aria: { current: current } do %>

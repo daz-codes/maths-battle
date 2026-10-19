@@ -5,7 +5,7 @@ module User::Challengeable
 
   # The day's daily challenge, if it's been played
   def daily_challenge_on(topic, day = today)
-    attempts.in_topic(topic).daily_challenges.find_by(played_on: day)
+    attempts.in_topic(topic).daily_challenges.where(answered: 1..).find_by(played_on: day)
   end
 
   def best_daily_challenge(topic)

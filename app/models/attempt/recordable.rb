@@ -6,6 +6,8 @@ module Attempt::Recordable
   MAX_ANSWERS = 150
   # The test lasts 60 seconds; allow a little slack for the end-of-test POST
   MAX_TOTAL_MS = 65_000
+  # A review has no clock, so only each answer's time is limited
+  MAX_REVIEW_ANSWER_MS = 10.minutes.in_milliseconds
   # Every field a result can have in any topic. Each topic checks its own fields strictly
   RESULT_FIELDS = %i[ a b c d e f n type v flip given ms ]
   # Anything the keypad can type, unfinished answers like "0." or "−" included: those are just wrong.
@@ -25,14 +27,19 @@ module Attempt::Recordable
   class_methods do
     # Raises Attempt::Invalid when the answers couldn't have come from a real test.
     # A game sent again with the same client id (a retried upload) is only recorded once
-    # A daily challenge or review is at the player's highest level, whose checks take questions from any level up to it
+    # Mixed games are issued at the highest level. That signed level stays valid if an offline upload
+    # arrives after another game has unlocked a new one.
     def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil, mode: "practice")
+      if existing = already_recorded(user, client_id)
+        return existing
+      end
+
       topic_module, level = topic_named(topic), Integer(level, exception: false)
       check_unlocked(user, topic_module, level)
-      check_mixed_level(user, topic_module, level) unless mode == "practice"
+      cleaned = clean_results(topic_module, level, results, mode)
+      raise Invalid, "Answer at least one question to finish the daily challenge" if mode == "challenge" && cleaned.empty?
 
-      already_recorded(user, client_id) ||
-        create_for!(user, client_id:, played_at:, topic:, level:, mode:, results: clean_results(topic_module, level, results))
+      create_for!(user, client_id:, played_at:, topic:, level:, mode:, results: cleaned)
     rescue ActiveRecord::RecordNotUnique
       already_recorded(user, client_id) || raise
     end
@@ -52,10 +59,6 @@ module Attempt::Recordable
         end
       end
 
-      def check_mixed_level(user, topic, level)
-        raise Invalid, "A mixed game is at the highest level" unless level == user.unlocked_level(topic)
-      end
-
       def check_unlocked(user, topic, level)
         raise Invalid, "Level not unlocked" unless level&.between?(1, user.unlocked_level(topic))
       end
@@ -72,23 +75,24 @@ module Attempt::Recordable
         Topic.find(topic) || raise(Invalid, "Unknown topic")
       end
 
-      def clean_results(topic, level, results)
+      def clean_results(topic, level, results, mode)
         raise Invalid, "Results must be a list" unless results.is_a?(Array)
         raise Invalid, "Too many answers" if results.size > MAX_ANSWERS
 
-        results.map { |result| clean_result(topic, level, result) }.tap { |cleaned| check_total_time(cleaned) }
+        max_ms = mode == "review" ? MAX_REVIEW_ANSWER_MS : MAX_TOTAL_MS
+        results.map { |result| clean_result(topic, level, result, max_ms) }.tap { |cleaned| check_total_time(cleaned) unless mode == "review" }
       end
 
       # The topic checks and scores each answer; the timing check is the same for every topic
-      def clean_result(topic, level, result)
+      def clean_result(topic, level, result, max_ms)
         raise Invalid, "Bad answer" unless result.is_a?(Hash)
 
         result = result.stringify_keys
-        topic.clean_result(result, level: level).merge("ms" => clean_ms(result["ms"]))
+        topic.clean_result(result, level: level).merge("ms" => clean_ms(result["ms"], max_ms))
       end
 
-      def clean_ms(ms)
-        Integer(ms, exception: false).tap { |value| raise Invalid, "Bad timing" unless value&.between?(0, MAX_TOTAL_MS) }
+      def clean_ms(ms, max_ms)
+        Integer(ms, exception: false).tap { |value| raise Invalid, "Bad timing" unless value&.between?(0, max_ms) }
       end
 
       def check_total_time(results)
@@ -128,8 +132,10 @@ module Attempt::Recordable
       update_column(:streak, user.streak)
     end
 
+    # Not a review's answers: with no clock and the questions just got wrong, they'd skew the speed and accuracy
+    # that pick a level's questions
     def record_fact_stats
-      user.fact_stats.record(self)
+      user.fact_stats.record(self) unless review?
     end
 
     # The game that unlocks the next level: the level's first bronze, unless the next level was already reached.

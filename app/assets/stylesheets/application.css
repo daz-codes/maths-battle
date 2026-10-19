@@ -653,6 +653,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* Share and Play again side by side on the results page */
 .results__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; width: 100%; }
+.results__actions--one { grid-template-columns: 1fr; }
 
 /* A freeze earned in a game, on its results page */
 .freeze-earned { margin: 0; padding: 0.45rem 1rem; border-radius: 999px; background: var(--blue); color: var(--on-neon); font-weight: 700; }
@@ -992,6 +993,13 @@ body.testing {
 }
 
 .keypad__key--back { background: var(--paper); font-size: 1.6rem; }
+
+.keypad__key--submit {
+  grid-column: 1 / -1;
+  min-height: 44px;
+  height: 44px;
+  font-size: 1.05rem;
+}
 
 /* ── Finished offline ─────────────────────────────── */
 

@@ -17,4 +17,5 @@
     <%= keypad_key "0", controller: controller %>
     <%= delete_key controller: controller %>
   <% end %>
+  <button type="button" class="keypad__key keypad__key--submit" data-action="<%= controller %>#checkAnswer">Check answer</button>
 </div>

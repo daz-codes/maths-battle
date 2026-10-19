@@ -41,15 +41,17 @@ module User::StreakFreezable
   # Covers the days missed since the streak was last kept, if there are freezes for all of them.
   # Returns how many were used
   def use_streak_freezes!
-    missed = missed_days
-    return 0 if missed.empty? || missed.size > streak_freezes || current_streak.zero?
+    return 0 unless streak_kept_on && streak_kept_on < today - 1 && current_streak.positive?
 
-    transaction do
+    with_lock do
+      missed = missed_days
+      next 0 if missed.empty? || missed.size > streak_freezes || current_streak.zero?
+
       missed.each { |day| frozen_days.create!(day: day) }
       update!(streak_freezes: streak_freezes - missed.size)
       refresh_streak!
+      missed.size
     end
-    missed.size
   end
 
   private

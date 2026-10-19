@@ -3,7 +3,35 @@ require "test_helper"
 class HomeControllerTest < ActionDispatch::IntegrationTest
   setup { @user = users(:ada) }
 
+  test "a new visitor picks a topic first, then the home page is on it" do
+    get root_path
+    assert_redirected_to topics_path
+    follow_redirect!
+    assert_select "h1", text: "What do you want to practise?"
+    assert_select ".topic-card", Topic::ALL.size
+    assert_select ".topic-card--current", count: 0
+
+    patch topic_path, params: { topic: "equations" }
+    assert_redirected_to root_path
+    follow_redirect!
+    assert_select ".current-topic__name", text: "⚖️ Equations"
+
+    get topics_path
+    assert_select "h1", text: "Topics"
+  end
+
+  test "a player on a new device carries on with the topic they last played" do
+    Attempt.record!(user: @user, topic: "functions", results: [ EASY_QUESTIONS.fetch(Functions) ] * 5)
+    sign_in_as @user
+    cookies.delete("topic")
+
+    get root_path
+    assert_response :success
+    assert_select ".current-topic__name", text: "⚙️ Functions"
+  end
+
   test "visitors can start playing without signing up" do
+    choose_topic
     get root_path
 
     assert_response :success
@@ -15,6 +43,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "says maths to browsers set to the UK, and math to everyone else" do
+    choose_topic
     get root_path, headers: { "Accept-Language" => "en-GB,en;q=0.9" }
     assert_select ".tagline", text: "Improve your maths in minutes"
     assert_select "html[lang=en-GB]"

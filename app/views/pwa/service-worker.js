@@ -56,7 +56,8 @@ async function rememberPlayer(response, request, url) {
     }
     const state = { key, version, expires: response.headers.get("X-Player-Expires") }
     await (await caches.open(STATE)).put(PLAYER_URL, new Response(JSON.stringify(state)))
-    if (request.method === "GET" && isPage(request) && response.ok && keptForOffline(url.pathname)) {
+    // A redirect's page isn't the one asked for: a new player's home goes to the topics page
+    if (request.method === "GET" && isPage(request) && response.ok && !response.redirected && keptForOffline(url.pathname)) {
       await (await caches.open(PAGES + key)).put(url.pathname + url.search, response.clone())
     }
   })

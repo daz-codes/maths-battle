@@ -34,6 +34,7 @@ sequentially because concurrent browser workers can contend for SQLite writes.
 
 ## Application flow
 
+A new player picks a topic first; on a new device it's the one last played.
 Home (the current topic, changed on its own page with progress in each, then the streak with the daily
 challenge under it) → play the daily challenge, or choose an unlocked level to learn it or practise it for a
 medal → score and practice feedback → stats or play again.
@@ -51,10 +52,12 @@ up to the player's; it has its own best, earns no medal and unlocks nothing. Whe
 challenge is in its signed ticket, so the browser can't decide. A new topic needs `MEDALS` and gets all this.
 
 Review mode asks again, exactly, the questions a player recently got wrong in a topic (from their last 10 games,
-`User::Reviewable`), round and round for a minute. Only the latest answer to each question counts, so getting
-it right takes it off the list. Like the daily challenge it's at the
-player's highest level and earns no medal; a game's mode (practice, challenge or review) is in its ticket.
+`User::Reviewable`), up to 10, each once and with no clock. Only the latest answer to each question counts, so
+getting it right takes it off the list. Like the daily challenge it's at the player's highest level and earns
+no medal; a game's mode (practice, challenge or review) is in its ticket. With no clock, its answers earn no
+stars, badges or question stats; finishing one earns a 50 star bonus.
 
+A daily challenge needs at least one submitted answer; an unanswered game leaves it available to try again.
 A day counts towards the streak when any topic's daily challenge is played. Until 20 October 2026 a game of five
 answers or a finished lesson counted instead (`DAILY_CHALLENGE_STREAKS_FROM`), and those days still count, so
 the change cost no one a streak.
@@ -66,6 +69,10 @@ try on the game's keypad, with a hint after a wrong answer. Each topic keeps its
 module (`TimesTables::Lessons`, `Equations::Lessons`, …). The one to try is a question in the topic's own form,
 so the topic writes it out as the game would and works out its answer (`worked`). Lessons are offered under
 the level's name and after levelling up.
+
+Answers are checked automatically as they reach the expected length. Enter or the keypad's Check answer
+button can submit a shorter answer, in both games and lessons. Keypad buttons also support keyboard and
+assistive activation.
 
 ## Achievements
 
@@ -81,7 +88,8 @@ Badges never name the player, so shared results can show them.
 
 Every right answer earns stars: 10, 20 if quick and 30 if lightning fast. Each topic sets what counts as
 quick in `STAR_TIMES`, since an equation takes longer than a times table. A game can also earn bonuses for a
-perfect game, a new high score or levelling up. The +10s that float up during a game are only for show:
+perfect game, a new high score or levelling up. A review's answers earn none, as it has no clock; finishing
+it earns a bonus. The +10s that float up during a game are only for show:
 the server works out the stars from the checked answers (`Attempt::Starrable`) and keeps them on the game,
 so a player's total is the sum of their games.
 
@@ -102,6 +110,10 @@ session; registration preserves the guest's browser identity and outstanding gam
 Games use signed question sets bound to the browser's current player. Uploads must contain the issued
 questions in order and the original game id. Retried uploads are idempotent. Tickets expire after 30 days;
 unsigned games and tickets from another player are rejected before creating guest accounts.
+
+Mixed games keep the level in their signed ticket, so levelling up before an offline upload does not
+invalidate it. Avatars are served only to their owner's active session with private, no-store responses;
+the default public Active Storage upload and download routes are disabled.
 
 The service worker caches home, game, and stats pages per player and URL, including the selected level.
 Account changes clear the previous cache. Late responses cannot restore an earlier player's cache, and

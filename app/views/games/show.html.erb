@@ -14,10 +14,16 @@
       data-test-submit-url-value="<%= attempts_path %>">
   <button type="button" class="test__stop" data-action="test#confirmStop" aria-label="Stop the game">✕</button>
 
+  <%# A review has no clock: the logo's ring just shows, with how far through the questions it is %>
   <header class="test__bar">
     <span class="test__score" data-test-target="score" aria-label="Score">0</span>
-    <%= render "clock", timer: true, class: "timer__clock" %>
-    <span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span>
+    <% if @mode == "review" %>
+      <%= render "clock", hands: false, class: "timer__clock" %>
+      <span class="test__seconds" data-test-target="progress" aria-label="Question">1/<%= @question_sets.first[:questions].size %></span>
+    <% else %>
+      <%= render "clock", timer: true, class: "timer__clock" %>
+      <span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span>
+    <% end %>
   </header>
 
   <div class="test__stage" data-test-target="stage">
@@ -32,7 +38,7 @@
     </div>
 
     <div class="offline-result" data-test-target="offlineResult" hidden>
-      <p class="offline-result__score"><span class="card__number" data-test-target="offlineScore"></span> in a minute!</p>
+      <p class="offline-result__score"><span class="card__number" data-test-target="offlineScore"></span> <%= @mode == "review" ? "right!" : "in a minute!" %></p>
       <p class="aside">You're offline, so this game is saved on this device. It'll be saved as soon as you're back online.</p>
       <%= link_to "Play again", play_path(@topic.slug, level: @level), class: "button button--blue button--wide" if @mode == "practice" %>
       <%= link_to "Home", root_path %>

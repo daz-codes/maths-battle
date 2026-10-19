@@ -6,6 +6,8 @@ import { finished, shown, typedWith } from "lib/answer_input"
 const DURATION = 60_000
 const STARS = { right: 10, quick: 20, lightning: 30 }
 const WRONG_PAUSE = 400
+// A review has no clock, so there's time to take in the right answer
+const REVIEW_WRONG_PAUSE = 1_500
 // Each quarter of the clock ring is a full 25 of 100 units; the clock's cut makes the gaps between them
 const QUARTER_LENGTH = 25
 const COUNTDOWN = [ [ "Ready", 900 ], [ "Set", 900 ], [ "GO!", 600 ] ]
@@ -13,9 +15,10 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 
 // Runs the whole one-minute test in the browser: nothing touches the network until it ends.
 // Offline, the finished game is kept on the device and uploaded later. It can be stopped part way,
-// after a warning, and then nothing is saved
+// after a warning, and then nothing is saved. A review has no clock or stars: it asks each of its
+// questions once and ends after the last
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage" ]
+  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress" ]
   static values = { questionSets: Array, topic: String, level: Number, mode: String, submitUrl: String, keys: Array, starTimes: Object }
 
   connect() {
@@ -47,7 +50,11 @@ export default class extends Controller {
     document.addEventListener("keydown", this.keydown)
     window.addEventListener("beforeunload", this.beforeUnload)
 
-    this.countdown(COUNTDOWN)
+    this.review ? this.startReview() : this.countdown(COUNTDOWN)
+  }
+
+  get review() {
+    return this.modeValue === "review"
   }
 
   disconnect() {
@@ -75,8 +82,15 @@ export default class extends Controller {
     this.run()
   }
 
+  startReview() {
+    this.state = "running"
+    this.show()
+  }
+
   run() {
     this.state = "running"
+    if (this.review) return
+
     this.element.classList.add("test--running")
     // A backup in case animation frames stop, e.g. while the tab is hidden
     this.endTimer = setTimeout(() => this.finish(), this.endsAt - performance.now() + 50)
@@ -116,6 +130,8 @@ export default class extends Controller {
   // Input
 
   tap(event) {
+    // Pointer input is handled immediately; a keyboard or assistive click has no pointer event.
+    if (event.type === "click" && event.detail > 0) return
     event.preventDefault()
     const digit = event.currentTarget.dataset.digit
     digit === "back" ? this.backspace() : this.type(digit)
@@ -130,6 +146,9 @@ export default class extends Controller {
     } else if (event.key === "Backspace") {
       event.preventDefault()
       this.backspace()
+    } else if (event.key === "Enter" && !event.target?.closest("button, a, input, textarea, select")) {
+      event.preventDefault()
+      this.checkAnswer()
     }
   }
 
@@ -146,6 +165,10 @@ export default class extends Controller {
 
   showTyped() {
     this.answerTarget.textContent = shown(this.typed)
+  }
+
+  checkAnswer() {
+    if (this.accepting && finished(this.typed)) this.check()
   }
 
   backspace() {
@@ -177,6 +200,7 @@ export default class extends Controller {
     this.typed = ""
     this.answerTarget.textContent = ""
     this.shownAt = performance.now()
+    if (this.hasProgressTarget) this.progressTarget.textContent = `${this.index + 1}/${this.questions.length}`
   }
 
   // 0.7 × −3000 is longer than 7 × 8, so it's shown smaller to stay on one line
@@ -196,7 +220,7 @@ export default class extends Controller {
       this.score++
       this.scoreTarget.textContent = this.score
       this.flash(this.scoreTarget, "--right")
-      this.popStars(ms)
+      if (!this.review) this.popStars(ms)
       this.next()
     } else {
       this.showCorrection()
@@ -226,7 +250,7 @@ export default class extends Controller {
       this.showingCorrection = false
       this.answerTarget.classList.remove("answer--wrong")
       if (this.state === "running" || this.state === "paused") this.next()
-    }, WRONG_PAUSE)
+    }, this.review ? REVIEW_WRONG_PAUSE : WRONG_PAUSE)
   }
 
   next() {
@@ -281,6 +305,8 @@ export default class extends Controller {
     // A question shown during the pause (after a correction) starts its timing now
     this.shownAt = this.shownAt < this.pausedAt ? this.shownAt + pausedFor : performance.now()
     this.run()
+    // The last answer's correction can end while paused, with no question left to show
+    if (!this.current) this.finish()
   }
 
   restartCountdown() {
@@ -296,8 +322,8 @@ export default class extends Controller {
     this.state = "done"
     this.stopClock()
     this.fillRing(1)
-    this.secondsTarget.textContent = 0
-    this.questionTarget.textContent = "Time's up!"
+    if (this.hasSecondsTarget) this.secondsTarget.textContent = 0
+    this.questionTarget.textContent = this.review ? "All done!" : "Time's up!"
     this.questionTarget.classList.remove("question--long", "question--longer")
     this.questionTarget.classList.add("question--done")
     this.answerTarget.textContent = ""
@@ -327,7 +353,9 @@ export default class extends Controller {
       }
     } else {
       this.state = "rejected"
-      this.status("Sorry, this game couldn't be saved.")
+      this.status(this.modeValue === "challenge" && this.results.length === 0
+        ? "No answers this time. Your daily challenge is still available — go home to try again."
+        : "Sorry, this game couldn't be saved.")
     }
   }
 

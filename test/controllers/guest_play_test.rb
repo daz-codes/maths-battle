@@ -33,6 +33,7 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
   end
 
   test "a visitor's footer offers sign in and sign up beside their picture, then home, achievements and stats" do
+    choose_topic
     get root_path
 
     assert_select ".site-footer a.site-footer__player[aria-label=Settings][href=?]", edit_profile_path

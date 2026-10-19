@@ -1,10 +1,9 @@
-# Existing players get the badges their games so far have earned, as if they'd had them all along.
-# Uses the models, as the rules live there; on a fresh database there are no players, so it does nothing
+require_relative "support/legacy_game_backfill"
+
+# Existing players get the badges their games so far have earned.
 class AwardBadgesForGamesAlreadyPlayed < ActiveRecord::Migration[8.1]
   def up
-    User.reset_column_information
-    Attempt.reset_column_information
-    User.find_each(&:catch_up_badges!)
+    LegacyGameBackfill.new(connection).badges(perfect_answers: 20)
   end
 
   def down

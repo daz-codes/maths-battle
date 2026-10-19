@@ -62,12 +62,36 @@ class User::ReviewableTest < ActiveSupport::TestCase
     assert_empty User.find(@user.id).review_questions(SimultaneousEquations)
   end
 
-  test "a review game goes round its questions, never the same one twice in a row" do
+  test "a review game asks each of its questions once, even just one" do
     play(wrong(3, 5), wrong(2, 5), wrong(4, 5))
-    questions = @user.review_sets(topic: TimesTables, count: 1).first[:questions]
+    assert_equal [ "10", "15", "20" ], @user.review_sets(topic: TimesTables, count: 1).first[:questions].map { _1[:answer] }.sort
 
-    assert_equal User::Practisable::QUESTION_COUNT, questions.size
-    assert_equal [ "10", "15", "20" ], questions.map { _1[:answer] }.uniq.sort
-    assert questions.each_cons(2).none? { |one, other| one[:text] == other[:text] }
+    play(right(3, 5), right(2, 5))
+    assert_equal [ "4 × 5" ], User.find(@user.id).review_sets(topic: TimesTables, count: 1).first[:questions].map { _1[:text] }
+  end
+
+  test "a review has no clock: it can take as long as it takes" do
+    play(wrong(3, 5), wrong(2, 5))
+    game = review(right(3, 5, ms: 70_000), right(2, 5, ms: 90_000))
+
+    assert_equal 2, game.score
+    assert_raises(Attempt::Invalid) { play(right(3, 5, ms: 70_000)) }
+  end
+
+  test "its answers earn no stars, but finishing it does, and it earns no badges" do
+    play(wrong(3, 5), wrong(2, 5))
+    game = review(right(3, 5, ms: 500), wrong(2, 5))
+
+    assert_equal 0, game.answer_stars
+    assert_equal({ review: 50 }, game.star_bonuses)
+    assert_equal 50, game.stars
+    assert_empty game.badges
+  end
+
+  test "its untimed answers don't change the stats that pick questions" do
+    play(wrong(3, 5), right(2, 3))
+    assert_no_changes -> { @user.fact_stats.order(:id).pluck(:correct_count, :wrong_count, :correct_ms) } do
+      review(right(3, 5, ms: 40_000))
+    end
   end
 end

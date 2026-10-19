@@ -65,7 +65,7 @@ module User::Streakable
     end
 
     def challenge_days
-      attempts.daily_challenges.where(played_on: DAILY_CHALLENGE_STREAKS_FROM..).distinct.pluck(:played_on)
+      attempts.daily_challenges.where(answered: 1.., played_on: DAILY_CHALLENGE_STREAKS_FROM..).distinct.pluck(:played_on)
     end
 
     def days_practised_before_challenges

@@ -14,6 +14,9 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     assert cookies[:session_id]
     follow_redirect!
+    assert_redirected_to topics_path, "a new player picks a topic first"
+    patch topic_path, params: { topic: "functions" }
+    follow_redirect!
     assert_select ".greeting", text: /Hi Zara!/
   end
 

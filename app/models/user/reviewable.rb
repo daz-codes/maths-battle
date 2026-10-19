@@ -1,10 +1,11 @@
-# Review: the questions a player recently got wrong in a topic, asked again exactly as they were. Taken from
-# their last few games, and only the latest answer to each question counts, so getting one right takes it off
+# Review: the questions a player recently got wrong in a topic, asked again exactly as they were, each once
+# and with no clock. Taken from their last few games, and only the latest answer to each question counts, so
+# getting one right takes it off
 module User::Reviewable
   extend ActiveSupport::Concern
 
   REVIEW_GAMES = 10
-  MAX_REVIEW_QUESTIONS = 20
+  MAX_REVIEW_QUESTIONS = 10
   ANSWER_FIELDS = %w[ given correct ms ]
 
   # Latest mistakes first, each question once. Only ones the topic still asks at the player's level, as a

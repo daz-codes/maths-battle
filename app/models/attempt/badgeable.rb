@@ -12,7 +12,10 @@ module Attempt::Badgeable
     has_many :badges, dependent: :nullify
   end
 
+  # Not for a review: ten untimed answers aren't ten in a minute
   def award_badges
+    return if review?
+
     earned = user.badges.pluck(:kind)
 
     Badge.catalogue.each do |kind|

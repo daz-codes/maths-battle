@@ -28,7 +28,9 @@ class ReviewTest < ActionDispatch::IntegrationTest
 
     assert_select "[data-test-mode-value=review]"
     questions = JSON.parse(css_select("[data-controller=test]").first["data-test-question-sets-value"]).first["questions"]
-    assert_equal [ "2 × 5", "3 × 5" ], questions.map { _1["text"] }.uniq.sort
+    assert_equal [ "2 × 5", "3 × 5" ], questions.map { _1["text"] }.sort, "each once"
+    assert_select ".test__bar [data-test-target=progress]", text: "1/2"
+    assert_select "[data-test-target=seconds]", count: 0, message: "no clock"
   end
 
   test "it's saved as a review: no medal, no level up, no high score to beat" do
@@ -44,18 +46,44 @@ class ReviewTest < ActionDispatch::IntegrationTest
     assert_equal 1, @user.unlocked_level(TimesTables), "12 would be a bronze in practice"
   end
 
-  test "its results page says it's a review, and offers another" do
-    Attempt.record!(user: @user, results: answers([ 3, 5, 14 ]))
-    post attempts_path, params: review_upload(score: 3), as: :json
+  test "its results page says how many were right, with no clock, best or sharing, then on to what's left" do
+    Attempt.record!(user: @user, results: answers([ 3, 5, 14 ], [ 2, 5, 11 ]))
+    upload = review_upload(score: 2)
+    upload[:attempt][:results].last["given"] = "1"
+    post attempts_path, params: upload, as: :json
     get response.parsed_body["url"]
 
     assert_select ".label", text: /Times tables, review/
-    assert_select ".results__actions a[href=?]", play_path("times-tables", review: 1), text: "Review again"
+    assert_select ".result__score", text: "1 of 2 right"
+    assert_select ".result__stats", text: /Best/, count: 0
+    assert_select ".stars-earned__bonuses li", text: "Mistakes reviewed +50"
+    assert_select ".button--share", count: 0
+    assert_select ".results__actions a[href=?]", play_path("times-tables", review: 1), text: "🔁 Review 1 more"
     assert_select ".level-progress", count: 0
+  end
+
+  test "once every mistake is put right, it's back to practice" do
+    Attempt.record!(user: @user, results: answers([ 3, 5, 14 ]))
+    post attempts_path, params: review_upload(score: 1), as: :json
+    get response.parsed_body["url"]
+
+    assert_select ".feedback", text: /Every one right. Those mistakes are fixed/
+    assert_select ".results__actions a[href=?]", play_path("times-tables", level: 1), text: "Practise level 1"
   end
 
   test "nothing to review goes back home" do
     get play_path("times-tables", review: 1)
     assert_redirected_to root_path
+  end
+
+  test "a signed review still saves after another game unlocks a level" do
+    Attempt.record!(user: @user, results: answers([ 3, 5, 14 ]))
+    upload = review_upload(score: 3)
+    unlock(@user, TimesTables, 2)
+
+    post attempts_path, params: upload, as: :json
+    assert_response :created
+    assert @user.attempts.last.review?
+    assert_equal 1, @user.attempts.last.level
   end
 end

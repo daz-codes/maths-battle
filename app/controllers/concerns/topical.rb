@@ -1,15 +1,20 @@
-# Which topic the player is on, and which of its levels. Remembered on the device, and changed by the switchers
-# or by playing. Play defaults to the highest unlocked level; picking an easier one is remembered until they level up
+# Which topic the player is on, and which of its levels. Remembered on the device, and changed on the topics page
+# or by playing. On a new device it's the topic last played; a new player picks one before anything else.
+# Play defaults to the highest unlocked level; picking an easier one is remembered until they level up
 module Topical
   extend ActiveSupport::Concern
 
   included do
-    helper_method :current_topic, :current_level
+    helper_method :current_topic, :current_level, :topic_chosen?
   end
 
   private
     def current_topic
-      Topic.find(cookies[:topic]) || Topic.default
+      Topic.find(cookies[:topic]) || current_player.last_topic || Topic.default
+    end
+
+    def topic_chosen?
+      Topic.find(cookies[:topic]).present? || current_player.last_topic.present?
     end
 
     def remember_topic(topic)

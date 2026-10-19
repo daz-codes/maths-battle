@@ -81,7 +81,45 @@ class DailyChallengeTest < ActionDispatch::IntegrationTest
     assert_select "[data-test-mode-value=challenge][data-test-level-value=1]", message: "times tables' doesn't use up equations'"
   end
 
-  test "the model only takes a daily challenge at the player's highest level" do
-    assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, level: 1, results: answers([ 2, 3, 6 ]), mode: "challenge") }
+  test "a signed challenge and its retry still save after another game unlocks a level" do
+    upload = challenge_upload(score: 3)
+    unlock(@user, TimesTables, 3)
+
+    post attempts_path, params: upload, as: :json
+    assert_response :created
+    url = response.parsed_body["url"]
+    assert_equal 2, @user.attempts.last.level
+
+    unlock(@user, TimesTables, 4)
+    assert_no_difference -> { Attempt.count } do
+      post attempts_path, params: upload, as: :json
+    end
+    assert_response :created
+    assert_equal url, response.parsed_body["url"]
+  end
+
+  test "an unanswered challenge leaves today's challenge available and earns no streak" do
+    travel_to Time.zone.local(2026, 11, 1, 12) do
+      assert_no_difference -> { Attempt.count } do
+        post attempts_path, params: challenge_upload(score: 0), as: :json
+      end
+      assert_response :unprocessable_entity
+      assert_match /at least one question/, response.parsed_body["error"]
+      assert_nil @user.daily_challenge_on(TimesTables)
+      assert_equal 0, @user.reload.streak
+      get play_path("times-tables", challenge: 1)
+      assert_response :success
+    end
+  end
+
+  test "legacy unanswered challenges do not consume the day or keep a streak" do
+    travel_to Time.zone.local(2026, 11, 1, 12) do
+      @user.attempts.create!(mode: "challenge", results: [])
+      assert_nil @user.daily_challenge_on(TimesTables)
+      assert_equal 0, @user.reload.streak
+      post attempts_path, params: challenge_upload(score: 1), as: :json
+      assert_response :created
+      assert_equal 1, @user.reload.streak
+    end
   end
 end

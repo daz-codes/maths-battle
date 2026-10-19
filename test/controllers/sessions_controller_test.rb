@@ -37,6 +37,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "signing in replaces the player's identity" do
+    choose_topic
     get root_path
     previous = response.headers.fetch("X-Player-Key")
     post session_path, params: { username: "ada", password: "password" }
