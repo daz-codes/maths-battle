@@ -109,6 +109,29 @@ The settings page has three parts: about you (picture and name, saved with its b
 stars and streak freezes) and app settings (the daily reminder, colours, and sounds and vibration, which save as
 they're changed).
 
+## Groups
+
+Players compete in groups (`Group`): an owner with an account starts one and shares its six character code
+(`Group::Joinable`), and anyone can join with it, giving a name for the leaderboard if they haven't one. The owner
+sets challenges (`Group::Challenge`): a topic and level, how long it runs, and whether they play too. A
+challenge's round (`Group::Round`) is one set of questions made when it's set, so everyone plays the same ones; a
+group game is saved against its round (the round is in its signed ticket) and earns no medals or level ups. The
+leaderboard (`Group::Challenge::Rankable`) counts each player's first go: score, then fewer wrong, then who played
+first by server save order; a device's clock cannot replace a counted score. Scores must reach the server before
+the round ends (the challenge's end, or local midnight for a daily round); late offline games still enter personal
+history. A challenge can be every day instead: a fresh round each day, the day going by the owner's time zone,
+with only today's playable, and leaderboards for today and the week (Monday to Sunday) by total or best day.
+Groups are invite only, show no pictures but the player's own, and have no messages. The owner can take
+players out, close a challenge, or delete the group; anyone can leave. Removing a player replaces the invite code,
+revoking old links without affecting existing players. Owners can also replace it themselves, and share the current
+code to invite someone back. Leaving voluntarily keeps the code. Both invitation lookups and joins share a rate
+limit sized for a class on one IP address. Closed daily challenges retain their final day and week's leaderboards.
+Lists load only their displayed rounds and first scores, without historical question or answer JSON.
+Waiting challenges show on the home page and in the daily
+reminder. Groups also send push notifications (`User::Notifiable`, through `NotifyJob`): a new challenge to its
+players, and to anyone who's had 1st place taken from them, at most once a day for each group. They only go to
+devices with reminders on, and never between 8pm and 7am in the player's time zone.
+
 ## Error pages
 
 The error pages in `public/` (400, 404, 422, 500) are static, so they still show when the app can't, but they're

@@ -70,7 +70,7 @@ module Negatives
   # level or an easier one (a daily challenge mixes them), of a kind its numbers fit
   def clean_result(result, level: 1)
     question = question_from(result)
-    raise Attempt::Invalid, "Bad question" unless asked_by(level).include?(question[:type]) && possible?(question)
+    raise Attempt::Invalid, "Bad question" unless facts_through(level).include?(question[:type]) && possible?(question)
 
     given = result["given"].to_s
     raise Attempt::Invalid, "Bad answer" unless given.match?(Attempt::TYPED_ANSWER)
@@ -141,10 +141,6 @@ module Negatives
   private
     def level_details(number)
       level(number) || raise(Attempt::Invalid, "Unknown level")
-    end
-
-    def asked_by(level)
-      levels.first(level_details(level)[:number]).flat_map { |details| details[:types] }
     end
 
     # Questions

@@ -3,6 +3,31 @@ require "test_helper"
 class User::ReviewableTest < ActiveSupport::TestCase
   setup { @user = users(:ada) }
 
+  Topic::ALL.each do |topic|
+    test "#{topic.key} reviews retain mistakes from every earlier level" do
+      topic.levels.each do |details|
+        user = User.create_guest!
+        level = details[:number]
+        unlock(user, topic, level)
+        questions = topic.levels.first(level).flat_map do |earlier|
+          asked_at = earlier[:number]
+          generated = topic.questions_for(topic.facts(asked_at).first, level: asked_at, random: Random.new(asked_at))
+          wrong = generated.map do |question|
+            question.except(:text, :answer).merge(given: question[:answer] == "0" ? "1" : "0", ms: 1000)
+          end
+          Attempt.record!(user: user, topic: topic.key, level: asked_at, results: wrong)
+          generated
+        end
+
+        review = User.find(user.id).review_questions(topic)
+        assert_equal questions.map { _1[:text] }.uniq.sort, review.map { _1[:text] }.sort, "at level #{level}"
+        review.each do |question|
+          assert topic.clean_result(question.stringify_keys.merge("given" => question[:answer]), level: level)["correct"]
+        end
+      end
+    end
+  end
+
   def play(*results)
     Attempt.record!(user: @user, results: results)
   end

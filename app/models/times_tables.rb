@@ -40,11 +40,11 @@ module TimesTables
   end
 
   # The answers the browser sent, checked and scored here rather than trusted. The fact must be one the level
-  # asks, so level 1 only takes the 2–5 tables
+  # asks, or one from an earlier level for a mixed game or review; level 1 only takes the 2–5 tables
   def clean_result(result, level: 1)
     a, b = result.values_at("a", "b").map { |number| decimal(number) }
-    raise Attempt::Invalid, "Bad question" unless [ a, b ].all? { |number| number && allowed?(number, level) }
-    raise Attempt::Invalid, "Bad question" unless facts(level).include?(fact_of(a, b))
+    raise Attempt::Invalid, "Bad question" unless a && b && allowed_factors?(a, b, level)
+    raise Attempt::Invalid, "Bad question" unless facts_through(level).include?(fact_of(a, b))
 
     given = result["given"].to_s
     raise Attempt::Invalid, "Bad answer" unless given.match?(Attempt::TYPED_ANSWER)

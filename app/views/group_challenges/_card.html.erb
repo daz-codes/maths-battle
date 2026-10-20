@@ -1,0 +1,17 @@
+<%# A challenge on its group's page: what it is, how long it has, and where the player stands %>
+<% challenge, entry = card.challenge, card.entry %>
+<li>
+  <%= link_to group_challenge_path(group, challenge), class: ["challenge-card", ("challenge-card--ended" unless challenge.open?)] do %>
+    <span class="challenge-card__title"><span aria-hidden="true"><%= challenge.topic_module.emoji %></span> <%= challenge.title %></span>
+    <span class="challenge-card__status"><%= challenge_status(challenge) %></span>
+    <span class="challenge-card__you">
+      <% if entry %>
+        <%= challenge.open? ? "Today: " : "Final day: " if challenge.daily? %>You scored <strong><%= entry.score %></strong> · <%= entry.rank.ordinalize %>
+      <% elsif card.playable? %>
+        <%= challenge.daily? ? "Not played today" : "Not played yet" %>
+      <% elsif !card.player %>
+        You're watching this one
+      <% end %>
+    </span>
+  <% end %>
+</li>

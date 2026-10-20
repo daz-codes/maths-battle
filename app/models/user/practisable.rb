@@ -49,8 +49,9 @@ module User::Practisable
     Array.new(count) { { id: SecureRandom.hex(16), questions: review_questions(topic).shuffle(random: random) } }
   end
 
+  # Mixed games can draw on earlier skills too; pick_fact restricts these weights to the level being asked.
   def question_weights(topic = Topic.default, level = 1)
-    (@question_weights ||= {})[[ topic, level ]] ||= topic.facts(level).index_with { |fact| question_weight(topic, level, fact) }
+    (@question_weights ||= {})[[ topic, level ]] ||= topic.facts_through(level).index_with { |fact| question_weight(topic, level, fact) }
   end
 
   # 0 for a player doing fine at a level (or new to it), rising to 1 for one getting half or fewer right recently

@@ -32,6 +32,17 @@ module Topic::Playable
     levels.size
   end
 
+  # Practice asks the current level's facts. Mixed games and reviews can also ask any earlier level's.
+  def levels_through(number)
+    raise Attempt::Invalid, "Unknown level" unless level(number)
+
+    levels.take_while { |details| details[:number] <= number }
+  end
+
+  def facts_through(number)
+    levels_through(number).flat_map { |details| facts(details[:number]) }.uniq
+  end
+
   # What one pick of a fact asks: one question, unless a topic asks several about the same thing
   # (simultaneous equations asks for y, then x)
   def questions_for(fact, level:, random:)

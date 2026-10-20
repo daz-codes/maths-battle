@@ -1,0 +1,41 @@
+<% content_for :title, "New challenge · MatheMinute" %>
+
+<main class="page page--narrow">
+  <h1 class="heading">New challenge</h1>
+  <p class="aside">Everyone in <%= @group.name %> plays the same questions. Only their first saved score counts: each day's, if it's every day. Scores must be saved before the round ends.</p>
+
+  <%= form_with model: @challenge, url: group_challenges_path(@group), scope: :group_challenge, class: "form" do |form| %>
+    <%= render "errors", user: @challenge %>
+
+    <%= label_tag "group_challenge_topic_level", "Topic and level" %>
+    <%= select_tag "group_challenge[topic_level]", topic_level_options("#{@challenge.topic}:#{@challenge.level}"), id: "group_challenge_topic_level", class: "form__select" %>
+
+    <fieldset class="choice">
+      <legend>How often</legend>
+      <% { "0" => "Just once: one set of questions", "1" => "Every day: new questions each day" }.each do |value, label| %>
+        <label class="choice__option">
+          <%= radio_button_tag "group_challenge[daily]", value, value == (@challenge.daily? ? "1" : "0") %>
+          <span><%= label %></span>
+        </label>
+      <% end %>
+    </fieldset>
+
+    <fieldset class="choice">
+      <legend>How long it runs</legend>
+      <% Group::Challenge::DURATIONS.each_key.with_index do |label, i| %>
+        <label class="choice__option">
+          <%= radio_button_tag "group_challenge[duration]", label, i == 2 %>
+          <span><%= label %></span>
+        </label>
+      <% end %>
+    </fieldset>
+
+    <label class="checkbox">
+      <%= hidden_field_tag "group_challenge[owner_plays]", "0", id: nil %>
+      <%= check_box_tag "group_challenge[owner_plays]", "1", @challenge.owner_plays %>
+      I'm playing too
+    </label>
+
+    <%= form.submit "Set the challenge", class: "button button--go" %>
+  <% end %>
+</main>

@@ -84,7 +84,7 @@ module Conversions
   def clean_result(result, level: 1)
     type = result["type"]
     amount = decimal(result["a"])
-    raise Attempt::Invalid, "Bad question" unless (1..level).flat_map { |easier| facts(easier) }.include?(type)
+    raise Attempt::Invalid, "Bad question" unless facts_through(level).include?(type)
     raise Attempt::Invalid, "Bad question" unless amount&.positive? && amount <= MAX_AMOUNT
 
     given = result["given"].to_s

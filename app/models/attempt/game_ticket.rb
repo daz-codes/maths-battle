@@ -5,13 +5,16 @@
 class Attempt::GameTicket
   QUESTION_FIELDS = %w[ a b c d e f n type v flip ].freeze
 
-  def self.issue(owner:, topic:, level:, id:, questions:, mode: "practice")
-    verifier.generate({ "owner" => owner, "topic" => topic, "level" => level, "id" => id, "mode" => mode,
+  # What a verified ticket says about its game: its mode, and for a group game, its round
+  Game = Data.define(:mode, :round_id)
+
+  def self.issue(owner:, topic:, level:, id:, questions:, mode: "practice", round: nil)
+    verifier.generate({ "owner" => owner, "topic" => topic, "level" => level, "id" => id, "mode" => mode, "round" => round&.id,
       "questions" => questions.map { |question| question.stringify_keys.slice(*QUESTION_FIELDS) } },
       expires_in: Attempt::MAX_OFFLINE_AGE, purpose: "game")
   end
 
-  # Returns the game's mode. Tickets from before there were modes said only whether it was a daily challenge
+  # Returns the game's mode and round. Tickets from before there were modes said only whether it was a daily challenge
   def self.verify!(ticket, owner:, topic:, level:, client_id:, results:)
     raise Attempt::Invalid, "Results must be a list" unless results.is_a?(Array)
 
@@ -27,7 +30,7 @@ class Attempt::GameTicket
     if game["mode"] == "review" && results.size != questions.size
       raise Attempt::Invalid, "Answer every question to finish the review"
     end
-    game["mode"] || (game["daily_challenge"] ? "challenge" : "practice")
+    Game.new(mode: game["mode"] || (game["daily_challenge"] ? "challenge" : "practice"), round_id: game["round"])
   end
 
   def self.verifier

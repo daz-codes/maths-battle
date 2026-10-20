@@ -1,4 +1,4 @@
-<% content_for :title, "#{@topic.title}#{{ "challenge" => " daily challenge", "review" => " review" }[@mode]} · MatheMinute" %>
+<% content_for :title, "#{@topic.title}#{{ "challenge" => " daily challenge", "review" => " review", "group" => " group challenge" }[@mode]} · MatheMinute" %>
 <% content_for :viewport, "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" %>
 <% content_for :body_class, "testing" %>
 <% content_for :focus_mode, true %>
@@ -9,6 +9,7 @@
       data-test-topic-value="<%= @topic.key %>"
       data-test-level-value="<%= @level %>"
       data-test-mode-value="<%= @mode %>"
+      data-test-round-value="<%= @round&.id %>"
       data-test-keys-value="<%= @topic.keys(@level).to_json %>"
       data-test-star-times-value="<%= @topic.star_times.to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">

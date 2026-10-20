@@ -10,6 +10,16 @@ Rails.application.routes.draw do
   resource :level, only: :update
   resource :streak_freeze, only: :create
   resource :reminder, only: %i[ update destroy ]
+  resources :groups, only: %i[ index new create show destroy ] do
+    resource :invite_code, only: :create, controller: "group_invite_codes"
+    resources :challenges, only: %i[ new create show ], controller: "group_challenges" do
+      resource :closing, only: :create, controller: "group_challenge_closings"
+    end
+    resources :memberships, only: :destroy, controller: "group_memberships"
+  end
+  # From a shared link, /join/K7Q2MX, or a code typed on the groups page, /join?code=K7Q2MX
+  get "join(/:code)", to: "group_joins#new", as: :join_group
+  post "join", to: "group_joins#create", as: :group_joins
 
   get "play/:topic", to: "games#show", as: :play
   get "learn/:topic/:level", to: "lessons#show", as: :lesson

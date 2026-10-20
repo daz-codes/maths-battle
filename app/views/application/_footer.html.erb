@@ -1,5 +1,5 @@
 <%# Fixed to the bottom of every page except the test: who's playing (tap for settings) with their stars, then
-    home, achievements and stats. Guests get sign in and sign up links in place of a name %>
+    home, groups, achievements and stats. Guests get sign in and sign up links in place of a name %>
 <% player = current_player %>
 <footer class="site-footer">
   <div class="site-footer__start">
@@ -24,6 +24,17 @@
       <path d="M2.5 12 12 3l9.5 9z"/>
     </svg>
     <span>Home</span>
+  <% end %>
+
+  <%= link_to groups_path, class: "site-footer__tab site-footer__groups" do %>
+    <%# Two people, pink and green %>
+    <svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="8" cy="7.5" r="3.5" fill="var(--pink)"/>
+      <path d="M1.5 20a6.5 6.5 0 0 1 13 0z" fill="var(--pink)"/>
+      <circle cx="16.5" cy="8.5" r="3" fill="var(--green)"/>
+      <path d="M12.5 20a5.5 5.5 0 0 1 10 -1.5V20z" fill="var(--green)"/>
+    </svg>
+    <span>Groups</span>
   <% end %>
 
   <%= link_to achievements_path, class: "site-footer__tab site-footer__achievements" do %>

@@ -1,0 +1,13 @@
+<% content_for :title, "Start a group · MatheMinute" %>
+
+<main class="page page--narrow">
+  <h1 class="heading">Start a group</h1>
+  <p class="aside">You'll get a code to share. Anyone with it can join, and you set the challenges.</p>
+
+  <%= form_with model: @group, class: "form" do |form| %>
+    <%= render "errors", user: @group %>
+    <%= form.label :name, "What's it called?" %>
+    <%= form.text_field :name, maxlength: Group::NAME_LENGTH, placeholder: "Class 4B, the Smith family…", autofocus: true %>
+    <%= form.submit "Start the group", class: "button button--go" %>
+  <% end %>
+</main>

@@ -39,14 +39,14 @@ module Division
   end
 
   # Checked and scored here rather than trusted: what it's divided by and the answer must both be numbers the
-  # level could have asked, from one of its facts, so the answer comes out exactly
+  # level or an earlier one could have asked, from one of its facts, so the answer comes out exactly
   def clean_result(result, level: 1)
     dividend, divisor = result.values_at("a", "b").map { |number| decimal(number) }
-    raise Attempt::Invalid, "Bad question" unless dividend && divisor && allowed?(divisor, level)
+    raise Attempt::Invalid, "Bad question" unless dividend && divisor&.positive?
 
     quotient = dividend / divisor
-    raise Attempt::Invalid, "Bad question" unless quotient * divisor == dividend && allowed?(quotient, level)
-    raise Attempt::Invalid, "Bad question" unless facts(level).include?(fact_of(divisor, quotient))
+    raise Attempt::Invalid, "Bad question" unless quotient * divisor == dividend && allowed_factors?(divisor, quotient, level)
+    raise Attempt::Invalid, "Bad question" unless facts_through(level).include?(fact_of(divisor, quotient))
 
     given = result["given"].to_s
     raise Attempt::Invalid, "Bad answer" unless given.match?(Attempt::TYPED_ANSWER)

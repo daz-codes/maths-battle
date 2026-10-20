@@ -4,10 +4,11 @@ class AttemptsController < ApplicationController
 
   def create
     results = results_param
-    mode = Attempt::GameTicket.verify!(params.dig(:attempt, :ticket), owner: player_key,
+    game = Attempt::GameTicket.verify!(params.dig(:attempt, :ticket), owner: player_key,
       topic: topic_param, level: level_param, client_id: params.dig(:attempt, :client_id), results: results)
     player.update_time_zone(params.dig(:attempt, :time_zone))
-    attempt = Attempt.record!(user: player, topic: topic_param, level: level_param, results: results, mode: mode, **upload_params)
+    round = Group::Round.find_by(id: game.round_id) if game.round_id
+    attempt = Attempt.record!(user: player, topic: topic_param, level: level_param, results: results, mode: game.mode, round: round, **upload_params)
     forget_level(attempt.topic_module) if attempt.levelled_up
     render json: { url: attempt_path(attempt) }, status: :created
   rescue Attempt::Invalid => error

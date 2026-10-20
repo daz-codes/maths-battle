@@ -86,4 +86,17 @@ class User::RemindableTest < ActiveSupport::TestCase
     assert push.dig(:vapid, :private_key).present?
     assert_equal 6.hours.to_i, push[:ttl]
   end
+
+  test "a group challenge waiting is in the reminder, and is reason enough for one once the daily challenge is done" do
+    group = users(:bob).owned_groups.create!(name: "Class 4B")
+    group.join(@user)
+    challenge = travel_to(london(10, 9)) { group.challenges.create!(topic: "times_tables", level: 2) }
+
+    sent = travel_to(london(10, 17, 5)) { pushes_sent { User.send_due_reminders } }
+    assert_equal "One minute of maths. Play it to start a streak! Class 4B's challenge is waiting too.", sent.first[:message][:body]
+
+    travel_to(london(11, 12)) { play_daily_challenge(@user) }
+    sent = travel_to(london(11, 17, 5)) { pushes_sent { User.send_due_reminders } }
+    assert_equal [ "🏆 Class 4B's challenge is waiting", "/groups/#{group.id}/challenges/#{challenge.id}" ], sent.first[:message].values_at(:title, :url)
+  end
 end

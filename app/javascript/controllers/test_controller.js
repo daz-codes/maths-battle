@@ -22,15 +22,14 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // questions once and ends after the last
 export default class extends Controller {
   static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress" ]
-  static values = { questionSets: Array, topic: String, level: Number, mode: String, submitUrl: String, keys: Array, starTimes: Object }
+  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, submitUrl: String, keys: Array, starTimes: Object }
 
   connect() {
     preparePlayer()
     this.state = "countdown"
     this.unwatch = watchPlayer(() => { this.state = "stopped" })
     if (this.state === "stopped") return
-    // A daily challenge's or review's spares are its own, as its questions are mixed from every level
-    this.questionSet = chooseQuestionSet(this.questionSetsValue, `${this.topicValue}:${this.modeValue === "practice" ? this.levelValue : this.modeValue}`)
+    this.questionSet = chooseQuestionSet(this.questionSetsValue, this.sparesKey)
     if (!this.questionSet) {
       this.state = "stopped"
       this.questionTarget.hidden = true
@@ -54,6 +53,13 @@ export default class extends Controller {
     window.addEventListener("beforeunload", this.beforeUnload)
 
     this.review ? this.startReview() : this.countdown(COUNTDOWN)
+  }
+
+  // A daily challenge's or review's spares are its own, as its questions are mixed from every level, and a group
+  // challenge's are its round's
+  get sparesKey() {
+    const kind = { practice: this.levelValue, group: `group-${this.roundValue}` }[this.modeValue] ?? this.modeValue
+    return `${this.topicValue}:${kind}`
   }
 
   get review() {

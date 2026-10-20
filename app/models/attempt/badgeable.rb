@@ -34,9 +34,10 @@ module Attempt::Badgeable
     streak >= days
   end
 
-  # Playing a level means it was reached; levelling up reaches the next one
+  # Playing a level means it was reached; levelling up reaches the next one. Not a group game, which can be at
+  # a level the player hasn't reached
   def reached_level?(topic, number)
-    topic_module == topic && (levelled_up ? level + 1 : level) >= number
+    topic_module == topic && !group? && (levelled_up ? level + 1 : level) >= number
   end
 
   def perfect_game?

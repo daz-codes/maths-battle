@@ -142,6 +142,14 @@ module Topic::Tabled
       number.positive? && FACTORS.cover?(base(number)) && POWERS.fetch(level).cover?(power(number))
     end
 
+    # Both factors must fit the same level, which may be an earlier one in a mixed game or a review.
+    # At level 4 this accepts level 3's zeroes or level 4's decimals, but mixing them still needs level 5.
+    def allowed_factors?(first, second, level)
+      levels_through(level).any? do |details|
+        allowed?(first, details[:number]) && allowed?(second, details[:number])
+      end
+    end
+
     # As shown in a question: 3000, 0.7, and for an old negatives game a proper minus sign: −3000
     def shown(number)
       written(number).sub("-", "−")

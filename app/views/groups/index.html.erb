@@ -1,0 +1,39 @@
+<% content_for :title, "Groups · MatheMinute" %>
+
+<main class="page groups">
+  <h1 class="heading">Groups</h1>
+  <%= render "flash" %>
+  <p class="aside">Compete with friends or your class: everyone in a challenge plays the same questions.</p>
+
+  <% if @groups.any? %>
+    <ul class="group-cards">
+      <% @groups.each do |group| %>
+        <% waiting = @waiting_counts.fetch(group.id, 0) %>
+        <li>
+          <%= link_to group, class: "group-card" do %>
+            <span class="group-card__name"><%= group.name %></span>
+            <span class="group-card__about">
+              <%= pluralize(@member_counts.fetch(group.id, 0), "player") %><%= " · You run it" if group.owned_by?(@user) %>
+            </span>
+            <%= tag.span("🏆 #{pluralize(waiting, "challenge")} to play", class: "group-card__waiting") if waiting.positive? %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <section class="group-join" aria-labelledby="join-heading">
+    <h2 class="settings__heading" id="join-heading">Join a group</h2>
+    <%= form_with url: join_group_path, method: :get, class: "group-join__form" do %>
+      <label class="visually-hidden" for="code">Group code</label>
+      <%= text_field_tag :code, nil, placeholder: "Code, like K7Q2MX", autocomplete: "off", autocapitalize: "characters", maxlength: 12, class: "group-join__code" %>
+      <%= submit_tag "Join", class: "button button--blue", name: nil %>
+    <% end %>
+  </section>
+
+  <% if @user.can_make_groups? %>
+    <%= link_to "Start a group", new_group_path, class: "button button--go button--wide" %>
+  <% else %>
+    <p class="aside"><%= link_to "Make an account", new_registration_path %> to start a group of your own.</p>
+  <% end %>
+</main>

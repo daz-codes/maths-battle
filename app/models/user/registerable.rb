@@ -3,6 +3,8 @@
 module User::Registerable
   extend ActiveSupport::Concern
 
+  NAME_LENGTH = 30
+
   USERNAME_FORMAT = /\A[a-z0-9_]+\z/
   MIN_PASSWORD_LENGTH = 15
 
@@ -19,7 +21,7 @@ module User::Registerable
       validate :password_set
     end
     validates :name, presence: true, on: :registration
-    validates :name, length: { maximum: 30 }
+    validates :name, length: { maximum: NAME_LENGTH }
     validates :password, length: { in: MIN_PASSWORD_LENGTH..72 }, allow_nil: true
     validate :password_fits_bcrypt
   end

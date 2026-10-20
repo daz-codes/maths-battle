@@ -28,7 +28,14 @@
   </section>
   <%= render "badges/earned", badges: @attempt.badges, celebrate: !(@attempt.levelled_up || @attempt.new_high_score) %>
 
-  <% if @attempt.review? %>
+  <% if @attempt.group? && (challenge = @attempt.round&.challenge) %>
+    <%# Where the game puts them on the group's leaderboard, if it's the go that counts %>
+    <% leaderboard = challenge.leaderboard(@attempt.round) %>
+    <p class="banner banner--group">🏆 <%= group_result_message(@attempt, leaderboard) %></p>
+    <div class="results__actions results__actions--one">
+      <%= link_to "See the leaderboard", group_challenge_path(challenge.group, challenge), class: "button button--blue" %>
+    </div>
+  <% elsif @attempt.review? %>
     <%# Nothing to share without a clock: on to the mistakes still left, or back to practice %>
     <% topic = @attempt.topic_module %>
     <div class="results__actions results__actions--one">

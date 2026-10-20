@@ -144,6 +144,19 @@ class User::PractisableTest < ActiveSupport::TestCase
     assert_equal 1.0, User.find(@user.id).question_weights(TimesTables, 3)["7x8"]
   end
 
+  test "mixed games weight earlier skills too, while practice still asks only the current skill" do
+    @user.fact_stats.create!(topic: "fractions", level: 2, fact: "simplify", wrong_count: 4)
+    weights = @user.question_weights(Fractions, 2)
+    assert_equal 5.0, weights["simplify"]
+    assert_equal 1.0, weights["add-same"]
+
+    questions = @user.questions(topic: Fractions, level: 2, count: 150, random: Random.new(2))
+    assert_empty questions.map { _1[:type] }.uniq - Fractions.facts(2)
+
+    mixed = @user.questions(topic: Fractions, level: 2, count: 150, random: Random.new(2), mix: :all_levels)
+    assert_includes mixed.map { _1[:type] }, "simplify"
+  end
+
   test "a fact comes up less as its percentage correct improves" do
     stat = stat("7x8", correct_count: 1, wrong_count: 3)
     before = weights["7x8"]

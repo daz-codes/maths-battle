@@ -95,14 +95,14 @@ a {
 
 /* Text links (and the sign out button, styled as one): green underline and a faint wash on hover.
    The wash is a touch of ink mixed into the paper, so it's slightly darker in light mode and lighter in dark */
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary, .daily-done, .current-topic), .link-button {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary, .daily-done, .current-topic, .group-card, .challenge-card, .group-waiting, .board-switch__option), .link-button {
   margin: 0 -0.2em;
   padding: 0.05em 0.2em;
   border-radius: 4px;
   transition: background-color 120ms, text-decoration-color 120ms;
 }
 
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary, .daily-done, .current-topic):hover, .link-button:hover {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary, .daily-done, .current-topic, .group-card, .challenge-card, .group-waiting, .board-switch__option):hover, .link-button:hover {
   background-color: color-mix(in srgb, var(--ink) 5%, var(--paper));
   text-decoration-color: var(--green);
 }
@@ -486,6 +486,62 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .avatar-field__controls .button:focus-within { outline: 3px solid var(--blue); outline-offset: 3px; }
 .avatar-field__remove { display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; font-weight: 500; }
 .avatar-field .hint { margin-top: 0; }
+
+/* ── Groups ─────────────────────────────────────── */
+
+/* A player's groups, and the challenges in one: tiles like the topics page's */
+.group-cards, .challenge-cards { display: grid; gap: 0.75rem; width: 100%; margin: 0; padding: 0; list-style: none; }
+.group-card, .challenge-card { display: flex; flex-direction: column; gap: 0.2rem; padding: 1rem; border-radius: var(--radius); background: var(--paper-alt); color: var(--ink); text-align: left; text-decoration: none; }
+.group-card:hover, .challenge-card:hover { background: color-mix(in srgb, var(--ink) 6%, var(--paper-alt)); }
+.group-card__name, .challenge-card__title { font-size: 1.15rem; font-weight: 800; }
+.group-card__about, .challenge-card__status { color: var(--muted); font-size: 0.9rem; font-weight: 600; }
+.group-card__waiting { color: var(--pink-text); font-size: 0.9rem; font-weight: 700; }
+.challenge-card__you { font-size: 0.95rem; font-weight: 600; }
+.challenge-card__you:empty { display: none; }
+.challenge-card--ended { opacity: 0.75; }
+.groups .settings__heading, .group .settings__heading, .challenge .settings__heading { align-self: flex-start; }
+
+.group-join, .challenges, .leaderboard { display: flex; flex-direction: column; gap: 0.75rem; width: 100%; }
+.group-join__form { display: flex; gap: 0.6rem; }
+.group-join__code { flex: 1; min-width: 0; min-height: 3.25rem; padding: 0 0.9rem; border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent); border-radius: var(--radius); background: var(--paper); color: var(--ink); font: inherit; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.group-join__code::placeholder { letter-spacing: 0; text-transform: none; font-weight: 500; }
+
+/* The owner's code to share: big enough to read out to a class */
+.group-code { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; width: 100%; padding: 1rem; border-radius: var(--radius); background: linear-gradient(var(--green) 0 6px, var(--paper-alt) 6px); }
+.group-code__label { margin: 0; color: var(--muted); font-size: 0.9rem; font-weight: 700; }
+.group-code__code { margin: 0; font-size: 2.4rem; font-weight: 900; letter-spacing: 0.18em; }
+
+.group-members { width: 100%; text-align: left; }
+.group-members summary { cursor: pointer; font-weight: 700; }
+.group-members ul { display: grid; gap: 0.5rem; margin: 0.75rem 0 0; padding: 0; list-style: none; }
+.group-members__player { display: flex; align-items: center; gap: 0.6rem; }
+.group-members__player > span { flex: 1; }
+.group-members__remove { color: var(--muted); font-size: 0.85rem; }
+
+/* A challenge's leaderboard: the player's own row stands out */
+.challenge__you { margin: 0; font-size: 1.2rem; font-weight: 700; }
+.leaderboard__rows { display: grid; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
+.leaderboard__row { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.75rem; border-radius: var(--radius); background: var(--paper-alt); text-align: left; }
+.leaderboard__row--you { background: color-mix(in srgb, var(--yellow) 35%, var(--paper-alt)); }
+.leaderboard__rank { width: 2rem; font-size: 1.15rem; font-weight: 800; text-align: center; }
+.leaderboard__name { flex: 1; min-width: 0; overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.leaderboard__score { font-size: 1.25rem; font-weight: 800; }
+.leaderboard__wrong { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
+
+/* An every day challenge's leaderboards: today's, or the week's by total or best day */
+.board-switch { display: grid; grid-template-columns: repeat(3, 1fr); padding: 0.25rem; border-radius: 999px; background: var(--paper-alt); }
+.board-switch__option { padding: 0.45rem 0.5rem; border-radius: 999px; color: var(--muted); font-size: 0.9rem; font-weight: 700; text-align: center; text-decoration: none; }
+.board-switch__option[aria-current="true"] { background: var(--blue-deep); color: #fff; }
+
+/* On the home page, under the daily challenge */
+.group-waiting { display: flex; flex-direction: column; gap: 0.15rem; width: var(--panel-width); padding: 0.75rem 1rem; border-radius: var(--radius); background: linear-gradient(90deg, var(--yellow) 0 6px, var(--paper-alt) 6px); color: var(--ink); text-decoration: none; }
+.group-waiting__title { font-weight: 800; }
+.group-waiting__about { color: var(--muted); font-size: 0.9rem; font-weight: 600; }
+.banner--group { background: var(--yellow); color: var(--on-neon); }
+
+.form__select { min-height: 3.25rem; padding: 0 0.75rem; border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent); border-radius: var(--radius); background: var(--paper); color: var(--ink); font: inherit; font-weight: 600; }
+.checkbox { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; }
+.checkbox input { width: 1.2rem; height: 1.2rem; accent-color: var(--green-deep); }
 
 /* ── Topics ─────────────────────────────────────── */
 

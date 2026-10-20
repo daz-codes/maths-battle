@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_20_180000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -59,6 +59,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_170000) do
     t.integer "stars", default: 0, null: false
     t.boolean "earned_streak_freeze", default: false, null: false
     t.string "mode", default: "practice", null: false
+    t.integer "round_id"
+    t.index ["round_id", "user_id"], name: "index_attempts_on_round_id_and_user_id"
+    t.index ["round_id"], name: "index_attempts_on_round_id"
     t.index ["share_token"], name: "index_attempts_on_share_token", unique: true
     t.index ["user_id", "client_id"], name: "index_attempts_on_user_id_and_client_id", unique: true
     t.index ["user_id", "created_at"], name: "index_attempts_on_user_id_and_created_at"
@@ -100,6 +103,51 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_170000) do
     t.datetime "updated_at", null: false
     t.index ["user_id", "day"], name: "index_frozen_days_on_user_id_and_day", unique: true
     t.index ["user_id"], name: "index_frozen_days_on_user_id"
+  end
+
+  create_table "group_challenges", force: :cascade do |t|
+    t.integer "group_id", null: false
+    t.string "topic", null: false
+    t.integer "level", null: false
+    t.boolean "owner_plays", default: true, null: false
+    t.datetime "ends_at"
+    t.datetime "closed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "daily", default: false, null: false
+    t.index ["group_id"], name: "index_group_challenges_on_group_id"
+  end
+
+  create_table "group_memberships", force: :cascade do |t|
+    t.integer "group_id", null: false
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.date "nudged_on"
+    t.index ["group_id", "user_id"], name: "index_group_memberships_on_group_id_and_user_id", unique: true
+    t.index ["group_id"], name: "index_group_memberships_on_group_id"
+    t.index ["user_id"], name: "index_group_memberships_on_user_id"
+  end
+
+  create_table "group_rounds", force: :cascade do |t|
+    t.integer "challenge_id", null: false
+    t.json "questions", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.date "day"
+    t.index ["challenge_id", "day"], name: "index_group_rounds_on_challenge_id_and_day", unique: true
+    t.index ["challenge_id"], name: "index_group_rounds_on_challenge_id"
+    t.index ["challenge_id"], name: "index_group_rounds_on_one_off_challenge", unique: true, where: "day IS NULL"
+  end
+
+  create_table "groups", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "owner_id", null: false
+    t.string "join_code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["join_code"], name: "index_groups_on_join_code", unique: true
+    t.index ["owner_id"], name: "index_groups_on_owner_id"
   end
 
   create_table "lesson_completions", force: :cascade do |t|
@@ -160,6 +208,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_170000) do
   add_foreign_key "badges", "users"
   add_foreign_key "fact_stats", "users"
   add_foreign_key "frozen_days", "users"
+  add_foreign_key "group_challenges", "groups"
+  add_foreign_key "group_memberships", "groups"
+  add_foreign_key "group_memberships", "users"
+  add_foreign_key "group_rounds", "group_challenges", column: "challenge_id"
+  add_foreign_key "groups", "users", column: "owner_id"
   add_foreign_key "lesson_completions", "users"
   add_foreign_key "push_subscriptions", "users"
   add_foreign_key "sessions", "users"
