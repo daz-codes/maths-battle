@@ -30,6 +30,7 @@ module AttemptTestHelper
     Negatives => { type: "below-zero", a: 4, b: 9, given: "-5", ms: 1000 },
     Fractions => { type: "simplify", a: 6, b: 8, given: "3/4", ms: 1000 },
     Percentages => { type: "50", a: 50, b: 60, given: "30", ms: 1000 },
+    Conversions => { type: "m>cm", a: "3", given: "300", ms: 1000 },
     Equations => { type: "x+a=b", a: 2, b: 5, v: "x", flip: false, given: "3", ms: 1000 },
     Functions => { type: "x+a", a: 2, n: 3, given: "5", ms: 1000 },
     # 2x + y = 5 and x + y = 3: x = 2

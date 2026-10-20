@@ -25,10 +25,15 @@ class PushSubscription < ApplicationRecord
   end
 
   def self.public_key
-    Rails.application.credentials.dig(:web_push, :public_key)
+    keys[:public_key]
   end
 
   def self.vapid
-    { subject: "https://matheminute.daz.codes", public_key: public_key, private_key: Rails.application.credentials.dig(:web_push, :private_key) }
+    { subject: "https://matheminute.daz.codes", public_key: public_key, private_key: keys[:private_key] }
+  end
+
+  # From the credentials, or the test environment's own (config/initializers/web_push.rb)
+  def self.keys
+    Rails.configuration.x.web_push
   end
 end

@@ -53,6 +53,24 @@ class NewTopicsTest < ApplicationSystemTestCase
     assert_equal "addition", users(:ada).attempts.last.topic
   end
 
+  test "metric conversions: pick it, answer with the decimal point, and see the results" do
+    sign_in users(:ada)
+    click_on "Change topic"
+    find(".topic-card", text: "Metric conversions").click
+    assert_selector ".levels__name", text: "Level 1: cm and m"
+    click_on "Practise level 1"
+    assert_selector ".question", text: "= ?", wait: 5
+    end_game_in(6_000)
+
+    3.times do |i|
+      find("body").send_keys(current_answer)
+      assert_selector ".test__score", text: (i + 1).to_s
+    end
+
+    assert_selector ".card__number", text: "3", wait: 10
+    assert_equal "conversions", users(:ada).attempts.last.topic
+  end
+
   test "percentages: pick it, answer with the keyboard, and see the results" do
     sign_in users(:ada)
     click_on "Change topic"

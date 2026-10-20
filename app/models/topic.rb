@@ -1,6 +1,6 @@
 # Every topic that can be played. Each one is a module answering the same questions (see TimesTables)
 module Topic
-  ALL = [ Addition, TimesTables, Division, Negatives, Fractions, Percentages, Equations, Functions, SimultaneousEquations ]
+  ALL = [ Addition, TimesTables, Division, Negatives, Fractions, Percentages, Conversions, Equations, Functions, SimultaneousEquations ]
 
   def self.default
     TimesTables
