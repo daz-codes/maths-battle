@@ -6,7 +6,7 @@ progressively harder levels. Times tables and division share their table facts, 
 2–12, zeroes, decimals, then both) through `Topic::Tabled`; negative numbers practises one skill a level (going
 below zero, starting below zero, adding negatives, subtracting them, then multiplying and dividing), and so does
 percentages (50% and 10%, 5% and 25%, combinations like 15%, 1% to 4%, then any), with whole number answers.
-Metric conversions goes cm and m, then length (mm, cm, m, km), mass (mg, g, kg), volume (ml, l, kl), then all.
+Metric conversions goes cm and m, then length (mm, cm, m, km), mass (mg, g, kg), volume (ml, l, kl), then imperial lengths, roughly (an inch ≈ 2.5 cm, 5 miles ≈ 8 km).
 Adding and subtracting goes single digits, two digits, three digits, round numbers, then decimals, never below zero.
 Fractions practises one skill a level (simplifying, adding and subtracting with the same or different
 denominators, multiplying, dividing), with answers in lowest terms, typed with a fraction line.

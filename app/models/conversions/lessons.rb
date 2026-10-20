@@ -40,12 +40,12 @@ module Conversions::Lessons
     },
     5 => {
       steps: [
-        { show: "milli = a thousandth", say: "mm, mg and ml are all a thousandth of the main unit" },
-        { show: "kilo = a thousand", say: "km, kg and kl are all a thousand of it" },
-        { show: "centi = a hundredth", say: "There are 100 cm in a metre" },
-        { show: "Bigger unit: divide", say: "Going to a bigger unit makes the number smaller" }
+        { show: "1 inch ≈ 2.5 cm", say: "Inches are an old, imperial unit: one is about two and a half centimetres" },
+        { show: "12 inches ≈ 30 cm", say: "Inches to cm: multiply by 2.5. 12 × 2 = 24, and half of 12 more is 30" },
+        { show: "5 miles ≈ 8 km", say: "Miles are longer: 5 miles is about 8 kilometres" },
+        { show: "15 miles ≈ 24 km", say: "15 miles is three lots of 5 miles, so it's three lots of 8 km" }
       ],
-      try: { question: { type: "mg>g", a: 2500 }, hint: "Milligrams to grams: divide by 1000" }
+      try: { question: { type: "in>cm", a: 8 }, hint: "8 × 2.5: 8 × 2 = 16, and half of 8 more" }
     }
   }
 end
