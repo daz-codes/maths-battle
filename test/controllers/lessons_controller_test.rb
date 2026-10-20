@@ -23,6 +23,12 @@ class LessonsControllerTest < ActionDispatch::IntegrationTest
     unlock(@user, TimesTables, 5)
 
     get lesson_path("times-tables", 5)
+    assert_select "[data-tutorial-answer-value='240']"
+    assert_select ".keypad__key[data-digit='.']"
+    assert_select ".keypad__key[data-digit='-']", count: 0, message: "times tables has no negatives"
+
+    unlock(@user, Negatives, 5)
+    get lesson_path("negative-numbers", 5)
     assert_select "[data-tutorial-answer-value='-56']"
     assert_select ".keypad__key[data-digit='-']"
   end

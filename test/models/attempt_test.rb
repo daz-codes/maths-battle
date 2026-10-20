@@ -35,7 +35,7 @@ class AttemptTest < ActiveSupport::TestCase
 
   test "an unfinished answer, like 0. or a lone minus, is just wrong: the rest of the game still saves" do
     unlock(@user, TimesTables, 5)
-    results = [ { a: "-0.9", b: "-20", given: "0.", ms: 2_000 }, { a: "-3", b: "6", given: "-18", ms: 2_000 }, { a: "2", b: "4", given: "-", ms: 2_000 } ]
+    results = [ { a: "0.9", b: "20", given: "0.", ms: 2_000 }, { a: "3", b: "6", given: "18", ms: 2_000 }, { a: "2", b: "4", given: "-", ms: 2_000 } ]
 
     attempt = Attempt.record!(user: @user, level: 5, results: results)
     assert_equal [ false, true, false ], attempt.results.map { _1["correct"] }

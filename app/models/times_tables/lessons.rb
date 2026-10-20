@@ -32,21 +32,21 @@ module TimesTables::Lessons
     },
     4 => {
       steps: [
-        { show: "0.7 × 3000", say: "A decimal and zeroes together" },
-        { show: "7 × 3 = 21", say: "Start with the table fact" },
-        { show: "3 zeroes, 1 decimal place", say: "Each decimal place cancels out a zero, leaving two zeroes" },
-        { show: "0.7 × 3000 = 2100", say: "21 with two zeroes on the end" }
+        { show: "0.7 × 3", say: "Decimals: numbers with a decimal point" },
+        { show: "7 × 3 = 21", say: "Start with the table fact, without the point" },
+        { show: "0.7 has 1 decimal place", say: "Count the digits after the point" },
+        { show: "0.7 × 3 = 2.1", say: "Put the point back so the answer has 1 decimal place too" }
       ],
       try: { question: { a: "0.4", b: "0.6" }, hint: "4 × 6 = 24, and there are two decimal places to put back" }
     },
     5 => {
       steps: [
-        { show: "−6 × 4", say: "A minus sign changes the answer's sign" },
-        { show: "6 × 4 = 24", say: "Do the table fact without the signs" },
-        { show: "−6 × 4 = −24", say: "One minus sign: the answer is negative" },
-        { show: "−6 × −4 = 24", say: "Two minus signs cancel out: the answer is positive" }
+        { show: "0.7 × 3000", say: "A decimal and zeroes together" },
+        { show: "7 × 3 = 21", say: "Start with the table fact" },
+        { show: "3 zeroes, 1 decimal place", say: "Each decimal place cancels out a zero, leaving two zeroes" },
+        { show: "0.7 × 3000 = 2100", say: "21 with two zeroes on the end" }
       ],
-      try: { question: { a: -7, b: 8 }, hint: "7 × 8 = 56. How many minus signs are there?" }
+      try: { question: { a: "0.6", b: "400" }, hint: "6 × 4 = 24. Two zeroes, one decimal place: one zero is left" }
     }
   }
 end

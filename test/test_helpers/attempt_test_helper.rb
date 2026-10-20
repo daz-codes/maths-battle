@@ -25,6 +25,8 @@ module AttemptTestHelper
 
   EASY_QUESTIONS = {
     TimesTables => { a: 2, b: 3, given: 6, ms: 1000 },
+    Division => { a: 6, b: 3, given: "2", ms: 1000 },
+    Negatives => { type: "below-zero", a: 4, b: 9, given: "-5", ms: 1000 },
     Fractions => { type: "simplify", a: 6, b: 8, given: "3/4", ms: 1000 },
     Equations => { type: "x+a=b", a: 2, b: 5, v: "x", flip: false, given: "3", ms: 1000 },
     Functions => { type: "x+a", a: 2, n: 3, given: "5", ms: 1000 },

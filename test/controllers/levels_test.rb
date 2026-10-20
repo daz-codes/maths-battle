@@ -119,29 +119,30 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_select ".levels-panel > a.button--practise[href=?]", play_path("equations", level: 1)
   end
 
-  test "the keypad grows a decimal point, then a minus sign" do
+  test "the keypad grows a decimal point, and never a minus sign" do
     (1..4).each { |level| practise(level: level, score: 10) }
 
     get play_path("times-tables", level: 3)
     assert_select ".keypad__key--extra", count: 0
 
-    get play_path("times-tables", level: 4)
-    assert_select ".keypad__key--extra", text: "."
-
-    get play_path("times-tables", level: 5)
-    assert_select ".keypad--wide .keypad__key--extra", 2
-    assert_select ".keypad__key[data-digit='-']", text: "−"
+    [ 4, 5 ].each do |level|
+      get play_path("times-tables", level: level)
+      assert_select ".keypad__key--extra", 1
+      assert_select ".keypad__key--extra", text: "."
+    end
   end
 
-  test "a game of decimals and negatives is checked on the server" do
+  test "zeroes, then decimals only, then both, are checked on the server; negatives are their own topic" do
     (1..4).each { |level| practise(level: level, score: 10) }
-    results = [ { a: "0.7", b: "-3000", given: "-2100", ms: 3000 }, { a: "-0.4", b: "0.6", given: "-0.24", ms: 3000 }, { a: "0.4", b: "0.6", given: "0.240", ms: 3000 } ]
+    results = [ { a: "0.7", b: "3000", given: "2100", ms: 3000 }, { a: "0.4", b: "0.6", given: "0.24", ms: 3000 }, { a: "0.4", b: "0.6", given: "0.240", ms: 3000 } ]
 
     post attempts_path, params: game_upload(level: 5, results: results), as: :json
     assert_response :created
     assert_equal [ true, true, false ], @user.attempts.last.results.map { _1["correct"] }, "0.240 isn't how 0.24 is written"
 
-    post attempts_path, params: game_upload(level: 3, results: [ { a: "-7", b: "8", given: "-56", ms: 1000 } ]), as: :json
-    assert_response :unprocessable_entity, "negatives aren't part of level 3"
+    post attempts_path, params: game_upload(level: 4, results: [ { a: "0.7", b: "3000", given: "2100", ms: 1000 } ]), as: :json
+    assert_response :unprocessable_entity, "zeroes and decimals together are level 5"
+    post attempts_path, params: game_upload(level: 5, results: [ { a: "-7", b: "8", given: "-56", ms: 1000 } ]), as: :json
+    assert_response :unprocessable_entity, "no negatives in times tables"
   end
 end

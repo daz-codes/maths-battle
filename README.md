@@ -1,7 +1,10 @@
 # MatheMinute
 
 A Rails and Hotwire app for one-minute maths practice. Players can start as guests, register to
-keep their history across devices, and practise times tables, fractions, equations, functions or simultaneous equations at progressively harder levels.
+keep their history across devices, and practise times tables, division, negative numbers, fractions, equations, functions or simultaneous equations at
+progressively harder levels. Times tables and division share their table facts, grouping and levels (tables 2–5,
+2–12, zeroes, decimals, then both) through `Topic::Tabled`; negative numbers practises one skill a level (going
+below zero, starting below zero, adding negatives, subtracting them, then multiplying and dividing).
 Fractions practises one skill a level (simplifying, adding and subtracting with the same or different
 denominators, multiplying, dividing), with answers in lowest terms, typed with a fraction line.
 
