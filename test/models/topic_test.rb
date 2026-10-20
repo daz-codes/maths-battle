@@ -6,6 +6,8 @@ class TopicTest < ActiveSupport::TestCase
     assert_equal [ "equations", "equations", "Equations", "⚖️" ], [ Equations.key, Equations.slug, Equations.title, Equations.emoji ]
     assert_equal [ "functions", "functions", "Functions", "⚙️" ], [ Functions.key, Functions.slug, Functions.title, Functions.emoji ]
     assert_equal [ "fractions", "fractions", "Fractions", "🍕" ], [ Fractions.key, Fractions.slug, Fractions.title, Fractions.emoji ]
+    assert_equal [ "addition", "adding-and-subtracting", "Adding and subtracting", "➕" ], [ Addition.key, Addition.slug, Addition.title, Addition.emoji ]
+    assert_equal [ "percentages", "percentages", "Percentages", "💯" ], [ Percentages.key, Percentages.slug, Percentages.title, Percentages.emoji ]
     assert_equal [ "division", "division", "Division", "➗" ], [ Division.key, Division.slug, Division.title, Division.emoji ]
     assert_equal [ "negatives", "negative-numbers", "Negative numbers", "🌡️" ], [ Negatives.key, Negatives.slug, Negatives.title, Negatives.emoji ]
   end
@@ -20,7 +22,7 @@ class TopicTest < ActiveSupport::TestCase
     assert_equal TimesTables, Topic.find("times_tables")
     assert_equal TimesTables, Topic.find_by_slug("times-tables")
     assert_nil Topic.find("spelling")
-    assert_equal %w[ times_tables division negatives fractions equations functions simultaneous ], Topic.keys
+    assert_equal %w[ addition times_tables division negatives fractions percentages equations functions simultaneous ], Topic.keys
   end
 
   test "a topic keeps its own module name" do
