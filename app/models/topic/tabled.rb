@@ -15,7 +15,9 @@ module Topic::Tabled
   POWERS = { 1 => 0..0, 2 => 0..0, 3 => 0..3, 4 => -2..0, 5 => -2..3 }
   # Between them the two numbers move by at most this many places, so answers stay typeable
   MAX_PLACES = 3
-  NUMBER_FORMAT = /\A\d{1,9}(\.\d{1,6})?\z/
+  # Signed, as games from when times tables had a negatives level are still read for history and feedback.
+  # New answers are positive (allowed?)
+  NUMBER_FORMAT = /\A-?\d{1,9}(\.\d{1,6})?\z/
 
   # A decimal point once the level has decimals
   def keys(level)
@@ -140,8 +142,8 @@ module Topic::Tabled
       number.positive? && FACTORS.cover?(base(number)) && POWERS.fetch(level).cover?(power(number))
     end
 
-    # As shown in a question: 3000, 0.7
+    # As shown in a question: 3000, 0.7, and for an old negatives game a proper minus sign: −3000
     def shown(number)
-      written(number)
+      written(number).sub("-", "−")
     end
 end

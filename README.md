@@ -108,6 +108,12 @@ The settings page has three parts: about you (picture and name, saved with its b
 stars and streak freezes) and app settings (the daily reminder, colours, and sounds and vibration, which save as
 they're changed).
 
+## Error pages
+
+The error pages in `public/` (400, 404, 422, 500) are static, so they still show when the app can't, but they're
+written from the app's own header and logo by `bin/rails errors:pages` (`ErrorPage`, `app/views/errors/page`).
+Run it after changing the logo or the wording.
+
 ## Sounds and vibration
 
 A tick for a right answer, a soft buzz for a wrong one and a fanfare for a level up, in games and lessons,

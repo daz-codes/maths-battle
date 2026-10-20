@@ -1,0 +1,52 @@
+<%# A static error page, written into public/ by bin/rails errors:pages so it still shows when the app can't:
+    the app's header and logo, what happened, and a way home. Styles are inline, as the app's stylesheet has a
+    fingerprinted name that changes with each deploy %>
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title><%= title %> · MatheMinute</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400..900&display=swap" rel="stylesheet">
+  <style>
+    :root { --yellow: #efff2e; --green: #5dff7a; --pink: #ff5cc6; --blue: #2be4ff; --ink: #3a3b35; --muted: #6f7064; --paper: #fffef9; --paper-alt: #f1f0e8; --pink-text: #e5139a; --blue-deep: #0078b8; --glow: 0%; color-scheme: light; }
+    @media (prefers-color-scheme: dark) {
+      :root { --ink: #eceef7; --muted: #a5aabe; --paper: #181a32; --paper-alt: #22254a; --pink-text: #ff5cc6; --glow: 60%; color-scheme: dark; }
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; min-height: 100dvh; background: var(--paper); color: var(--ink); text-align: center;
+      font-family: "Nunito", ui-rounded, "SF Pro Rounded", ui-sans-serif, system-ui, sans-serif; }
+    .site-header { display: flex; flex-direction: column; align-items: center; padding: calc(1.5rem + env(safe-area-inset-top)) 1rem 0; }
+    .logo { display: inline-flex; align-items: center; gap: 0.65rem; color: var(--ink); text-decoration: none; }
+    .clock { display: block; color: var(--ink); overflow: visible; }
+    .logo__mark { width: clamp(3.2rem, 14.4vw, 4rem); height: clamp(3.2rem, 14.4vw, 4rem); }
+    .logo__word { display: block; height: clamp(1.9rem, 8.6vw, 2.4rem); width: auto; overflow: visible; }
+    .logo__word path { stroke: currentColor; stroke-width: 2.2; stroke-linejoin: round; }
+    .logo__minute { fill: var(--pink-text); stroke: var(--pink-text) !important; }
+    main { display: flex; flex-direction: column; align-items: center; gap: 1rem; max-width: 26rem; margin: 0 auto; padding: 3rem 1rem; }
+    .error__emoji { margin: 0; font-size: 3.5rem; line-height: 1; }
+    h1 { margin: 0; font-size: clamp(1.9rem, 8vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; }
+    p { margin: 0; color: var(--muted); font-size: 1.1rem; font-weight: 600; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 3.25rem; margin-top: 0.5rem; padding: 0.6rem 1.6rem;
+      border-radius: 10px; background: var(--blue-deep); box-shadow: 0 0 22px color-mix(in srgb, var(--blue) var(--glow), transparent);
+      color: #fff; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.06em; text-decoration: none; text-transform: uppercase; }
+    .error__code { color: var(--muted); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <%= render "logo" %>
+  </header>
+  <main>
+    <p class="error__emoji" aria-hidden="true"><%= emoji %></p>
+    <h1><%= title %></h1>
+    <p><%= message %></p>
+    <a class="button" href="/">Back to home</a>
+    <p class="error__code">Error <%= code %></p>
+  </main>
+</body>
+</html>

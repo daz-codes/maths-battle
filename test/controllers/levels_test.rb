@@ -132,6 +132,18 @@ class LevelsTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "games from when times tables had negatives are still read: the next results page shows" do
+    old = { "a" => "-7", "b" => "8", "given" => "-55", "correct" => false, "ms" => 2000 }
+    @user.attempts.create!(topic: "times_tables", level: 5, results: [ old ] * 3, played_at: 1.day.ago)
+    attempt = practise(level: 1, score: 6)
+
+    get attempt_path(attempt)
+    assert_response :success
+    assert_equal "−7 × 8 = −56", TimesTables.label(old)
+    assert_equal "7x8", TimesTables.fact_key(old)
+    assert_raises(Attempt::Invalid) { TimesTables.clean_result(old, level: 5) }
+  end
+
   test "zeroes, then decimals only, then both, are checked on the server; negatives are their own topic" do
     (1..4).each { |level| practise(level: level, score: 10) }
     results = [ { a: "0.7", b: "3000", given: "2100", ms: 3000 }, { a: "0.4", b: "0.6", given: "0.24", ms: 3000 }, { a: "0.4", b: "0.6", given: "0.240", ms: 3000 } ]
