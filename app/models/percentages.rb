@@ -1,5 +1,5 @@
 # The percentages topic: finding a percentage of a number, like 15% of 80. First the ones everything else is
-# built from (50% and 10%, then 5% and 25%), then combinations of them (15% is 10% and 5%), then 1%, then any
+# built from (50% and 10%, then 5% and 25%), then combinations of them (15% is 10% and 5%), then 1% to 4%, then any
 # percentage. Each level practises its own; a daily challenge mixes them. The numbers are chosen so every
 # answer is whole: it's about the method, not long decimals
 module Percentages
@@ -16,14 +16,14 @@ module Percentages
     "5"     => { difficulty: 1, form: "5%", example: "5% of 80", percents: [ 5 ], step: 20, up_to: 400 },
     "25"    => { difficulty: 1, form: "25%", example: "25% of 48", percents: [ 25 ], step: 4, up_to: 400 },
     "fives" => { difficulty: 2, form: "Made of 10% and 5%", example: "15% of 60", percents: (15..95).step(5).to_a - [ 25, 50 ], step: 20, up_to: 400 },
-    "1"     => { difficulty: 1, form: "1%", example: "1% of 700", percents: [ 1 ], step: 100, up_to: 2000 },
+    "1"     => { difficulty: 1, form: "1% to 4%", example: "3% of 700", percents: [ 1, 2, 3, 4 ], step: 100, up_to: 2000 },
     "any"   => { difficulty: 2, form: "Any percentage", example: "37% of 300", percents: (2..99).to_a - [ 5, 10, 25, 50 ], step: 100, up_to: 500 }
   }
   LEVELS = [
     { number: 1, name: "50% and 10%", example: "10% of 70", types: %w[ 50 10 ] },
     { number: 2, name: "5% and 25%", example: "25% of 48", types: %w[ 5 25 ] },
     { number: 3, name: "Combinations", example: "15% of 60", types: %w[ fives ] },
-    { number: 4, name: "1%", example: "1% of 700", types: %w[ 1 ] },
+    { number: 4, name: "1% to 4%", example: "3% of 700", types: %w[ 1 ] },
     { number: 5, name: "Any percentage", example: "37% of 300", types: %w[ any ] }
   ]
   STAR_TIMES = { lightning: 3_000, quick: 6_000 }

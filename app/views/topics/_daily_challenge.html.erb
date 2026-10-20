@@ -1,9 +1,11 @@
 <%# Once a day: the button to play it, saying so if the streak needs it, or, once it's played, a quiet line
-    saying how it went. Any topic's daily challenge keeps the streak going %>
+    saying how it went and mixed practice. Any topic's daily challenge keeps the streak going %>
 <% if (done = user.daily_challenge_on(topic)) %>
   <%= link_to attempt_path(done), class: "daily-done" do %>
     ✅ Challenge done today: <strong><%= done.score %></strong>
   <% end %>
+  <%# The same mix as the challenge, as often as they like now it's done %>
+  <%= link_to "🔀 Mixed practice", play_path(topic.slug, mixed: 1), class: "button button--mixed" %>
 <% else %>
   <%= link_to play_path(topic.slug, challenge: 1), class: "button button--start button--challenge" do %>
     ⭐ Daily challenge

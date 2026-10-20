@@ -17,7 +17,7 @@ class PercentagesTest < ActiveSupport::TestCase
     assert_equal [ 5, 25 ], percents(2)
     assert percents(3).all? { (_1 % 5).zero? } && percents(3).include?(15) && percents(3).include?(95)
     assert_empty percents(3) & [ 5, 10, 25, 50 ]
-    assert_equal [ 1 ], percents(4)
+    assert_equal [ 1, 2, 3, 4 ], percents(4)
     assert_operator percents(5).size, :>, 50
   end
 

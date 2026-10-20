@@ -126,11 +126,11 @@ module Attempt::Recordable
     def record_high_score
       best_before =
         if daily_challenge? then user.best_daily_challenge(topic_module)
-        elsif review? || group? then Float::INFINITY # about the mistakes, or the group's leaderboard: no score to beat
+        elsif review? || group? || mixed? then Float::INFINITY # mistakes, a leaderboard or a mix: no score to beat
         else user.best_score(topic_module, level)
         end
       self.new_high_score = score.positive? && score > best_before
-      self.best_score = review? || group? ? score : [ score, best_before ].max
+      self.best_score = review? || group? || mixed? ? score : [ score, best_before ].max
     end
 
     # A snapshot of the streak is kept on the attempt for its results and share pages. Reaching 7 or 30 days

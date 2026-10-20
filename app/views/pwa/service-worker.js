@@ -64,7 +64,7 @@ function isPage(request) {
 }
 
 function keptForOffline(path) {
-  return path === "/" || path.startsWith("/play/") || path === "/stats" || path.startsWith("/stats/") || path === "/achievements"
+  return path === "/" || path.startsWith("/play/") || path === "/stats" || path.startsWith("/stats/") || path === "/awards"
 }
 
 async function playerState() {

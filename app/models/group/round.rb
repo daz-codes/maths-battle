@@ -25,8 +25,9 @@ class Group::Round < ApplicationRecord
   end
 
   # Unweighted (a new player's questions), so no one's history makes the set easier or harder for them
+  # A mixed challenge's come from every level, like the daily challenge's
   def self.questions_for(challenge)
-    User.new.questions(topic: challenge.topic_module, level: challenge.level)
+    User.new.questions(topic: challenge.topic_module, level: challenge.level, mix: challenge.mixed? ? :all_levels : :level_only)
   end
 
   # Only today's round can be played: yesterday's questions are known by now

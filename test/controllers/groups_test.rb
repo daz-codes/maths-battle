@@ -6,8 +6,8 @@ class GroupsTest < ActionDispatch::IntegrationTest
     @group = @owner.owned_groups.create!(name: "Class 4B")
   end
 
-  def set_challenge(topic_level: "times_tables:2", duration: "1 week", owner_plays: "1")
-    post group_challenges_path(@group), params: { group_challenge: { topic_level: topic_level, duration: duration, owner_plays: owner_plays } }
+  def set_challenge(topic: "times_tables", level: "2", duration: "1 week", owner_plays: "1")
+    post group_challenges_path(@group), params: { group_challenge: { topic: topic, level: level, duration: duration, owner_plays: owner_plays } }
     @group.challenges.last
   end
 
@@ -38,8 +38,10 @@ class GroupsTest < ActionDispatch::IntegrationTest
 
     @group = group
     get new_group_challenge_path(group)
-    assert_select "select[name='group_challenge[topic_level]'] optgroup[label='✖️ Times tables'] option[value='times_tables:2']", text: "Times tables, level 2: Tables 2–12"
-    challenge = set_challenge(topic_level: "percentages:3", duration: "3 days")
+    assert_select "select[name='group_challenge[topic]'] option[value=percentages]", text: "💯 Percentages"
+    assert_select "select[name='group_challenge[level]'] option[value='2']", text: "Level 2: Tables 2–12"
+    assert_select "select[name='group_challenge[level]'] option[value=mixed]", text: "Mixed: every level"
+    challenge = set_challenge(topic: "percentages", level: "3", duration: "3 days")
     assert_equal [ "percentages", 3 ], [ challenge.topic, challenge.level ]
     assert_in_delta 3.days.from_now, challenge.ends_at, 5
     assert_redirected_to group_challenge_path(group, challenge)
@@ -164,7 +166,7 @@ class GroupsTest < ActionDispatch::IntegrationTest
 
   test "an every day challenge: set, played today, three leaderboards, and yesterday's round can't be played" do
     sign_in_as @owner
-    post group_challenges_path(@group), params: { group_challenge: { topic_level: "times_tables:2", daily: "1", duration: "Until I close it", owner_plays: "1" } }
+    post group_challenges_path(@group), params: { group_challenge: { topic: "times_tables", level: "2", daily: "1", duration: "Until I close it", owner_plays: "1" } }
     challenge = @group.challenges.last
     assert challenge.daily?
     follow_redirect!
@@ -334,4 +336,23 @@ class GroupsTest < ActionDispatch::IntegrationTest
       assert_response :created
       @owner.attempts.find_by!(client_id: set["id"])
     end
+
+  test "a mixed challenge: every level of the topic, played at the top one" do
+    sign_in_as @owner
+    challenge = set_challenge(topic: "functions", level: "mixed")
+    assert [ challenge.mixed?, challenge.level ] == [ true, 5 ]
+    assert_equal "Functions · Mixed", challenge.title
+    assert_operator challenge.round.questions.map { _1["type"] }.uniq.size, :>, Functions::INVERSE.size
+    get group_challenge_path(@group, challenge)
+    assert_select ".aside", text: /Every level/
+  end
+
+  test "a challenge says which group it's in, and goes back to it; a group goes back to the list" do
+    sign_in_as @owner
+    challenge = set_challenge
+    get group_challenge_path(@group, challenge)
+    assert_select "a.back-link[href=?]", group_path(@group), text: "← Class 4B"
+    get group_path(@group)
+    assert_select "a.back-link[href=?]", groups_path, text: "← All groups"
+  end
 end

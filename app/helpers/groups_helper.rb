@@ -27,13 +27,14 @@ module GroupsHelper
     end
   end
 
-  # Every topic's levels, for choosing a challenge's, grouped by topic: "Times tables, level 2: Tables 2–12"
-  # (times_tables:2). The topic is in each option too, as a closed menu shows only the one chosen
-  def topic_level_options(selected)
-    grouped = Topic::ALL.to_h do |topic|
-      options = topic.levels.map { |level| [ "#{topic.title}, level #{level[:number]}: #{level[:name]}", "#{topic.key}:#{level[:number]}" ] }
-      [ "#{topic.emoji} #{topic.title}", options ]
-    end
-    grouped_options_for_select(grouped, selected)
+  # The levels to choose from for a challenge's topic, with their names, then every level mixed
+  def challenge_level_options(topic, selected)
+    levels = topic.levels.map { |level| [ "Level #{level[:number]}: #{level[:name]}", level[:number] ] }
+    options_for_select(levels + [ [ "Mixed: every level", "mixed" ] ], selected)
+  end
+
+  # Each topic's level names, so the level menu can follow the topic chosen (challenge-levels controller)
+  def challenge_level_names
+    Topic::ALL.to_h { |topic| [ topic.key, topic.levels.map { |level| level[:name] } ] }
   end
 end

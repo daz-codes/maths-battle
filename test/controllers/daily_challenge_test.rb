@@ -122,4 +122,30 @@ class DailyChallengeTest < ActionDispatch::IntegrationTest
       assert_equal 1, @user.reload.streak
     end
   end
+
+  test "mixed practice opens up once the day's challenge is done: the same mix, as often as they like" do
+    get play_path("times-tables", mixed: 1)
+    assert_redirected_to root_path
+    get root_path
+    assert_select "a.button--mixed", count: 0
+
+    post attempts_path, params: challenge_upload(score: 12), as: :json
+    get root_path
+    assert_select "a.button--mixed[href=?]", play_path("times-tables", mixed: 1), text: "🔀 Mixed practice"
+
+    2.times do
+      get play_path("times-tables", mixed: 1)
+      assert_select "[data-test-mode-value=mixed][data-test-level-value=2]"
+    end
+    set = JSON.parse(css_select("[data-controller=test]").first["data-test-question-sets-value"]).first
+    results = set["questions"].first(8).map { |question| question.slice("a", "b").merge("given" => question["answer"], "ms" => 1000) }
+    post attempts_path, params: { attempt: { topic: "times_tables", level: 2, client_id: set["id"], ticket: set["ticket"], results: results } }, as: :json
+    mixed = @user.attempts.last
+    assert mixed.mixed?
+    assert_nil mixed.medal
+    assert_not mixed.new_high_score
+    get attempt_path(mixed)
+    assert_select ".label", text: /Times tables, mixed practice/
+    assert_select ".results__actions a[href=?]", play_path("times-tables", mixed: 1), text: "Play again"
+  end
 end

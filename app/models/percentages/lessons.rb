@@ -33,10 +33,10 @@ module Percentages::Lessons
       steps: [
         { show: "1% of 700", say: "1% is a hundredth" },
         { show: "700 ÷ 100 = 7", say: "To find 1%, divide by 100" },
-        { show: "1% of 1200 = 12", say: "Take two zeroes off the end" },
-        { show: "3% of 700 = 21", say: "And 3% is three lots of 1%" }
+        { show: "3% of 700", say: "3% is three lots of 1%" },
+        { show: "7 × 3 = 21", say: "So find 1%, then multiply: 3% of 700 = 21" }
       ],
-      try: { question: { type: "1", a: 1, b: 900 }, hint: "Divide 900 by 100" }
+      try: { question: { type: "1", a: 4, b: 900 }, hint: "1% of 900 is 9. Then four lots of that" }
     },
     5 => {
       steps: [

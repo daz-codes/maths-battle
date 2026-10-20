@@ -24,17 +24,19 @@ module Equations
   ONE_STEP = %w[ x+a=b x-a=b x/a=b ax=b ]
   TWO_STEP = %w[ ax+b=c ax-b=c x/a+b=c x/a-b=c ]
   BRACKETS = %w[ a(x+b)=c (x+a)/b=c ]
+  # The ones where the letter is multiplied, so the answer can be a fraction
+  MULTIPLIED = %w[ ax=b ax+b=c ax-b=c a(x+b)=c ]
 
-  # Each level adds to the one before, so earlier levels' questions are always fair game.
-  # The limits set how big the numbers get; fractions only come at the top level
+  # Each level is its own skill: one step, bigger, two step, bigger with brackets, then fraction answers. The
+  # limits set how big the numbers get. A daily challenge mixes earlier levels in (facts_through)
   SMALL = { solution: 1..10, multiplier: 2..5, divisor: 2..5, addend: 1..10 }
   BIG = { solution: 1..20, multiplier: 2..12, divisor: 2..10, addend: 1..20 }
   LEVELS = [
     { number: 1, name: "One step", example: "x + 4 = 9", types: ONE_STEP, limits: SMALL, flip: false, fractions: false },
     { number: 2, name: "Bigger one step", example: "12x = 96", types: ONE_STEP, limits: BIG, flip: true, fractions: false },
-    { number: 3, name: "Two step", example: "2x + 3 = 11", types: ONE_STEP + TWO_STEP, limits: SMALL, flip: true, fractions: false },
-    { number: 4, name: "Bigger two step", example: "4(x + 3) = 36", types: ONE_STEP + TWO_STEP + BRACKETS, limits: BIG, flip: true, fractions: false },
-    { number: 5, name: "Fractions", example: "12x = 9", types: ONE_STEP + TWO_STEP + BRACKETS, limits: BIG, flip: true, fractions: true }
+    { number: 3, name: "Two step", example: "2x + 3 = 11", types: TWO_STEP, limits: SMALL, flip: true, fractions: false },
+    { number: 4, name: "Bigger two step", example: "4(x + 3) = 36", types: TWO_STEP + BRACKETS, limits: BIG, flip: true, fractions: false },
+    { number: 5, name: "Fractions", example: "12x = 9", types: MULTIPLIED, limits: BIG, flip: true, fractions: true }
   ]
   # Quick and lightning stars, allowing for an equation taking longer than a times table
   STAR_TIMES = { lightning: 3_000, quick: 6_000 }
@@ -44,8 +46,8 @@ module Equations
   BADGE_SCORES = [ 5, 10, 20, 30, 50 ]
   # Letters that can't be mistaken for a number or for each other (no i, l, o, s)
   VARIABLES = %w[ x y a b c d k m n p t w z h g r ]
-  # At the fractions level, how often a question that could have a fraction answer does
-  FRACTION_CHANCE = 0.5
+  # At the fractions level, how often the answer is a fraction rather than whole
+  FRACTION_CHANCE = 0.8
   # How often the equation is written the other way round: 11 = 2x + 7
   FLIP_CHANCE = 0.25
   # The largest number the server accepts in a question sent back (well above anything generated)
@@ -91,7 +93,7 @@ module Equations
   def clean_result(result, level: 1)
     question = question_from(result)
     solution = solve(question)
-    raise Attempt::Invalid, "Bad question" unless solution.positive? && facts(level).include?(question[:type])
+    raise Attempt::Invalid, "Bad question" unless solution.positive? && facts_through(level).include?(question[:type])
     raise Attempt::Invalid, "Bad question" unless solution.denominator == 1 || level_details(level)[:fractions]
 
     given = result["given"].to_s

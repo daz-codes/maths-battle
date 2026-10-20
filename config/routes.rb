@@ -28,9 +28,10 @@ Rails.application.routes.draw do
   get "times-tables", to: redirect("/play/times-tables")
   resources :attempts, only: %i[create show]
   get "stats(/:topic)", to: "stats#show", as: :stats
-  # Players see their badges as achievements
-  resource :achievements, only: :show, controller: :badges
-  get "badges", to: redirect("/achievements")
+  # Players see their badges as awards (called achievements before)
+  resource :awards, only: :show, controller: :badges
+  get "badges", to: redirect("/awards")
+  get "achievements", to: redirect("/awards")
   get "s/:share_token", to: "shares#show", as: :share
 
   get "up" => "rails/health#show", as: :rails_health_check

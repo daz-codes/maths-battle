@@ -32,7 +32,7 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
     assert_equal 6, User.last.best_score(TimesTables, 1)
   end
 
-  test "a visitor's footer offers sign in and sign up beside their picture, then home, groups, achievements and stats" do
+  test "a visitor's footer offers sign in and sign up beside their picture, then home, groups, awards and stats" do
     choose_topic
     get root_path
 

@@ -34,11 +34,12 @@ class SimultaneousEquationsTest < ActiveSupport::TestCase
   end
 
   test "every generated pair has a whole solution from 1 to 5 that scores as right" do
-    sample.each do |question|
+    every_level = (1..5).flat_map { sample(300, level: _1) }
+    every_level.each do |question|
       assert T.clean_result(sent(question), level: 5)["correct"], question.inspect
       assert_includes 1..5, question[:answer].to_i
     end
-    assert_equal T::TYPES.keys.sort, sample.map { _1[:type] }.uniq.sort
+    assert_equal T::TYPES.keys.sort, every_level.map { _1[:type] }.uniq.sort
   end
 
   test "level 1: everything positive, the y terms match, and subtracting leaves x itself" do
@@ -57,12 +58,12 @@ class SimultaneousEquationsTest < ActiveSupport::TestCase
   end
 
   test "levels go from subtracting, to subtracting and dividing, adding, a mixture, then doubling one" do
-    assert_equal [ "subtract", "subtract and divide" ], sample(200, level: 2).map { _1[:type] }.uniq.sort
+    assert_equal [ "subtract and divide" ], sample(200, level: 2).map { _1[:type] }.uniq
     assert sample(200, level: 2).all? { _1.values_at(:c, :f).all?(&:positive?) }
-    assert_includes sample(200, level: 3).map { _1[:type] }, "add"
+    assert_equal [ "add" ], sample(200, level: 3).map { _1[:type] }.uniq
     assert sample(200, level: 4).any? { _1[:type] != "add" && _1[:b].negative? }, "negative terms beyond adding"
     assert sample(200, level: 4).none? { _1[:type] == "multiply" }
-    assert_includes sample(200, level: 5).map { _1[:type] }, "multiply"
+    assert_equal [ "multiply" ], sample(200, level: 5).map { _1[:type] }.uniq
   end
 
   test "doubling one equation leaves a small multiple of x" do

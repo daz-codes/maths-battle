@@ -95,14 +95,14 @@ a {
 
 /* Text links (and the sign out button, styled as one): green underline and a faint wash on hover.
    The wash is a touch of ink mixed into the paper, so it's slightly darker in light mode and lighter in dark */
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary, .daily-done, .current-topic, .group-card, .challenge-card, .group-waiting, .board-switch__option), .link-button {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary, .daily-done, .current-topic, .group-card, .challenge-card, .group-waiting, .board-switch__option, .back-link), .link-button {
   margin: 0 -0.2em;
   padding: 0.05em 0.2em;
   border-radius: 4px;
   transition: background-color 120ms, text-decoration-color 120ms;
 }
 
-a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary, .daily-done, .current-topic, .group-card, .challenge-card, .group-waiting, .board-switch__option):hover, .link-button:hover {
+a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary, .daily-done, .current-topic, .group-card, .challenge-card, .group-waiting, .board-switch__option, .back-link):hover, .link-button:hover {
   background-color: color-mix(in srgb, var(--ink) 5%, var(--paper));
   text-decoration-color: var(--green);
 }
@@ -393,7 +393,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* ── Footer: fixed to the bottom like an app's tab bar ── */
 
-/* Spread evenly like a phone's tab bar: who's playing, then home, achievements and stats */
+/* Spread evenly like a phone's tab bar: who's playing, then home, groups, awards and stats */
 .site-footer {
   position: fixed;
   inset: auto 0 0;
@@ -489,6 +489,10 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* ── Groups ─────────────────────────────────────── */
 
+/* Back up from a challenge to its group, or a group to the list: a pill in the corner, like the topic's */
+.back-link { align-self: flex-start; padding: 0.35rem 0.9rem; border-radius: 999px; background: var(--paper-alt); color: var(--ink); font-weight: 700; text-decoration: none; }
+.back-link:hover { background: color-mix(in srgb, var(--ink) 7%, var(--paper-alt)); }
+
 /* A player's groups, and the challenges in one: tiles like the topics page's */
 .group-cards, .challenge-cards { display: grid; gap: 0.75rem; width: 100%; margin: 0; padding: 0; list-style: none; }
 .group-card, .challenge-card { display: flex; flex-direction: column; gap: 0.2rem; padding: 1rem; border-radius: var(--radius); background: var(--paper-alt); color: var(--ink); text-align: left; text-decoration: none; }
@@ -515,8 +519,10 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .group-members summary { cursor: pointer; font-weight: 700; }
 .group-members ul { display: grid; gap: 0.5rem; margin: 0.75rem 0 0; padding: 0; list-style: none; }
 .group-members__player { display: flex; align-items: center; gap: 0.6rem; }
-.group-members__player > span { flex: 1; }
-.group-members__remove { color: var(--muted); font-size: 0.85rem; }
+.group-members__name { flex: 1; min-width: 0; }
+.group-members__player .avatar { flex: none; }
+/* Small and quiet, but a button: outlined in the ink colour */
+.group-members__remove { --fill: transparent; min-height: 2.25rem; padding: 0.3rem 0.85rem; border: 1.5px solid color-mix(in srgb, var(--ink) 30%, transparent); color: var(--ink); font-size: 0.8rem; }
 
 /* A challenge's leaderboard: the player's own row stands out */
 .challenge__you { margin: 0; font-size: 1.2rem; font-weight: 700; }
@@ -539,6 +545,8 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .group-waiting__about { color: var(--muted); font-size: 0.9rem; font-weight: 600; }
 .banner--group { background: var(--yellow); color: var(--on-neon); }
 
+/* The topic and level menus, one under the other in the form */
+.form__pair { display: contents; }
 .form__select { min-height: 3.25rem; padding: 0 0.75rem; border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent); border-radius: var(--radius); background: var(--paper); color: var(--ink); font: inherit; font-weight: 600; }
 .checkbox { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; }
 .checkbox input { width: 1.2rem; height: 1.2rem; accent-color: var(--green-deep); }
@@ -631,6 +639,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .daily-done { color: var(--muted); font-weight: 600; text-align: center; text-decoration: none; }
 .daily-done strong { color: var(--ink); }
 .button--practise { width: 100%; margin-top: -0.5rem; }
+.button--mixed { --fill: var(--blue-deep); --glow: var(--blue); width: var(--panel-width); }
 .button--review { --fill: var(--paper-alt); width: 100%; margin-top: -0.5rem; color: var(--ink); }
 
 /* Under the level's name, kept close to it, and kept from widening the levels like the name */

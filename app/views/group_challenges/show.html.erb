@@ -3,9 +3,9 @@
 <% medal = ->(rank) { { 1 => "🥇", 2 => "🥈", 3 => "🥉" }.fetch(rank, rank) } %>
 
 <main class="page challenge">
-  <p class="label"><%= link_to @group.name, @group %></p>
+  <%= link_to "← #{@group.name}", @group, class: "back-link", aria: { label: "Back to #{@group.name}" } %>
   <h1 class="heading"><span aria-hidden="true"><%= @challenge.topic_module.emoji %></span> <%= @challenge.title %></h1>
-  <p class="aside"><%= @challenge.topic_module.level(@challenge.level)[:name] %> · <%= challenge_status(@challenge) %></p>
+  <p class="aside"><%= @challenge.level_name %> · <%= challenge_status(@challenge) %></p>
   <%= render "flash" %>
   <p class="hint"><% if @challenge.open? %>
     Only your first saved score counts. Save before the challenge ends<%= " or midnight in #{@group.owner.time_zone}" if @challenge.daily? %>.

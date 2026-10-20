@@ -33,16 +33,16 @@ module Functions
   COMPOSITE = %w[ f(g(x)) g(f(x)) ]
   INVERSE = %w[ inv:ax+b inv:x/a+b ]
 
-  # Each level adds to the one before, so earlier levels' questions are always fair game.
-  # Level 1 keeps everything positive, so there's no minus key until level 2
+  # Each level is its own skill: linear, negatives, squares, composites, then inverses (a daily challenge mixes
+  # earlier ones in). Level 1 keeps everything positive, so there's no minus key until level 2
   SMALL = { input: 1..10, multiplier: 2..5, addend: 1..10 }
   BIG = { input: -10..10, multiplier: 2..10, addend: 1..20 }
   LEVELS = [
     { number: 1, name: "Linear", example: "f(x) = 2x + 3", types: LINEAR, limits: SMALL, negatives: false },
     { number: 2, name: "Negatives", example: "f(−4)", types: LINEAR + DIVIDED, limits: BIG, negatives: true },
-    { number: 3, name: "Squares", example: "f(x) = x² − 5", types: LINEAR + DIVIDED + SQUARES, limits: BIG, negatives: true },
-    { number: 4, name: "Composite", example: "f(g(5))", types: LINEAR + DIVIDED + SQUARES + COMPOSITE, limits: BIG, negatives: true },
-    { number: 5, name: "Inverse", example: "f⁻¹(11)", types: LINEAR + DIVIDED + SQUARES + COMPOSITE + INVERSE, limits: BIG, negatives: true }
+    { number: 3, name: "Squares", example: "f(x) = x² − 5", types: SQUARES, limits: BIG, negatives: true },
+    { number: 4, name: "Composite", example: "f(g(5))", types: COMPOSITE, limits: BIG, negatives: true },
+    { number: 5, name: "Inverse", example: "f⁻¹(11)", types: INVERSE, limits: BIG, negatives: true }
   ]
   # Quick and lightning stars, allowing for working out a function taking longer than a times table
   STAR_TIMES = { lightning: 3_000, quick: 6_000 }
@@ -90,7 +90,7 @@ module Functions
   # A question from this level or an easier one: its form must be in the level, and negatives only from level 2
   def clean_result(result, level: 1)
     question = question_from(result)
-    raise Attempt::Invalid, "Bad question" unless facts(level).include?(question[:type]) && possible?(question)
+    raise Attempt::Invalid, "Bad question" unless facts_through(level).include?(question[:type]) && possible?(question)
     raise Attempt::Invalid, "Bad question" unless level_details(level)[:negatives] || (question.values_at(*numbers_used(question[:type])) + [ value(question) ]).all?(&:positive?)
 
     given = result["given"].to_s

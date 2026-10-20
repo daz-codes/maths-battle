@@ -36,8 +36,15 @@ class FunctionsTest < ActiveSupport::TestCase
   end
 
   test "every generated question has a whole number answer that scores as right" do
-    sample.each { |question| assert Functions.clean_result(sent(question), level: 5)["correct"], question.inspect }
-    assert_equal Functions::TYPES.keys.sort, sample.map { _1[:type] }.uniq.sort
+    every_level = (1..5).flat_map { sample(400, level: _1) }
+    every_level.each { |question| assert Functions.clean_result(sent(question), level: 5)["correct"], question.inspect }
+    assert_equal Functions::TYPES.keys.sort, every_level.map { _1[:type] }.uniq.sort
+  end
+
+  test "each level is its own skill: level 5 is only inverses" do
+    assert_equal Functions::SQUARES.sort, sample(500, level: 3).map { _1[:type] }.uniq.sort
+    assert_equal Functions::COMPOSITE.sort, sample(500, level: 4).map { _1[:type] }.uniq.sort
+    assert_equal Functions::INVERSE.sort, sample(500, level: 5).map { _1[:type] }.uniq.sort
   end
 
   test "levels go from linear, to negatives, squares, composites, then inverses" do

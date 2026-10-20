@@ -1,7 +1,7 @@
-<% content_for :title, "Achievements · MatheMinute" %>
+<% content_for :title, "Awards · MatheMinute" %>
 
 <main class="page">
-  <h1 class="heading">Achievements</h1>
+  <h1 class="heading">Awards</h1>
   <p class="aside"><%= @user.badges_by_kind.size %> of <%= Badge.catalogue.size %> unlocked</p>
 
   <% Badge::GROUPS.each do |group, heading| %>

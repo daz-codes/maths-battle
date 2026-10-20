@@ -49,7 +49,9 @@
   <div class="results__actions">
     <button type="button" class="button button--share" data-controller="share"
             data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>
-    <% if @attempt.daily_challenge? %>
+    <% if @attempt.mixed? %>
+      <%= link_to "Play again", play_path(@attempt.topic_module.slug, mixed: 1), class: "button button--blue" %>
+    <% elsif @attempt.daily_challenge? %>
       <%= link_to "Practise level #{@attempt.level}", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
     <% else %>
       <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
@@ -78,7 +80,7 @@
 
   <%= tag.p(medal_progress(@attempt.user, @attempt.topic_module, @attempt.level), class: "level-progress") if @attempt.practice? %>
   <%= link_to "See your stats", stats_path(@attempt.topic_module.slug) %>
-  <%= link_to "See your achievements", achievements_path if @attempt.badges.any? %>
+  <%= link_to "See your awards", awards_path if @attempt.badges.any? %>
 
   <% if @attempt.user.guest? %>
     <p class="save-nudge">

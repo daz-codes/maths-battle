@@ -63,11 +63,11 @@ test('level query parameters select separate offline pages', async () => {
   assert.equal(await response.text(), 'level one')
 })
 
-test('the achievements page opens offline', async () => {
+test('the awards page opens offline', async () => {
   const w = worker()
-  await load(w, '/achievements', page('ada', 1, 'achievements'))
+  await load(w, '/awards', page('ada', 1, 'achievements'))
   w.context.fetch = async () => { throw new Error('offline') }
-  const response = await w.fromNetwork(request('/achievements'), new URL('https://example.test/achievements'))
+  const response = await w.fromNetwork(request('/awards'), new URL('https://example.test/awards'))
   assert.equal(await response.text(), 'achievements')
 })
 

@@ -93,7 +93,7 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".site-footer a.site-footer__stats[href=?] svg.stats-icon", stats_path
     assert_select ".site-footer a.site-footer__home[href=?]", root_path, text: "Home"
     assert_select ".site-footer a.site-footer__home svg.footer-icon"
-    assert_select ".site-footer a.site-footer__achievements[href=?]", achievements_path, text: "Achievements"
+    assert_select ".site-footer a.site-footer__awards[href=?]", awards_path, text: "Awards"
     assert_select ".site-footer", text: /Settings/, count: 0
   end
 

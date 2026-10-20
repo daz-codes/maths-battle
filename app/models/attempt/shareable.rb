@@ -33,6 +33,7 @@ module Attempt::Shareable
   def topic_and_level
     if daily_challenge? then "#{topic_module.title}, daily challenge"
     elsif review? then "#{topic_module.title}, review"
+    elsif mixed? then "#{topic_module.title}, mixed practice"
     elsif group? then "#{topic_module.title}, level #{level}, group challenge"
     elsif topic_module.levels.many? then "#{topic_module.title}, level #{level}"
     else topic_module.title

@@ -7,9 +7,9 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
     Attempt.record!(user: @user, results: answers(*right_answers(10)))
     sign_in_as @user
 
-    get achievements_path
+    get awards_path
     assert_response :success
-    assert_select "h1", text: "Achievements"
+    assert_select "h1", text: "Awards"
     assert_select ".aside", text: "5 of #{Badge.catalogue.size} unlocked", message: "first game, 5 and 10 in a minute, a perfect game, and level 2 for a bronze"
     assert_select ".badge:not(.badge--locked) .badge__name", text: "First minute"
     assert_select ".badge--locked .badge__name", text: "1 week streak"
@@ -18,13 +18,15 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".badge", Badge.catalogue.size
   end
 
-  test "the old badges address goes to achievements" do
+  test "the old badges and achievements addresses go to awards" do
     get "/badges"
-    assert_redirected_to "/achievements"
+    assert_redirected_to "/awards"
+    get "/achievements"
+    assert_redirected_to "/awards"
   end
 
   test "visitors see them all still to earn" do
-    get achievements_path
+    get awards_path
     assert_response :success
     assert_select ".badge--locked", Badge.catalogue.size
   end
@@ -37,8 +39,8 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
 
     get attempt_path(attempt)
     assert_select ".badges--new[data-controller=confetti] .badge__name", text: "5 times tables in a minute"
-    assert_select ".badges--new .label", text: "New achievements!", message: "5 times tables, and level 2"
-    assert_select "a[href=?]", achievements_path, text: "See your achievements"
+    assert_select ".badges--new .label", text: "New awards!", message: "5 times tables, and level 2"
+    assert_select "a[href=?]", awards_path, text: "See your awards"
   end
 
   test "one lot of confetti: a level up already has it" do
@@ -66,7 +68,7 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get stats_path
-    assert_select "a.badge-summary[href=?]", achievements_path, text: /3 of #{Badge.catalogue.size} unlocked/
+    assert_select "a.badge-summary[href=?]", awards_path, text: /3 of #{Badge.catalogue.size} unlocked/
     assert_equal %w[ ⭐ 🎉 🎯 ], css_select(".badge-summary__emojis").first.text.chars.sort, "first game, 5 right and level 2"
   end
 end

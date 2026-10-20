@@ -20,14 +20,15 @@ module SimultaneousEquations
     "multiply"            => { difficulty: 2, form: "Double one",          example: "x + y = 5, 3x + 2y = 12" }
   }
 
-  # Each level adds to the one before. Levels 1 and 2 are all positive; from level 4 terms can be negative,
+  # Each level is its own way of solving, but level 4 mixes the first three with negatives. Levels 1 to 3 are all
+  # positive; from level 4 terms can be negative,
   # and either equation can come first
   LEVELS = [
     { number: 1, name: "Subtract", example: "3x + 5y = 11, 2x + 5y = 9", types: %w[ subtract ], negatives: false, max_total: 20 },
-    { number: 2, name: "Subtract and divide", example: "5x + 2y = 16, 2x + 2y = 10", types: [ "subtract", "subtract and divide" ], negatives: false, max_total: 20 },
-    { number: 3, name: "Add", example: "2x + 3y = 13, x − 3y = −7", types: [ "subtract", "subtract and divide", "add" ], negatives: false, max_total: 20 },
+    { number: 2, name: "Subtract and divide", example: "5x + 2y = 16, 2x + 2y = 10", types: [ "subtract and divide" ], negatives: false, max_total: 20 },
+    { number: 3, name: "Add", example: "2x + 3y = 13, x − 3y = −7", types: [ "add" ], negatives: false, max_total: 20 },
     { number: 4, name: "Mixed", example: "3x − 2y = 5, x − 2y = −1", types: [ "subtract", "subtract and divide", "add" ], negatives: true, max_total: 25 },
-    { number: 5, name: "Double one", example: "x + y = 5, 3x + 2y = 12", types: [ "subtract", "subtract and divide", "add", "multiply" ], negatives: true, max_total: 25 }
+    { number: 5, name: "Double one", example: "x + y = 5, 3x + 2y = 12", types: [ "multiply" ], negatives: true, max_total: 25 }
   ]
   # Quick and lightning stars: each answer is a few steps of working out
   STAR_TIMES = { lightning: 5_000, quick: 10_000 }
@@ -82,7 +83,7 @@ module SimultaneousEquations
   # must be one the level asks, and must be how this pair's y terms cancel
   def clean_result(result, level: 1)
     question = question_from(result)
-    raise Attempt::Invalid, "Bad question" unless facts(level).include?(question[:type]) && way_of_solving(question) == question[:type]
+    raise Attempt::Invalid, "Bad question" unless facts_through(level).include?(question[:type]) && way_of_solving(question) == question[:type]
 
     given = result["given"].to_s
     raise Attempt::Invalid, "Bad answer" unless given.match?(Attempt::TYPED_ANSWER)

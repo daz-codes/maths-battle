@@ -38,8 +38,14 @@ class EquationsTest < ActiveSupport::TestCase
     end
   end
 
+  test "each level is its own skill: two step at level 3, fraction answers at level 5" do
+    assert_equal Equations::TWO_STEP.sort, sample(500, level: 3).map { _1[:type] }.uniq.sort
+    assert_equal Equations::MULTIPLIED.sort, sample(500, level: 5).map { _1[:type] }.uniq.sort
+    assert_operator sample(500, level: 5).count { _1[:answer].include?("/") }, :>, 300
+  end
+
   test "covers every type, with some fractions, letters other than x, and some written the other way round" do
-    questions = sample
+    questions = (1..5).flat_map { sample(400, level: _1) }
     assert_equal Equations::TYPES.keys.sort, questions.map { _1[:type] }.uniq.sort
     assert questions.any? { _1[:answer].include?("/") }
     assert_operator questions.map { _1[:v] }.uniq.size, :>, 5

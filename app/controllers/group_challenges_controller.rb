@@ -27,11 +27,13 @@ class GroupChallengesController < ApplicationController
   end
 
   private
-    # The topic and level come as one choice, like "times_tables:2"
+    # A level, or "mixed": every level, played at the top one
     def challenge_params
-      details = params.expect(group_challenge: %i[ topic_level daily duration owner_plays ])
-      topic, level = details[:topic_level].to_s.split(":")
+      details = params.expect(group_challenge: %i[ topic level daily duration owner_plays ])
+      mixed = details[:level] == "mixed"
+      level = mixed ? Topic.find(details[:topic])&.max_level : details[:level].to_i
       duration = Group::Challenge::DURATIONS.fetch(details[:duration], nil)
-      { topic: topic, level: level.to_i, daily: details[:daily] == "1", owner_plays: details[:owner_plays] == "1", ends_at: (duration.from_now if duration) }
+      { topic: details[:topic], level: level, mixed: mixed, daily: details[:daily] == "1", owner_plays: details[:owner_plays] == "1",
+        ends_at: (duration.from_now if duration) }
     end
 end

@@ -5,7 +5,7 @@ keep their history across devices, and practise adding and subtracting, times ta
 progressively harder levels. Times tables and division share their table facts, grouping and levels (tables 2–5,
 2–12, zeroes, decimals, then both) through `Topic::Tabled`; negative numbers practises one skill a level (going
 below zero, starting below zero, adding negatives, subtracting them, then multiplying and dividing), and so does
-percentages (50% and 10%, 5% and 25%, combinations like 15%, 1%, then any), with whole number answers.
+percentages (50% and 10%, 5% and 25%, combinations like 15%, 1% to 4%, then any), with whole number answers.
 Metric conversions goes cm and m, then length (mm, cm, m, km), mass (mg, g, kg), volume (ml, l, kl), then all.
 Adding and subtracting goes single digits, two digits, three digits, round numbers, then decimals, never below zero.
 Fractions practises one skill a level (simplifying, adding and subtracting with the same or different
@@ -59,6 +59,11 @@ first bronze unlocks the next level. Each topic's daily challenge, once a day, m
 up to the player's; it has its own best, earns no medal and unlocks nothing. Whether a game is a daily
 challenge is in its signed ticket, so the browser can't decide. A new topic needs `MEDALS` and gets all this.
 
+Once the day's challenge is done, mixed practice opens up: the same mix of every level up to the player's, as
+often as they like, earning stars but no medals or level ups. Practising a level otherwise asks only that level's
+skill: times tables, division and adding and subtracting build up (level 2 includes level 1's tables), but the
+other topics' levels are each their own (functions level 5 is just inverses).
+
 Review mode asks again, exactly, the questions a player recently got wrong in a topic (from their last 10 games,
 `User::Reviewable`), up to 10, each once and with no clock. Games are ordered by play time, so a late offline
 upload can't override a more recent answer. Only the latest answer to each question counts, so getting it
@@ -84,9 +89,9 @@ Answers are checked automatically as they reach the expected length. Enter or th
 button can submit a shorter answer, in both games and lessons. Keypad buttons also support keyboard and
 assistive activation.
 
-## Achievements
+## Awards
 
-Players collect achievements (badges, in the code) for their first game, scores in each topic, streaks, unlocking levels, perfect
+Players collect awards (badges, in the code; they were called achievements) for their first game, scores in each topic, streaks, unlocking levels, perfect
 and fast games, playing every topic, and beating their best after a week away. Every badge and its rule
 is listed in `Badge::Catalogued`; the rules are questions asked of a game (`Attempt::Badgeable`), and only
 look at that game and earlier ones. Each badge is earned once, by the first game to meet it, and is
@@ -113,7 +118,7 @@ they're changed).
 
 Players compete in groups (`Group`): an owner with an account starts one and shares its six character code
 (`Group::Joinable`), and anyone can join with it, giving a name for the leaderboard if they haven't one. The owner
-sets challenges (`Group::Challenge`): a topic and level, how long it runs, and whether they play too. A
+sets challenges (`Group::Challenge`): a topic and a level, or every level mixed, how long it runs, and whether they play too. A
 challenge's round (`Group::Round`) is one set of questions made when it's set, so everyone plays the same ones; a
 group game is saved against its round (the round is in its signed ticket) and earns no medals or level ups. The
 leaderboard (`Group::Challenge::Rankable`) counts each player's first go: score, then fewer wrong, then who played

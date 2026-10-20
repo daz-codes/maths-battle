@@ -79,7 +79,12 @@ class Group::Challenge < ApplicationRecord
   end
 
   def title
-    "#{topic_module.title} · Level #{level}"
+    "#{topic_module.title} · #{mixed? ? "Mixed" : "Level #{level}"}"
+  end
+
+  # "Tables 2–12", or "Every level" for a mixed one
+  def level_name
+    mixed? ? "Every level" : topic_module.level(level)[:name]
   end
 
   private

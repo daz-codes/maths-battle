@@ -10,7 +10,8 @@ class GroupsTest < ApplicationSystemTestCase
     code = find(".group-code__code").text
 
     click_on "+ New challenge"
-    find("#group_challenge_topic_level option[value='times_tables:1']").select_option
+    select "✖️ Times tables", from: "Topic"
+    select "Level 1: Tables 2–5", from: "Level"
     choose "1 day"
     uncheck "I'm playing too"
     click_on "Set the challenge"
@@ -57,7 +58,7 @@ class GroupsTest < ApplicationSystemTestCase
     changed = find(".group-code__code").text
     assert_not_equal original, changed
     find(".group-members summary").click
-    accept_confirm { click_on "Take out" }
+    accept_confirm { click_on "Remove" }
     assert_text "Share the new code to invite them back"
     invitation = find(".group-code__code").text
     assert_not_equal changed, invitation
