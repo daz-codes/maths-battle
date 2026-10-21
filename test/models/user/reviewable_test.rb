@@ -140,9 +140,9 @@ class User::ReviewableTest < ActiveSupport::TestCase
     play(wrong(3, 5), wrong(2, 5))
     game = review(right(3, 5, ms: 500), wrong(2, 5))
 
-    assert_equal 0, game.answer_stars
-    assert_equal({ review: 50 }, game.star_bonuses)
-    assert_equal 50, game.stars
+    assert_equal 0, game.answer_gems
+    assert_equal({ review: 50 }, game.gem_bonuses)
+    assert_equal 50, game.gems
     assert_empty game.badges
   end
 

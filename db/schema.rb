@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_20_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_21_150000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -56,7 +56,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_200000) do
     t.integer "level", default: 1, null: false
     t.boolean "levelled_up", default: false, null: false
     t.integer "best_score", default: 0, null: false
-    t.integer "stars", default: 0, null: false
+    t.integer "gems", default: 0, null: false
     t.boolean "earned_streak_freeze", default: false, null: false
     t.string "mode", default: "practice", null: false
     t.integer "round_id"
@@ -194,7 +194,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_200000) do
     t.string "name"
     t.string "theme", default: "system", null: false
     t.integer "streak_freezes", default: 0, null: false
-    t.integer "stars_spent", default: 0, null: false
+    t.integer "gems_spent", default: 0, null: false
     t.date "streak_kept_on"
     t.integer "reminder_minute"
     t.date "reminded_on"

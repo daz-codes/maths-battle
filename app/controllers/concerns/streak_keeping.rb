@@ -10,6 +10,6 @@ module StreakKeeping
     def keep_streak
       return unless authenticated? && (used = Current.user.use_streak_freezes!).positive?
 
-      flash.now[:notice] = "🧊 #{used == 1 ? "A streak freeze" : "#{used} streak freezes"} kept your #{Current.user.streak} day streak going!"
+      flash.now[:notice] = "#{used == 1 ? "A streak freeze" : "#{used} streak freezes"} kept your #{Current.user.streak} day streak going!"
     end
 end

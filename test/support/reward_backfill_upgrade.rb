@@ -30,7 +30,7 @@ context.rollback
 raise "Rollback detached badge games" unless links == connection.select_rows("SELECT id, attempt_id FROM badges ORDER BY id")
 context.migrate
 raise "Reapplying the migration detached badge games" unless links == connection.select_rows("SELECT id, attempt_id FROM badges ORDER BY id")
-puts({ stars: connection.select_values("SELECT stars FROM attempts ORDER BY id"),
+puts({ gems: connection.select_values("SELECT gems FROM attempts ORDER BY id"),
   modes: connection.select_values("SELECT mode FROM attempts ORDER BY id"),
   badges: connection.select_all("SELECT user_id, attempt_id, kind FROM badges ORDER BY id").to_a,
   users: users, games: games }.to_json)

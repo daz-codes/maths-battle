@@ -1,6 +1,6 @@
 require "test_helper"
 
-# Times tables levels: practise a level for a medal, and a bronze unlocks the next one
+# Times tables levels: practise a level for stars, and the first star unlocks the next one
 class LevelsTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:ada)
@@ -11,31 +11,34 @@ class LevelsTest < ActionDispatch::IntegrationTest
     Attempt.record!(user: @user, level: level, results: answers(*Array.new(score) { [ 2, 3, 6 ] }, ms: 1000))
   end
 
-  test "home shows the levels, with locked ones padlocked, medals on the ones that have them, and what's next" do
+  test "home shows the levels, with locked ones padlocked, stars on the ones that have them, and what's next" do
     practise(level: 1, score: 12)
     get root_path
 
     assert_select ".levels .levels__level[aria-current=true]", text: /2/, message: "the bronze unlocked level 2, which Play goes to"
-    assert_select ".levels .levels__level .levels__medal[aria-label=Silver]", text: "🥈"
+    assert_select ".levels .levels__level .stars[aria-label='2 of 3 stars']"
     assert_select ".levels__level--locked", 3
     assert_select ".levels__name", text: "Level 2: Tables 2–12"
-    assert_select ".levels__medal-line", text: "Score 5 for 🥉 bronze and unlock level 3"
+    assert_select ".levels__progress", text: "Score 5 for a and unlock level 3"
+    assert_select ".levels__progress .icon--star"
     assert_select "a.button--play[href=?]", play_path("times-tables", level: 2), text: /Play level 2/
     assert_select ".levels-panel > a.button--mixed[href=?]", play_path("times-tables", mixed: 1)
   end
 
-  test "a level's best medal and the next to aim for" do
+  test "a level's stars and the next to aim for" do
     practise(level: 1, score: 12)
     patch level_path, params: { level: 1 }
     get root_path
-    assert_select ".levels__medal-line", text: "🥈 Silver · best 12 · 20 for gold"
+    assert_select ".levels__progress", text: /best 12 · 20 for 3 stars/
+    assert_select ".levels__progress .stars[aria-label='2 of 3 stars']"
   end
 
-  test "the results page says what the next medal needs" do
+  test "the results page says what the next star needs" do
     practise(level: 1, score: 7)
     get attempt_path(@user.attempts.last)
 
-    assert_select ".level-progress", text: "🥉 Bronze · best 7 · 10 for silver"
+    assert_select ".level-progress", text: /best 7 · 10 for 2 stars/
+    assert_select ".level-progress .stars[aria-label='1 of 3 stars']"
   end
 
   test "a bronze is celebrated as a level up, and Play moves up to the new level" do
@@ -50,12 +53,12 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_select ".levels__name", text: "Level 2: Tables 2–12"
   end
 
-  test "a better medal at a level is celebrated" do
+  test "more stars at a level are celebrated" do
     practise(level: 1, score: 6)
     post attempts_path, params: game_upload(level: 1, results: answers(*Array.new(11) { [ 2, 3, 6 ] }, ms: 1000)), as: :json
     get response.parsed_body["url"]
 
-    assert_select ".banner--medal", text: "🥈 Silver medal for level 1!"
+    assert_select ".banner--stars", text: /2 stars for level 1!/
   end
 
   test "Play moves up after levelling up, even if the results page is never seen (a game uploaded from offline)" do
@@ -97,7 +100,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     practise(level: 1, score: 10)
     get stats_path("times-tables", level: 1)
 
-    assert_select ".current-topic__name", text: "✖️ Times tables"
+    assert_select ".current-topic__name", text: "Times tables"
     assert_select ".button--play", count: 0, message: "the big Play is on the home page, under the streak"
     assert_select "form[action=?][method=get] input[name=level][value=2]", stats_path("times-tables")
     assert_select ".levels .levels__level[aria-current=true]", text: /1/
@@ -110,11 +113,11 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_equal 2, @user.unlocked_level(TimesTables), "looking at stats doesn't change anything"
   end
 
-  test "every topic has medals and Play, with its own medal scores" do
+  test "every topic has stars and Play, at 5, 10 and 20" do
     patch topic_path, params: { topic: "equations" }
     get root_path
 
-    assert_select ".levels__medal-line", text: "Score 5 for 🥉 bronze and unlock level 2"
+    assert_select ".levels__progress", text: "Score 5 for a and unlock level 2"
     assert_select "a.button--play[href=?]", play_path("equations", level: 1)
   end
 
@@ -160,7 +163,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
   test "beating your best: by how much, or how close it was, on the results page" do
     practise(level: 1, score: 12)
     get attempt_path(practise(level: 1, score: 15))
-    assert_select ".best-line--new", text: "🏆 15, up from 12"
+    assert_select ".best-line--new", text: "15, up from 12"
 
     get attempt_path(practise(level: 1, score: 13))
     assert_select ".best-line", text: "So close: 3 more to beat your best of 15"

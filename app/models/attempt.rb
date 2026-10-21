@@ -1,5 +1,5 @@
 class Attempt < ApplicationRecord
-  include Badgeable, Gradable, Medallable, Recordable, Reviewable, Shareable, Starrable
+  include Badgeable, Gemmable, Gradable, Rateable, Recordable, Reviewable, Shareable
 
   belongs_to :user
   belongs_to :round, class_name: "Group::Round", optional: true
@@ -9,7 +9,7 @@ class Attempt < ApplicationRecord
 
   # A level's practice; mixed practice, mixing every level up to the player's; a review of their recent mistakes;
   # or a group challenge's round (Group::Challenge). There was a daily challenge (once a day, mixed) until 21 October
-  # 2026, and its games are kept. Only practice belongs to a level: earning medals and unlocking the next one
+  # 2026, and its games are kept. Only practice belongs to a level: earning stars and unlocking the next one
   MODES = %w[ practice challenge mixed review group ]
 
   validates :topic, inclusion: { in: Topic.keys }

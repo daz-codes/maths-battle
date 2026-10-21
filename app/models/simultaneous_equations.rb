@@ -30,10 +30,10 @@ module SimultaneousEquations
     { number: 4, name: "Mixed", example: "3x − 2y = 5, x − 2y = −1", types: [ "subtract", "subtract and divide", "add" ], negatives: true, max_total: 25 },
     { number: 5, name: "Double one", example: "x + y = 5, 3x + 2y = 12", types: [ "multiply" ], negatives: true, max_total: 25 }
   ]
-  # Quick and lightning stars: each answer is a few steps of working out
-  STAR_TIMES = { lightning: 5_000, quick: 10_000 }
-  # A level's practice earns a medal for its score; bronze unlocks the next level
-  MEDALS = { gold: 20, silver: 10, bronze: 5 }
+  # Quick and lightning gems: each answer is a few steps of working out
+  GEM_TIMES = { lightning: 5_000, quick: 10_000 }
+  # A level's practice earns 1, 2 or 3 stars for its score; the first star unlocks the next level
+  STARS = { 3 => 20, 2 => 10, 1 => 5 }
   # Scores in one game that earn a badge. Lower than the other topics: each pair of equations is two answers
   BADGE_SCORES = [ 5, 10, 15, 20, 30 ]
   SOLUTIONS = 1..5

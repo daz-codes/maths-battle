@@ -1,14 +1,14 @@
-<%# The freezes held, and buying another with stars. A freeze keeps the streak going through a missed day %>
+<%# The freezes held, and buying another with gems. A freeze keeps the streak going through a missed day %>
 <% price = User::StreakFreezable::STREAK_FREEZE_PRICE %>
 <section class="freezes" aria-label="Streak freezes">
   <p class="freezes__held">
-    <span class="freezes__icons" aria-hidden="true"><%= "🧊" * user.streak_freezes %><%= "◌" * (User::StreakFreezable::MAX_STREAK_FREEZES - user.streak_freezes) %></span>
+    <span class="freezes__icons" aria-hidden="true"><%= safe_join(Array.new(User::StreakFreezable::MAX_STREAK_FREEZES) { |i| icon(:freeze, class: ("icon--faded" if i >= user.streak_freezes)) }) %></span>
     <%= user.streak_freezes.zero? ? "No streak freezes" : pluralize(user.streak_freezes, "streak freeze") %>
   </p>
   <% if user.can_buy_streak_freeze? %>
-    <%= button_to "Buy one for #{number_with_delimiter price} ⭐", streak_freeze_path, class: "button freezes__buy", form_class: "freezes__form" %>
+    <%= button_to safe_join([ "Buy one for #{number_with_delimiter price} ", icon(:gem, label: "gems") ]), streak_freeze_path, class: "button freezes__buy", form_class: "freezes__form" %>
   <% elsif user.can_hold_streak_freeze? %>
-    <p class="freezes__hint">Get <%= number_with_delimiter price - user.stars %> more ⭐ to buy one, or reach a <%= User::StreakFreezable::FREE_STREAK_FREEZES_AT.to_sentence(two_words_connector: " or ", last_word_connector: " or ") %> day streak for a free one.</p>
+    <p class="freezes__hint">Get <%= number_with_delimiter price - user.gems %> more <%= icon(:gem, label: "gems") %> to buy one, or reach a <%= User::StreakFreezable::FREE_STREAK_FREEZES_AT.to_sentence(two_words_connector: " or ", last_word_connector: " or ") %> day streak for a free one.</p>
   <% else %>
     <p class="freezes__hint">That's the most you can hold. One is used up by itself if you miss a day.</p>
   <% end %>

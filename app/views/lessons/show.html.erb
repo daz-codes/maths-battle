@@ -8,7 +8,7 @@
   <%= link_to "✕", root_path, class: "lesson__close", aria: { label: "Close the lesson" } %>
 
   <header class="lesson__header">
-    <p class="label"><%= @topic.emoji %> <%= @topic.title %>, level <%= @level %></p>
+    <p class="label"><%= topic_icon(@topic) %> <%= @topic.title %>, level <%= @level %></p>
     <h1 class="lesson__title"><%= @topic.level(@level)[:name] %></h1>
     <ol class="lesson__dots" aria-hidden="true">
       <% (@lesson[:steps].size + 1).times do |i| %>
@@ -33,11 +33,11 @@
       <p class="lesson__show lesson__show--<%= @topic.slug %>"><%= sanitize @try[:text], tags: %w[ span var ], attributes: %w[ class ] %></p>
       <p class="answer" data-tutorial-target="answer" aria-live="polite"></p>
       <p class="lesson__feedback" data-tutorial-target="feedback" aria-live="polite"></p>
-      <p class="lesson__hint" data-tutorial-target="hint" hidden>💡 <%= @lesson[:try][:hint] %></p>
+      <p class="lesson__hint" data-tutorial-target="hint" hidden><%= icon(:bulb) %> <%= @lesson[:try][:hint] %></p>
     </section>
 
     <section class="lesson__step lesson__done" data-tutorial-target="done" hidden>
-      <p class="lesson__show">🎉 That's it!</p>
+      <p class="lesson__show"><%= icon(:party) %> That's it!</p>
       <p class="lesson__say"><%= @topic.label(@try.except(:text, :answer).transform_keys(&:to_s).merge("given" => @try[:answer])) %></p>
       <%= link_to "Play level #{@level}", play_path(@topic.slug, level: @level), class: "button button--start" %>
       <%= link_to "Home", root_path %>
@@ -46,7 +46,7 @@
 
   <div class="lesson__controls">
     <button type="button" class="button button--blue button--wide" data-tutorial-target="next" data-action="tutorial#next">Next</button>
-    <button type="button" class="button button--wide lesson__hint-button" data-tutorial-target="hintButton" data-action="tutorial#showHint" hidden>💡 Hint</button>
+    <button type="button" class="button button--wide lesson__hint-button" data-tutorial-target="hintButton" data-action="tutorial#showHint" hidden><%= icon(:bulb) %> Hint</button>
   </div>
 
   <div class="lesson__keypad" data-tutorial-target="keypadArea" hidden>

@@ -24,12 +24,12 @@ class MixedPracticeTest < ActionDispatch::IntegrationTest
     assert_select "title", text: /Times tables mixed practice/
   end
 
-  test "saved as mixed practice: no medal, no best to beat, but it keeps the streak" do
+  test "saved as mixed practice: no stars, no best to beat, but it keeps the streak" do
     post attempts_path, params: mixed_upload(score: 12), as: :json
     assert_response :created
     mixed = @user.attempts.last
     assert mixed.mixed?
-    assert_nil mixed.medal
+    assert_equal 0, mixed.stars
     assert_not mixed.new_high_score
     assert @user.reload.practised_today?
 

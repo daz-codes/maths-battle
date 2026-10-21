@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  include Abandonable, Avatarable, Badgeable, Challengeable, Groupable, Learnable, Levelable, Notifiable, Practisable, Registerable, Remindable, Reviewable, Scorable, Starrable, StreakFreezable, Streakable, Themeable, Trackable
+  include Abandonable, Avatarable, Badgeable, Challengeable, Groupable, Learnable, Levelable, Notifiable, Practisable, Registerable, Remindable, Reviewable, Scorable, Gemmable, StreakFreezable, Streakable, Themeable, Trackable
 
   has_many :sessions, dependent: :destroy
   has_many :attempts, dependent: :destroy

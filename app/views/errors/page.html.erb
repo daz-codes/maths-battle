@@ -28,7 +28,8 @@
     .logo__word path { stroke: currentColor; stroke-width: 2.2; stroke-linejoin: round; }
     .logo__minute { fill: var(--pink-text); stroke: var(--pink-text) !important; }
     main { display: flex; flex-direction: column; align-items: center; gap: 1rem; max-width: 26rem; margin: 0 auto; padding: 3rem 1rem; }
-    .error__emoji { margin: 0; font-size: 3.5rem; line-height: 1; }
+    .error__icon { margin: 0; color: var(--pink-text); }
+    .error__icon svg { width: 4rem; height: 4rem; }
     h1 { margin: 0; font-size: clamp(1.9rem, 8vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; }
     p { margin: 0; color: var(--muted); font-size: 1.1rem; font-weight: 600; }
     .button { display: inline-flex; align-items: center; justify-content: center; min-height: 3.25rem; margin-top: 0.5rem; padding: 0.6rem 1.6rem;
@@ -42,7 +43,7 @@
     <%= render "logo" %>
   </header>
   <main>
-    <p class="error__emoji" aria-hidden="true"><%= emoji %></p>
+    <p class="error__icon"><%= icon(local_assigns[:icon]) %></p>
     <h1><%= title %></h1>
     <p><%= message %></p>
     <a class="button" href="/">Back to home</a>

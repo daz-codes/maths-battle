@@ -38,7 +38,7 @@ class GroupsTest < ActionDispatch::IntegrationTest
 
     @group = group
     get new_group_challenge_path(group)
-    assert_select "select[name='group_challenge[topic]'] option[value=percentages]", text: "💯 Percentages"
+    assert_select "select[name='group_challenge[topic]'] option[value=percentages]", text: "Percentages"
     assert_select "select[name='group_challenge[level]'] option[value='2']", text: "Level 2: Tables 2–12"
     assert_select "select[name='group_challenge[level]'] option[value=mixed]", text: "Mixed: every level"
     challenge = set_challenge(topic: "percentages", level: "3", duration: "3 days")
@@ -121,7 +121,7 @@ class GroupsTest < ActionDispatch::IntegrationTest
     assert_equal [ "group", challenge.round ], [ game.mode, game.round ]
 
     get attempt_path(game)
-    assert_select ".banner--group", text: "🏆 You're 1st of 1 in Class 4B"
+    assert_select ".banner--group", text: "You're 1st of 1 in Class 4B"
     assert_select "a[href=?]", group_challenge_path(@group, challenge), text: "See the leaderboard"
 
     get group_challenge_path(@group, challenge)
@@ -170,7 +170,7 @@ class GroupsTest < ActionDispatch::IntegrationTest
     challenge = @group.challenges.last
     assert challenge.daily?
     follow_redirect!
-    assert_select ".aside", text: /🔁 Every day · Until it's closed/
+    assert_select ".aside", text: /Every day · Until it.s closed/
     assert_select ".board-switch a", 3
     assert_select "a.button", text: "Play today's"
 
@@ -179,7 +179,7 @@ class GroupsTest < ActionDispatch::IntegrationTest
     results = set["questions"].first(6).map { |question| question.slice("a", "b").merge("given" => question["answer"], "ms" => 1000) }
     post attempts_path, params: { attempt: { topic: "times_tables", level: 2, client_id: set["id"], ticket: set["ticket"], results: results } }, as: :json
     get response.parsed_body["url"]
-    assert_select ".banner--group", text: "🏆 You're 1st of 1 today in Class 4B"
+    assert_select ".banner--group", text: "You're 1st of 1 today in Class 4B"
 
     get group_challenge_path(@group, challenge, board: "total")
     assert_select ".board-switch a[aria-current=true]", text: "Week total"

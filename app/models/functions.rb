@@ -44,10 +44,10 @@ module Functions
     { number: 4, name: "Composite", example: "f(g(5))", types: COMPOSITE, limits: BIG, negatives: true },
     { number: 5, name: "Inverse", example: "f⁻¹(11)", types: INVERSE, limits: BIG, negatives: true }
   ]
-  # Quick and lightning stars, allowing for working out a function taking longer than a times table
-  STAR_TIMES = { lightning: 3_000, quick: 6_000 }
-  # A level's practice earns a medal for its score; bronze unlocks the next level
-  MEDALS = { gold: 20, silver: 10, bronze: 5 }
+  # Quick and lightning gems, allowing for working out a function taking longer than a times table
+  GEM_TIMES = { lightning: 3_000, quick: 6_000 }
+  # A level's practice earns 1, 2 or 3 stars for its score; the first star unlocks the next level
+  STARS = { 3 => 20, 2 => 10, 1 => 5 }
   # Scores in one game that earn a badge. Like equations: each question takes some reading
   BADGE_SCORES = [ 5, 10, 20, 30, 50 ]
   # The largest number the server accepts in a question sent back (well above anything generated)

@@ -15,7 +15,7 @@
             <span class="group-card__about">
               <%= pluralize(@member_counts.fetch(group.id, 0), "player") %><%= " · You run it" if group.owned_by?(@user) %>
             </span>
-            <%= tag.span("🏆 #{pluralize(waiting, "challenge")} to play", class: "group-card__waiting") if waiting.positive? %>
+            <%= tag.span(safe_join([ icon(:trophy), " #{pluralize(waiting, "challenge")} to play" ]), class: "group-card__waiting") if waiting.positive? %>
           <% end %>
         </li>
       <% end %>

@@ -16,7 +16,7 @@ class FunctionsTest < ApplicationSystemTestCase
     end
 
     assert_selector ".card__number", text: "3", wait: 10
-    assert_text "⚙️ FUNCTIONS"
+    assert_text "FUNCTIONS, LEVEL 1"
     assert_equal "functions", users(:ada).attempts.last.topic
   end
 

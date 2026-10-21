@@ -1,5 +1,5 @@
 # Streak freezes keep a streak going through a missed day, which matters for children, who don't control
-# their own day. A player holds up to two: bought with stars, or given free when the streak reaches 7 or
+# their own day. A player holds up to two: bought with gems, or given free when the streak reaches 7 or
 # 30 days. They're used up by themselves when the player comes back after missing days, but only if there
 # are enough to cover every missed day, as otherwise the streak is lost anyway.
 # A frozen day keeps the streak going without adding to it (User::Streakable)
@@ -18,14 +18,14 @@ module User::StreakFreezable
   end
 
   def can_buy_streak_freeze?
-    can_hold_streak_freeze? && stars >= STREAK_FREEZE_PRICE
+    can_hold_streak_freeze? && gems >= STREAK_FREEZE_PRICE
   end
 
   def buy_streak_freeze!
     with_lock do
       raise NotAllowed unless can_buy_streak_freeze?
 
-      update!(streak_freezes: streak_freezes + 1, stars_spent: stars_spent + STREAK_FREEZE_PRICE)
+      update!(streak_freezes: streak_freezes + 1, gems_spent: gems_spent + STREAK_FREEZE_PRICE)
     end
   end
 

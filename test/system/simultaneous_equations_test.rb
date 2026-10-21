@@ -17,7 +17,7 @@ class SimultaneousEquationsTest < ApplicationSystemTestCase
     assert_selector ".test__score", text: "2"
 
     assert_selector ".card__number", text: /\A[23]\z/, wait: 10
-    assert_text "🔗 SIMULTANEOUS EQUATIONS"
+    assert_text "SIMULTANEOUS EQUATIONS, LEVEL 1"
     assert_equal "simultaneous", users(:ada).attempts.last.topic
   end
 

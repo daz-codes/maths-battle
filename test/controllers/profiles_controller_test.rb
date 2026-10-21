@@ -88,9 +88,9 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     get root_path
     assert_select ".site-footer a.site-footer__player[href=?][aria-label=Settings]", edit_profile_path
     assert_select ".site-footer a.site-footer__name[href=?]", edit_profile_path, text: "ada"
-    assert_select ".site-footer .site-footer__stars", text: "0 ⭐"
+    assert_select ".site-footer .site-footer__gems", text: "0"
     assert_select ".site-footer a.site-footer__player .avatar"
-    assert_select ".site-footer a.site-footer__stats[href=?] svg.stats-icon", stats_path
+    assert_select ".site-footer a.site-footer__stats[href=?] svg.icon--stats", stats_path
     assert_select ".site-footer a.site-footer__home[href=?]", root_path, text: "Home"
     assert_select ".site-footer a.site-footer__home svg.footer-icon"
     assert_select ".site-footer a.site-footer__awards[href=?]", awards_path, text: "Awards"
@@ -99,20 +99,20 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
 
   test "shows the player's stars and streak freezes, and buys a freeze with stars" do
     get edit_profile_path
-    assert_select ".collection .stars-total", text: "0 ⭐ stars"
+    assert_select ".collection .gems-total", text: "0 gems"
     assert_select ".freezes__held", text: /No streak freezes/
-    assert_select ".freezes__hint", text: /Get 10,000 more ⭐ to buy one/
+    assert_select ".freezes__hint", text: /Get 10,000 more\s+to buy one/
 
-    @user.attempts.create!(topic: "times_tables", results: []).update_column(:stars, 10_100)
+    @user.attempts.create!(topic: "times_tables", results: []).update_column(:gems, 10_100)
     get edit_profile_path
-    assert_select "form[action=?] button", streak_freeze_path, text: "Buy one for 10,000 ⭐"
+    assert_select "form[action=?] button", streak_freeze_path, text: "Buy one for 10,000"
 
     post streak_freeze_path
     assert_redirected_to edit_profile_path
     follow_redirect!
     assert_select ".flash", text: /You bought a streak freeze/
     assert_select ".freezes__held", text: /1 streak freeze/
-    assert_select ".collection .stars-total", text: "100 ⭐ stars"
+    assert_select ".collection .gems-total", text: "100 gems"
   end
 
   test "rejects unknown themes" do

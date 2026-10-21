@@ -27,9 +27,9 @@ module Negatives
   ]
   # The numbers in a question, before signs: small enough for mental maths
   NUMBERS = 1..12
-  STAR_TIMES = { lightning: 2_000, quick: 4_000 }
-  # A level's practice earns a medal for its score; bronze unlocks the next level
-  MEDALS = { gold: 20, silver: 10, bronze: 5 }
+  GEM_TIMES = { lightning: 2_000, quick: 4_000 }
+  # A level's practice earns 1, 2 or 3 stars for its score; the first star unlocks the next level
+  STARS = { 3 => 20, 2 => 10, 1 => 5 }
   BADGE_SCORES = [ 5, 10, 20, 30, 50 ]
   # The largest number the server accepts in a question sent back (well above anything generated)
   MAX_NUMBER = 999

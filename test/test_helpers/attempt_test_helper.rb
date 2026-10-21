@@ -46,7 +46,7 @@ module AttemptTestHelper
   # Plays a bronze at each level below to unlock this one. The questions are ones every level asks
   def unlock(user, topic, level)
     (1...level).each do |below|
-      Attempt.record!(user: user, topic: topic.key, level: below, results: [ EASY_QUESTIONS.fetch(topic) ] * topic.medals[:bronze])
+      Attempt.record!(user: user, topic: topic.key, level: below, results: [ EASY_QUESTIONS.fetch(topic) ] * topic.star_scores[1])
     end
   end
 end

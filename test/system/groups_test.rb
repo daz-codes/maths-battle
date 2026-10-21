@@ -10,7 +10,7 @@ class GroupsTest < ApplicationSystemTestCase
     code = find(".group-code__code").text
 
     click_on "+ New challenge"
-    select "✖️ Times tables", from: "Topic"
+    select "Times tables", from: "Topic"
     select "Level 1: Tables 2–5", from: "Level"
     choose "1 day"
     uncheck "I'm playing too"

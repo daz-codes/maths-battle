@@ -7,7 +7,7 @@
     <ul class="badges__list">
       <% badges.each do |badge| %>
         <li class="badge" data-award-reveal-target="award">
-          <span class="badge__emoji" aria-hidden="true"><%= badge.emoji %></span>
+          <span class="badge__icon"><%= icon(badge.icon) %></span>
           <span class="badge__name"><%= badge.name %></span>
         </li>
       <% end %>

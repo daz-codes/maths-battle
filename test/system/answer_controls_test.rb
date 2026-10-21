@@ -37,7 +37,7 @@ class AnswerControlsTest < ApplicationSystemTestCase
   end
 
   test "a shorter lesson answer can be checked and retried" do
-    click_on "📖 Learn how"
+    click_on "Learn how"
     4.times { click_on "Next" }
     find("body").send_keys("3", :enter)
     assert_selector ".lesson__feedback", text: "Not quite"

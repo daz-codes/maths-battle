@@ -3,10 +3,10 @@
 # What each says is kept short and kind, as it's usually not the player's fault
 module ErrorPage
   ALL = {
-    400 => { emoji: "🤔", title: "That didn't work", message: "Something about that request wasn't right. Head back home and try again." },
-    404 => { emoji: "🔍", title: "We couldn't find that page", message: "It may have moved, or the link might not be quite right." },
-    422 => { emoji: "🔄", title: "That didn't go through", message: "The page may have been open a while. Go back, refresh, and try again." },
-    500 => { emoji: "😬", title: "Something went wrong", message: "Sorry, that's on our side, not yours. Try again in a moment, or head back home." }
+    400 => { icon: :question, title: "That didn't work", message: "Something about that request wasn't right. Head back home and try again." },
+    404 => { icon: :search, title: "We couldn't find that page", message: "It may have moved, or the link might not be quite right." },
+    422 => { icon: :review, title: "That didn't go through", message: "The page may have been open a while. Go back, refresh, and try again." },
+    500 => { icon: :oops, title: "Something went wrong", message: "Sorry, that's on our side, not yours. Try again in a moment, or head back home." }
   }
 
   def self.write_all

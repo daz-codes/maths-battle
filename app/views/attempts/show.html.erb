@@ -4,12 +4,12 @@
   <%# Beating a best is the big one: wave after wave of confetti, and the fanfare %>
   <% best_beaten = @attempt.practice? && @attempt.new_high_score && @attempt.previous_best.positive? %>
   <% if @attempt.levelled_up %>
-    <p class="banner banner--level" data-controller="confetti fanfare" data-confetti-big-value="<%= best_beaten %>">⬆️ Level up! You've unlocked Level <%= @attempt.level + 1 %>: <%= @attempt.topic_module.level(@attempt.level + 1)[:name] %></p>
-    <%= link_to "📖 Learn how to do level #{@attempt.level + 1}", lesson_path(@attempt.topic_module.slug, @attempt.level + 1), class: "button button--blue" if @attempt.topic_module.lesson(@attempt.level + 1) %>
-  <% elsif (medal = @attempt.new_medal) %>
-    <p class="banner banner--medal" data-controller="confetti<%= " fanfare" if best_beaten %>" data-confetti-big-value="<%= best_beaten %>"><%= Attempt::MEDAL_EMOJI[medal] %> <%= Attempt::MEDAL_NAMES[medal] %> medal for level <%= @attempt.level %>!</p>
+    <p class="banner banner--level" data-controller="confetti fanfare" data-confetti-big-value="<%= best_beaten %>"><%= icon(:level_up) %> Level up! You've unlocked Level <%= @attempt.level + 1 %>: <%= @attempt.topic_module.level(@attempt.level + 1)[:name] %></p>
+    <%= link_to safe_join([ icon(:book), " Learn how to do level #{@attempt.level + 1}" ]), lesson_path(@attempt.topic_module.slug, @attempt.level + 1), class: "button button--blue" if @attempt.topic_module.lesson(@attempt.level + 1) %>
+  <% elsif (stars = @attempt.new_stars) %>
+    <p class="banner banner--stars" data-controller="confetti<%= " fanfare" if best_beaten %>" data-confetti-big-value="<%= best_beaten %>"><%= star_rating(stars) %> <%= pluralize(stars, "star") %> for level <%= @attempt.level %>!</p>
   <% elsif @attempt.new_high_score %>
-    <p class="banner" data-controller="confetti<%= " fanfare" if best_beaten %>" data-confetti-big-value="<%= best_beaten %>">🎉 New high score! 🎉</p>
+    <p class="banner" data-controller="confetti<%= " fanfare" if best_beaten %>" data-confetti-big-value="<%= best_beaten %>"><%= icon(:party) %> New high score!</p>
   <% end %>
 
   <%= render "card", attempt: @attempt %>
@@ -17,7 +17,7 @@
   <% if @attempt.practice? && (previous = @attempt.previous_best).positive? %>
     <%# Beating the level's best is the point: by how much, or how close it was %>
     <% if @attempt.score > previous %>
-      <p class="best-line best-line--new">🏆 <%= @attempt.score %>, up from <%= previous %></p>
+      <p class="best-line best-line--new"><%= icon(:trophy) %> <%= @attempt.score %>, up from <%= previous %></p>
     <% elsif @attempt.score == previous %>
       <p class="best-line">Level with your best of <%= previous %>. One more next time!</p>
     <% else %>
@@ -27,15 +27,15 @@
   <% end %>
 
   <% if @attempt.earned_streak_freeze %>
-    <p class="freeze-earned">🧊 <%= @attempt.streak %> day streak! You earned a free streak freeze.</p>
+    <p class="freeze-earned"><%= icon(:freeze) %> <%= @attempt.streak %> day streak! You earned a free streak freeze.</p>
   <% end %>
 
-  <section class="stars-earned" aria-label="Stars">
-    <span class="stars-earned__total">+<%= number_with_delimiter @attempt.stars %> ⭐</span>
-    <% if @attempt.star_bonuses.any? %>
-      <ul class="stars-earned__bonuses">
-        <% @attempt.star_bonuses.each do |bonus, stars| %>
-          <li><%= Attempt::BONUS_NAMES[bonus] %> +<%= stars %></li>
+  <section class="gems-earned" aria-label="Gems">
+    <span class="gems-earned__total">+<%= number_with_delimiter @attempt.gems %> <%= icon(:gem, label: "gems") %></span>
+    <% if @attempt.gem_bonuses.any? %>
+      <ul class="gems-earned__bonuses">
+        <% @attempt.gem_bonuses.each do |bonus, gems| %>
+          <li><%= Attempt::BONUS_NAMES[bonus] %> +<%= gems %></li>
         <% end %>
       </ul>
     <% end %>
@@ -45,7 +45,7 @@
   <% if @attempt.group? && (challenge = @attempt.round&.challenge) %>
     <%# Where the game puts them on the group's leaderboard, if it's the go that counts %>
     <% leaderboard = challenge.leaderboard(@attempt.round) %>
-    <p class="banner banner--group">🏆 <%= group_result_message(@attempt, leaderboard) %></p>
+    <p class="banner banner--group"><%= icon(:trophy) %> <%= group_result_message(@attempt, leaderboard) %></p>
     <div class="results__actions results__actions--one">
       <%= link_to "See the leaderboard", group_challenge_path(challenge.group, challenge), class: "button button--blue" %>
     </div>
@@ -54,9 +54,9 @@
     <% topic = @attempt.topic_module %>
     <div class="results__actions results__actions--one">
       <% if (left = @attempt.user.review_questions(topic)).any? %>
-        <%= link_to "🔁 Review #{left.size} more", play_path(topic.slug, review: 1), class: "button button--blue" %>
+        <%= link_to safe_join([ icon(:review), " Review #{left.size} more" ]), play_path(topic.slug, review: 1), class: "button button--blue" %>
       <% else %>
-        <%= link_to "Practise level #{@attempt.user.unlocked_level(topic)}", play_path(topic.slug, level: @attempt.user.unlocked_level(topic)), class: "button button--blue" %>
+        <%= link_to "Play level #{@attempt.user.unlocked_level(topic)}", play_path(topic.slug, level: @attempt.user.unlocked_level(topic)), class: "button button--blue" %>
       <% end %>
     </div>
   <% else %>
@@ -66,7 +66,7 @@
     <% if @attempt.mixed? %>
       <%= link_to "Play again", play_path(@attempt.topic_module.slug, mixed: 1), class: "button button--blue" %>
     <% elsif @attempt.daily_challenge? %>
-      <%= link_to "Practise level #{@attempt.level}", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
+      <%= link_to "Play level #{@attempt.level}", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
     <% else %>
       <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
     <% end %>
@@ -83,16 +83,16 @@
           <li><%= fact %></li>
         <% end %>
         <% @attempt.slow_facts.each do |fact| %>
-          <li class="missed__slow"><%= fact %> <span title="Right, but slow">🐢</span></li>
+          <li class="missed__slow"><%= fact %> <span title="Right, but slow"><%= icon(:slow, label: "right, but slow") %></span></li>
         <% end %>
       </ul>
       <% if @attempt.slow_facts.any? %>
-        <p class="hint hint--centre">🐢 Right, but slow. Practise these to get quicker.</p>
+        <p class="hint hint--centre"><%= icon(:slow) %> Right, but slow. Practise these to get quicker.</p>
       <% end %>
     </section>
   <% end %>
 
-  <%= tag.p(medal_progress(@attempt.user, @attempt.topic_module, @attempt.level), class: "level-progress") if @attempt.practice? %>
+  <%= tag.p(star_progress(@attempt.user, @attempt.topic_module, @attempt.level), class: "level-progress") if @attempt.practice? %>
   <%= link_to "See your stats", stats_path(@attempt.topic_module.slug) %>
   <%= link_to "See your awards", awards_path if @attempt.badges.any? %>
 

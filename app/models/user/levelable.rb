@@ -1,5 +1,5 @@
 # Topics have levels (times tables: tables 2–5, 2–12, zeroes, decimals, negatives). A level unlocks with a
-# bronze medal at the one before (Attempt::Medallable). Unlocked levels can always be played again, and Play defaults to the highest
+# star at the one before (Attempt::Rateable). Unlocked levels can always be played again, and Play defaults to the highest
 module User::Levelable
   extend ActiveSupport::Concern
 
@@ -26,13 +26,13 @@ module User::Levelable
     topic.level(unlocked_level(topic) + 1)
   end
 
-  # The best medal a level's games have earned, or nil
-  def medal(topic, level)
-    Attempt.medal_for(best_score(topic, level), topic)
+  # The most stars a level's games have earned, 0 to 3
+  def stars(topic, level)
+    Attempt.stars_for(best_score(topic, level), topic)
   end
 
   private
     def unlocked?(topic, number)
-      attempts.at_level(topic, number).exists? || medal(topic, number - 1).present?
+      attempts.at_level(topic, number).exists? || stars(topic, number - 1).positive?
     end
 end

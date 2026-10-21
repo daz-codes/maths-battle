@@ -1,10 +1,9 @@
 <% content_for :title, "#{@challenge.title} · #{@group.name} · MatheMinute" %>
 <% entry = @leaderboard.find { _1.user == Current.user } %>
-<% medal = ->(rank) { { 1 => "🥇", 2 => "🥈", 3 => "🥉" }.fetch(rank, rank) } %>
 
 <main class="page challenge">
   <%= link_to "← #{@group.name}", @group, class: "back-link", aria: { label: "Back to #{@group.name}" } %>
-  <h1 class="heading"><span aria-hidden="true"><%= @challenge.topic_module.emoji %></span> <%= @challenge.title %></h1>
+  <h1 class="heading"><%= topic_icon(@challenge.topic_module) %> <%= @challenge.title %></h1>
   <p class="aside"><%= @challenge.level_name %> · <%= challenge_status(@challenge) %></p>
   <%= render "flash" %>
   <p class="hint"><% if @challenge.open? %>
@@ -43,7 +42,7 @@
         <ol class="leaderboard__rows">
           <% @week_leaderboard.each do |row| %>
             <li class="leaderboard__row <%= "leaderboard__row--you" if row.user == Current.user %>">
-              <span class="leaderboard__rank"><%= medal.(row.rank) %></span>
+              <span class="leaderboard__rank leaderboard__rank--<%= row.rank %>"><%= row.rank %></span>
               <%= render "avatar", user: row.user, size: "small" %>
               <span class="leaderboard__name"><%= row.user.display_name %></span>
               <span class="leaderboard__score"><%= @board == "best" ? row.best : row.total %>
@@ -58,7 +57,7 @@
       <ol class="leaderboard__rows">
         <% @leaderboard.each do |row| %>
           <li class="leaderboard__row <%= "leaderboard__row--you" if row.user == Current.user %>">
-            <span class="leaderboard__rank"><%= medal.(row.rank) %></span>
+            <span class="leaderboard__rank leaderboard__rank--<%= row.rank %>"><%= row.rank %></span>
             <%= render "avatar", user: row.user, size: "small" %>
             <span class="leaderboard__name"><%= row.user.display_name %></span>
             <span class="leaderboard__score"><%= row.score %><% if row.wrong.positive? %> <span class="leaderboard__wrong"><%= row.wrong %> wrong</span><% end %></span>

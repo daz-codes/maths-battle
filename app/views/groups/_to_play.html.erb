@@ -3,7 +3,7 @@
 <% if waiting.any? %>
   <% first = waiting.first %>
   <%= link_to (waiting.one? ? group_challenge_path(first.group, first) : groups_path), class: "group-waiting" do %>
-    <span class="group-waiting__title">🏆 <%= waiting.one? ? "#{first.group.name} challenge" : "#{waiting.size} group challenges to play" %></span>
+    <span class="group-waiting__title"><%= icon(:trophy) %> <%= waiting.one? ? "#{first.group.name} challenge" : "#{waiting.size} group challenges to play" %></span>
     <span class="group-waiting__about"><%= waiting.one? ? "#{first.title} · #{challenge_status(first)}" : waiting.map { _1.group.name }.uniq.to_sentence %></span>
   <% end %>
 <% end %>

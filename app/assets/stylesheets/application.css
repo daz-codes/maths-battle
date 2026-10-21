@@ -161,6 +161,15 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .logo__word path { stroke: currentColor; stroke-width: 2.2; stroke-linejoin: round; }
 .logo__minute { fill: var(--pink-text); stroke: var(--pink-text) !important; }
 
+/* ── Icons ──────────────────────────────────────── */
+
+/* The app's own icons (IconsHelper), sized with the text they sit in */
+.icon { display: inline-block; width: 1.2em; height: 1.2em; flex: none; vertical-align: -0.22em; overflow: visible; }
+.stars { display: inline-flex; align-items: center; gap: 0.05em; vertical-align: -0.18em; }
+.stars .icon { vertical-align: 0; }
+.streak__flame { width: 0.92em; height: 0.92em; margin-right: 0.04em; vertical-align: -0.06em; }
+.banner .stars .icon { width: 1.2em; height: 1.2em; }
+
 /* ── Type ───────────────────────────────────────── */
 
 .heading {
@@ -191,6 +200,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.45rem;
   min-height: 3.25rem;
   padding: 0.6rem 1.4rem;
   border: 0;
@@ -410,10 +420,10 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 }
 
 .site-footer__start { display: flex; flex: 0 1 auto; align-items: center; gap: 0.5rem; min-width: 0; }
-/* Name (or sign in and sign up) over the player's stars */
+/* Name (or sign in and sign up) over the player's gems */
 .site-footer__who { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
 .site-footer__name { overflow: hidden; color: inherit; font-weight: 700; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
-.site-footer__stars { color: var(--muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+.site-footer__gems { color: var(--muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
 .site-footer__tab { flex: none; }
 
 .site-footer__player, .site-footer__tab {
@@ -529,7 +539,11 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .leaderboard__rows { display: grid; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
 .leaderboard__row { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.75rem; border-radius: var(--radius); background: var(--paper-alt); text-align: left; }
 .leaderboard__row--you { background: color-mix(in srgb, var(--yellow) 35%, var(--paper-alt)); }
-.leaderboard__rank { width: 2rem; font-size: 1.15rem; font-weight: 800; text-align: center; }
+.leaderboard__rank { display: inline-grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; font-size: 0.95rem; font-weight: 800; }
+/* The top three's places in the logo's colours */
+.leaderboard__rank--1 { background: var(--yellow); color: var(--on-neon); }
+.leaderboard__rank--2 { background: var(--blue); color: var(--on-neon); }
+.leaderboard__rank--3 { background: var(--pink); color: var(--on-neon); }
 .leaderboard__name { flex: 1; min-width: 0; overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .leaderboard__score { font-size: 1.25rem; font-weight: 800; }
 .leaderboard__wrong { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
@@ -592,14 +606,16 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 .topic-card:hover { background: color-mix(in srgb, var(--ink) 6%, var(--paper-alt)); }
 .topic-card--current { background: linear-gradient(90deg, var(--pink) 0 6px, var(--paper-alt) 6px); }
-.topic-card__emoji { font-size: 2.2rem; line-height: 1; }
+.topic-card__icon .icon { width: 2.2rem; height: 2.2rem; }
 .topic-card__body { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
 .topic-card__title { font-size: 1.15rem; font-weight: 800; }
 .topic-card__now { color: var(--pink-text); font-size: 0.85rem; font-weight: 700; }
 .topic-card__level { color: var(--muted); font-size: 0.9rem; font-weight: 600; }
-.topic-card__medals { display: flex; gap: 0.35rem; font-size: 1.15rem; }
-.topic-card__medal { display: inline-grid; place-items: center; width: 1.5rem; color: var(--muted); }
-.topic-card__medal--locked .icon { width: 0.9rem; height: 0.9rem; }
+/* Each level's stars, small, or a padlock */
+.topic-card__levels { display: flex; flex-wrap: wrap; gap: 0.15rem 0.6rem; }
+.topic-card__level-stars .stars .icon { width: 0.85rem; height: 0.85rem; }
+.topic-card__level-stars--locked { display: inline-grid; place-items: center; width: 2.6rem; color: var(--muted); }
+.topic-card__level-stars--locked .icon { width: 0.8rem; height: 0.8rem; }
 .topic-card__done { color: var(--green-deep); font-size: 0.85rem; font-weight: 700; }
 
 /* Levels: unlocked ones can be picked, locked ones show a padlock */
@@ -635,8 +651,12 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* A level's best score, small under its circle */
 .levels__best { position: absolute; top: calc(100% + 0.2rem); left: 50%; transform: translateX(-50%); color: var(--muted); font-size: 0.75rem; font-weight: 700; line-height: 1; }
 .levels:has(.levels__best) { margin-bottom: 0.9rem; }
-.levels__medal { position: absolute; right: -0.4rem; bottom: -0.4rem; font-size: 1.3rem; line-height: 1; }
-.levels__medal-line { margin: -1rem 0 0; color: var(--ink); font-size: 1.1rem; font-weight: 700; }
+/* A level's stars, small, inside its circle under the number */
+.levels__level .stars { display: flex; gap: 0; margin-top: -0.1rem; }
+.levels__level .stars .icon { width: 0.82rem; height: 0.82rem; }
+.levels__level[aria-current="true"] .stars .icon--star_empty path { stroke: rgb(255 255 255 / 0.55); }
+.levels__progress { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.25rem; margin: -1rem 0 0; color: var(--ink); font-size: 1.1rem; font-weight: 700; }
+.levels__progress .stars .icon { width: 1.15rem; height: 1.15rem; }
 
 /* Under the levels: playing the level picked (on stats), mixed practice, and the day's game if done */
 .daily-done { color: var(--muted); font-weight: 600; text-align: center; text-decoration: none; }
@@ -657,11 +677,11 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 .tables__example { display: block; color: var(--muted); font-size: 0.75rem; font-weight: 500; }
 
-/* ── Stars ──────────────────────────────────────── */
+/* ── Gems ───────────────────────────────────────── */
 
-/* Each right answer's stars start on the question, float up above it and fade slowly, so a fast run leaves
+/* Each right answer's gems start on the question, float up above it and fade slowly, so a fast run leaves
    several on screen at once. Bigger and brighter the quicker the answer was */
-.star-pop {
+.gem-pop {
   --drift: 0px;
   position: absolute;
   top: 18%;
@@ -675,14 +695,14 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   animation: star-float 2.2s ease-out forwards;
 }
 
-.star-pop--quick { color: var(--blue-deep); font-size: 1.8rem; }
-.star-pop--lightning { color: var(--pink-text); font-size: 2.1rem; }
+.gem-pop--quick { color: var(--blue-deep); font-size: 1.8rem; }
+.gem-pop--lightning { color: var(--pink-text); font-size: 2.1rem; }
 
-:root[data-theme="dark"] .star-pop--right { color: var(--green); }
-:root[data-theme="dark"] .star-pop--quick { color: var(--blue); }
+:root[data-theme="dark"] .gem-pop--right { color: var(--green); }
+:root[data-theme="dark"] .gem-pop--quick { color: var(--blue); }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .star-pop--right { color: var(--green); }
-  :root:not([data-theme="light"]) .star-pop--quick { color: var(--blue); }
+  :root:not([data-theme="light"]) .gem-pop--right { color: var(--green); }
+  :root:not([data-theme="light"]) .gem-pop--quick { color: var(--blue); }
 }
 
 @keyframes star-float {
@@ -694,32 +714,34 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* Without motion they just fade where they appear */
 @media (prefers-reduced-motion: reduce) {
-  .star-pop { animation: star-fade 2.2s ease-out forwards !important; transform: translateX(-50%); }
+  .gem-pop { animation: star-fade 2.2s ease-out forwards !important; transform: translateX(-50%); }
 }
 
 @keyframes star-fade { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
 
 /* What a game earned, on its results page */
-.stars-earned { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; margin: 0; }
-.stars-earned__total { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
-.stars-earned__bonuses { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
-.stars-earned__bonuses li { padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--paper-alt); color: var(--muted); font-size: 0.85rem; font-weight: 700; }
+.gems-earned { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; margin: 0; }
+.gems-earned__total { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
+.gems-earned__bonuses { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
+.gems-earned__bonuses li { padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--paper-alt); color: var(--muted); font-size: 0.85rem; font-weight: 700; }
 
 /* The player's collection, on the home page under the streak */
-.stars-total { margin: -0.5rem 0 0; color: var(--muted); font-weight: 700; }
-.stars-total strong { color: var(--ink); font-size: 1.15rem; }
+.gems-total { margin: -0.5rem 0 0; color: var(--muted); font-weight: 700; }
+.gems-total strong { color: var(--ink); font-size: 1.15rem; }
 
 /* Streak freezes on the home page: those held, and buying another */
 .freezes { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: -0.5rem; }
 .freezes__held { display: flex; align-items: center; gap: 0.5rem; margin: 0; color: var(--muted); font-weight: 700; }
-.freezes__icons { color: var(--muted); font-size: 1.3rem; letter-spacing: 0.1em; }
+.freezes__icons { display: inline-flex; gap: 0.2rem; }
+.freezes__icons .icon { width: 1.4rem; height: 1.4rem; }
+.icon--faded { opacity: 0.3; }
 .freezes__form { display: contents; }
 .freezes__buy { --fill: var(--blue-deep); --glow: var(--blue); min-height: 2.6rem; padding: 0.4rem 1.1rem; font-size: 0.9rem; }
 .freezes__hint { max-width: 22rem; margin: 0; color: var(--muted); font-size: 0.85rem; }
 
-/* Settings: the player's stars and streak freezes, above their picture and name */
+/* Settings: the player's gems and streak freezes, above their picture and name */
 .collection { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; padding: 1rem; border-radius: var(--radius); background: linear-gradient(var(--blue) 0 6px, var(--paper-alt) 6px); }
-.collection .stars-total, .collection .freezes { margin: 0; }
+.collection .gems-total, .collection .freezes { margin: 0; }
 
 /* The settings page in three parts: about you, the game, and the app */
 .settings__section { display: flex; flex-direction: column; align-items: center; gap: 1rem; width: 100%; }
@@ -814,13 +836,15 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   background: linear-gradient(var(--yellow) 0 6px, var(--paper-alt) 6px);
 }
 
-.badge__emoji { font-size: 2rem; line-height: 1.1; }
+.badge__icon .icon { width: 2.2rem; height: 2.2rem; }
+/* On a new award's yellow tile, its icon sits on a disc so a yellow one still shows */
+.badges--new .badge__icon, .badge--flying .badge__icon { display: grid; place-items: center; width: 3.1rem; height: 3.1rem; border-radius: 50%; background: var(--paper); }
 .badge__name { font-weight: 800; line-height: 1.2; }
 .badge__how { color: var(--muted); font-size: 0.75rem; line-height: 1.3; }
 
 /* Not earned yet: faded, so the earned ones stand out */
 .badge--locked { background: color-mix(in srgb, var(--paper-alt) 55%, var(--paper)); }
-.badge--locked .badge__emoji { filter: grayscale(1); opacity: 0.45; }
+.badge--locked .badge__icon { filter: grayscale(1); opacity: 0.45; }
 .badge--locked .badge__name { color: var(--muted); }
 
 /* A new badge, on its results page: all yellow, glowing in the dark */
@@ -850,8 +874,9 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .badge-summary__count { color: var(--muted); font-weight: 600; }
 .badge-summary__count strong { color: var(--ink); font-size: 1.75rem; letter-spacing: -0.03em; }
 .badge-summary__count::after { content: " ›"; }
-.badge-summary__emojis { font-size: 1.5rem; letter-spacing: 0.1em; }
-.badge-summary__emojis:empty { display: none; }
+.badge-summary__icons { display: flex; gap: 0.25rem; }
+.badge-summary__icons .icon { width: 1.6rem; height: 1.6rem; }
+.badge-summary__icons:empty { display: none; }
 
 /* ── Stats ──────────────────────────────────────── */
 
@@ -955,7 +980,8 @@ body.testing {
 .test__best { color: var(--muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
 .test--beating .test__score { color: var(--pink-text); text-shadow: 0 0 14px color-mix(in srgb, var(--pink) var(--glow-strength), transparent); }
 .test--beating .test__best { color: var(--pink-text); }
-.star-pop--best { color: var(--pink-text); font-size: 1.9rem; font-weight: 900; }
+.gem-pop--best { color: var(--pink-text); font-size: 1.9rem; font-weight: 900; }
+.gem-pop .icon { width: 1em; height: 1em; vertical-align: -0.12em; }
 
 .test__score {
   justify-self: end;

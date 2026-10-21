@@ -5,7 +5,14 @@
 module Badge::Catalogued
   extend ActiveSupport::Concern
 
-  Kind = Data.define(:key, :group, :emoji, :name, :description, :check)
+  Kind = Data.define(:key, :group, :emoji, :name, :description, :check) do
+    # Its own icon (IconsHelper) for pages; the emoji is for plain text
+    def icon
+      ICONS.fetch(emoji)
+    end
+  end
+  ICONS = { "🎉" => :party, "🌈" => :rainbow, "🎯" => :target, "🔥" => :flame, "⭐" => :star, "💯" => :perfect,
+    "⚡" => :lightning, "🚀" => :rocket, "💪" => :comeback }
 
   GROUPS = { start: "Getting started", scores: "Scores", streaks: "Streaks", levels: "Levels", special: "Special" }
   STREAKS = { 3 => "3 day streak", 7 => "1 week streak", 14 => "2 week streak", 30 => "1 month streak", 100 => "100 day streak" }
@@ -74,5 +81,5 @@ module Badge::Catalogued
     self.class.kind(kind)
   end
 
-  delegate :emoji, :name, :description, :group, to: :details
+  delegate :emoji, :icon, :name, :description, :group, to: :details
 end

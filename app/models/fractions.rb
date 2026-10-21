@@ -29,10 +29,10 @@ module Fractions
   # Denominators the questions use, and the largest a common denominator gets, so it's mental maths
   DENOMINATORS = 2..10
   MAX_COMMON_DENOMINATOR = 40
-  # Quick and lightning stars, allowing for some working out
-  STAR_TIMES = { lightning: 4_000, quick: 8_000 }
-  # A level's practice earns a medal for its score; bronze unlocks the next level
-  MEDALS = { gold: 20, silver: 10, bronze: 5 }
+  # Quick and lightning gems, allowing for some working out
+  GEM_TIMES = { lightning: 4_000, quick: 8_000 }
+  # A level's practice earns 1, 2 or 3 stars for its score; the first star unlocks the next level
+  STARS = { 3 => 20, 2 => 10, 1 => 5 }
   # Scores in one game that earn a badge. Like equations: each question takes some working out
   BADGE_SCORES = [ 5, 10, 20, 30, 50 ]
   # The largest number the server accepts in a question sent back (well above anything generated)

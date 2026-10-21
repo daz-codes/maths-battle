@@ -1,12 +1,12 @@
 module GroupsHelper
-  # "Ends in 3 days", "Open until it's closed", "Ended 12 Oct", and for an every day one "🔁 Every day · …"
+  # "Ends in 3 days", "Open until it's closed", "Ended 12 Oct", and for an every day one "Every day · …" with its icon
   def challenge_status(challenge)
     status =
       if !challenge.open? then "Ended #{l(challenge.ended_at.to_date, format: :short)}"
       elsif challenge.ends_at then "Ends in #{distance_of_time_in_words_to_now(challenge.ends_at)}"
       else challenge.daily? ? "Until it's closed" : "Open until it's closed"
       end
-    challenge.daily? ? "🔁 Every day · #{status}" : status
+    challenge.daily? ? safe_join([ icon(:review), " Every day · #{status}" ]) : status
   end
 
   # "3rd of 12"

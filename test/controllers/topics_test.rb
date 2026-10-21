@@ -14,25 +14,25 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     follow_redirect!
     assert_select "a.button--play[href=?]", play_path("equations", level: 1)
-    assert_select ".current-topic__name", text: "⚖️ Equations"
+    assert_select ".current-topic__name", text: "Equations"
   end
 
   test "the home page says which topic, and tapping it goes to change it" do
     get root_path
-    assert_select ".current-topic__name", text: "✖️ Times tables"
+    assert_select ".current-topic__name", text: "Times tables"
     assert_select "a.current-topic[href=?][title='Change topic'][aria-label=?]", topics_path, "Times tables. Change topic"
     assert_select "select", count: 0
   end
 
   test "the settings page says which topic too, and changing it from there comes back there" do
     get edit_profile_path
-    assert_select ".current-topic__name", text: "✖️ Times tables"
+    assert_select ".current-topic__name", text: "Times tables"
     assert_select "a.current-topic[href=?]", topics_path(from: "profile")
 
     patch topic_path, params: { topic: "functions", from: "profile" }
     assert_redirected_to edit_profile_path
     follow_redirect!
-    assert_select ".current-topic__name", text: "⚙️ Functions"
+    assert_select ".current-topic__name", text: "Functions"
   end
 
   test "changing topic is a page of every topic with the player's progress, the current one marked" do
@@ -44,10 +44,10 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".topic-card--current[aria-current=true]", 1 do
       assert_select ".topic-card__title", text: /Times tables · On it now/
       assert_select ".topic-card__level", text: "Level 2 of 5"
-      assert_select ".topic-card__medal", text: "🥈"
-      assert_select ".topic-card__medal--locked", 3
+      assert_select ".topic-card__level-stars .stars[aria-label='2 of 3 stars']"
+      assert_select ".topic-card__level-stars--locked", 3
     end
-    assert_select "form[action=?]:has(input[name=topic][value=functions]) .topic-card__done", topic_path, text: "✅ Played today"
+    assert_select "form[action=?]:has(input[name=topic][value=functions]) .topic-card__done", topic_path, text: "Played today"
   end
 
   test "picking a topic makes it the current one, back where the player came from" do
@@ -59,14 +59,14 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     patch topic_path, params: { topic: "equations", from: "stats" }
     assert_redirected_to stats_path
     follow_redirect!
-    assert_select ".current-topic__name", text: "⚖️ Equations"
+    assert_select ".current-topic__name", text: "Equations"
     assert_select "a.current-topic[href=?]", topics_path(from: "stats")
   end
 
   test "a stats page for a topic can still be linked to" do
     get stats_path, params: { topic: "functions" }
     assert_response :success
-    assert_select ".current-topic__name", text: "⚙️ Functions"
+    assert_select ".current-topic__name", text: "Functions"
     assert_select ".aside", text: "Play a game of functions and your stats will show up here."
   end
 
@@ -106,7 +106,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ 20, 6 ], [ @user.best_score(TimesTables, 1), @user.best_score(Equations, 1) ]
 
     get stats_path("equations", level: 1)
-    assert_select ".current-topic__name", text: "⚖️ Equations"
+    assert_select ".current-topic__name", text: "Equations"
     assert_select "thead th", text: "Type"
     assert_select "tbody th", text: /ax = b\s+e\.g\. 3x = 12/
     assert_select ".stats dd", text: "100%"

@@ -83,12 +83,12 @@ class GroupTest < ActiveSupport::TestCase
     assert_empty set.reload.leaderboard
   end
 
-  test "a group game is at the challenge's level even if it's locked, and earns no medal or level badge" do
+  test "a group game is at the challenge's level even if it's locked, and earns no stars or level badge" do
     @group.join(users(:bob))
     game = play(users(:bob), challenge, right: 12)
 
     assert game.group?
-    assert_nil game.medal
+    assert_equal 0, game.stars
     assert_not game.levelled_up
     assert_not game.new_high_score
     assert_equal 1, users(:bob).unlocked_level(TimesTables)

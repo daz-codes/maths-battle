@@ -20,9 +20,9 @@ module Addition
     { number: 4, name: "Zeroes", example: "4700 − 2800" },
     { number: 5, name: "Decimals", example: "2.3 − 0.32" }
   ]
-  STAR_TIMES = { lightning: 2_000, quick: 4_000 }
-  # A level's practice earns a medal for its score; bronze unlocks the next level
-  MEDALS = { gold: 20, silver: 10, bronze: 5 }
+  GEM_TIMES = { lightning: 2_000, quick: 4_000 }
+  # A level's practice earns 1, 2 or 3 stars for its score; the first star unlocks the next level
+  STARS = { 3 => 20, 2 => 10, 1 => 5 }
   BADGE_SCORES = [ 5, 10, 25, 50, 75 ]
   NUMBER_FORMAT = /\A\d{1,6}(\.\d{1,2})?\z/
 

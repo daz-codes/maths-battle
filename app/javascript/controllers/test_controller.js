@@ -6,7 +6,7 @@ import * as feedback from "lib/feedback"
 import confetti from "canvas-confetti"
 
 const DURATION = 60_000
-const STARS = { right: 10, quick: 20, lightning: 30 }
+const GEMS = { right: 10, quick: 20, lightning: 30 }
 const WRONG_PAUSE = 400
 // A review has no clock, so there's time to take in the right answer
 const REVIEW_WRONG_PAUSE = 1_500
@@ -19,11 +19,11 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 
 // Runs the whole one-minute test in the browser: nothing touches the network until it ends.
 // Offline, the finished game is kept on the device and uploaded later. It can be stopped part way,
-// after a warning, and then nothing is saved. A review has no clock or stars: it asks each of its
+// after a warning, and then nothing is saved. A review has no clock or gems: it asks each of its
 // questions once and ends after the last
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best" ]
-  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, submitUrl: String, keys: Array, starTimes: Object }
+  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "gemIcon", "trophyIcon" ]
+  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, submitUrl: String, keys: Array, gemTimes: Object }
 
   connect() {
     preparePlayer()
@@ -233,7 +233,7 @@ export default class extends Controller {
       this.scoreTarget.textContent = this.score
       this.flash(this.scoreTarget, "--right")
       feedback.right()
-      if (!this.review) this.popStars(ms)
+      if (!this.review) this.popGems(ms)
       if (this.bestValue && this.score === this.bestValue + 1) this.passBest()
       this.next()
     } else {
@@ -241,12 +241,13 @@ export default class extends Controller {
     }
   }
 
-  // Stars for a right answer float up and fade: +10, +20 if quick, +30 if lightning fast. The server works
-  // out the stars that count from the answers, with the same rules (Attempt::Starrable)
-  popStars(ms) {
-    const { lightning, quick } = this.starTimesValue
-    const [ stars, tier ] = ms < lightning ? [ STARS.lightning, "lightning" ] : ms < quick ? [ STARS.quick, "quick" ] : [ STARS.right, "right" ]
-    const pop = Object.assign(document.createElement("span"), { className: `star-pop star-pop--${tier}`, textContent: `+${stars} ⭐` })
+  // Gems for a right answer float up and fade: +10, +20 if quick, +30 if lightning fast. The server works
+  // out the gems that count from the answers, with the same rules (Attempt::Gemmable)
+  popGems(ms) {
+    const { lightning, quick } = this.gemTimesValue
+    const [ gems, tier ] = ms < lightning ? [ GEMS.lightning, "lightning" ] : ms < quick ? [ GEMS.quick, "quick" ] : [ GEMS.right, "right" ]
+    const pop = Object.assign(document.createElement("span"), { className: `gem-pop gem-pop--${tier}`, textContent: `+${gems} ` })
+    pop.append(this.gemIconTarget.content.cloneNode(true))
     pop.setAttribute("aria-hidden", "true")
     // Spread out a little, so quick answers in a row don't land on top of each other
     pop.style.setProperty("--drift", `${Math.round((Math.random() - 0.5) * 180)}px`)
@@ -263,7 +264,8 @@ export default class extends Controller {
     confetti({ particleCount: 140, spread: 100, startVelocity: 40, origin, colors: [ "#efff2e", "#ff5cc6", "#2be4ff", "#5dff7a" ], disableForReducedMotion: true })
     this.element.classList.add("test--beating")
     if (this.hasBestTarget) this.bestTarget.textContent = "New best!"
-    const pop = Object.assign(document.createElement("span"), { className: "star-pop star-pop--best", textContent: "🏆 New best!" })
+    const pop = Object.assign(document.createElement("span"), { className: "gem-pop gem-pop--best" })
+    pop.append(this.trophyIconTarget.content.cloneNode(true), " New best!")
     pop.setAttribute("aria-hidden", "true")
     pop.style.setProperty("--drift", "0px")
     pop.addEventListener("animationend", () => pop.remove())

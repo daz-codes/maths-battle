@@ -5,7 +5,7 @@
   <%= link_to "← All groups", groups_path, class: "back-link" %>
   <h1 class="heading"><%= @group.name %></h1>
   <%= render "flash" %>
-  <p class="aside">👥 <%= pluralize(@memberships.size, "player") %><%= " · run by #{@group.owner.display_name}" unless owner %></p>
+  <p class="aside"><%= icon(:people) %> <%= pluralize(@memberships.size, "player") %><%= " · run by #{@group.owner.display_name}" unless owner %></p>
 
   <% if owner %>
     <section class="group-code" aria-label="How others join">

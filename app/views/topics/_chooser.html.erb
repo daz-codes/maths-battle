@@ -11,29 +11,27 @@
         <%= button_to url, **options, class: "levels__level", form_class: "levels__form",
               title: "Level #{details[:number]}: #{details[:name]}", aria: { current: (details[:number] == level) } do %>
           <%= details[:number] %>
-          <% if (medal = user.medal(topic, details[:number])) %>
-            <span class="levels__medal" aria-label="<%= Attempt::MEDAL_NAMES[medal] %>"><%= Attempt::MEDAL_EMOJI[medal] %></span>
-          <% end %>
+          <%= star_rating(user.stars(topic, details[:number])) %>
           <% if (best = user.best_score(topic, details[:number])).positive? %>
             <span class="levels__best" aria-label="Best <%= best %>"><%= best %></span>
           <% end %>
         <% end %>
       <% else %>
         <span class="levels__level levels__level--locked" title="Level <%= details[:number] %>: <%= details[:name] %> (locked)">
-          <%= render "icons/lock" %>
+          <%= icon(:lock) %>
         </span>
       <% end %>
     <% end %>
   </nav>
   <p class="levels__name">Level <%= level %>: <%= topic.level(level)[:name] %></p>
-  <p class="levels__medal-line"><%= medal_progress(user, topic, level) %></p>
+  <p class="levels__progress"><%= star_progress(user, topic, level) %></p>
   <% if topic.lesson(level) %>
-    <p class="levels__learn"><%= link_to "📖 Learn how", lesson_path(topic.slug, level) %></p>
+    <p class="levels__learn"><%= link_to safe_join([ icon(:book), " Learn how" ]), lesson_path(topic.slug, level) %></p>
   <% end %>
 <% end %>
 <%= link_to "Play level #{level}", play_path(topic.slug, level: level), class: "button button--blue button--practise" if choosing == :stats %>
-<%= link_to "🔀 Mixed practice", play_path(topic.slug, mixed: 1), class: "button button--mixed" if user.unlocked_level(topic) > 1 %>
+<%= link_to safe_join([ icon(:mixed), " Mixed practice" ]), play_path(topic.slug, mixed: 1), class: "button button--mixed" if user.unlocked_level(topic) > 1 %>
 <% if (review = user.review_questions(topic)).any? %>
-  <%= link_to "🔁 Review mistakes (#{review.size})", play_path(topic.slug, review: 1), class: "button button--review" %>
+  <%= link_to safe_join([ icon(:review), " Review mistakes (#{review.size})" ]), play_path(topic.slug, review: 1), class: "button button--review" %>
 <% end %>
 </div>

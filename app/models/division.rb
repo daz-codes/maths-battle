@@ -15,10 +15,10 @@ module Division
     { number: 4, name: "Decimals", example: "2.1 ÷ 0.7" },
     { number: 5, name: "Zeroes and decimals", example: "2100 ÷ 0.7" }
   ]
-  # A level's practice earns a medal for its score; bronze unlocks the next level
-  MEDALS = { gold: 20, silver: 10, bronze: 5 }
+  # A level's practice earns 1, 2 or 3 stars for its score; the first star unlocks the next level
+  STARS = { 3 => 20, 2 => 10, 1 => 5 }
   # A little longer than times tables, as dividing is the harder way round
-  STAR_TIMES = { lightning: 1_500, quick: 3_000 }
+  GEM_TIMES = { lightning: 1_500, quick: 3_000 }
   BADGE_SCORES = [ 5, 10, 25, 50, 75, 100 ]
 
   extend Topic::Playable

@@ -12,7 +12,7 @@
       data-test-round-value="<%= @round&.id %>"
       data-test-best-value="<%= @best %>"
       data-test-keys-value="<%= @topic.keys(@level).to_json %>"
-      data-test-star-times-value="<%= @topic.star_times.to_json %>"
+      data-test-gem-times-value="<%= @topic.gem_times.to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">
   <button type="button" class="test__stop" data-action="test#confirmStop" aria-label="Stop the game">✕</button>
 
@@ -31,6 +31,10 @@
       <span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span>
     <% end %>
   </header>
+
+  <%# Icons the game copies into what floats up: gems for each right answer, the trophy for a new best %>
+  <template data-test-target="gemIcon"><%= icon(:gem) %></template>
+  <template data-test-target="trophyIcon"><%= icon(:trophy) %></template>
 
   <div class="test__stage" data-test-target="stage">
     <p class="question" data-test-target="question" aria-live="off">Ready</p>

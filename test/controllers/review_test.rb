@@ -19,7 +19,7 @@ class ReviewTest < ActionDispatch::IntegrationTest
 
     Attempt.record!(user: @user, results: answers([ 3, 5, 14 ], [ 2, 5, 11 ], [ 2, 3, 6 ]))
     get root_path
-    assert_select "a.button--review[href=?]", play_path("times-tables", review: 1), text: "🔁 Review mistakes (2)"
+    assert_select "a.button--review[href=?]", play_path("times-tables", review: 1), text: "Review mistakes (2)"
   end
 
   test "a review game is made of those questions only" do
@@ -42,7 +42,7 @@ class ReviewTest < ActionDispatch::IntegrationTest
     [ [], complete_results.first(1), complete_results.first(1).map { _1.merge("given" => "1") } ].each do |partial_results|
       upload[:attempt][:results] = partial_results
       assert_no_difference -> { @user.attempts.count } do
-        assert_no_changes -> { @user.reload.stars } do
+        assert_no_changes -> { @user.reload.gems } do
           post attempts_path, params: upload, as: :json
         end
       end
@@ -54,7 +54,7 @@ class ReviewTest < ActionDispatch::IntegrationTest
     post attempts_path, params: upload, as: :json
     assert_response :created
     assert @user.attempts.last.review?
-    assert_equal 50, @user.attempts.last.stars
+    assert_equal 50, @user.attempts.last.gems
   end
 
   test "a complete review earns its bonus even with wrong answers, and a retry earns nothing extra" do
@@ -62,7 +62,7 @@ class ReviewTest < ActionDispatch::IntegrationTest
     upload = review_upload(score: 2)
     upload[:attempt][:results].each { _1["given"] = "1" }
 
-    assert_difference -> { @user.reload.stars }, 50 do
+    assert_difference -> { @user.reload.gems }, 50 do
       post attempts_path, params: upload, as: :json
     end
     assert_response :created
@@ -70,7 +70,7 @@ class ReviewTest < ActionDispatch::IntegrationTest
     assert_equal 0, @user.attempts.last.score
 
     assert_no_difference -> { @user.attempts.count } do
-      assert_no_changes -> { @user.reload.stars } do
+      assert_no_changes -> { @user.reload.gems } do
         post attempts_path, params: upload, as: :json
       end
     end
@@ -78,14 +78,14 @@ class ReviewTest < ActionDispatch::IntegrationTest
     assert_equal url, response.parsed_body["url"]
   end
 
-  test "it's saved as a review: no medal, no level up, no high score to beat" do
+  test "it's saved as a review: no stars, no level up, no high score to beat" do
     Attempt.record!(user: @user, results: answers([ 3, 5, 14 ], [ 2, 5, 11 ]))
     post attempts_path, params: review_upload(score: 12), as: :json
     assert_response :created
 
     review = @user.attempts.last
     assert review.review?
-    assert_nil review.medal
+    assert_equal 0, review.stars
     assert_not review.levelled_up
     assert_not review.new_high_score
     assert_equal 1, @user.unlocked_level(TimesTables), "12 would be a bronze in practice"
@@ -101,9 +101,9 @@ class ReviewTest < ActionDispatch::IntegrationTest
     assert_select ".label", text: /Times tables, review/
     assert_select ".result__score", text: "1 of 2 right"
     assert_select ".result__stats", text: /Best/, count: 0
-    assert_select ".stars-earned__bonuses li", text: "Mistakes reviewed +50"
+    assert_select ".gems-earned__bonuses li", text: "Mistakes reviewed +50"
     assert_select ".button--share", count: 0
-    assert_select ".results__actions a[href=?]", play_path("times-tables", review: 1), text: "🔁 Review 1 more"
+    assert_select ".results__actions a[href=?]", play_path("times-tables", review: 1), text: "Review 1 more"
     assert_select ".level-progress", count: 0
   end
 
@@ -113,7 +113,7 @@ class ReviewTest < ActionDispatch::IntegrationTest
     get response.parsed_body["url"]
 
     assert_select ".feedback", text: /Every one right. Those mistakes are fixed/
-    assert_select ".results__actions a[href=?]", play_path("times-tables", level: 1), text: "Practise level 1"
+    assert_select ".results__actions a[href=?]", play_path("times-tables", level: 1), text: "Play level 1"
   end
 
   test "nothing to review goes back home" do

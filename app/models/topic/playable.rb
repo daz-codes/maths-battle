@@ -49,9 +49,9 @@ module Topic::Playable
     [ question(fact, level: level, random: random) ]
   end
 
-  # Under how many ms a right answer earns the quick and lightning stars
-  def star_times
-    self::STAR_TIMES
+  # Under how many ms a right answer earns the quick and lightning gems
+  def gem_times
+    self::GEM_TIMES
   end
 
   # A level's tutorial, if the topic has them: steps to tap through, then one to try (see TimesTables::Lessons)
@@ -59,10 +59,10 @@ module Topic::Playable
     self::Lessons::ALL[number] if const_defined?(:Lessons, false)
   end
 
-  # The scores for bronze, silver and gold: a level's practice earns a medal, and the first bronze unlocks the
-  # next level (Attempt::Medallable). Each topic sets its own, as some questions take longer
-  def medals
-    self::MEDALS
+  # The scores for 1, 2 and 3 stars, most first: a level's practice earns stars, and the first star unlocks the
+  # next level (Attempt::Rateable). Every topic has 5, 10 and 20
+  def star_scores
+    self::STARS
   end
 
   def badge_scores

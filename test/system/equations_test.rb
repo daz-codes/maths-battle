@@ -21,7 +21,7 @@ class EquationsTest < ApplicationSystemTestCase
     find("body").send_keys(wrong) # a one-character answer is checked straight away, so this one's wrong unless the answer is 1
 
     assert_selector ".card__number", text: /\A[45]\z/, wait: 10
-    assert_text "⚖️ EQUATIONS"
+    assert_text "EQUATIONS, LEVEL 1"
     assert_equal "equations", users(:ada).attempts.last.topic
   end
 

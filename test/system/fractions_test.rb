@@ -17,7 +17,7 @@ class FractionsTest < ApplicationSystemTestCase
     end
 
     assert_selector ".card__number", text: "3", wait: 10
-    assert_text "🍕 FRACTIONS"
+    assert_text "FRACTIONS, LEVEL 1"
     assert_equal "fractions", users(:ada).attempts.last.topic
   end
 

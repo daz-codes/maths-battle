@@ -14,7 +14,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     patch topic_path, params: { topic: "equations" }
     assert_redirected_to root_path
     follow_redirect!
-    assert_select ".current-topic__name", text: "⚖️ Equations"
+    assert_select ".current-topic__name", text: "Equations"
 
     get topics_path
     assert_select "h1", text: "Topics"
@@ -27,7 +27,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     get root_path
     assert_response :success
-    assert_select ".current-topic__name", text: "⚙️ Functions"
+    assert_select ".current-topic__name", text: "Functions"
   end
 
   test "visitors can start playing without signing up" do
@@ -61,8 +61,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     Attempt.record!(user: users(:ada), results: answers(*right_answers(5), ms: 2_500))
 
     get root_path
-    assert_select ".site-footer__stars", text: "200 ⭐", message: "50 for the answers, then a new high score and a level up"
-    assert_select "main .stars-total", count: 0
+    assert_select ".site-footer__gems", text: "200", message: "50 for the answers, then a new high score and a level up"
+    assert_select "main .gems-total", count: 0
     assert_select "main .freezes", count: 0
   end
 
@@ -73,7 +73,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as user
 
     get root_path
-    assert_select ".flash", text: "🧊 A streak freeze kept your 3 day streak going!"
+    assert_select ".flash", text: "A streak freeze kept your 3 day streak going!"
     assert_select ".streak__number", text: /3/
     assert_equal 0, user.reload.streak_freezes
   end
@@ -142,6 +142,6 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     unlock(@user, TimesTables, 2)
     sign_in_as @user
     get root_path
-    assert_select ".levels-panel a.button--mixed[href=?]", play_path("times-tables", mixed: 1), text: "🔀 Mixed practice"
+    assert_select ".levels-panel a.button--mixed[href=?]", play_path("times-tables", mixed: 1), text: "Mixed practice"
   end
 end

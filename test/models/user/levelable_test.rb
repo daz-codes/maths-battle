@@ -1,6 +1,6 @@
 require "test_helper"
 
-# Every topic levels up by medals: a level's practice earns one for its score, and a bronze unlocks the next
+# Every topic levels up by stars: a level's practice earns 1 to 3 for its score, and the first star unlocks the next
 class User::LevelableTest < ActiveSupport::TestCase
   setup { @user = users(:ada) }
 
@@ -16,11 +16,11 @@ class User::LevelableTest < ActiveSupport::TestCase
   test "a bronze unlocks the next level, and the game that earns it says so" do
     assert_not practise(level: 1, score: 4).levelled_up
     assert_equal 1, @user.unlocked_level(TimesTables)
-    assert_nil @user.medal(TimesTables, 1)
+    assert_equal 0, @user.stars(TimesTables, 1)
 
     bronze = practise(level: 1, score: 5)
     assert bronze.levelled_up
-    assert_equal :bronze, bronze.new_medal
+    assert_equal 1, bronze.new_stars
     assert_equal 2, @user.unlocked_level(TimesTables)
   end
 
@@ -31,24 +31,24 @@ class User::LevelableTest < ActiveSupport::TestCase
     assert_equal 2, @user.unlocked_level(Functions)
 
     Topic::ALL.each do |topic|
-      assert_equal({ gold: 20, silver: 10, bronze: 5 }, topic.medals, topic.title)
+      assert_equal({ 3 => 20, 2 => 10, 1 => 5 }, topic.star_scores, topic.title)
     end
   end
 
-  test "a level keeps its best medal, and a better one is new" do
+  test "a level keeps its most stars, and more are new" do
     practise(level: 1, score: 6)
     silver = practise(level: 1, score: 12)
     worse = practise(level: 1, score: 8)
     gold = practise(level: 1, score: 21)
 
-    assert_equal [ :silver, nil, :gold ], [ silver.new_medal, worse.new_medal, gold.new_medal ]
+    assert_equal [ 2, nil, 3 ], [ silver.new_stars, worse.new_stars, gold.new_stars ]
     assert_not silver.levelled_up, "only the first bronze unlocks the next level"
-    assert_equal :gold, @user.medal(TimesTables, 1)
+    assert_equal 3, @user.stars(TimesTables, 1)
   end
 
-  test "a daily challenge earns no medal and unlocks nothing" do
+  test "a daily challenge earns no stars and unlocks nothing" do
     challenge = practise(level: 1, score: 25, mode: "challenge")
-    assert_nil challenge.medal
+    assert_equal 0, challenge.stars
     assert_not challenge.levelled_up
     assert_equal 1, @user.unlocked_level(TimesTables)
   end

@@ -40,8 +40,9 @@ class TimesTablesTest < ApplicationSystemTestCase
 
     a, b = find(".question").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
-    assert_selector ".star-pop.star-pop--lightning", text: "+30 ⭐"
-    assert_no_selector ".star-pop", wait: 4
+    assert_selector ".gem-pop.gem-pop--lightning .icon--gem", visible: :all
+    assert_selector ".gem-pop.gem-pop--lightning", text: "+30"
+    assert_no_selector ".gem-pop", wait: 4
   end
 
   test "one game played to the end keeps the streak, and Play stops asking for one" do
@@ -79,6 +80,7 @@ class TimesTablesTest < ApplicationSystemTestCase
     find("body").send_keys((a * b).to_s)
 
     assert_selector ".test--beating .test__best", text: "New best!"
-    assert_selector ".star-pop--best", text: "🏆 New best!"
+    assert_selector ".gem-pop--best .icon--trophy", visible: :all
+    assert_selector ".gem-pop--best", text: "New best!"
   end
 end

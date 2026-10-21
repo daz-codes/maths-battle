@@ -46,15 +46,15 @@ A new player picks a topic first; on a new device it's the one last played.
 Home (the current topic, changed on its own page with progress in each, then the streak with Play under it)
 → play the level picked, or learn it, or mixed practice → score and practice feedback → stats or play again.
 The server generates questions weighted towards facts the player finds difficult. Any game played to the end
-keeps the streak going, and a bronze medal unlocks the next level.
+keeps the streak going, and a level's first star unlocks the next level.
 The first saved game creates a guest account; registering preserves that guest's history. Signing into
 an existing account switches accounts without merging guest history.
 
-## Medals and mixed practice
+## Stars and mixed practice
 
-Every topic plays by medals, with 5 right for bronze, 10 for silver and 20 for gold (`MEDALS`). Practising
-a level asks only that level's questions and earns bronze, silver or gold; a level shows its best, and the
-first bronze unlocks the next level. A new topic needs `MEDALS` and gets all this. Practising a level asks only
+Every topic rates its levels with stars: 5 right for 1 star, 10 for 2 and 20 for 3 (`STARS`,
+`Attempt::Rateable`). Practising a level asks only that level's questions; a level shows its most stars, and
+the first star unlocks the next level. A new topic needs `STARS` and gets all this. Practising a level asks only
 its own skill: times tables, division and adding and subtracting build up (level 2 includes level 1's tables),
 but the other topics' levels are each their own (functions level 5 is just inverses).
 
@@ -66,15 +66,15 @@ wave of confetti and the fanfare. A new award spins in big in the middle of the 
 place (`award-reveal` controller). Anyone whose device asks for less motion gets none of the animation.
 
 Mixed practice, once a second level is unlocked, mixes every level up to the player's, as often as they like,
-earning stars but no medals, bests or level ups. It took the place of the daily challenge (once a day, mixed),
+earning gems but no stars, bests or level ups. It took the place of the daily challenge (once a day, mixed),
 which was played until 21 October 2026: its games are kept, and a link to it goes to mixed practice. A game's
 mode (practice, mixed, review or group) is in its signed ticket, so the browser can't decide.
 
 Review mode asks again, exactly, the questions a player recently got wrong in a topic (from their last 10 games,
 `User::Reviewable`), up to 10, each once and with no clock. Games are ordered by play time, so a late offline
 upload can't override a more recent answer. Only the latest answer to each question counts, so getting it
-right takes it off the list. Like mixed practice it's at the player's highest level and earns no medal. With no clock, its answers earn no
-stars, badges or question stats; finishing one earns a 50 star bonus. Every question in its signed set must
+right takes it off the list. Like mixed practice it's at the player's highest level and earns no stars. With no clock, its answers earn no
+gems, badges or question stats; finishing one earns a 50 gem bonus. Every question in its signed set must
 be answered before a review can be saved.
 
 A day counts towards the streak when any game is played to the end with at least one answer: practice, mixed,
@@ -103,19 +103,19 @@ celebrated on that game's results page. `User#catch_up_badges!` replays a player
 how existing players got their badges, and how a newly added badge can reach players who already earned it.
 Badges never name the player, so shared results can show them.
 
-## Stars
+## Gems
 
-Every right answer earns stars: 10, 20 if quick and 30 if lightning fast. Each topic sets what counts as
-quick in `STAR_TIMES`, since an equation takes longer than a times table. A game can also earn bonuses for a
+Every right answer earns gems: 10, 20 if quick and 30 if lightning fast. Each topic sets what counts as
+quick in `GEM_TIMES`, since an equation takes longer than a times table. A game can also earn bonuses for a
 perfect game, a new high score or levelling up. A review's answers earn none, as it has no clock; finishing
 it earns a bonus. The +10s that float up during a game are only for show:
-the server works out the stars from the checked answers (`Attempt::Starrable`) and keeps them on the game,
+the server works out the gems from the checked answers (`Attempt::Gemmable`) and keeps them on the game,
 so a player's total is the sum of their games.
 
 ## Settings
 
 The settings page has three parts: about you (picture and name, saved with its button), the game (the topic,
-stars and streak freezes) and app settings (the daily reminder, colours, and sounds and vibration, which save as
+gems and streak freezes) and app settings (the daily reminder, colours, and sounds and vibration, which save as
 they're changed).
 
 ## Groups
@@ -124,7 +124,7 @@ Players compete in groups (`Group`): an owner with an account starts one and sha
 (`Group::Joinable`), and anyone can join with it, giving a name for the leaderboard if they haven't one. The owner
 sets challenges (`Group::Challenge`): a topic and a level, or every level mixed, how long it runs, and whether they play too. A
 challenge's round (`Group::Round`) is one set of questions made when it's set, so everyone plays the same ones; a
-group game is saved against its round (the round is in its signed ticket) and earns no medals or level ups. The
+group game is saved against its round (the round is in its signed ticket) and earns no stars or level ups. The
 leaderboard (`Group::Challenge::Rankable`) counts each player's first go: score, then fewer wrong, then who played
 first by server save order; a device's clock cannot replace a counted score. Scores must reach the server before
 the round ends (the challenge's end, or local midnight for a daily round); late offline games still enter personal
@@ -140,6 +140,14 @@ Waiting challenges show on the home page and in the daily
 reminder. Groups also send push notifications (`User::Notifiable`, through `NotifyJob`): a new challenge to its
 players, and to anyone who's had 1st place taken from them, at most once a day for each group. They only go to
 devices with reminders on, and never between 8pm and 7am in the player's time zone.
+
+## Icons
+
+The app draws its own icons (`IconsHelper`, `icon(:flame)`) in place of emojis, so they look the same on every
+device and match the logo: SVGs on a 24 × 24 grid, in the logo's neon colours or the text's colour. Each topic
+has one (`topic_icon`), and each kind of award (`Badge::Kind#icon`). An icon beside words is hidden from screen
+readers; one standing alone has a label. Plain text keeps emojis: shared results, push notifications, menus and
+flash messages.
 
 ## Error pages
 
@@ -168,7 +176,7 @@ the Home Screen.
 ## Streak freezes
 
 A freeze keeps a streak going through a missed day: the day doesn't add to the streak, but doesn't end it.
-Players hold up to two, bought for 10,000 stars (from the settings page) or given free when a streak reaches 7 or 30 days. Coming back
+Players hold up to two, bought for 10,000 gems (from the settings page) or given free when a streak reaches 7 or 30 days. Coming back
 after missed days uses them up by themselves (`StreakKeeping`, before any page shows the streak), but only if
 there are enough to cover every missed day. Covered days are kept as frozen days so the streak can be worked
 out again later; a game played offline that turns up for a frozen day gives its freeze back.

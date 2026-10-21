@@ -1,18 +1,12 @@
 module TopicsHelper
-  # Under a medal level's name: its best medal and the next to aim for, or what earns the first one
-  # (which unlocks the next level). "🥈 Silver · best 24 · 30 for gold"
-  def medal_progress(user, topic, level)
-    medal, needed = user.medal(topic, level), topic.medals
-    best = user.best_score(topic, level)
+  # Under a level's name: its stars, its best and the score for the next star, or what earns the first one
+  def star_progress(user, topic, level)
+    stars, needed, best = user.stars(topic, level), topic.star_scores, user.best_score(topic, level)
+    return safe_join([ star_rating(stars), " best #{best}" ], " ·") if stars == Attempt::MAX_STARS
+    return safe_join([ star_rating(stars), " best #{best} · #{needed[stars + 1]} for #{pluralize(stars + 1, "star")}" ], " ·") if stars.positive?
 
-    case medal
-    when :gold then "#{Attempt::MEDAL_EMOJI[:gold]} Gold · best #{best}"
-    when :silver then "#{Attempt::MEDAL_EMOJI[:silver]} Silver · best #{best} · #{needed[:gold]} for gold"
-    when :bronze then "#{Attempt::MEDAL_EMOJI[:bronze]} Bronze · best #{best} · #{needed[:silver]} for silver"
-    else
-      unlocks = topic.level(level + 1) && level == user.unlocked_level(topic)
-      "Score #{needed[:bronze]} for #{Attempt::MEDAL_EMOJI[:bronze]} bronze#{" and unlock level #{level + 1}" if unlocks}"
-    end
+    unlocks = topic.level(level + 1) && level == user.unlocked_level(topic)
+    safe_join([ "Score #{needed[1]} for a ", icon(:star), (" and unlock level #{level + 1}" if unlocks) ].compact)
   end
 
   # Where picking a level in the chooser goes. On the home page it changes what Practise plays (remembered on

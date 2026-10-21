@@ -15,7 +15,7 @@
   <% end %>
 
   <section class="streak <%= "streak--done" if @user.practised_today? %>" aria-label="Streak">
-    <span class="streak__number">🔥 <%= @user.streak %></span>
+    <span class="streak__number"><%= icon(:flame, class: "streak__flame") %><%= @user.streak %></span>
     <span class="streak__label">day streak</span>
   </section>
 
@@ -26,7 +26,7 @@
 
   <% if @user.persisted? %>
     <dl class="stats">
-      <div><dt>Best</dt><dd>🏆 <%= @user.best_score(current_topic, current_level) %></dd></div>
+      <div><dt>Best</dt><dd><%= icon(:trophy) %> <%= @user.best_score(current_topic, current_level) %></dd></div>
       <div><dt>Longest streak</dt><dd><%= @user.longest_streak %></dd></div>
       <div><dt>Average score</dt><dd><%= @user.average_score(current_topic, current_level) || "—" %></dd></div>
       <div><dt>Average time</dt><dd><%= seconds(@user.overall_stats(current_topic, current_level).average_ms) %></dd></div>

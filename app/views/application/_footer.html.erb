@@ -1,4 +1,4 @@
-<%# Fixed to the bottom of every page except the test: who's playing (tap for settings) with their stars, then
+<%# Fixed to the bottom of every page except the test: who's playing (tap for settings) with their gems, then
     home, groups, awards and stats. Guests get sign in and sign up links in place of a name %>
 <% player = current_player %>
 <footer class="site-footer">
@@ -13,47 +13,27 @@
       <% else %>
         <%= link_to player.username, edit_profile_path, class: "site-footer__name" %>
       <% end %>
-      <span class="site-footer__stars"><%= number_with_delimiter player.stars %> ⭐</span>
+      <span class="site-footer__gems"><%= number_with_delimiter player.gems %> <%= icon(:gem, label: "gems") %></span>
     </span>
   </div>
 
   <%= link_to root_path, class: "site-footer__tab site-footer__home" do %>
-    <%# A house, all blue %>
-    <svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true" fill="var(--blue)">
-      <rect x="5" y="11" width="14" height="10"/>
-      <path d="M2.5 12 12 3l9.5 9z"/>
-    </svg>
+    <%= icon(:home, class: "footer-icon") %>
     <span>Home</span>
   <% end %>
 
   <%= link_to groups_path, class: "site-footer__tab site-footer__groups" do %>
-    <%# Two people, pink and green %>
-    <svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="8" cy="7.5" r="3.5" fill="var(--pink)"/>
-      <path d="M1.5 20a6.5 6.5 0 0 1 13 0z" fill="var(--pink)"/>
-      <circle cx="16.5" cy="8.5" r="3" fill="var(--green)"/>
-      <path d="M12.5 20a5.5 5.5 0 0 1 10 -1.5V20z" fill="var(--green)"/>
-    </svg>
+    <%= icon(:people, class: "footer-icon") %>
     <span>Groups</span>
   <% end %>
 
   <%= link_to awards_path, class: "site-footer__tab site-footer__awards" do %>
-    <%# A trophy, all yellow %>
-    <svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true" fill="var(--yellow)">
-      <path d="M6 3h12v5a6 6 0 0 1-12 0z"/>
-      <path d="M6 5H3v1.5A4.5 4.5 0 0 0 7 11V9a2.5 2.5 0 0 1-2-2.5V7h1zM18 5h3v1.5A4.5 4.5 0 0 1 17 11V9a2.5 2.5 0 0 0 2-2.5V7h-1z"/>
-      <rect x="10.75" y="13" width="2.5" height="4"/>
-      <rect x="7" y="17" width="10" height="3.5" rx="1"/>
-    </svg>
+    <%= icon(:trophy, class: "footer-icon") %>
     <span>Awards</span>
   <% end %>
 
   <%= link_to stats_path, class: "site-footer__tab site-footer__stats" do %>
-    <svg class="footer-icon stats-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="3" y="12" width="5" height="9" rx="1.5" fill="var(--pink)"/>
-      <rect x="9.5" y="7" width="5" height="14" rx="1.5" fill="var(--green)"/>
-      <rect x="16" y="3" width="5" height="18" rx="1.5" fill="var(--blue)"/>
-    </svg>
+    <%= icon(:stats, class: "footer-icon") %>
     <span>Stats</span>
   <% end %>
 </footer>

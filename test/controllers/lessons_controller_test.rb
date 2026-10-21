@@ -55,7 +55,7 @@ class LessonsControllerTest < ActionDispatch::IntegrationTest
   test "the home page offers the lesson for the level picked, in every topic" do
     choose_topic
     get root_path
-    assert_select ".levels__learn a[href=?]", lesson_path("times-tables", 1), text: "📖 Learn how"
+    assert_select ".levels__learn a[href=?]", lesson_path("times-tables", 1), text: "Learn how"
 
     patch topic_path, params: { topic: "functions" }
     get root_path
@@ -68,6 +68,6 @@ class LessonsControllerTest < ActionDispatch::IntegrationTest
     levelled_up = @user.attempts.find_by!(levelled_up: true)
 
     get attempt_path(levelled_up)
-    assert_select "a[href=?]", lesson_path("times-tables", 2), text: "📖 Learn how to do level 2"
+    assert_select "a[href=?]", lesson_path("times-tables", 2), text: "Learn how to do level 2"
   end
 end

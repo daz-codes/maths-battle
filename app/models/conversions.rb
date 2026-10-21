@@ -43,9 +43,9 @@ module Conversions
     { number: 4, name: "Volume", example: "750 ml = ? l", types: both_ways(VOLUME) },
     { number: 5, name: "Imperial lengths", example: "12 inches ≈ ? cm", types: IMPERIAL.keys }
   ]
-  STAR_TIMES = { lightning: 3_000, quick: 6_000 }
-  # A level's practice earns a medal for its score; bronze unlocks the next level
-  MEDALS = { gold: 20, silver: 10, bronze: 5 }
+  GEM_TIMES = { lightning: 3_000, quick: 6_000 }
+  # A level's practice earns 1, 2 or 3 stars for its score; the first star unlocks the next level
+  STARS = { 3 => 20, 2 => 10, 1 => 5 }
   BADGE_SCORES = [ 5, 10, 20, 30, 50 ]
   NUMBER_FORMAT = /\A\d{1,7}(\.\d{1,3})?\z/
   # The biggest amount the server accepts in a question sent back (well above anything generated)

@@ -17,10 +17,10 @@ module TimesTables
     { number: 4, name: "Decimals", example: "0.7 × 3" },
     { number: 5, name: "Zeroes and decimals", example: "0.7 × 3000" }
   ]
-  # A level's practice earns a medal for its score; bronze unlocks the next level
-  MEDALS = { gold: 20, silver: 10, bronze: 5 }
-  # A right answer under 1 second earns the lightning stars, under 2 the quick ones
-  STAR_TIMES = { lightning: 1_000, quick: 2_000 }
+  # A level's practice earns 1, 2 or 3 stars for its score; the first star unlocks the next level
+  STARS = { 3 => 20, 2 => 10, 1 => 5 }
+  # A right answer under 1 second earns the lightning gems, under 2 the quick ones
+  GEM_TIMES = { lightning: 1_000, quick: 2_000 }
   # Scores in one game that earn a badge
   BADGE_SCORES = [ 5, 10, 25, 50, 75, 100 ]
 

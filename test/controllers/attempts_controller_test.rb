@@ -79,9 +79,10 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     attempt = Attempt.record!(user: @user, results: answers(*right_answers(5), ms: 500))
 
     get attempt_path(attempt)
-    assert_select ".stars-earned__total", text: "+300 ⭐"
-    assert_select ".stars-earned__bonuses li", text: "New high score +50"
-    assert_select ".stars-earned__bonuses li", text: "Level up +100"
+    assert_select ".gems-earned__total", text: "+300"
+    assert_select ".gems-earned__total .icon--gem[aria-label=gems]"
+    assert_select ".gems-earned__bonuses li", text: "New high score +50"
+    assert_select ".gems-earned__bonuses li", text: "Level up +100"
   end
 
   test "results page says when the game earned a free streak freeze" do
@@ -89,7 +90,7 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     attempt.update_columns(earned_streak_freeze: true, streak: 7)
 
     get attempt_path(attempt)
-    assert_select ".freeze-earned", text: "🧊 7 day streak! You earned a free streak freeze."
+    assert_select ".freeze-earned", text: "7 day streak! You earned a free streak freeze."
   end
 
   test "results page shows the score, feedback and missed facts" do

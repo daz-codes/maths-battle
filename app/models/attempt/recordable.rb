@@ -20,8 +20,8 @@ module Attempt::Recordable
 
   included do
     before_create :score_results, :set_played_on, :record_high_score
-    # Stars and badges come last, as they look at the streak and any level up
-    after_create :update_streak, :record_fact_stats, :check_level_up, :forget_unlocked_levels, :award_stars, :award_badges
+    # Gems and badges come last, as they look at the streak and any level up
+    after_create :update_streak, :record_fact_stats, :check_level_up, :forget_unlocked_levels, :award_gems, :award_badges
   end
 
   class_methods do
@@ -152,7 +152,7 @@ module Attempt::Recordable
     def check_level_up
       return unless practice? && topic_module.level(level + 1)
 
-      update_column(:levelled_up, true) if first_bronze? && user.attempts.at_level(topic_module, level + 1).none?
+      update_column(:levelled_up, true) if first_star? && user.attempts.at_level(topic_module, level + 1).none?
     end
 
     # This game may have unlocked a level, or been the first played at one

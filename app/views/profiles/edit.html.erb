@@ -48,7 +48,7 @@
 
     <% if @user.persisted? %>
       <div class="collection">
-        <p class="stars-total"><strong><%= number_with_delimiter @user.stars %></strong> ⭐ stars</p>
+        <p class="gems-total"><strong><%= number_with_delimiter @user.gems %></strong> <%= icon(:gem) %> gems</p>
         <%= render "streak_freezes/status", user: @user %>
       </div>
     <% end %>

@@ -70,6 +70,6 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
 
     get stats_path
     assert_select "a.badge-summary[href=?]", awards_path, text: /3 of #{Badge.catalogue.size} unlocked/
-    assert_equal %w[ ⭐ 🎉 🎯 ], css_select(".badge-summary__emojis").first.text.chars.sort, "first game, 5 right and level 2"
+    assert_equal %w[ icon--party icon--star icon--target ], css_select(".badge-summary__icons .icon").map { _1["class"][/icon--\w+/] }.sort, "first game, 5 right and level 2"
   end
 end

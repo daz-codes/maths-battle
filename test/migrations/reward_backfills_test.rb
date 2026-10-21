@@ -9,7 +9,7 @@ class RewardBackfillsTest < ActiveSupport::TestCase
         File.join(directory, "upgrade.sqlite3"))
       assert status.success?, "#{output}\n#{errors}"
       result = JSON.parse(output.lines.last)
-      assert_equal [ 800, 850, 400 ], result["stars"]
+      assert_equal [ 800, 850, 400 ], result["gems"], "the stars games earned, as gems"
       assert_equal [ "practice" ] * 3, result["modes"]
       badges = result["badges"]
       assert badges.any? { |badge| badge["kind"] == "first_game" && badge["attempt_id"] == result["games"][0] }
