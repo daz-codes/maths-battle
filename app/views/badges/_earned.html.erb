@@ -1,10 +1,12 @@
-<%# The badges one game earned, on its results page and its share page. Badges never name the player %>
+<%# The badges one game earned, on its results page and its share page. Badges never name the player. On the
+    results page (reveal) each spins to the front of the screen, then back to its place %>
 <% if badges.any? %>
-  <section class="badges badges--new" <%= tag.attributes(data: { controller: ("confetti" if local_assigns[:celebrate]) }) %>>
+  <% controllers = [ ("confetti" if local_assigns[:celebrate]), ("award-reveal" if local_assigns[:reveal]) ].compact %>
+  <section class="badges badges--new" <%= tag.attributes(data: { controller: controllers.join(" ").presence }) %>>
     <h2 class="label"><%= badges.one? ? "New award!" : "New awards!" %></h2>
     <ul class="badges__list">
       <% badges.each do |badge| %>
-        <li class="badge">
+        <li class="badge" data-award-reveal-target="award">
           <span class="badge__emoji" aria-hidden="true"><%= badge.emoji %></span>
           <span class="badge__name"><%= badge.name %></span>
         </li>

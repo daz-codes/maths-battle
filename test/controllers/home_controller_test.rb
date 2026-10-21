@@ -107,7 +107,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".streak__number", text: /12/
     assert_select ".stats", text: /41/
     assert_select "a[href=?]", stats_path("times-tables"), text: "See all stats"
-    assert_select "a.button--play[href=?]", play_path("times-tables", level: 1), text: "Play level 1", message: "nothing more to say: the streak is safe today"
+    assert_select "a.button--play[href=?]", play_path("times-tables", level: 1), text: /Play level 1\s+Beat your best: 41/, message: "the streak is safe today, so it's the best to beat"
+    assert_select ".levels__level[aria-current=true] .levels__best", text: "41"
     assert_select ".nudge", count: 0
   end
 

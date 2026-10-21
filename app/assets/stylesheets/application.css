@@ -632,6 +632,9 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .levels__name { margin: -0.25rem 0 0; color: var(--ink); font-size: clamp(1.5rem, 7vw, 1.8rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
 /* A medal level's best medal, on its circle and under its name */
 .levels__level { position: relative; }
+/* A level's best score, small under its circle */
+.levels__best { position: absolute; top: calc(100% + 0.2rem); left: 50%; transform: translateX(-50%); color: var(--muted); font-size: 0.75rem; font-weight: 700; line-height: 1; }
+.levels:has(.levels__best) { margin-bottom: 0.9rem; }
 .levels__medal { position: absolute; right: -0.4rem; bottom: -0.4rem; font-size: 1.3rem; line-height: 1; }
 .levels__medal-line { margin: -1rem 0 0; color: var(--ink); font-size: 1.1rem; font-weight: 700; }
 
@@ -739,6 +742,10 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .results__actions--one { grid-template-columns: 1fr; }
 
 /* A freeze earned in a game, on its results page */
+/* On the results page: how the game compares with the level's best */
+.best-line { margin: 0; color: var(--muted); font-size: 1.05rem; font-weight: 700; }
+.best-line--new { color: var(--pink-text); font-size: 1.2rem; }
+
 .freeze-earned { margin: 0; padding: 0.45rem 1rem; border-radius: 999px; background: var(--blue); color: var(--on-neon); font-weight: 700; }
 
 /* ── Lessons ────────────────────────────────────── */
@@ -817,6 +824,10 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .badge--locked .badge__name { color: var(--muted); }
 
 /* A new badge, on its results page: all yellow, glowing in the dark */
+/* A new award spins in over everything else, as a copy fixed to the middle of the screen (award-reveal
+   controller), before flying back to its place */
+.badge--flying { position: fixed; top: 50%; left: 50%; z-index: 100; margin: 0; list-style: none; pointer-events: none;
+  padding-top: 0.75rem; background: var(--yellow); box-shadow: 0 0 30px color-mix(in srgb, var(--yellow) 80%, transparent); color: var(--on-neon); }
 .badges--new .badge { padding-top: 0.75rem; background: var(--yellow); box-shadow: 0 0 20px color-mix(in srgb, var(--yellow) var(--glow-strength), transparent); color: var(--on-neon); }
 
 /* On the stats page: a tile like the stats above it, with a pink stripe */
@@ -938,6 +949,13 @@ body.testing {
 .test[data-quarter="3"] { --quarter: var(--pink); }
 
 .test__seconds { justify-self: start; font-size: 1.75rem; }
+
+/* The score, with the best to beat under it, which turns the logo's pink once it's passed */
+.test__tally { display: flex; flex-direction: column; align-items: flex-end; justify-self: end; gap: 0.15rem; }
+.test__best { color: var(--muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+.test--beating .test__score { color: var(--pink-text); text-shadow: 0 0 14px color-mix(in srgb, var(--pink) var(--glow-strength), transparent); }
+.test--beating .test__best { color: var(--pink-text); }
+.star-pop--best { color: var(--pink-text); font-size: 1.9rem; font-weight: 900; }
 
 .test__score {
   justify-self: end;

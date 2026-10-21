@@ -62,6 +62,23 @@ class TimesTablesTest < ApplicationSystemTestCase
     assert_selector ".card__number", text: "1", wait: 8
     visit root_path
     assert_selector ".streak__number", text: "1"
-    assert_no_selector ".button--play .button__note"
+    assert_no_selector ".button--play .button__note", text: /streak/i
+  end
+
+  test "passing your best mid-game: the score turns pink and says so" do
+    Attempt.record!(user: users(:ada), results: answers([ 2, 3, 6 ]))
+    sign_in users(:ada)
+    click_on "Play level 1"
+    assert_selector ".test__best", text: "Best 1"
+    assert_selector ".question", text: "×", wait: 5
+
+    a, b = find(".question").text.split(" × ").map(&:to_i)
+    find("body").send_keys((a * b).to_s)
+    assert_no_selector ".test--beating"
+    a, b = find(".question").text.split(" × ").map(&:to_i)
+    find("body").send_keys((a * b).to_s)
+
+    assert_selector ".test--beating .test__best", text: "New best!"
+    assert_selector ".star-pop--best", text: "🏆 New best!"
   end
 end

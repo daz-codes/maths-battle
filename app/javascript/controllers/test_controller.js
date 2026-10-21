@@ -3,6 +3,7 @@ import { Turbo } from "@hotwired/turbo-rails"
 import { chooseQuestionSet, playerKey, preparePlayer, postGame, saveForLater, watchPlayer } from "lib/offline_games"
 import { finished, shown, typedWith } from "lib/answer_input"
 import * as feedback from "lib/feedback"
+import confetti from "canvas-confetti"
 
 const DURATION = 60_000
 const STARS = { right: 10, quick: 20, lightning: 30 }
@@ -21,8 +22,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // after a warning, and then nothing is saved. A review has no clock or stars: it asks each of its
 // questions once and ends after the last
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress" ]
-  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, submitUrl: String, keys: Array, starTimes: Object }
+  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best" ]
+  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, submitUrl: String, keys: Array, starTimes: Object }
 
   connect() {
     preparePlayer()
@@ -233,6 +234,7 @@ export default class extends Controller {
       this.flash(this.scoreTarget, "--right")
       feedback.right()
       if (!this.review) this.popStars(ms)
+      if (this.bestValue && this.score === this.bestValue + 1) this.passBest()
       this.next()
     } else {
       this.showCorrection()
@@ -251,6 +253,23 @@ export default class extends Controller {
     pop.addEventListener("animationend", () => pop.remove())
     setTimeout(() => pop.remove(), 2_600)
     this.stageTarget.append(pop)
+  }
+
+  // The moment the score passes the level's best: it turns pink, says so, bursts with confetti from the score
+  // and plays the fanfare
+  passBest() {
+    const score = this.scoreTarget.getBoundingClientRect()
+    const origin = { x: (score.left + score.width / 2) / window.innerWidth, y: (score.top + score.height / 2) / window.innerHeight }
+    confetti({ particleCount: 140, spread: 100, startVelocity: 40, origin, colors: [ "#efff2e", "#ff5cc6", "#2be4ff", "#5dff7a" ], disableForReducedMotion: true })
+    this.element.classList.add("test--beating")
+    if (this.hasBestTarget) this.bestTarget.textContent = "New best!"
+    const pop = Object.assign(document.createElement("span"), { className: "star-pop star-pop--best", textContent: "🏆 New best!" })
+    pop.setAttribute("aria-hidden", "true")
+    pop.style.setProperty("--drift", "0px")
+    pop.addEventListener("animationend", () => pop.remove())
+    setTimeout(() => pop.remove(), 2_600)
+    this.stageTarget.append(pop)
+    feedback.fanfare()
   }
 
   // Show the right answer briefly so it sticks, then carry on

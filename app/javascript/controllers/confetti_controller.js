@@ -1,19 +1,33 @@
 import { Controller } from "@hotwired/stimulus"
 import confetti from "canvas-confetti"
 
-// Celebrates a new high score with bursts from both sides
-export default class extends Controller {
-  connect() {
-    const colors = [ "#efff2e", "#ff5cc6", "#2be4ff", "#5dff7a" ]
-    const burst = (x, angle) => confetti({ particleCount: 80, spread: 70, angle, origin: { x, y: 0.7 }, colors, disableForReducedMotion: true })
+const COLOURS = [ "#efff2e", "#ff5cc6", "#2be4ff", "#5dff7a" ]
 
-    burst(0, 60)
-    burst(1, 120)
-    this.timer = setTimeout(() => confetti({ particleCount: 120, spread: 100, origin: { y: 0.4 }, colors, disableForReducedMotion: true }), 350)
+// Celebrates a new high score with bursts from both sides. A big one (beating a best) keeps going: wave after
+// wave from the sides, then a shower from the top
+export default class extends Controller {
+  static values = { big: Boolean }
+
+  connect() {
+    const burst = (options) => confetti({ colors: COLOURS, disableForReducedMotion: true, ...options })
+    const sides = (count) => {
+      burst({ particleCount: count, spread: 70, angle: 60, origin: { x: 0, y: 0.7 } })
+      burst({ particleCount: count, spread: 70, angle: 120, origin: { x: 1, y: 0.7 } })
+    }
+
+    sides(80)
+    this.timers = [ setTimeout(() => burst({ particleCount: 120, spread: 100, origin: { y: 0.4 } }), 350) ]
+    if (!this.bigValue) return
+
+    this.timers.push(
+      setTimeout(() => sides(100), 800),
+      setTimeout(() => burst({ particleCount: 200, spread: 160, startVelocity: 35, origin: { y: 0 } }), 1300),
+      setTimeout(() => sides(80), 1900)
+    )
   }
 
   disconnect() {
-    clearTimeout(this.timer)
+    this.timers.forEach(clearTimeout)
     confetti.reset()
   }
 }

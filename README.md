@@ -58,6 +58,13 @@ first bronze unlocks the next level. A new topic needs `MEDALS` and gets all thi
 its own skill: times tables, division and adding and subtracting build up (level 2 includes level 1's tables),
 but the other topics' levels are each their own (functions level 5 is just inverses).
 
+Beating your best is the point. Each level's best shows under its circle and on Play ("Beat your best: 23"). A
+level's practice game shows the best under the score, and the moment it's passed the score turns pink with
+"New best!", confetti from the score and the fanfare. The results page says by how much ("26, up from 23") or how
+close it was ("So close: 2 more to beat your best of 23"), and beating a best gets a big celebration: wave after
+wave of confetti and the fanfare. A new award spins in big in the middle of the screen, then flies back to its
+place (`award-reveal` controller). Anyone whose device asks for less motion gets none of the animation.
+
 Mixed practice, once a second level is unlocked, mixes every level up to the player's, as often as they like,
 earning stars but no medals, bests or level ups. It took the place of the daily challenge (once a day, mixed),
 which was played until 21 October 2026: its games are kept, and a link to it goes to mixed practice. A game's

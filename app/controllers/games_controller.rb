@@ -13,6 +13,7 @@ class GamesController < ApplicationController
     return redirect_to(groups_path, notice: "That group challenge has finished.") if @mode == "group" && !group_round
 
     @level = game_level
+    @best = @mode == "practice" ? current_player.best_score(@topic, @level) : 0
     remember_topic @topic unless @mode == "group"
     @question_sets = question_sets
     @question_sets.each do |set|

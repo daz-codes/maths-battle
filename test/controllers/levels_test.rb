@@ -156,4 +156,50 @@ class LevelsTest < ActionDispatch::IntegrationTest
     post attempts_path, params: game_upload(level: 5, results: [ { a: "-7", b: "8", given: "-56", ms: 1000 } ]), as: :json
     assert_response :unprocessable_entity, "no negatives in times tables"
   end
+
+  test "beating your best: by how much, or how close it was, on the results page" do
+    practise(level: 1, score: 12)
+    get attempt_path(practise(level: 1, score: 15))
+    assert_select ".best-line--new", text: "🏆 15, up from 12"
+
+    get attempt_path(practise(level: 1, score: 13))
+    assert_select ".best-line", text: "So close: 3 more to beat your best of 15"
+    get attempt_path(practise(level: 1, score: 15))
+    assert_select ".best-line", text: "Level with your best of 15. One more next time!"
+    get attempt_path(practise(level: 1, score: 6))
+    assert_select ".best-line", text: "10 more to beat your best of 15"
+  end
+
+  test "a first game has no best to compare with, and only practice has a best" do
+    get attempt_path(practise(level: 1, score: 7))
+    assert_select ".best-line", count: 0
+  end
+
+  test "a level's practice game knows the best to beat; mixed practice and reviews don't" do
+    practise(level: 1, score: 12)
+    get play_path("times-tables", level: 1)
+    assert_select "[data-test-best-value=12]"
+    assert_select ".test__best", text: "Best 12"
+
+    get play_path("times-tables", level: 2)
+    assert_select "[data-test-best-value=0]"
+    assert_select ".test__best", count: 0
+    get play_path("times-tables", mixed: 1)
+    assert_select "[data-test-best-value=0]"
+  end
+
+  test "beating a best is a big celebration, and new awards spin in" do
+    practise(level: 1, score: 8)
+    get attempt_path(practise(level: 1, score: 12))
+    assert_select ".banner[data-controller~=confetti][data-controller~=fanfare][data-confetti-big-value=true]"
+    assert_select ".badges--new[data-controller~=award-reveal] .badge[data-award-reveal-target=award]"
+
+    get attempt_path(practise(level: 1, score: 13))
+    assert_select "[data-confetti-big-value=true]", text: /New high score/
+  end
+
+  test "a first game's high score is a normal celebration" do
+    get attempt_path(practise(level: 1, score: 3))
+    assert_select ".banner[data-confetti-big-value=false]", text: /New high score/
+  end
 end

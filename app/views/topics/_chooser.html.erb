@@ -14,6 +14,9 @@
           <% if (medal = user.medal(topic, details[:number])) %>
             <span class="levels__medal" aria-label="<%= Attempt::MEDAL_NAMES[medal] %>"><%= Attempt::MEDAL_EMOJI[medal] %></span>
           <% end %>
+          <% if (best = user.best_score(topic, details[:number])).positive? %>
+            <span class="levels__best" aria-label="Best <%= best %>"><%= best %></span>
+          <% end %>
         <% end %>
       <% else %>
         <span class="levels__level levels__level--locked" title="Level <%= details[:number] %>: <%= details[:name] %> (locked)">

@@ -24,17 +24,17 @@ module Attempt::Medallable
 
   # This game's medal, if it's better than any the level had before
   def new_medal
-    medal if self.class.medal_rank(medal) > self.class.medal_rank(self.class.medal_for(best_before_this, topic_module))
+    medal if self.class.medal_rank(medal) > self.class.medal_rank(self.class.medal_for(previous_best, topic_module))
+  end
+
+  # The level's best practice score before this game, 0 if it's the first
+  def previous_best
+    user.attempts.at_level(topic_module, level).where(id: ...id).maximum(:score).to_i
   end
 
   private
     # The first bronze at a level unlocks the next one
     def first_bronze?
-      practice? && score >= topic_module.medals[:bronze] && best_before_this < topic_module.medals[:bronze]
-    end
-
-    # The level's best from the games recorded before this one
-    def best_before_this
-      user.attempts.at_level(topic_module, level).where(id: ...id).maximum(:score).to_i
+      practice? && score >= topic_module.medals[:bronze] && previous_best < topic_module.medals[:bronze]
     end
 end

@@ -38,7 +38,7 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
     @user.badges.where.not(kind: "first_game").update_all(attempt_id: attempt.id)
 
     get attempt_path(attempt)
-    assert_select ".badges--new[data-controller=confetti] .badge__name", text: "5 times tables in a minute"
+    assert_select ".badges--new[data-controller~=confetti][data-controller~=award-reveal] .badge__name", text: "5 times tables in a minute"
     assert_select ".badges--new .label", text: "New awards!", message: "5 times tables, and level 2"
     assert_select "a[href=?]", awards_path, text: "See your awards"
   end
@@ -50,7 +50,8 @@ class BadgesControllerTest < ActionDispatch::IntegrationTest
     get attempt_path(attempt)
     assert_select ".banner[data-controller~=confetti]", text: /Level up/
     assert_select ".badges--new .badge__name", text: "First minute"
-    assert_select ".badges--new[data-controller]", count: 0
+    assert_select ".badges--new[data-controller~=confetti]", count: 0
+    assert_select ".badges--new[data-controller=award-reveal]", message: "it still spins in"
   end
 
   test "a shared result shows its badges, still without the player's name" do

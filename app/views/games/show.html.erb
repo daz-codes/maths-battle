@@ -10,6 +10,7 @@
       data-test-level-value="<%= @level %>"
       data-test-mode-value="<%= @mode %>"
       data-test-round-value="<%= @round&.id %>"
+      data-test-best-value="<%= @best %>"
       data-test-keys-value="<%= @topic.keys(@level).to_json %>"
       data-test-star-times-value="<%= @topic.star_times.to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">
@@ -17,7 +18,11 @@
 
   <%# A review has no clock: the logo's ring just shows, with how far through the questions it is %>
   <header class="test__bar">
-    <span class="test__score" data-test-target="score" aria-label="Score">0</span>
+    <%# A level's practice shows the best to beat, and celebrates passing it %>
+    <span class="test__tally">
+      <span class="test__score" data-test-target="score" aria-label="Score">0</span>
+      <% if @best.positive? %><span class="test__best" data-test-target="best">Best <%= @best %></span><% end %>
+    </span>
     <% if @mode == "review" %>
       <%= render "clock", hands: false, class: "timer__clock" %>
       <span class="test__seconds" data-test-target="progress" aria-label="Question">1/<%= @question_sets.first[:questions].size %></span>
