@@ -1,0 +1,7 @@
+<%# Head to heads sent to the player, under the Play button, each straight to its page %>
+<% user.head_to_heads_to_play.each do |head_to_head| %>
+  <%= link_to head_to_head, class: "group-waiting head-to-head-waiting" do %>
+    <span class="group-waiting__title"><%= icon(:versus) %> <%= head_to_head.challenger.display_name %> challenged you!</span>
+    <span class="group-waiting__about"><%= head_to_head.title %> · <%= head_to_head_status(head_to_head, user) %></span>
+  <% end %>
+<% end %>

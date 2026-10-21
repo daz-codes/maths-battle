@@ -29,19 +29,24 @@ module Attempt::Recordable
     # A game sent again with the same client id (a retried upload) is only recorded once
     # Mixed games are issued at the highest level. That signed level stays valid if an offline upload
     # arrives after another game has unlocked a new one. A group game is at whatever level its challenge set,
-    # unlocked or not, for one of the challenge's players
-    def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil, mode: "practice", round: nil)
+    # unlocked or not, for one of the challenge's players, and a head to head game at its level, for one of its two
+    def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil, mode: "practice", round: nil, head_to_head: nil)
       if existing = already_recorded(user, client_id)
         return existing
       end
 
       topic_module, level = topic_named(topic), Integer(level, exception: false)
-      mode == "group" ? check_round(user, round, topic_module, level) : check_unlocked(user, topic_module, level)
+      case mode
+      when "group" then check_round(user, round, topic_module, level)
+      when "head_to_head" then check_head_to_head(user, head_to_head, topic_module, level)
+      else check_unlocked(user, topic_module, level)
+      end
       raise Invalid, "Only a group game has a round" if round && mode != "group"
+      raise Invalid, "Only a head to head game has a head to head" if head_to_head && mode != "head_to_head"
       cleaned = clean_results(topic_module, level, results, mode)
       raise Invalid, "Answer at least one question to finish the daily challenge" if mode == "challenge" && cleaned.empty?
 
-      create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, results: cleaned)
+      create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, results: cleaned)
     rescue ActiveRecord::RecordNotUnique
       already_recorded(user, client_id) || raise
     end
@@ -51,13 +56,14 @@ module Attempt::Recordable
         user.attempts.find_by(client_id: client_id) if client_id.present?
       end
 
-      def create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, results:)
+      def create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, results:)
         transaction do
           user.lock!
           played_at = play_time(played_at)
           raise Invalid, "Today's daily challenge is already done" if mode == "challenge" && user.daily_challenge_on(topic_named(topic), played_at.in_time_zone(user.time_zone).to_date)
 
           user.attempts.create!(topic: topic, level: level, results: results, client_id: client_id.presence, played_at: played_at, mode: mode, round: round)
+            .tap { |attempt| head_to_head&.played(attempt) }
         end
       end
 
@@ -66,6 +72,12 @@ module Attempt::Recordable
         raise Invalid, "That group challenge isn't there any more" unless challenge
         raise Invalid, "Only the group's players can play its challenge" unless challenge.player?(user)
         raise Invalid, "Bad question" unless challenge.topic_module == topic && challenge.level == level
+      end
+
+      def check_head_to_head(user, head_to_head, topic, level)
+        raise Invalid, "That head to head isn't there any more" unless head_to_head
+        raise Invalid, "Only its two players can play a head to head" unless head_to_head.player?(user)
+        raise Invalid, "Bad question" unless head_to_head.topic_module == topic && head_to_head.level == level
       end
 
       def check_unlocked(user, topic, level)
@@ -126,11 +138,11 @@ module Attempt::Recordable
     def record_high_score
       best_before =
         if daily_challenge? then user.best_daily_challenge(topic_module)
-        elsif review? || group? || mixed? then Float::INFINITY # mistakes, a leaderboard or a mix: no score to beat
+        elsif review? || group? || head_to_head? || mixed? then Float::INFINITY # mistakes, a rival or a mix: no score to beat
         else user.best_score(topic_module, level)
         end
       self.new_high_score = score.positive? && score > best_before
-      self.best_score = review? || group? || mixed? ? score : [ score, best_before ].max
+      self.best_score = review? || group? || head_to_head? || mixed? ? score : [ score, best_before ].max
     end
 
     # A snapshot of the streak is kept on the attempt for its results and share pages. Reaching 7 or 30 days

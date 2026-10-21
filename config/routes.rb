@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     end
     resources :memberships, only: :destroy, controller: "group_memberships"
   end
+  resources :head_to_heads, only: %i[ new create show ]
   # From a shared link, /join/K7Q2MX, or a code typed on the groups page, /join?code=K7Q2MX
   get "join(/:code)", to: "group_joins#new", as: :join_group
   post "join", to: "group_joins#create", as: :group_joins

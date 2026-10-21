@@ -1,26 +1,59 @@
-<% content_for :title, "Groups · MatheMinute" %>
+<% content_for :title, "Compete · MatheMinute" %>
 
 <main class="page groups">
-  <h1 class="heading">Groups</h1>
+  <h1 class="heading">Compete</h1>
   <%= render "flash" %>
-  <p class="aside">Compete with friends or your class: everyone in a challenge plays the same questions.</p>
+  <p class="aside">Take on a friend head to head, or your whole class in a group. Everyone plays the same questions.</p>
 
-  <% if @groups.any? %>
-    <ul class="group-cards">
-      <% @groups.each do |group| %>
-        <% waiting = @waiting_counts.fetch(group.id, 0) %>
-        <li>
-          <%= link_to group, class: "group-card" do %>
-            <span class="group-card__name"><%= group.name %></span>
-            <span class="group-card__about">
-              <%= pluralize(@member_counts.fetch(group.id, 0), "player") %><%= " · You run it" if group.owned_by?(@user) %>
+  <section class="head-to-heads" aria-labelledby="head-to-heads-heading">
+    <h2 class="settings__heading" id="head-to-heads-heading">Head to head</h2>
+    <% if @head_to_heads.any? %>
+      <ul class="challenge-cards">
+        <%= render partial: "head_to_heads/card", collection: @head_to_heads, as: :head_to_head, locals: { user: @user } %>
+      </ul>
+    <% end %>
+
+    <% if @rivals.any? %>
+      <ul class="rival-rows" aria-label="Friends to challenge">
+        <% @rivals.each do |rival| %>
+          <li class="rival-row">
+            <%= render "avatar", user: rival, size: "small" %>
+            <span class="rival-row__who">
+              <span class="rival-row__name"><%= rival.display_name %></span>
+              <span class="rival-row__record"><%= record_line(@user.head_to_head_record(rival)) %></span>
             </span>
-            <%= tag.span(safe_join([ icon(:trophy), " #{pluralize(waiting, "challenge")} to play" ]), class: "group-card__waiting") if waiting.positive? %>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  <% end %>
+            <%= button_to "Challenge", head_to_heads_path, params: { opponent_id: rival.id }, class: "button button--share rival-row__button",
+                  title: "Play #{current_topic.title} level #{current_level}, then send it to #{rival.display_name}" %>
+          </li>
+        <% end %>
+      </ul>
+      <p class="hint">Challenge plays <%= current_topic.title.downcase %> level <%= current_level %> first, then sends it. Or send any game from its results.</p>
+    <% else %>
+      <p class="aside">Join a group to find friends to challenge.</p>
+    <% end %>
+  </section>
+
+  <section class="group-list" aria-labelledby="groups-heading">
+    <h2 class="settings__heading" id="groups-heading">Groups</h2>
+    <% if @groups.any? %>
+      <ul class="group-cards">
+        <% @groups.each do |group| %>
+          <% waiting = @waiting_counts.fetch(group.id, 0) %>
+          <li>
+            <%= link_to group, class: "group-card" do %>
+              <span class="group-card__name"><%= group.name %></span>
+              <span class="group-card__about">
+                <%= pluralize(@member_counts.fetch(group.id, 0), "player") %><%= " · You run it" if group.owned_by?(@user) %>
+              </span>
+              <%= tag.span(safe_join([ icon(:trophy), " #{pluralize(waiting, "challenge")} to play" ]), class: "group-card__waiting") if waiting.positive? %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="aside">You're not in a group yet. Join one with its code, or start your own.</p>
+    <% end %>
+  </section>
 
   <section class="group-join" aria-labelledby="join-heading">
     <h2 class="settings__heading" id="join-heading">Join a group</h2>

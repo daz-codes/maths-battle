@@ -1,0 +1,38 @@
+<% content_for :title, "You vs #{@rival.display_name} · MatheMinute" %>
+<% mine, theirs = @head_to_head.attempt_of(Current.user), @head_to_head.attempt_of(@rival) %>
+<% result = @head_to_head.result_for(Current.user) %>
+
+<main class="page head-to-head">
+  <%= link_to "← Compete", groups_path, class: "back-link" %>
+  <h1 class="heading"><%= icon(:versus) %> You vs <%= @rival.display_name %></h1>
+  <p class="aside"><%= topic_icon(@head_to_head.topic_module) %> <%= @head_to_head.title %></p>
+  <%= render "flash" %>
+
+  <section class="versus <%= "versus--#{result}" if result %>" aria-label="Scores">
+    <div class="versus__player <%= "versus__player--winner" if result == :won %>">
+      <%= render "avatar", user: Current.user, size: "small" %>
+      <span class="versus__name">You</span>
+      <span class="versus__score"><%= mine&.score || "–" %></span>
+    </div>
+    <span class="versus__vs">vs</span>
+    <div class="versus__player <%= "versus__player--winner" if result == :lost %>">
+      <%= render "avatar", user: @rival, size: "small" %>
+      <span class="versus__name"><%= @rival.display_name %></span>
+      <span class="versus__score"><%= theirs&.score || "–" %></span>
+    </div>
+  </section>
+
+  <p class="banner <%= result == :won ? "banner--level" : "banner--group" %>" <%= "data-controller=confetti" if result == :won %>><%= head_to_head_status(@head_to_head, Current.user) %></p>
+
+  <% if @head_to_head.turn?(Current.user) %>
+    <%= link_to (@head_to_head.sent? ? "Play · beat #{theirs.score}" : "Play"), play_path(@head_to_head.topic_module.slug, head_to_head: @head_to_head.id),
+          class: "button button--start button--wide" %>
+    <p class="hint hint--centre">Same questions, one go each.</p>
+  <% elsif @head_to_head.decided? || @head_to_head.ran_out? %>
+    <%= button_to "Rematch", head_to_heads_path, params: { opponent_id: @rival.id, topic: @head_to_head.topic, level: @head_to_head.level, mixed: (1 if @head_to_head.mixed?) },
+          class: "button button--share button--wide", form_class: "wide-form" %>
+    <p class="hint hint--centre">New questions. You play first, then it's sent to <%= @rival.display_name %>.</p>
+  <% end %>
+
+  <p class="head-to-head__record">Against <%= @rival.display_name %>: <strong><%= record_line(@record) %></strong></p>
+</main>

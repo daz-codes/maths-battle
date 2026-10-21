@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_21_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_21_160000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -151,6 +151,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_21_150000) do
     t.index ["owner_id"], name: "index_groups_on_owner_id"
   end
 
+  create_table "head_to_heads", force: :cascade do |t|
+    t.integer "challenger_id", null: false
+    t.integer "opponent_id", null: false
+    t.string "topic", null: false
+    t.integer "level", null: false
+    t.boolean "mixed", default: false, null: false
+    t.json "questions", null: false
+    t.integer "challenger_attempt_id"
+    t.integer "opponent_attempt_id"
+    t.datetime "expires_at"
+    t.datetime "decided_at"
+    t.integer "winner_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["challenger_attempt_id"], name: "index_head_to_heads_on_challenger_attempt_id"
+    t.index ["challenger_id"], name: "index_head_to_heads_on_challenger_id"
+    t.index ["opponent_attempt_id"], name: "index_head_to_heads_on_opponent_attempt_id"
+    t.index ["opponent_id"], name: "index_head_to_heads_on_opponent_id"
+    t.index ["winner_id"], name: "index_head_to_heads_on_winner_id"
+  end
+
   create_table "lesson_completions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "topic", null: false
@@ -214,6 +235,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_21_150000) do
   add_foreign_key "group_memberships", "users"
   add_foreign_key "group_rounds", "group_challenges", column: "challenge_id"
   add_foreign_key "groups", "users", column: "owner_id"
+  add_foreign_key "head_to_heads", "attempts", column: "challenger_attempt_id", on_delete: :nullify
+  add_foreign_key "head_to_heads", "attempts", column: "opponent_attempt_id", on_delete: :nullify
+  add_foreign_key "head_to_heads", "users", column: "challenger_id"
+  add_foreign_key "head_to_heads", "users", column: "opponent_id"
+  add_foreign_key "head_to_heads", "users", column: "winner_id"
   add_foreign_key "lesson_completions", "users"
   add_foreign_key "push_subscriptions", "users"
   add_foreign_key "sessions", "users"

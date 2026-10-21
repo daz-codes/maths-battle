@@ -2,7 +2,7 @@
 <% owner = @group.owned_by?(Current.user) %>
 
 <main class="page group">
-  <%= link_to "← All groups", groups_path, class: "back-link" %>
+  <%= link_to "← Compete", groups_path, class: "back-link" %>
   <h1 class="heading"><%= @group.name %></h1>
   <%= render "flash" %>
   <p class="aside"><%= icon(:people) %> <%= pluralize(@memberships.size, "player") %><%= " · run by #{@group.owner.display_name}" unless owner %></p>

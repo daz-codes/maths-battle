@@ -8,7 +8,9 @@ class AttemptsController < ApplicationController
       topic: topic_param, level: level_param, client_id: params.dig(:attempt, :client_id), results: results)
     player.update_time_zone(params.dig(:attempt, :time_zone))
     round = Group::Round.find_by(id: game.round_id) if game.round_id
-    attempt = Attempt.record!(user: player, topic: topic_param, level: level_param, results: results, mode: game.mode, round: round, **upload_params)
+    head_to_head = HeadToHead.find_by(id: game.head_to_head_id) if game.head_to_head_id
+    attempt = Attempt.record!(user: player, topic: topic_param, level: level_param, results: results, mode: game.mode, round: round,
+      head_to_head: head_to_head, **upload_params)
     forget_level(attempt.topic_module) if attempt.levelled_up
     render json: { url: attempt_path(attempt) }, status: :created
   rescue Attempt::Invalid => error

@@ -8,9 +8,9 @@ class Attempt < ApplicationRecord
   after_create_commit -> { round.challenge.played(self) }, if: -> { group? && round }
 
   # A level's practice; mixed practice, mixing every level up to the player's; a review of their recent mistakes;
-  # or a group challenge's round (Group::Challenge). There was a daily challenge (once a day, mixed) until 21 October
+  # a group challenge's round (Group::Challenge); or a head to head's game against one other player (HeadToHead). There was a daily challenge (once a day, mixed) until 21 October
   # 2026, and its games are kept. Only practice belongs to a level: earning stars and unlocking the next one
-  MODES = %w[ practice challenge mixed review group ]
+  MODES = %w[ practice challenge mixed review group head_to_head ]
 
   validates :topic, inclusion: { in: Topic.keys }
   validates :mode, inclusion: { in: MODES }
@@ -24,6 +24,18 @@ class Attempt < ApplicationRecord
   def mixed? = mode == "mixed"
   def review? = mode == "review"
   def group? = mode == "group"
+  def head_to_head? = mode == "head_to_head"
+
+  # The head to heads it's the go that counts in: just the one for a head to head game. A practice game can be sent
+  # to several friends
+  def head_to_heads
+    HeadToHead.where(challenger_attempt_id: id).or(HeadToHead.where(opponent_attempt_id: id))
+  end
+
+  # A practice or mixed game can be sent to a friend to beat
+  def sendable?
+    (practice? || mixed?) && finished?
+  end
 
   def topic_module
     Topic.find(topic)

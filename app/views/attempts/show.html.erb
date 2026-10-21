@@ -49,6 +49,13 @@
     <div class="results__actions results__actions--one">
       <%= link_to "See the leaderboard", group_challenge_path(challenge.group, challenge), class: "button button--blue" %>
     </div>
+  <% elsif @attempt.head_to_head? %>
+    <%# Who won, or that it's been sent %>
+    <% head_to_head = @attempt.head_to_heads.first %>
+    <p class="banner banner--group" <%= "data-controller=confetti" if head_to_head&.result_for(@attempt.user) == :won %>><%= icon(:versus) %> <%= head_to_head_result_message(@attempt, head_to_head) %></p>
+    <div class="results__actions results__actions--one">
+      <%= link_to "See the head to head", head_to_head || groups_path, class: "button button--blue" %>
+    </div>
   <% elsif @attempt.review? %>
     <%# Nothing to share without a clock: on to the mistakes still left, or back to practice %>
     <% topic = @attempt.topic_module %>
@@ -71,6 +78,8 @@
       <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
     <% end %>
   </div>
+  <%# The same game, sent for a friend to beat %>
+  <%= link_to safe_join([ icon(:versus), " Challenge a friend to beat #{@attempt.score}" ]), new_head_to_head_path(attempt: @attempt), class: "button button--wide button--challenge" if @attempt.sendable? && @attempt.user.rivals.exists? %>
   <% end %>
 
   <p class="feedback"><%= @attempt.feedback_message %></p>

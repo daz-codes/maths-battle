@@ -1,4 +1,5 @@
-# A player's groups, making one, and a group's page: its challenges, and for the owner, how others join
+# The Compete page (a player's head to heads and groups), making a group, and a group's page: its challenges, and
+# for the owner, how others join
 class GroupsController < ApplicationController
   allow_unauthenticated_access only: :index
   rate_limit to: 10, within: 10.minutes, only: :create
@@ -8,6 +9,8 @@ class GroupsController < ApplicationController
     @groups = @user.persisted? ? @user.groups.includes(:owner).order(:name) : []
     @waiting_counts = @user.group_challenges_to_play.group_by(&:group_id).transform_values(&:size)
     @member_counts = Group::Membership.where(group: @groups).group(:group_id).count
+    @head_to_heads = recent_head_to_heads
+    @rivals = @user.rivals.order(:name, :username)
   end
 
   def new
@@ -38,4 +41,13 @@ class GroupsController < ApplicationController
     Current.user.owned_groups.find(params[:id]).destroy
     redirect_to groups_path, notice: "Group deleted."
   end
+
+  private
+    # Sent, or still for the player to play first, latest first
+    def recent_head_to_heads
+      return [] unless @user.persisted?
+
+      @user.head_to_heads.merge(HeadToHead.sent.or(HeadToHead.where(challenger: @user)))
+        .includes(:challenger, :opponent, :challenger_attempt, :opponent_attempt).order(updated_at: :desc).limit(10)
+    end
 end

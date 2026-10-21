@@ -1,4 +1,4 @@
-<% content_for :title, "#{@topic.title}#{{ "review" => " review", "group" => " group challenge", "mixed" => " mixed practice" }[@mode]} · MatheMinute" %>
+<% content_for :title, "#{@topic.title}#{{ "review" => " review", "group" => " group challenge", "mixed" => " mixed practice", "head_to_head" => " head to head" }[@mode]} · MatheMinute" %>
 <% content_for :viewport, "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" %>
 <% content_for :body_class, "testing" %>
 <% content_for :focus_mode, true %>
@@ -9,8 +9,9 @@
       data-test-topic-value="<%= @topic.key %>"
       data-test-level-value="<%= @level %>"
       data-test-mode-value="<%= @mode %>"
-      data-test-round-value="<%= @round&.id %>"
+      data-test-round-value="<%= @round&.id || @head_to_head&.id %>"
       data-test-best-value="<%= @best %>"
+      data-test-passed-value="<%= @mode == "head_to_head" ? "Winning!" : "New best!" %>"
       data-test-keys-value="<%= @topic.keys(@level).to_json %>"
       data-test-gem-times-value="<%= @topic.gem_times.to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">
@@ -18,10 +19,10 @@
 
   <%# A review has no clock: the logo's ring just shows, with how far through the questions it is %>
   <header class="test__bar">
-    <%# A level's practice shows the best to beat, and celebrates passing it %>
+    <%# A level's practice shows the best to beat, and a head to head the challenger's score, celebrating passing it %>
     <span class="test__tally">
       <span class="test__score" data-test-target="score" aria-label="Score">0</span>
-      <% if @best.positive? %><span class="test__best" data-test-target="best">Best <%= @best %></span><% end %>
+      <% if @best.positive? %><span class="test__best" data-test-target="best"><%= @mode == "head_to_head" ? "Beat" : "Best" %> <%= @best %></span><% end %>
     </span>
     <% if @mode == "review" %>
       <%= render "clock", hands: false, class: "timer__clock" %>

@@ -20,6 +20,7 @@
   </section>
 
   <%= render "topics/play", user: @user, topic: current_topic, level: current_level %>
+  <%= render "head_to_heads/to_play", user: @user %>
   <%= render "groups/to_play", user: @user %>
 
   <%= render "topics/chooser", choosing: :play, user: current_player, topic: current_topic, level: current_level %>

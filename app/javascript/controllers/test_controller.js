@@ -23,7 +23,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // questions once and ends after the last
 export default class extends Controller {
   static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "gemIcon", "trophyIcon" ]
-  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, submitUrl: String, keys: Array, gemTimes: Object }
+  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, submitUrl: String, keys: Array, gemTimes: Object }
 
   connect() {
     preparePlayer()
@@ -57,9 +57,9 @@ export default class extends Controller {
   }
 
   // Mixed practice's or a review's spares are its own, as its questions are mixed from every level, and a group
-  // challenge's are its round's
+  // challenge's are its round's, and a head to head's its own (its id is in the round value too)
   get sparesKey() {
-    const kind = { practice: this.levelValue, group: `group-${this.roundValue}` }[this.modeValue] ?? this.modeValue
+    const kind = { practice: this.levelValue, group: `group-${this.roundValue}`, head_to_head: `h2h-${this.roundValue}` }[this.modeValue] ?? this.modeValue
     return `${this.topicValue}:${kind}`
   }
 
@@ -256,16 +256,16 @@ export default class extends Controller {
     this.stageTarget.append(pop)
   }
 
-  // The moment the score passes the level's best: it turns pink, says so, bursts with confetti from the score
+  // The moment the score passes the level's best, or a rival's: it turns pink, says so, bursts with confetti from the score
   // and plays the fanfare
   passBest() {
     const score = this.scoreTarget.getBoundingClientRect()
     const origin = { x: (score.left + score.width / 2) / window.innerWidth, y: (score.top + score.height / 2) / window.innerHeight }
     confetti({ particleCount: 140, spread: 100, startVelocity: 40, origin, colors: [ "#efff2e", "#ff5cc6", "#2be4ff", "#5dff7a" ], disableForReducedMotion: true })
     this.element.classList.add("test--beating")
-    if (this.hasBestTarget) this.bestTarget.textContent = "New best!"
+    if (this.hasBestTarget) this.bestTarget.textContent = this.passedValue
     const pop = Object.assign(document.createElement("span"), { className: "gem-pop gem-pop--best" })
-    pop.append(this.trophyIconTarget.content.cloneNode(true), " New best!")
+    pop.append(this.trophyIconTarget.content.cloneNode(true), ` ${this.passedValue}`)
     pop.setAttribute("aria-hidden", "true")
     pop.style.setProperty("--drift", "0px")
     pop.addEventListener("animationend", () => pop.remove())

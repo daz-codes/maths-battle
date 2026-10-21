@@ -22,6 +22,8 @@ module IconsHelper
     bulb: %(<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z" #{LINE}/>),
     slow: %(<path d="M6.5 3h11M6.5 21h11M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9s8 4 8 9" #{LINE}/>),
     bell: %(<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4" #{LINE}/>),
+    # Two swords crossed, in the two players' colours
+    versus: %(<path d="M4 4l11 11M12.5 17.5l5-5M16 16l4 4" fill="none" stroke="var(--blue)" stroke-width="2.4" stroke-linecap="round"/><path d="M20 4 9 15M6.5 12.5l5 5M8 16l-4 4" fill="none" stroke="var(--pink)" stroke-width="2.4" stroke-linecap="round"/>),
     people: %(<circle cx="8" cy="7.5" r="3.5" fill="var(--pink)"/><path d="M1.5 20a6.5 6.5 0 0 1 13 0z" fill="var(--pink)"/><circle cx="16.5" cy="8.5" r="3" fill="var(--green)"/><path d="M12.5 20a5.5 5.5 0 0 1 10-1.5V20z" fill="var(--green)"/>),
     check: %(<circle cx="12" cy="12" r="9.5" fill="var(--green)"/><path d="M7.5 12.3l3 3 6-6.3" fill="none" stroke="var(--on-neon, #1d1e17)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>),
     party: %(<path d="M3 21l4.5-12.5 8 8z" fill="var(--yellow)"/><path d="M13 3.5c.6 1.6 0 3-1.5 3.8M20.5 11c-1.6-.6-3 0-3.8 1.5M16.5 4.5l.5-1.5M19.5 7.5 21 7M18 9l1-1" fill="none" stroke="var(--pink)" stroke-width="2" stroke-linecap="round"/><circle cx="14" cy="9.5" r="1.2" fill="var(--blue)"/><circle cx="20" cy="15.5" r="1.2" fill="var(--green)"/>),

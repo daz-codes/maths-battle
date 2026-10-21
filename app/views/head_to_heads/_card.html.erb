@@ -1,0 +1,8 @@
+<%# A head to head on the Compete page: who against, and where it stands %>
+<li>
+  <%= link_to head_to_head, class: ["challenge-card", ("challenge-card--ended" if head_to_head.ran_out?)] do %>
+    <span class="challenge-card__title"><%= icon(:versus) %> You vs <%= head_to_head.rival_of(user).display_name %></span>
+    <span class="challenge-card__status"><%= head_to_head.title %></span>
+    <span class="challenge-card__you"><%= head_to_head_status(head_to_head, user) %></span>
+  <% end %>
+</li>

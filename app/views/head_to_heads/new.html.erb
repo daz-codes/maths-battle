@@ -1,0 +1,24 @@
+<% content_for :title, "Challenge a friend · MatheMinute" %>
+
+<main class="page head-to-head-new">
+  <%= link_to "← Your results", attempt_path(@attempt), class: "back-link" %>
+  <h1 class="heading"><%= icon(:versus) %> Challenge a friend</h1>
+  <p class="aside">They'll play the same questions and try to beat your <strong><%= @attempt.score %></strong>, with <%= HeadToHead::TIME_TO_PLAY.inspect %> to play.</p>
+
+  <% if @rivals.any? %>
+    <ul class="rival-rows">
+      <% @rivals.each do |rival| %>
+        <li class="rival-row">
+          <%= render "avatar", user: rival, size: "small" %>
+          <span class="rival-row__who">
+            <span class="rival-row__name"><%= rival.display_name %></span>
+            <span class="rival-row__record"><%= record_line(Current.user.head_to_head_record(rival)) %></span>
+          </span>
+          <%= button_to "Send", head_to_heads_path, params: { opponent_id: rival.id, attempt_id: @attempt.id }, class: "button button--share rival-row__button" %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="aside">You can challenge anyone in your groups. <%= link_to "Join or start a group", groups_path %> to find friends to play.</p>
+  <% end %>
+</main>

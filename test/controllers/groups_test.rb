@@ -15,7 +15,7 @@ class GroupsTest < ActionDispatch::IntegrationTest
     sign_in_as @owner
     get groups_path
 
-    assert_select ".site-footer a.site-footer__groups[href=?]", groups_path, text: "Groups"
+    assert_select ".site-footer a.site-footer__groups[href=?]", groups_path, text: "Compete"
     assert_select "a.group-card[href=?]", group_path(@group), text: /Class 4B.*1 player · You run it/m
     assert_select "form[action=?][method=get] input[name=code]", join_group_path
     assert_select "a[href=?]", new_group_path, text: "Start a group"
@@ -353,6 +353,6 @@ class GroupsTest < ActionDispatch::IntegrationTest
     get group_challenge_path(@group, challenge)
     assert_select "a.back-link[href=?]", group_path(@group), text: "← Class 4B"
     get group_path(@group)
-    assert_select "a.back-link[href=?]", groups_path, text: "← All groups"
+    assert_select "a.back-link[href=?]", groups_path, text: "← Compete"
   end
 end
