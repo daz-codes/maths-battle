@@ -68,13 +68,16 @@ class AttemptTest < ActiveSupport::TestCase
     assert_equal 16_000, seven_eight.reload.correct_ms, "a 30 second answer counts as 10"
   end
 
-  test "a daily challenge keeps the streak, a level's practice doesn't, and each game keeps the streak as it stood" do
-    travel_to(User::Streakable::DAILY_CHALLENGE_STREAKS_FROM.in_time_zone.change(hour: 12)) do
-      practice = Attempt.record!(user: @user, results: answers(*right_answers(10)))
-      assert_equal [ 0, 0 ], [ @user.reload.current_streak, practice.streak ]
-
-      challenge = play_daily_challenge(@user)
-      assert_equal [ 1, 1 ], [ @user.reload.current_streak, challenge.streak ]
+  test "any game played to the end keeps the streak, and each game keeps the streak as it stood" do
+    travel_to(Time.zone.local(2026, 11, 2, 12)) do
+      practice = Attempt.record!(user: @user, results: answers(*right_answers(1)))
+      assert_equal [ 1, 1 ], [ @user.reload.current_streak, practice.streak ], "even one answer"
+    end
+    travel_to(Time.zone.local(2026, 11, 3, 12)) do
+      walked_away = Attempt.record!(user: @user, results: [])
+      assert_equal [ 1, 1 ], [ @user.reload.current_streak, walked_away.streak ], "no answers: yesterday's streak, not added to"
+      mixed = Attempt.record!(user: @user, mode: "mixed", results: answers(*right_answers(5)))
+      assert_equal [ 2, 2 ], [ @user.reload.current_streak, mixed.streak ]
     end
   end
 

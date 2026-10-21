@@ -1,5 +1,5 @@
 # The adding and subtracting topic: single digits, then two digits, three digits, round numbers with zeroes,
-# then decimals. Adding and subtracting are the two facts tracked, at every level; a daily challenge mixes the
+# then decimals. Adding and subtracting are the two facts tracked, at every level; mixed practice mixes the
 # levels. A subtraction never goes below zero: that's the negative numbers topic
 require "bigdecimal"
 
@@ -61,7 +61,7 @@ module Addition
   end
 
   # Worked out again from the numbers, so the score never depends on the browser. Numbers this level or an
-  # easier one could have asked (a daily challenge mixes them), and a subtraction that stays above zero
+  # easier one could have asked (mixed practice mixes them), and a subtraction that stays above zero
   def clean_result(result, level: 1)
     type = result["type"]
     a, b = result.values_at("a", "b").map { |number| decimal(number) }

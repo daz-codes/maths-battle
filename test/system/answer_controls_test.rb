@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class AnswerControlsTest < ApplicationSystemTestCase
   test "a shorter wrong answer can be submitted with Enter or the check button" do
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
     # Pick a real issued question with a two-digit answer, rather than changing its maths.
     page.execute_script(<<~JS)
@@ -22,7 +22,7 @@ class AnswerControlsTest < ApplicationSystemTestCase
   end
 
   test "a focused keypad button responds to Enter and Space without duplicate input" do
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
     page.execute_script(<<~JS)
       const game = window.Stimulus.getControllerForElementAndIdentifier(document.querySelector('[data-controller=test]'), 'test')

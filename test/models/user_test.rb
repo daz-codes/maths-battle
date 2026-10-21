@@ -47,27 +47,29 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 5, @user.longest_streak
   end
 
-  test "only the daily challenge keeps the streak, even a short one; practice, reviews and lessons don't" do
+  test "any game played to the end keeps the streak, even a short one, in any mode; a lesson doesn't" do
     travel_to(day(15).in_time_zone.change(hour: 12)) do
-      Attempt.record!(user: @user, results: answers(*right_answers(20)))
       @user.complete_lesson!(TimesTables, 1)
       assert_equal 0, @user.reload.current_streak
       assert_not @user.practised_today?
 
-      play_daily_challenge(@user, answered: 1)
+      Attempt.record!(user: @user, results: answers(*right_answers(1)))
       assert_equal 1, @user.reload.current_streak
       assert @user.practised_today?
+      assert @user.played_today?(TimesTables)
+      assert_not @user.played_today?(Fractions)
     end
+    travel_to(day(16).in_time_zone.change(hour: 12)) { Attempt.record!(user: @user, mode: "mixed", results: answers(*right_answers(5))) }
+    assert_equal 2, @user.reload.current_streak
   end
 
-  test "before the daily challenge did, a game long enough or a lesson kept the streak, and those days still count" do
-    before = User::Streakable::DAILY_CHALLENGE_STREAKS_FROM
-    travel_to((before - 3).in_time_zone.change(hour: 12)) { Attempt.record!(user: @user, results: answers(*right_answers(4))) }
-    travel_to((before - 2).in_time_zone.change(hour: 12)) { Attempt.record!(user: @user, results: answers(*right_answers(5))) }
-    travel_to((before - 1).in_time_zone.change(hour: 12)) { @user.complete_lesson!(TimesTables, 1) }
-    travel_to(before.in_time_zone.change(hour: 12)) { play_daily_challenge(@user) }
+  test "lessons kept the streak until 20 October 2026, and those days still count" do
+    until_then = User::Streakable::LESSONS_COUNTED_UNTIL
+    travel_to((until_then - 2).in_time_zone.change(hour: 12)) { Attempt.record!(user: @user, results: answers(*right_answers(4))) }
+    travel_to((until_then - 1).in_time_zone.change(hour: 12)) { @user.complete_lesson!(TimesTables, 1) }
+    travel_to(until_then.in_time_zone.change(hour: 12)) { Attempt.record!(user: @user, results: answers(*right_answers(3))) }
 
-    assert_equal 3, @user.reload.current_streak, "a short game never counted"
+    assert_equal 3, @user.reload.current_streak
   end
 
   test "a game played offline yesterday still counts when it arrives today" do

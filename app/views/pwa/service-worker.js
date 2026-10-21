@@ -45,7 +45,7 @@ self.addEventListener("fetch", event => {
 
 // A daily reminder from the server (User::Remindable). A push always shows something, as browsers expect
 self.addEventListener("push", event => {
-  const { title = "MatheMinute", body = "Your daily challenge is ready.", url = "/" } = event.data?.json() ?? {}
+  const { title = "MatheMinute", body = "Time for a minute of maths.", url = "/" } = event.data?.json() ?? {}
   event.waitUntil(self.registration.showNotification(title, { body, icon: "/icon-192.png", tag: "daily-reminder", data: { url } }))
 })
 

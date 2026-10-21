@@ -33,7 +33,7 @@ module Functions
   COMPOSITE = %w[ f(g(x)) g(f(x)) ]
   INVERSE = %w[ inv:ax+b inv:x/a+b ]
 
-  # Each level is its own skill: linear, negatives, squares, composites, then inverses (a daily challenge mixes
+  # Each level is its own skill: linear, negatives, squares, composites, then inverses (mixed practice mixes
   # earlier ones in). Level 1 keeps everything positive, so there's no minus key until level 2
   SMALL = { input: 1..10, multiplier: 2..5, addend: 1..10 }
   BIG = { input: -10..10, multiplier: 2..10, addend: 1..20 }

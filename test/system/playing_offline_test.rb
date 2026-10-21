@@ -9,7 +9,7 @@ class PlayingOfflineTest < ApplicationSystemTestCase
   teardown { go_online }
 
   test "a game finished offline is kept on the device, then uploaded once back online" do
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
     end_game_in(3_000)
     5.times { answer_question }
@@ -58,7 +58,7 @@ class PlayingOfflineTest < ApplicationSystemTestCase
   end
 
   test "a failed device write offers retry instead of claiming an offline save" do
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
     5.times { answer_question }
     page.execute_script(<<~JS)

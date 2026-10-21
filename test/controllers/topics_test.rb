@@ -8,12 +8,12 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
 
   test "the switcher changes what Play plays, and is remembered" do
     get root_path
-    assert_select "a.button--practise[href=?]", play_path("times-tables", level: 1)
+    assert_select "a.button--play[href=?]", play_path("times-tables", level: 1)
 
     patch topic_path, params: { topic: "equations" }
     assert_redirected_to root_path
     follow_redirect!
-    assert_select "a.button--practise[href=?]", play_path("equations", level: 1)
+    assert_select "a.button--play[href=?]", play_path("equations", level: 1)
     assert_select ".current-topic__name", text: "⚖️ Equations"
   end
 
@@ -47,7 +47,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
       assert_select ".topic-card__medal", text: "🥈"
       assert_select ".topic-card__medal--locked", 3
     end
-    assert_select "form[action=?]:has(input[name=topic][value=functions]) .topic-card__done", topic_path, text: "✅ Challenge done today"
+    assert_select "form[action=?]:has(input[name=topic][value=functions]) .topic-card__done", topic_path, text: "✅ Played today"
   end
 
   test "picking a topic makes it the current one, back where the player came from" do
@@ -73,7 +73,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
   test "playing a topic makes it the current one" do
     get play_path("equations")
     get root_path
-    assert_select "a.button--practise[href=?]", play_path("equations", level: 1)
+    assert_select "a.button--play[href=?]", play_path("equations", level: 1)
   end
 
   test "the equations fractions level has a fraction key; other levels and times tables don't" do

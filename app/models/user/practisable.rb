@@ -2,7 +2,7 @@
 # and facts answered right but slowly, come up more often and drop back as the player improves.
 # A player who is struggling overall gets more easy questions and fewer hard ones, to build confidence
 # back up; that eases off by itself as their recent accuracy rises.
-# A level's practice asks only that level; the daily challenge mixes in every level up to it, so what was
+# A level's practice asks only that level; mixed practice mixes in every level up to it, so what was
 # learnt at the easier ones isn't forgotten
 module User::Practisable
   extend ActiveSupport::Concern
@@ -26,7 +26,7 @@ module User::Practisable
   # At full strength easy facts come up 3× as often, medium 1.5×, and hard ones 0.4×
   EASING = { 0 => 2.0, 1 => 0.5, 2 => -0.6 }
 
-  # mix: :level_only for a level's practice, or :all_levels for a daily challenge, spread evenly over every
+  # mix: :level_only for a level's practice, or :all_levels for mixed practice, spread evenly over every
   # level up to this one
   def questions(topic: Topic.default, level: 1, count: QUESTION_COUNT, random: Random.new, mix: :level_only)
     previous, questions = nil, []

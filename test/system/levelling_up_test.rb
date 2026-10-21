@@ -7,7 +7,7 @@ class LevellingUpTest < ApplicationSystemTestCase
     sign_in user
 
     assert_selector ".levels__name", text: "Level 5: Zeroes and decimals"
-    click_on "Practise level 5"
+    click_on "Play level 5"
     assert_selector ".question", text: "×", wait: 5
     assert_selector ".keypad__key--extra", text: "."
     assert_no_selector ".keypad__key[data-digit='-']"

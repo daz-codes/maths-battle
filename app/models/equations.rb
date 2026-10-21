@@ -28,7 +28,7 @@ module Equations
   MULTIPLIED = %w[ ax=b ax+b=c ax-b=c a(x+b)=c ]
 
   # Each level is its own skill: one step, bigger, two step, bigger with brackets, then fraction answers. The
-  # limits set how big the numbers get. A daily challenge mixes earlier levels in (facts_through)
+  # limits set how big the numbers get. Mixed practice mixes earlier levels in (facts_through)
   SMALL = { solution: 1..10, multiplier: 2..5, divisor: 2..5, addend: 1..10 }
   BIG = { solution: 1..20, multiplier: 2..12, divisor: 2..10, addend: 1..20 }
   LEVELS = [

@@ -353,8 +353,8 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   text-transform: uppercase;
 }
 
-/* The daily challenge, right under the streak it keeps going, saying so when the streak needs it */
-.button--challenge { flex-direction: column; gap: 0.15rem; width: var(--panel-width); min-height: 3.9rem; padding-block: 0.5rem; font-size: clamp(1.4rem, 6.5vw, 1.75rem); }
+/* Play, right under the streak it keeps going, saying so when the streak needs it */
+.button--play { flex-direction: column; gap: 0.15rem; width: var(--panel-width); min-height: 3.9rem; padding-block: 0.5rem; font-size: clamp(1.4rem, 6.5vw, 1.75rem); }
 .button__note { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; opacity: 0.9; }
 
 .save-nudge {
@@ -539,7 +539,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .board-switch__option { padding: 0.45rem 0.5rem; border-radius: 999px; color: var(--muted); font-size: 0.9rem; font-weight: 700; text-align: center; text-decoration: none; }
 .board-switch__option[aria-current="true"] { background: var(--blue-deep); color: #fff; }
 
-/* On the home page, under the daily challenge */
+/* On the home page, under Play */
 .group-waiting { display: flex; flex-direction: column; gap: 0.15rem; width: var(--panel-width); padding: 0.75rem 1rem; border-radius: var(--radius); background: linear-gradient(90deg, var(--yellow) 0 6px, var(--paper-alt) 6px); color: var(--ink); text-decoration: none; }
 .group-waiting__title { font-weight: 800; }
 .group-waiting__about { color: var(--muted); font-size: 0.9rem; font-weight: 600; }
@@ -635,11 +635,11 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .levels__medal { position: absolute; right: -0.4rem; bottom: -0.4rem; font-size: 1.3rem; line-height: 1; }
 .levels__medal-line { margin: -1rem 0 0; color: var(--ink); font-size: 1.1rem; font-weight: 700; }
 
-/* Practising the level picked, and the daily challenge once it's done */
+/* Under the levels: playing the level picked (on stats), mixed practice, and the day's game if done */
 .daily-done { color: var(--muted); font-weight: 600; text-align: center; text-decoration: none; }
 .daily-done strong { color: var(--ink); }
 .button--practise { width: 100%; margin-top: -0.5rem; }
-.button--mixed { --fill: var(--blue-deep); --glow: var(--blue); width: var(--panel-width); }
+.button--mixed { --fill: var(--blue-deep); --glow: var(--blue); width: 100%; margin-top: -0.5rem; }
 .button--review { --fill: var(--paper-alt); width: 100%; margin-top: -0.5rem; color: var(--ink); }
 
 /* Under the level's name, kept close to it, and kept from widening the levels like the name */

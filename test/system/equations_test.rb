@@ -6,7 +6,7 @@ class EquationsTest < ApplicationSystemTestCase
     click_on "Change topic"
     find(".topic-card", text: "Equations").click
     assert_selector ".levels__name", text: "Level 1: One step"
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question var", wait: 5
     end_game_in(6_000)
 

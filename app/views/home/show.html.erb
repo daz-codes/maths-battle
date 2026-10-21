@@ -19,7 +19,7 @@
     <span class="streak__label">day streak</span>
   </section>
 
-  <%= render "topics/daily_challenge", user: @user, topic: current_topic %>
+  <%= render "topics/play", user: @user, topic: current_topic, level: current_level %>
   <%= render "groups/to_play", user: @user %>
 
   <%= render "topics/chooser", choosing: :play, user: current_player, topic: current_topic, level: current_level %>

@@ -1,5 +1,6 @@
 <%# One of the topic's unlocked levels, the same on every page that needs it. choosing: :play on the home page
-    (changes what Practise plays), or :stats on the stats page. Practise goes under the levels, as wide as they are %>
+    (changes what its Play button, above, plays), or :stats on the stats page, which has its own Play button under
+    the levels. Then mixed practice, once there's more than one level to mix, and reviewing mistakes %>
 <div class="levels-panel">
 <% if topic.levels.many? %>
   <% unlocked = user.unlocked_level(topic) %>
@@ -27,7 +28,8 @@
     <p class="levels__learn"><%= link_to "📖 Learn how", lesson_path(topic.slug, level) %></p>
   <% end %>
 <% end %>
-<%= link_to "Practise level #{level}", play_path(topic.slug, level: level), class: "button button--blue button--practise" %>
+<%= link_to "Play level #{level}", play_path(topic.slug, level: level), class: "button button--blue button--practise" if choosing == :stats %>
+<%= link_to "🔀 Mixed practice", play_path(topic.slug, mixed: 1), class: "button button--mixed" if user.unlocked_level(topic) > 1 %>
 <% if (review = user.review_questions(topic)).any? %>
   <%= link_to "🔁 Review mistakes (#{review.size})", play_path(topic.slug, review: 1), class: "button button--review" %>
 <% end %>

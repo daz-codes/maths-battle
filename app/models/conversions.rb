@@ -96,7 +96,7 @@ module Conversions
   end
 
   # Worked out again from the amount, so the score never depends on the browser. A pair of units this level or
-  # an easier one asks (a daily challenge mixes them), with a sensible amount
+  # an easier one asks (mixed practice mixes them), with a sensible amount
   def clean_result(result, level: 1)
     type = result["type"]
     amount = decimal(result["a"])

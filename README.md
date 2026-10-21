@@ -43,39 +43,36 @@ sequentially because concurrent browser workers can contend for SQLite writes.
 ## Application flow
 
 A new player picks a topic first; on a new device it's the one last played.
-Home (the current topic, changed on its own page with progress in each, then the streak with the daily
-challenge under it) → play the daily challenge, or choose an unlocked level to learn it or practise it for a
-medal → score and practice feedback → stats or play again.
-The server generates questions weighted towards facts the player finds difficult. The daily challenge keeps
-the streak going, and a bronze medal unlocks the next level.
+Home (the current topic, changed on its own page with progress in each, then the streak with Play under it)
+→ play the level picked, or learn it, or mixed practice → score and practice feedback → stats or play again.
+The server generates questions weighted towards facts the player finds difficult. Any game played to the end
+keeps the streak going, and a bronze medal unlocks the next level.
 The first saved game creates a guest account; registering preserves that guest's history. Signing into
 an existing account switches accounts without merging guest history.
 
-## Medals and the daily challenge
+## Medals and mixed practice
 
 Every topic plays by medals, with 5 right for bronze, 10 for silver and 20 for gold (`MEDALS`). Practising
 a level asks only that level's questions and earns bronze, silver or gold; a level shows its best, and the
-first bronze unlocks the next level. Each topic's daily challenge, once a day, mixes questions from every level
-up to the player's; it has its own best, earns no medal and unlocks nothing. Whether a game is a daily
-challenge is in its signed ticket, so the browser can't decide. A new topic needs `MEDALS` and gets all this.
+first bronze unlocks the next level. A new topic needs `MEDALS` and gets all this. Practising a level asks only
+its own skill: times tables, division and adding and subtracting build up (level 2 includes level 1's tables),
+but the other topics' levels are each their own (functions level 5 is just inverses).
 
-Once the day's challenge is done, mixed practice opens up: the same mix of every level up to the player's, as
-often as they like, earning stars but no medals or level ups. Practising a level otherwise asks only that level's
-skill: times tables, division and adding and subtracting build up (level 2 includes level 1's tables), but the
-other topics' levels are each their own (functions level 5 is just inverses).
+Mixed practice, once a second level is unlocked, mixes every level up to the player's, as often as they like,
+earning stars but no medals, bests or level ups. It took the place of the daily challenge (once a day, mixed),
+which was played until 21 October 2026: its games are kept, and a link to it goes to mixed practice. A game's
+mode (practice, mixed, review or group) is in its signed ticket, so the browser can't decide.
 
 Review mode asks again, exactly, the questions a player recently got wrong in a topic (from their last 10 games,
 `User::Reviewable`), up to 10, each once and with no clock. Games are ordered by play time, so a late offline
 upload can't override a more recent answer. Only the latest answer to each question counts, so getting it
-right takes it off the list. Like the daily challenge it's at the player's highest level and earns
-no medal; a game's mode (practice, challenge or review) is in its ticket. With no clock, its answers earn no
+right takes it off the list. Like mixed practice it's at the player's highest level and earns no medal. With no clock, its answers earn no
 stars, badges or question stats; finishing one earns a 50 star bonus. Every question in its signed set must
 be answered before a review can be saved.
 
-A daily challenge needs at least one submitted answer; an unanswered game leaves it available to try again.
-A day counts towards the streak when any topic's daily challenge is played. Until 20 October 2026 a game of five
-answers or a finished lesson counted instead (`DAILY_CHALLENGE_STREAKS_FROM`), and those days still count, so
-the change cost no one a streak.
+A day counts towards the streak when any game is played to the end with at least one answer: practice, mixed,
+a review or a group's (stopping part way saves nothing). Until 20 October 2026 a finished lesson counted too
+(`LESSONS_COUNTED_UNTIL`), and those days still count, so no one lost a streak.
 
 ## Lessons
 
@@ -130,7 +127,7 @@ Groups are invite only, show no pictures but the player's own, and have no messa
 players out, close a challenge, or delete the group; anyone can leave. Removing a player replaces the invite code,
 revoking old links without affecting existing players. Owners can also replace it themselves, and share the current
 code to invite someone back. Leaving voluntarily keeps the code. Both invitation lookups and joins share a rate
-limit sized for a class on one IP address. Closed daily challenges retain their final day and week's leaderboards.
+limit sized for a class on one IP address. Closed every day group challenges retain their final day and week's leaderboards.
 Lists load only their displayed rounds and first scores, without historical question or answer JSON.
 Waiting challenges show on the home page and in the daily
 reminder. Groups also send push notifications (`User::Notifiable`, through `NotifyJob`): a new challenge to its
@@ -154,7 +151,7 @@ in settings; the page says which on `<html data-sounds>`.
 ## Reminders
 
 Players can turn on a daily reminder in settings, at a half hour they pick from 7am to 9pm. If they haven't
-done a daily challenge by then (in their own time zone), each device they turned it on from gets a web push
+played a game by then (in their own time zone), each device they turned it on from gets a web push
 notification like "🔥 Your 12 day streak is waiting", once that day (`User::Remindable`, checked every 15
 minutes by `config/recurring.yml`). Each device is a `PushSubscription`, sent to only at the browsers' own push
 services; one that unsubscribes is forgotten. Notifications are signed with VAPID keys kept in the credentials

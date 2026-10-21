@@ -1,5 +1,5 @@
 # The negative numbers topic: going below zero, starting below zero, adding and subtracting negatives, then
-# multiplying and dividing them. Each level practises its own skill; a daily challenge mixes them. A negative
+# multiplying and dividing them. Each level practises its own skill; mixed practice mixes them. A negative
 # number added, taken away, multiplied or divided by is written in brackets: −3 + (−4), 6 × (−4)
 module Negatives
   TOPIC = "negatives"
@@ -42,7 +42,7 @@ module Negatives
     [ "-" ]
   end
 
-  # Facts: kinds of question. A level's practice asks only its own; a daily challenge mixes in the ones before
+  # Facts: kinds of question. A level's practice asks only its own; mixed practice mixes in the ones before
 
   def facts(level = 1)
     level_details(level)[:types]
@@ -67,7 +67,7 @@ module Negatives
   end
 
   # Works the answer out again from the numbers, so the score never depends on the browser. A question from this
-  # level or an easier one (a daily challenge mixes them), of a kind its numbers fit
+  # level or an easier one (mixed practice mixes them), of a kind its numbers fit
   def clean_result(result, level: 1)
     question = question_from(result)
     raise Attempt::Invalid, "Bad question" unless facts_through(level).include?(question[:type]) && possible?(question)

@@ -6,7 +6,7 @@ class FunctionsTest < ApplicationSystemTestCase
     click_on "Change topic"
     find(".topic-card", text: "Functions").click
     assert_selector ".levels__name", text: "Level 1: Linear"
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question .function--ask", wait: 5
     end_game_in(6_000)
 

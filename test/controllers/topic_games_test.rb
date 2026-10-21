@@ -4,14 +4,14 @@ require "test_helper"
 class TopicGamesTest < ActionDispatch::IntegrationTest
   Topic::ALL.each do |topic|
     topic.levels.each do |details|
-      %w[ practice challenge ].each do |mode|
+      %w[ practice mixed ].each do |mode|
         test "#{topic.key} level #{details[:number]} #{mode} issues questions that can all be saved" do
           user = users(:ada)
           level = details[:number]
           unlock(user, topic, level)
           sign_in_as user
 
-          get play_path(topic.slug, **(mode == "challenge" ? { challenge: 1 } : { level: level }))
+          get play_path(topic.slug, **(mode == "mixed" ? { mixed: 1 } : { level: level }))
           assert_response :success
           node = css_select("[data-test-question-sets-value]").first
           assert_equal level.to_s, node["data-test-level-value"]

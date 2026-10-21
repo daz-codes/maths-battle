@@ -1,6 +1,6 @@
 # Medals: a level's practice game earns bronze, silver or gold for its score (each topic sets the scores),
 # the level keeps the best medal its games have earned, and the first bronze unlocks the next level.
-# Only practice earns medals: the daily challenge and reviews mix levels
+# Only practice earns medals: mixed practice, reviews and group games aren't a level's own
 module Attempt::Medallable
   extend ActiveSupport::Concern
 

@@ -29,7 +29,7 @@
                 <% end %>
               <% end %>
             </span>
-            <%= tag.span("✅ Challenge done today", class: "topic-card__done") if @user.daily_challenge_on(topic) %>
+            <%= tag.span("✅ Played today", class: "topic-card__done") if @user.played_today?(topic) %>
           </span>
         <% end %>
       </li>

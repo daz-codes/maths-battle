@@ -1,6 +1,6 @@
 # The percentages topic: finding a percentage of a number, like 15% of 80. First the ones everything else is
 # built from (50% and 10%, then 5% and 25%), then combinations of them (15% is 10% and 5%), then 1% to 4%, then any
-# percentage. Each level practises its own; a daily challenge mixes them. The numbers are chosen so every
+# percentage. Each level practises its own; mixed practice mixes them. The numbers are chosen so every
 # answer is whole: it's about the method, not long decimals
 module Percentages
   TOPIC = "percentages"
@@ -39,7 +39,7 @@ module Percentages
     []
   end
 
-  # Facts: kinds of percentage. A level's practice asks only its own; a daily challenge mixes in the ones before
+  # Facts: kinds of percentage. A level's practice asks only its own; mixed practice mixes in the ones before
 
   def facts(level = 1)
     level_details(level)[:types]
@@ -67,7 +67,7 @@ module Percentages
   end
 
   # Works the answer out again from the numbers, so the score never depends on the browser. A question from this
-  # level or an easier one (a daily challenge mixes them), with numbers its kind could have used
+  # level or an easier one (mixed practice mixes them), with numbers its kind could have used
   def clean_result(result, level: 1)
     question = question_from(result)
     raise Attempt::Invalid, "Bad question" unless facts_through(level).include?(question[:type]) && possible?(question)

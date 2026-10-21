@@ -3,7 +3,7 @@
          data-reminder-key-value="<%= PushSubscription.public_key %>" data-reminder-url-value="<%= reminder_path %>"
          data-reminder-on-value="<%= user.reminders_on? %>">
   <h2 class="label" id="reminder-heading">🔔 Daily reminder</h2>
-  <p class="reminder__about">A notification if you haven't done your daily challenge by then. Your groups can tell you about new challenges too, but never at night.</p>
+  <p class="reminder__about">A notification if you haven't played by then. Your groups can tell you about new challenges too, but never at night.</p>
   <div class="reminder__row">
     <label class="visually-hidden" for="reminder_minute">Remind me at</label>
     <select id="reminder_minute" class="reminder__time" data-reminder-target="time" data-action="reminder#changeTime">

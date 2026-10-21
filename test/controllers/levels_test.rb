@@ -20,8 +20,8 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_select ".levels__level--locked", 3
     assert_select ".levels__name", text: "Level 2: Tables 2–12"
     assert_select ".levels__medal-line", text: "Score 5 for 🥉 bronze and unlock level 3"
-    assert_select "a.button--challenge[href=?]", play_path("times-tables", challenge: 1), text: /⭐ Daily challenge/
-    assert_select ".levels-panel > a.button--practise[href=?]", play_path("times-tables", level: 2), text: "Practise level 2"
+    assert_select "a.button--play[href=?]", play_path("times-tables", level: 2), text: /Play level 2/
+    assert_select ".levels-panel > a.button--mixed[href=?]", play_path("times-tables", mixed: 1)
   end
 
   test "a level's best medal and the next to aim for" do
@@ -80,7 +80,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     patch level_path, params: { level: 1 }
     get root_path
     assert_select ".levels__name", text: "Level 1: Tables 2–5"
-    assert_select "a.button--practise[href=?]", play_path("times-tables", level: 1), text: "Practise level 1"
+    assert_select "a.button--play[href=?]", play_path("times-tables", level: 1), text: /Play level 1/
 
     get play_path("times-tables")
     assert_select "[data-test-level-value=1]"
@@ -98,25 +98,24 @@ class LevelsTest < ActionDispatch::IntegrationTest
     get stats_path("times-tables", level: 1)
 
     assert_select ".current-topic__name", text: "✖️ Times tables"
-    assert_select ".button--challenge", count: 0, message: "the daily challenge is on the home page, under the streak"
+    assert_select ".button--play", count: 0, message: "the big Play is on the home page, under the streak"
     assert_select "form[action=?][method=get] input[name=level][value=2]", stats_path("times-tables")
     assert_select ".levels .levels__level[aria-current=true]", text: /1/
     assert_select ".levels__level--locked", 3
     assert_select ".levels__name", text: "Level 1: Tables 2–5"
-    assert_select ".levels-panel > a.button--practise[href=?]", play_path("times-tables", level: 1)
+    assert_select ".levels-panel > a.button--practise[href=?]", play_path("times-tables", level: 1), text: "Play level 1"
 
     get stats_path("times-tables", level: 2)
     assert_select ".levels .levels__level[aria-current=true]", text: /2/
     assert_equal 2, @user.unlocked_level(TimesTables), "looking at stats doesn't change anything"
   end
 
-  test "every topic has medals, practice and a daily challenge, with its own medal scores" do
+  test "every topic has medals and Play, with its own medal scores" do
     patch topic_path, params: { topic: "equations" }
     get root_path
 
     assert_select ".levels__medal-line", text: "Score 5 for 🥉 bronze and unlock level 2"
-    assert_select "a.button--challenge[href=?]", play_path("equations", challenge: 1)
-    assert_select ".levels-panel > a.button--practise[href=?]", play_path("equations", level: 1)
+    assert_select "a.button--play[href=?]", play_path("equations", level: 1)
   end
 
   test "the keypad grows a decimal point, and never a minus sign" do

@@ -3,7 +3,7 @@ require "application_system_test_case"
 class TimesTablesTest < ApplicationSystemTestCase
   test "plays a test with the keyboard and sees the results" do
     sign_in users(:ada)
-    click_on "Practise level 1"
+    click_on "Play level 1"
 
     # Shorten the minute so the test runs quickly; the countdown still plays first
     page.execute_script(<<~JS)
@@ -35,7 +35,7 @@ class TimesTablesTest < ApplicationSystemTestCase
 
   test "each right answer's stars float up and fade away" do
     sign_in users(:ada)
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
 
     a, b = find(".question").text.split(" × ").map(&:to_i)
@@ -44,9 +44,10 @@ class TimesTablesTest < ApplicationSystemTestCase
     assert_no_selector ".star-pop", wait: 4
   end
 
-  test "the daily challenge: play it once, and the home page says how it went" do
+  test "one game played to the end keeps the streak, and Play stops asking for one" do
     sign_in users(:ada)
-    click_on "⭐ Daily challenge"
+    assert_selector ".button--play", text: /Play to start a streak/i
+    click_on "Play level 1"
     page.execute_script(<<~JS)
       const waitForStart = setInterval(() => {
         const element = document.querySelector("[data-controller=test]")
@@ -58,10 +59,9 @@ class TimesTablesTest < ApplicationSystemTestCase
     a, b = find(".question").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
 
-    assert_text "TIMES TABLES, DAILY CHALLENGE", wait: 8
-    assert users(:ada).attempts.last.daily_challenge?
-
+    assert_selector ".card__number", text: "1", wait: 8
     visit root_path
-    assert_selector "a.daily-done", text: "Challenge done today: 1"
+    assert_selector ".streak__number", text: "1"
+    assert_no_selector ".button--play .button__note"
   end
 end

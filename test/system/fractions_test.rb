@@ -6,7 +6,7 @@ class FractionsTest < ApplicationSystemTestCase
     click_on "Change topic"
     find(".topic-card", text: "Fractions").click
     assert_selector ".levels__name", text: "Level 1: Simplifying"
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question .question__verb", text: "Simplify", wait: 5
     assert_selector ".question .frac", count: 1
     end_game_in(6_000)

@@ -39,7 +39,7 @@ class User::RemindableTest < ActiveSupport::TestCase
     assert @user.reminder_due?(ActiveSupport::TimeZone["America/New_York"].local(2026, 11, 10, 17, 5))
   end
 
-  test "not once today's daily challenge is done" do
+  test "not once a game has been played today" do
     travel_to(london(10, 12)) { play_daily_challenge(@user) }
     assert_not @user.reminder_due?(london(10, 17))
   end
@@ -49,7 +49,7 @@ class User::RemindableTest < ActiveSupport::TestCase
 
     sent = travel_to(london(10, 17, 5)) { pushes_sent { User.send_due_reminders } }
     assert_equal [ PUSH_ENDPOINT, "https://web.push.apple.com/device-2" ], sent.map { _1[:endpoint] }.sort
-    assert_equal({ title: "⭐ Your daily challenge is ready", body: "One minute of maths. Play it to start a streak!", url: "/" }, sent.first[:message])
+    assert_equal({ title: "⭐ Time for a minute of maths", body: "Play a game to start a streak!", url: "/" }, sent.first[:message])
 
     assert_empty travel_to(london(10, 17, 20)) { pushes_sent { User.send_due_reminders } }
     assert_equal 2, travel_to(london(11, 17, 5)) { pushes_sent { User.send_due_reminders } }.size
@@ -87,13 +87,13 @@ class User::RemindableTest < ActiveSupport::TestCase
     assert_equal 6.hours.to_i, push[:ttl]
   end
 
-  test "a group challenge waiting is in the reminder, and is reason enough for one once the daily challenge is done" do
+  test "a group challenge waiting is in the reminder, and is reason enough for one once a game's been played" do
     group = users(:bob).owned_groups.create!(name: "Class 4B")
     group.join(@user)
     challenge = travel_to(london(10, 9)) { group.challenges.create!(topic: "times_tables", level: 2) }
 
     sent = travel_to(london(10, 17, 5)) { pushes_sent { User.send_due_reminders } }
-    assert_equal "One minute of maths. Play it to start a streak! Class 4B's challenge is waiting too.", sent.first[:message][:body]
+    assert_equal "Play a game to start a streak! Class 4B's challenge is waiting too.", sent.first[:message][:body]
 
     travel_to(london(11, 12)) { play_daily_challenge(@user) }
     sent = travel_to(london(11, 17, 5)) { pushes_sent { User.send_due_reminders } }

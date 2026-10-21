@@ -7,9 +7,9 @@ class Attempt < ApplicationRecord
   # A group game may take 1st place from someone, who's told (Group::Challenge::Announceable)
   after_create_commit -> { round.challenge.played(self) }, if: -> { group? && round }
 
-  # A level's practice; the daily challenge, mixing every level up to the player's; mixed practice, the same mix
-  # as often as they like once the day's challenge is done; a review of their recent mistakes; or a group
-  # challenge's round (Group::Challenge). Only practice belongs to a level: earning medals and unlocking the next one
+  # A level's practice; mixed practice, mixing every level up to the player's; a review of their recent mistakes;
+  # or a group challenge's round (Group::Challenge). There was a daily challenge (once a day, mixed) until 21 October
+  # 2026, and its games are kept. Only practice belongs to a level: earning medals and unlocking the next one
   MODES = %w[ practice challenge mixed review group ]
 
   validates :topic, inclusion: { in: Topic.keys }

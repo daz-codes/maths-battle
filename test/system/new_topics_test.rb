@@ -6,7 +6,7 @@ class NewTopicsTest < ApplicationSystemTestCase
     click_on "Change topic"
     find(".topic-card", text: "Division").click
     assert_selector ".levels__name", text: "Level 1: Tables 2–5"
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question", text: "÷", wait: 5
     end_game_in(6_000)
 
@@ -23,7 +23,7 @@ class NewTopicsTest < ApplicationSystemTestCase
     sign_in users(:ada)
     click_on "Change topic"
     find(".topic-card", text: "Negative numbers").click
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question", text: "−", wait: 5
 
     page.execute_script(<<~JS)
@@ -40,7 +40,7 @@ class NewTopicsTest < ApplicationSystemTestCase
     click_on "Change topic"
     find(".topic-card", text: "Adding and subtracting").click
     assert_selector ".levels__name", text: "Level 1: Single digits"
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question", text: /[+−]/, wait: 5
     end_game_in(6_000)
 
@@ -58,7 +58,7 @@ class NewTopicsTest < ApplicationSystemTestCase
     click_on "Change topic"
     find(".topic-card", text: "Metric conversions").click
     assert_selector ".levels__name", text: "Level 1: cm and m"
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question", text: "= ?", wait: 5
     end_game_in(6_000)
 
@@ -76,7 +76,7 @@ class NewTopicsTest < ApplicationSystemTestCase
     click_on "Change topic"
     find(".topic-card", text: "Percentages").click
     assert_selector ".levels__name", text: "Level 1: 50% and 10%"
-    click_on "Practise level 1"
+    click_on "Play level 1"
     assert_selector ".question", text: "% of", wait: 5
     end_game_in(6_000)
 

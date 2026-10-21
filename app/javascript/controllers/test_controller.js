@@ -55,7 +55,7 @@ export default class extends Controller {
     this.review ? this.startReview() : this.countdown(COUNTDOWN)
   }
 
-  // A daily challenge's or review's spares are its own, as its questions are mixed from every level, and a group
+  // Mixed practice's or a review's spares are its own, as its questions are mixed from every level, and a group
   // challenge's are its round's
   get sparesKey() {
     const kind = { practice: this.levelValue, group: `group-${this.roundValue}` }[this.modeValue] ?? this.modeValue
@@ -366,9 +366,7 @@ export default class extends Controller {
       }
     } else {
       this.state = "rejected"
-      this.status(this.modeValue === "challenge" && this.results.length === 0
-        ? "No answers this time. Your daily challenge is still available — go home to try again."
-        : "Sorry, this game couldn't be saved.")
+      this.status("Sorry, this game couldn't be saved.")
     }
   }
 

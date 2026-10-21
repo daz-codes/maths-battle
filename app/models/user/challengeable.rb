@@ -1,4 +1,4 @@
-# The daily challenge, in topics that play by medals: one game a day, mixing questions from every level up to
+# The daily challenge, played until 21 October 2026 (its games are kept): one game a day, mixing questions from every level up to
 # the player's. It has its own best score, as it's played across levels
 module User::Challengeable
   extend ActiveSupport::Concern

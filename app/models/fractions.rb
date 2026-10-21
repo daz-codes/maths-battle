@@ -1,5 +1,5 @@
 # The fractions topic: simplifying, then adding and subtracting with the same denominator, then different ones,
-# then multiplying and dividing. Each level practises its own skill; a daily challenge mixes them. Answers are
+# then multiplying and dividing. Each level practises its own skill; mixed practice mixes them. Answers are
 # in lowest terms, top-heavy when they're more than one (7/4), and whole numbers on their own (1)
 module Fractions
   TOPIC = "fractions"
@@ -46,7 +46,7 @@ module Fractions
     [ "/" ]
   end
 
-  # Facts: kinds of question. A level's practice asks only its own; a daily challenge mixes in the ones before
+  # Facts: kinds of question. A level's practice asks only its own; mixed practice mixes in the ones before
 
   def facts(level = 1)
     level_details(level)[:types]
@@ -72,7 +72,7 @@ module Fractions
   end
 
   # Works the answer out again from the numbers, so the score never depends on the browser. A question from this
-  # level or an easier one (a daily challenge mixes them), with numbers the game could have asked
+  # level or an easier one (mixed practice mixes them), with numbers the game could have asked
   def clean_result(result, level: 1)
     question = question_from(result)
     raise Attempt::Invalid, "Bad question" unless facts_through(level).include?(question[:type]) && possible?(question)

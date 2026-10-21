@@ -1,0 +1,10 @@
+<%# The main button, under the streak: play the level picked below. Any game played to the end keeps the streak
+    going, so it says so when the streak needs one today %>
+<%= link_to play_path(topic.slug, level: level), class: "button button--start button--play" do %>
+  Play level <%= level %>
+  <% if user.streak_at_risk? %>
+    <span class="button__note">Don't lose your streak!</span>
+  <% elsif !user.practised_today? %>
+    <span class="button__note">Play to start a streak</span>
+  <% end %>
+<% end %>

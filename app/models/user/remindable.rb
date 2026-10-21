@@ -1,4 +1,4 @@
-# Daily reminders: a push notification at a time the player picks, if they haven't done a daily challenge by
+# Daily reminders: a push notification at a time the player picks, if they haven't played a game by
 # then, like "Your 12 day streak is waiting", or a group challenge is waiting for them. The time is the player's,
 # in their own time zone; each device that should get it has a push subscription. Checked every 15 minutes
 # (config/recurring.yml)
@@ -55,7 +55,7 @@ module User::Remindable
     push_subscriptions.each { |subscription| subscription.deliver(reminder_message) }
   end
 
-  # The daily challenge if it's still to do, saying if a group challenge is waiting too; or just the group's
+  # A game to keep the streak, saying if a group challenge is waiting too; or just the group's
   def reminder_message
     waiting = group_challenges_to_play.first
     group_line = "#{waiting.group.name}'s challenge is waiting" if waiting
@@ -63,9 +63,9 @@ module User::Remindable
     if practised_today?
       { title: "🏆 #{group_line}", body: "#{waiting.title}. Everyone plays the same questions!", url: Rails.application.routes.url_helpers.group_challenge_path(waiting.group_id, waiting) }
     elsif streak.positive?
-      { title: "🔥 Your #{streak} day streak is waiting", body: [ "Play today's daily challenge to keep it going.", ("#{group_line} too." if group_line) ].compact.join(" "), url: "/" }
+      { title: "🔥 Your #{streak} day streak is waiting", body: [ "Play a game to keep it going.", ("#{group_line} too." if group_line) ].compact.join(" "), url: "/" }
     else
-      { title: "⭐ Your daily challenge is ready", body: [ "One minute of maths. Play it to start a streak!", ("#{group_line} too." if group_line) ].compact.join(" "), url: "/" }
+      { title: "⭐ Time for a minute of maths", body: [ "Play a game to start a streak!", ("#{group_line} too." if group_line) ].compact.join(" "), url: "/" }
     end
   end
 end
