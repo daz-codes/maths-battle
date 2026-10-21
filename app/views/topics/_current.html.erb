@@ -1,5 +1,6 @@
-<%# The topic the player is on, like a language in Duolingo: just shown, and tapping it goes to the page for
-    changing it. from: the page to come back to after changing, or nil for home %>
+<%# The topic the player is on, like a language in Duolingo, as a wide button that says it changes the topic: it
+    goes to the page for changing it. from: the page to come back to after changing, or nil for home %>
 <%= link_to topics_path(from: from), class: "current-topic", title: "Change topic", aria: { label: "#{topic.title}. Change topic" } do %>
   <span class="current-topic__name"><%= topic_icon(topic) %> <%= topic.title %></span>
+  <span class="current-topic__change">Click to change</span>
 <% end %>

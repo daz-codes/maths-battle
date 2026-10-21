@@ -569,22 +569,27 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* ── Topics ─────────────────────────────────────── */
 
-/* The topic the player is on, standing out, with a quiet way to change it under it */
-.current-topic { display: inline-flex; border-radius: 999px; color: var(--ink); text-decoration: none; -webkit-tap-highlight-color: transparent; }
-
-.current-topic__name {
-  padding: 0.45rem 1.25rem;
-  border-radius: 999px;
+/* The topic the player is on: a wide rounded button like the others, saying it changes the topic */
+.current-topic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-big);
   background: var(--paper-alt);
   box-shadow: 0 0 18px color-mix(in srgb, var(--blue) calc(var(--glow-strength) / 2), transparent);
-  font-size: clamp(1.5rem, 7vw, 1.85rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
   transition: background-color 150ms, transform 100ms;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.current-topic:hover .current-topic__name { background: color-mix(in srgb, var(--ink) 7%, var(--paper-alt)); }
-.current-topic:active .current-topic__name { transform: scale(0.97); }
+.current-topic__name { display: flex; align-items: center; gap: 0.45rem; font-size: clamp(1.5rem, 7vw, 1.85rem); font-weight: 800; letter-spacing: -0.02em; }
+.current-topic__change { color: var(--muted); font-size: 0.85rem; font-weight: 700; }
+.current-topic:hover { background: color-mix(in srgb, var(--ink) 7%, var(--paper-alt)); }
+.current-topic:active { transform: scale(0.98); }
 .current-topic:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 
 /* Changing topic: a tile for each, with the player's progress in it */
