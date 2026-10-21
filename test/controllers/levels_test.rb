@@ -195,7 +195,9 @@ class LevelsTest < ActionDispatch::IntegrationTest
     practise(level: 1, score: 8)
     get attempt_path(practise(level: 1, score: 12))
     assert_select ".banner[data-controller~=confetti][data-controller~=fanfare][data-confetti-big-value=true]"
-    assert_select ".badges--new[data-controller~=award-reveal] .badge[data-award-reveal-target=award]"
+    assert_select "main[data-controller=reveal]"
+    assert_select ".banner[data-reveal-target=item]", 1, "the banner spins in first"
+    assert_select ".badges--new .badge[data-reveal-target=item]", message: "then each award"
 
     get attempt_path(practise(level: 1, score: 13))
     assert_select "[data-confetti-big-value=true]", text: /New high score/

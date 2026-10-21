@@ -49,7 +49,8 @@ module IconsHelper
     percentages: %(<path d="M18.5 5.5l-13 13" #{LINE} stroke-width="2.6"/><circle cx="7" cy="7" r="2.6" #{LINE}/><circle cx="17" cy="17" r="2.6" #{LINE}/>),
     conversions: %(<rect x="2" y="7.5" width="20" height="9" rx="1.5" #{LINE}/><path d="M6 7.5V11M10 7.5v5M14 7.5V11M18 7.5v5" #{LINE}/>),
     equations: %(<path d="M12 3.5v17M7.5 20.5h9M4 6.5h16M4 6.5l-2.5 6a3 3 0 0 0 5 0zM20 6.5l-2.5 6a3 3 0 0 0 5 0z" #{LINE}/>),
-    functions: %(<circle cx="12" cy="12" r="3" #{LINE}/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" #{LINE}/>),
+    # A cog: a ring with eight square teeth
+    functions: %(<circle cx="12" cy="12" r="6.6" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 6V2.4M16.24 7.76l2.55-2.55M18 12h3.6M16.24 16.24l2.55 2.55M12 18v3.6M7.76 16.24l-2.55 2.55M6 12H2.4M7.76 7.76 5.21 5.21" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="butt"/>),
     simultaneous: %(<path d="M3 19 21 7M3 9l18 8" #{LINE}/><circle cx="12" cy="13" r="2.4" fill="var(--pink)"/>)
   }.freeze
 

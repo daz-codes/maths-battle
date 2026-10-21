@@ -44,8 +44,9 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".topic-card--current[aria-current=true]", 1 do
       assert_select ".topic-card__title", text: /Times tables · On it now/
       assert_select ".topic-card__level", text: "Level 2 of 5"
-      assert_select ".topic-card__level-stars .stars[aria-label='2 of 3 stars']"
-      assert_select ".topic-card__level-stars--locked", 3
+      assert_select ".topic-card__step:first-child .topic-card__number", text: "1"
+      assert_select ".topic-card__step .stars[aria-label='2 of 3 stars']"
+      assert_select ".topic-card__step--locked .icon--lock", 3
     end
     assert_select "form[action=?]:has(input[name=topic][value=functions]) .topic-card__done", topic_path, text: "Played today"
   end
