@@ -10,8 +10,9 @@ module IconsHelper
   ICONS = {
     # The game
     gem: %(<path d="M7 3.5h10l4.5 5.5L12 21 2.5 9z" fill="var(--blue)"/><path d="M2.5 9h19M9.5 3.5 8 9l4 12 4-12-1.5-5.5" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round"/>),
-    star: %(<path d="#{STAR}" fill="var(--yellow)" stroke="color-mix(in srgb, var(--ink) 35%, transparent)" stroke-width="1" stroke-linejoin="round"/>),
-    star_empty: %(<path d="#{STAR}" fill="none" stroke="color-mix(in srgb, var(--ink) 30%, transparent)" stroke-width="1.6" stroke-linejoin="round"/>),
+    # A star earned is solid blue, outlined in the same blue so it's the same size as one still to earn, in grey
+    star: %(<path d="#{STAR}" fill="var(--blue)" stroke="var(--blue)" stroke-width="1.6" stroke-linejoin="round"/>),
+    star_empty: %(<path d="#{STAR}" fill="none" stroke="color-mix(in srgb, var(--ink) 35%, transparent)" stroke-width="1.6" stroke-linejoin="round"/>),
     flame: %(<path d="M12 2.5c.6 3.4 5.5 5.6 5.5 11a5.5 5.5 0 0 1-11 0c0-2.6 1.4-4.4 2.6-6 .2 1.8 1 2.8 2 3.2-.4-3 .1-5.8.9-8.2z" fill="var(--pink)"/><path d="M12 12.5c.8 1.6 2.6 2.4 2.6 4.4a2.6 2.6 0 0 1-5.2 0c0-1.3.8-2.2 1.4-3 .2.8.6 1.2 1.1 1.4-.1-1 0-1.9.1-2.8z" fill="var(--yellow)"/>),
     trophy: %(<path d="M6 3h12v5a6 6 0 0 1-12 0z" fill="var(--yellow)"/><path d="M6 5H3v1.5A4.5 4.5 0 0 0 7 11V9a2.5 2.5 0 0 1-2-2.5V7h1zM18 5h3v1.5A4.5 4.5 0 0 1 17 11V9a2.5 2.5 0 0 0 2-2.5V7h-1z" fill="var(--yellow)"/><rect x="10.75" y="13" width="2.5" height="4" fill="var(--yellow)"/><rect x="7" y="17" width="10" height="3.5" rx="1" fill="var(--yellow)"/>),
     freeze: %(<path d="M12 2.5v19M3.8 7.25l16.4 9.5M3.8 16.75l16.4-9.5M9.5 4.2 12 6.5l2.5-2.3M9.5 19.8 12 17.5l2.5 2.3" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>),

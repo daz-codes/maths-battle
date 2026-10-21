@@ -167,7 +167,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .icon { display: inline-block; width: 1.2em; height: 1.2em; flex: none; vertical-align: -0.22em; overflow: visible; }
 .stars { display: inline-flex; align-items: center; gap: 0.05em; vertical-align: -0.18em; }
 .stars .icon { vertical-align: 0; }
-.streak__flame { width: 0.92em; height: 0.92em; margin-right: 0.04em; vertical-align: -0.06em; }
+.streak__flame { width: 1.1em; height: 1.1em; margin-right: 0.02em; vertical-align: -0.12em; }
 .banner .stars .icon { width: 1.2em; height: 1.2em; }
 
 /* ── Type ───────────────────────────────────────── */
@@ -649,12 +649,12 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* A medal level's best medal, on its circle and under its name */
 .levels__level { position: relative; }
 /* A level's best score, small under its circle */
-.levels__best { position: absolute; top: calc(100% + 0.2rem); left: 50%; transform: translateX(-50%); color: var(--muted); font-size: 0.75rem; font-weight: 700; line-height: 1; }
-.levels:has(.levels__best) { margin-bottom: 0.9rem; }
-/* A level's stars, small, inside its circle under the number */
-.levels__level .stars { display: flex; gap: 0; margin-top: -0.1rem; }
-.levels__level .stars .icon { width: 0.82rem; height: 0.82rem; }
-.levels__level[aria-current="true"] .stars .icon--star_empty path { stroke: rgb(255 255 255 / 0.55); }
+.levels__best { position: absolute; top: calc(100% + 1.45rem); left: 50%; transform: translateX(-50%); color: var(--muted); font-size: 0.8rem; font-weight: 700; line-height: 1; }
+.levels { margin-bottom: 1.4rem; }
+.levels:has(.levels__best) { margin-bottom: 2.4rem; }
+/* Under each level's circle: its stars, then its best */
+.levels__level .stars { position: absolute; top: calc(100% + 0.3rem); left: 50%; transform: translateX(-50%); gap: 0.05rem; }
+.levels__level .stars .icon { width: 0.95rem; height: 0.95rem; }
 .levels__progress { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.25rem; margin: -1rem 0 0; color: var(--ink); font-size: 1.1rem; font-weight: 700; }
 .levels__progress .stars .icon { width: 1.15rem; height: 1.15rem; }
 
