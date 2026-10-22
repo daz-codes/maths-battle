@@ -26,6 +26,9 @@
   --paper-alt: #f3f2e9;
   --line: var(--ink);
   --glow-strength: 0%;
+  /* The trophy: neon yellow is lost on paper, so in light mode it's gold with a brown outline */
+  --trophy: #f5c400;
+  --trophy-outline: #8a5a00;
 
   --radius: 10px;
   --radius-big: 16px;
@@ -46,6 +49,8 @@
   --glow-strength: 55%;
   --pink-text: var(--pink);
   --on-pink-text: var(--on-neon);
+  --trophy: var(--yellow);
+  --trophy-outline: transparent;
   color-scheme: dark;
 }
 
@@ -63,6 +68,8 @@
     --glow-strength: 55%;
     --pink-text: var(--pink);
     --on-pink-text: var(--on-neon);
+    --trophy: var(--yellow);
+    --trophy-outline: transparent;
   }
 }
 

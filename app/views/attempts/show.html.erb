@@ -87,16 +87,21 @@
   <% if @attempt.missed_facts.any? || @attempt.slow_facts.any? %>
     <section class="missed">
       <h2 class="label">Work on these</h2>
-      <ul>
-        <% @attempt.missed_facts.each do |fact| %>
-          <li><%= fact %></li>
-        <% end %>
-        <% @attempt.slow_facts.each do |fact| %>
-          <li class="missed__slow"><%= fact %> <span title="Right, but slow"><%= icon(:slow, label: "right, but slow") %></span></li>
-        <% end %>
-      </ul>
+      <% if @attempt.missed_facts.any? %>
+        <ul>
+          <% @attempt.missed_facts.each do |fact| %>
+            <li><%= fact %></li>
+          <% end %>
+        </ul>
+      <% end %>
+      <%# The slow ones after what they are %>
       <% if @attempt.slow_facts.any? %>
         <p class="hint hint--centre"><%= icon(:slow) %> Right, but slow. Practise these to get quicker.</p>
+        <ul class="missed__slow-list">
+          <% @attempt.slow_facts.each do |fact| %>
+            <li class="missed__slow"><%= fact %> <span title="Right, but slow"><%= icon(:slow, label: "right, but slow") %></span></li>
+          <% end %>
+        </ul>
       <% end %>
     </section>
   <% end %>

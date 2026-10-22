@@ -14,13 +14,15 @@ module IconsHelper
     star: %(<path d="#{STAR}" fill="var(--blue)" stroke="var(--blue)" stroke-width="1.6" stroke-linejoin="round"/>),
     star_empty: %(<path d="#{STAR}" fill="none" stroke="color-mix(in srgb, var(--ink) 35%, transparent)" stroke-width="1.6" stroke-linejoin="round"/>),
     flame: %(<path d="M12 2.5c.6 3.4 5.5 5.6 5.5 11a5.5 5.5 0 0 1-11 0c0-2.6 1.4-4.4 2.6-6 .2 1.8 1 2.8 2 3.2-.4-3 .1-5.8.9-8.2z" fill="var(--pink)"/><path d="M12 12.5c.8 1.6 2.6 2.4 2.6 4.4a2.6 2.6 0 0 1-5.2 0c0-1.3.8-2.2 1.4-3 .2.8.6 1.2 1.1 1.4-.1-1 0-1.9.1-2.8z" fill="var(--yellow)"/>),
-    trophy: %(<path d="M6 3h12v5a6 6 0 0 1-12 0z" fill="var(--yellow)"/><path d="M6 5H3v1.5A4.5 4.5 0 0 0 7 11V9a2.5 2.5 0 0 1-2-2.5V7h1zM18 5h3v1.5A4.5 4.5 0 0 1 17 11V9a2.5 2.5 0 0 0 2-2.5V7h-1z" fill="var(--yellow)"/><rect x="10.75" y="13" width="2.5" height="4" fill="var(--yellow)"/><rect x="7" y="17" width="10" height="3.5" rx="1" fill="var(--yellow)"/>),
+    # Gold with a brown outline in light mode, where neon yellow is hard to see; neon yellow in dark mode
+    trophy: %(<g fill="var(--trophy, var(--yellow))" stroke="var(--trophy-outline, transparent)" stroke-width="1.2" stroke-linejoin="round" paint-order="stroke"><path d="M6 3h12v5a6 6 0 0 1-12 0z"/><path d="M6 5H3v1.5A4.5 4.5 0 0 0 7 11V9a2.5 2.5 0 0 1-2-2.5V7h1zM18 5h3v1.5A4.5 4.5 0 0 1 17 11V9a2.5 2.5 0 0 0 2-2.5V7h-1z"/><rect x="10.75" y="13" width="2.5" height="4"/><rect x="7" y="17" width="10" height="3.5" rx="1"/></g>),
     freeze: %(<path d="M12 2.5v19M3.8 7.25l16.4 9.5M3.8 16.75l16.4-9.5M9.5 4.2 12 6.5l2.5-2.3M9.5 19.8 12 17.5l2.5 2.3" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>),
     review: %(<path d="M19.5 10.5A7.5 7.5 0 0 0 6.2 6.6L4 9M4.5 13.5a7.5 7.5 0 0 0 13.3 3.9L20 15" #{LINE}/><path d="M4 4.5V9h4.5M20 19.5V15h-4.5" #{LINE}/>),
     mixed: %(<path d="M3 7h3.5c4.5 0 6.5 10 11 10H21M3 17h3.5c1.6 0 2.8-1.3 3.8-3M13.7 10c1-1.7 2.2-3 3.8-3H21" #{LINE}/><path d="M18 4l3 3-3 3M18 14l3 3-3 3" #{LINE}/>),
     book: %(<path d="M12 6.5C9.5 4.5 6 4.2 3 5v13.5c3-.8 6.5-.5 9 1.5 2.5-2 6-2.3 9-1.5V5c-3-.8-6.5-.5-9 1.5zM12 6.5V20" #{LINE}/>),
     bulb: %(<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z" #{LINE}/>),
-    slow: %(<path d="M6.5 3h11M6.5 21h11M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9s8 4 8 9" #{LINE}/>),
+    # Zzz: right, but sleepy
+    slow: %(<path d="M2.5 11h7l-7 9.5h7M12 5.5h5.5L12 13h5.5M18.5 1.8h3.5l-3.5 4.7H22" #{LINE}/>),
     bell: %(<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4" #{LINE}/>),
     # Two swords crossed, in the two players' colours
     versus: %(<path d="M4 4l11 11M12.5 17.5l5-5M16 16l4 4" fill="none" stroke="var(--blue)" stroke-width="2.4" stroke-linecap="round"/><path d="M20 4 9 15M6.5 12.5l5 5M8 16l-4 4" fill="none" stroke="var(--pink)" stroke-width="2.4" stroke-linecap="round"/>),
