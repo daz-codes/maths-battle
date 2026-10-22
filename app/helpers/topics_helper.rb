@@ -1,9 +1,10 @@
 module TopicsHelper
-  # Under a level's name: its stars, its best and the score for the next star, or what earns the first one
+  # Under a level's name: its best and the score for the next star, or what earns the first one. Its stars are on
+  # its circle already
   def star_progress(user, topic, level)
     stars, needed, best = user.stars(topic, level), topic.star_scores, user.best_score(topic, level)
-    return safe_join([ star_rating(stars), " best #{best}" ], " ·") if stars == Attempt::MAX_STARS
-    return safe_join([ star_rating(stars), " best #{best} · #{needed[stars + 1]} for #{pluralize(stars + 1, "star")}" ], " ·") if stars.positive?
+    return "Best: #{best}" if stars == Attempt::MAX_STARS
+    return "Best: #{best} · #{needed[stars + 1]} for #{pluralize(stars + 1, "star")}" if stars.positive?
 
     unlocks = topic.level(level + 1) && level == user.unlocked_level(topic)
     safe_join([ "Score #{needed[1]} for a ", icon(:star), (" and unlock level #{level + 1}" if unlocks) ].compact)

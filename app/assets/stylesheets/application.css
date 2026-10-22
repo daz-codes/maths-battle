@@ -1307,3 +1307,6 @@ body.testing {
 .versus__score { font-size: 2.6rem; font-weight: 800; line-height: 1; }
 .versus__vs { color: var(--muted); font-weight: 800; text-transform: uppercase; }
 .head-to-head__record { color: var(--muted); }
+.versus__unknown { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: color-mix(in srgb, var(--ink) 12%, transparent); font-weight: 800; }
+.head-to-head-link__target { font-size: 1.4rem; font-weight: 700; }
+.head-to-head-link__target strong { color: var(--pink-text); font-size: 2.4rem; }

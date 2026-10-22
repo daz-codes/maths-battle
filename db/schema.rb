@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_21_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_090000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -153,7 +153,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_21_160000) do
 
   create_table "head_to_heads", force: :cascade do |t|
     t.integer "challenger_id", null: false
-    t.integer "opponent_id", null: false
+    t.integer "opponent_id"
     t.string "topic", null: false
     t.integer "level", null: false
     t.boolean "mixed", default: false, null: false
@@ -165,10 +165,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_21_160000) do
     t.integer "winner_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "share_token"
     t.index ["challenger_attempt_id"], name: "index_head_to_heads_on_challenger_attempt_id"
     t.index ["challenger_id"], name: "index_head_to_heads_on_challenger_id"
     t.index ["opponent_attempt_id"], name: "index_head_to_heads_on_opponent_attempt_id"
     t.index ["opponent_id"], name: "index_head_to_heads_on_opponent_id"
+    t.index ["share_token"], name: "index_head_to_heads_on_share_token", unique: true
     t.index ["winner_id"], name: "index_head_to_heads_on_winner_id"
   end
 

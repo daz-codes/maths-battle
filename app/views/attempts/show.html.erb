@@ -19,10 +19,10 @@
     <% if @attempt.score > previous %>
       <p class="best-line best-line--new"><%= icon(:trophy) %> <%= @attempt.score %>, up from <%= previous %></p>
     <% elsif @attempt.score == previous %>
-      <p class="best-line">Level with your best of <%= previous %>. One more next time!</p>
+      <p class="best-line">Level with your best of <%= previous %>! One more next time!</p>
     <% else %>
       <% gap = previous - @attempt.score %>
-      <p class="best-line"><%= gap <= 3 ? "So close: " : "" %><%= gap + 1 %> more to beat your best of <%= previous %></p>
+      <p class="best-line"><%= gap <= 3 ? "So close! " : "" %><%= gap + 1 %> more to beat your best of <%= previous %></p>
     <% end %>
   <% end %>
 
@@ -79,7 +79,7 @@
     <% end %>
   </div>
   <%# The same game, sent for a friend to beat %>
-  <%= link_to safe_join([ icon(:versus), " Challenge a friend to beat #{@attempt.score}" ]), new_head_to_head_path(attempt: @attempt), class: "button button--wide button--challenge" if @attempt.sendable? && @attempt.user.rivals.exists? %>
+  <%= link_to safe_join([ icon(:versus), " Challenge a friend to beat #{@attempt.score}" ]), new_head_to_head_path(attempt: @attempt), class: "button button--wide button--challenge" if @attempt.sendable? %>
   <% end %>
 
   <p class="feedback"><%= @attempt.feedback_message %></p>

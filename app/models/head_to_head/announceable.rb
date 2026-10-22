@@ -5,7 +5,7 @@ module HeadToHead::Announceable
   extend ActiveSupport::Concern
 
   included do
-    after_commit :announce_sent, on: %i[ create update ], if: -> { saved_change_to_challenger_attempt_id? && sent? }
+    after_commit :announce_sent, on: %i[ create update ], if: -> { saved_change_to_challenger_attempt_id? && sent? && opponent }
     after_commit :announce_result, on: :update, if: -> { saved_change_to_decided_at? && decided? }
   end
 

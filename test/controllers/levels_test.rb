@@ -29,16 +29,17 @@ class LevelsTest < ActionDispatch::IntegrationTest
     practise(level: 1, score: 12)
     patch level_path, params: { level: 1 }
     get root_path
-    assert_select ".levels__progress", text: /best 12 · 20 for 3 stars/
-    assert_select ".levels__progress .stars[aria-label='2 of 3 stars']"
+    assert_select ".levels__progress", text: /Best: 12 · 20 for 3 stars/
+    assert_select ".levels__progress .stars", count: 0, message: "the stars are on the level's circle"
+    assert_select ".levels__level .stars[aria-label='2 of 3 stars']"
   end
 
   test "the results page says what the next star needs" do
     practise(level: 1, score: 7)
     get attempt_path(@user.attempts.last)
 
-    assert_select ".level-progress", text: /best 7 · 10 for 2 stars/
-    assert_select ".level-progress .stars[aria-label='1 of 3 stars']"
+    assert_select ".level-progress", text: /Best: 7 · 10 for 2 stars/
+    assert_select ".level-progress .stars", count: 0
   end
 
   test "a bronze is celebrated as a level up, and Play moves up to the new level" do
@@ -166,9 +167,9 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_select ".best-line--new", text: "15, up from 12"
 
     get attempt_path(practise(level: 1, score: 13))
-    assert_select ".best-line", text: "So close: 3 more to beat your best of 15"
+    assert_select ".best-line", text: "So close! 3 more to beat your best of 15"
     get attempt_path(practise(level: 1, score: 15))
-    assert_select ".best-line", text: "Level with your best of 15. One more next time!"
+    assert_select ".best-line", text: "Level with your best of 15! One more next time!"
     get attempt_path(practise(level: 1, score: 6))
     assert_select ".best-line", text: "10 more to beat your best of 15"
   end

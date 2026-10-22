@@ -10,7 +10,6 @@ class GroupsController < ApplicationController
     @waiting_counts = @user.group_challenges_to_play.group_by(&:group_id).transform_values(&:size)
     @member_counts = Group::Membership.where(group: @groups).group(:group_id).count
     @head_to_heads = recent_head_to_heads
-    @rivals = @user.rivals.order(:name, :username)
   end
 
   def new

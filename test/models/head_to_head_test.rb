@@ -119,6 +119,19 @@ class HeadToHeadTest < ActiveSupport::TestCase
     end
   end
 
+  test "a link is taken up once, not by the challenger, and not after it's run out" do
+    carol = User.create!(username: "carol", password: "a long password 123")
+    link = HeadToHead.from_game(record_tables_game(@ada, tables_results(right: 5)))
+    assert link.link?
+    assert_not link.claim(@ada)
+    assert link.claim(carol)
+    assert_not link.claim(@bob)
+    assert_equal carol, link.reload.opponent
+
+    late = HeadToHead.from_game(record_tables_game(@ada, tables_results(right: 5)))
+    travel(4.days) { assert_not late.claim(carol) }
+  end
+
   test "a player who's deleted takes their head to heads with them" do
     sent_game
     assert_difference "HeadToHead.count", -1 do

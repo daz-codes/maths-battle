@@ -49,11 +49,11 @@ class Attempt::ReviewableTest < ActiveSupport::TestCase
   test "says well done when everything was right" do
     feedback = attempt_with([ 2, 3, 6 ], [ 4, 5, 20 ])
     assert_empty feedback.missed_facts
-    assert_equal "Every answer right. Brilliant, ada!", feedback.feedback_message
+    assert_equal "Every answer right! Brilliant, ada!", feedback.feedback_message
   end
 
   test "uses the player's name" do
     @user.update!(name: "Ada")
-    assert_equal "Every answer right. Brilliant, Ada!", attempt_with([ 2, 3, 6 ]).feedback_message
+    assert_equal "Every answer right! Brilliant, Ada!", attempt_with([ 2, 3, 6 ]).feedback_message
   end
 end

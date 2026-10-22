@@ -13,24 +13,7 @@
       </ul>
     <% end %>
 
-    <% if @rivals.any? %>
-      <ul class="rival-rows" aria-label="Friends to challenge">
-        <% @rivals.each do |rival| %>
-          <li class="rival-row">
-            <%= render "avatar", user: rival, size: "small" %>
-            <span class="rival-row__who">
-              <span class="rival-row__name"><%= rival.display_name %></span>
-              <span class="rival-row__record"><%= record_line(@user.head_to_head_record(rival)) %></span>
-            </span>
-            <%= button_to "Challenge", head_to_heads_path, params: { opponent_id: rival.id }, class: "button button--share rival-row__button",
-                  title: "Play #{current_topic.title} level #{current_level}, then send it to #{rival.display_name}" %>
-          </li>
-        <% end %>
-      </ul>
-      <p class="hint">Challenge plays <%= current_topic.title.downcase %> level <%= current_level %> first, then sends it. Or send any game from its results.</p>
-    <% else %>
-      <p class="aside">Join a group to find friends to challenge.</p>
-    <% end %>
+    <p class="aside">Challenge a friend from any game's results: they play the same questions and try to beat you.</p>
   </section>
 
   <section class="group-list" aria-labelledby="groups-heading">

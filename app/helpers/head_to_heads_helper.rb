@@ -8,8 +8,10 @@ module HeadToHeadsHelper
 
   # Where a head to head stands, for one of its players
   def head_to_head_status(head_to_head, user)
-    rival = head_to_head.rival_of(user).display_name
-    if head_to_head.decided?
+    rival = head_to_head.rival_of(user)&.display_name
+    if head_to_head.link?
+      head_to_head.open? ? "Sent as a link · #{time_left(head_to_head)}" : "No one took up your link in time"
+    elsif head_to_head.decided?
       mine, theirs = head_to_head.attempt_of(user).score, head_to_head.attempt_of(head_to_head.rival_of(user)).score
       { won: "You won #{mine}–#{theirs}", lost: "#{rival} won #{theirs}–#{mine}", drew: "A draw, #{mine}–#{theirs}" }.fetch(head_to_head.result_for(user))
     elsif !head_to_head.sent?
@@ -27,7 +29,7 @@ module HeadToHeadsHelper
   def head_to_head_result_message(attempt, head_to_head)
     if head_to_head.nil?
       "Saved to your history: this head to head was over before your game was saved."
-    elsif head_to_head.decided?
+    elsif head_to_head.decided? || head_to_head.link?
       head_to_head_status(head_to_head, attempt.user)
     else
       "Sent! #{head_to_head.rival_of(attempt.user).display_name} has #{HeadToHead::TIME_TO_PLAY.inspect} to beat your #{attempt.score}."

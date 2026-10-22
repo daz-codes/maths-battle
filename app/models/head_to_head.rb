@@ -1,14 +1,15 @@
-# Two players on the same questions. The challenger plays first, or sends a game they've just played, and the
-# opponent then has a few days to beat their score. One go each: the first saved game is the one that counts. Only
-# players who already know each other can play, by sharing a group or having played before (User::HeadToHeadable),
-# and their wins, losses and draws add up across rematches
+# Two players on the same questions. The challenger sends a game they've just played, or plays a rematch first,
+# and the opponent then has a few days to beat their score. One go each: the first saved game is the one that
+# counts. The opponent is someone the challenger already knows, by sharing a group or having played before
+# (User::HeadToHeadable), or whoever opens the game's link first (Linkable). Wins, losses and draws add up across
+# rematches
 class HeadToHead < ApplicationRecord
-  include Announceable, Decidable
+  include Announceable, Decidable, Linkable
 
   TIME_TO_PLAY = 3.days
 
   belongs_to :challenger, class_name: "User"
-  belongs_to :opponent, class_name: "User"
+  belongs_to :opponent, class_name: "User", optional: true
   belongs_to :challenger_attempt, class_name: "Attempt", optional: true
   belongs_to :opponent_attempt, class_name: "Attempt", optional: true
   belongs_to :winner, class_name: "User", optional: true
@@ -25,8 +26,8 @@ class HeadToHead < ApplicationRecord
 
   class << self
     # A game the challenger has just played, sent as it is: the questions they answered, then more like them in case
-    # the opponent gets further
-    def from_game(attempt, opponent:)
+    # the opponent gets further. No opponent sends it as a link
+    def from_game(attempt, opponent: nil)
       played = attempt.results.map { |result| attempt.topic_module.worked(result.except(*User::ANSWER_FIELDS).symbolize_keys) }
       more = questions_for(attempt.topic_module, attempt.level, attempt.mixed?, count: User::QUESTION_COUNT - played.size)
       create!(challenger: attempt.user, opponent: opponent, topic: attempt.topic, level: attempt.level, mixed: attempt.mixed?,
@@ -56,6 +57,7 @@ class HeadToHead < ApplicationRecord
     user.present? && user.id.in?([ challenger_id, opponent_id ])
   end
 
+  # Nil for the challenger of a link no one has opened yet
   def rival_of(user)
     user.id == challenger_id ? opponent : challenger
   end
@@ -70,6 +72,6 @@ class HeadToHead < ApplicationRecord
     end
 
     def opponent_known
-      errors.add(:opponent, "isn't someone you know") unless challenger && opponent && challenger.rival?(opponent)
+      errors.add(:opponent, "isn't someone you know") if opponent && !challenger&.rival?(opponent)
     end
 end

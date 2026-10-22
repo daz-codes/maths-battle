@@ -48,18 +48,57 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     assert_select ".banner", text: /Waiting for Bob · 3 days left/
   end
 
-  test "no one to challenge without a group, and only people you know" do
+  test "without a group there's no one to pick, but the game can still go as a link; only people you know can be picked" do
     @group.destroy!
     sign_in_as @ada
     game = practice_game
     get attempt_path(game)
-    assert_select "a.button--challenge", count: 0
-
     get new_head_to_head_path(attempt: game)
-    assert_select "a[href=?]", groups_path, text: "Join or start a group"
+    assert_select ".rival-row", count: 0
+    assert_select "form[action=?] button", head_to_heads_path, text: "Share a link"
 
     post head_to_heads_path, params: { opponent_id: @bob.id, attempt_id: game.id }
     assert_response :not_found
+  end
+
+  test "sent as a link: the first to open it and play is the opponent, a guest giving their name, and they're rivals after" do
+    sign_in_as @ada
+    game = practice_game(right: 9)
+    assert_difference "HeadToHead.count" do
+      2.times { post head_to_heads_path, params: { attempt_id: game.id } }
+    end
+    head_to_head = HeadToHead.last
+    assert_nil head_to_head.opponent
+    assert_redirected_to head_to_head
+    follow_redirect!
+    assert_select "h1", text: /You vs \?/
+    assert_select "[data-controller=share][data-share-text-value=?]",
+      "Ada scored 9 in a minute at Times tables · Level 1. Can you beat it? #{head_to_head_link_url(head_to_head.share_token)}"
+    assert_select ".banner", text: /Sent as a link · 3 days left/
+    sign_out
+
+    get head_to_head_link_path(head_to_head.share_token)
+    assert_select "h1", text: /Ada challenged you!/
+    assert_select ".head-to-head-link__target", text: "Beat 9 in a minute"
+    assert_select "input[name=name][required]"
+    post head_to_head_link_path(head_to_head.share_token)
+    assert_redirected_to head_to_head_link_path(head_to_head.share_token), "a name first"
+
+    post head_to_head_link_path(head_to_head.share_token), params: { name: "Zara" }
+    zara = User.find_by(name: "Zara")
+    assert zara.guest?
+    assert_equal zara, head_to_head.reload.opponent
+    assert_redirected_to play_path("times-tables", head_to_head: head_to_head.id)
+    follow_redirect!
+    play_from_page(zara, right: 3)
+    assert_equal @ada, head_to_head.reload.winner
+    assert zara.rival?(@ada)
+
+    sign_in_as @bob
+    get head_to_head_link_path(head_to_head.share_token)
+    assert_select ".aside", text: "Someone else has already taken up this challenge."
+    get head_to_head_link_path("nope")
+    assert_redirected_to root_path
   end
 
   test "the friend sees it on the home page, plays the same questions to beat the score, and both see who won" do
@@ -97,14 +136,13 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?] button", head_to_heads_path, text: "Rematch"
   end
 
-  test "a rematch, or a challenge from the Compete page, is new questions the challenger plays first, then it's sent" do
+  test "a rematch is new questions the challenger plays first, then it's sent" do
     sign_in_as @ada
     get groups_path
     assert_select "h1", text: "Compete"
-    assert_select ".rival-row__name", text: "Bob"
-    assert_select ".rival-row form[action=?] button", head_to_heads_path, text: "Challenge"
+    assert_select ".rival-row", count: 0, message: "challenges start from a game"
 
-    post head_to_heads_path, params: { opponent_id: @bob.id }
+    post head_to_heads_path, params: { opponent_id: @bob.id, topic: "times_tables", level: 1 }
     head_to_head = HeadToHead.last
     assert_not head_to_head.sent?
     assert_redirected_to play_path("times-tables", head_to_head: head_to_head.id)

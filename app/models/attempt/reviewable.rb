@@ -10,15 +10,15 @@ module Attempt::Reviewable
 
   def feedback_message
     if review?
-      perfect? ? "Every one right. Those mistakes are fixed#{with_name}!" : "Good work#{with_name}. The ones you missed are still there to review."
+      perfect? ? "Every one right! Those mistakes are fixed#{with_name}!" : "Good work#{with_name}! The ones you missed are still there to review."
     elsif answered.zero?
-      "Have another go — type your answers as fast as you can!"
+      "Have another go! Type your answers as fast as you can!"
     elsif weak_groups.any?
       topic_module.practise_message(weak_groups)
     elsif perfect?
-      "Every answer right. Brilliant#{with_name}!"
+      "Every answer right! Brilliant#{with_name}!"
     else
-      "Great work#{with_name} — keep your streak going!"
+      "Great work#{with_name}! Keep your streak going!"
     end
   end
 

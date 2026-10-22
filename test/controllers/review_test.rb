@@ -112,7 +112,7 @@ class ReviewTest < ActionDispatch::IntegrationTest
     post attempts_path, params: review_upload(score: 1), as: :json
     get response.parsed_body["url"]
 
-    assert_select ".feedback", text: /Every one right. Those mistakes are fixed/
+    assert_select ".feedback", text: /Every one right! Those mistakes are fixed/
     assert_select ".results__actions a[href=?]", play_path("times-tables", level: 1), text: "Play level 1"
   end
 
