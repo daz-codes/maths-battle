@@ -22,8 +22,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // after a warning, and then nothing is saved. A review has no clock or gems: it asks each of its
 // questions once and ends after the last
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "gemIcon", "trophyIcon" ]
-  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, submitUrl: String, keys: Array, gemTimes: Object }
+  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "gemIcon", "trophyIcon" ]
+  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, ghost: Object, submitUrl: String, keys: Array, gemTimes: Object }
 
   connect() {
     preparePlayer()
@@ -45,6 +45,7 @@ export default class extends Controller {
     this.index = 0
     this.typed = ""
     this.score = 0
+    this.ghostScore = 0
     this.results = []
 
     this.keydown = this.keydown.bind(this)
@@ -119,6 +120,7 @@ export default class extends Controller {
     if (left <= 0) return this.finish()
 
     this.fillRing(1 - left / DURATION)
+    this.moveGhost(DURATION - left)
     const seconds = Math.ceil(left / 1000)
     if (seconds !== this.seconds) {
       this.seconds = seconds
@@ -127,6 +129,27 @@ export default class extends Controller {
       if (seconds <= TICKING_FROM) feedback.clockTick()
     }
     this.frame = requestAnimationFrame(this.tick)
+  }
+
+  // A head to head's challenger, racing alongside: how many they'd got right by this point in their minute,
+  // and whether they're ahead
+  moveGhost(elapsed) {
+    if (!this.hasGhostTarget) return
+
+    const times = this.ghostValue.times || []
+    const before = this.ghostScore
+    while (this.ghostScore < times.length && times[this.ghostScore] <= elapsed) this.ghostScore++
+    if (this.ghostScore !== before) {
+      this.ghostTarget.textContent = `${this.ghostValue.name} ${this.ghostScore}`
+      this.showGhostLead()
+    }
+  }
+
+  showGhostLead() {
+    if (!this.hasGhostTarget) return
+
+    this.ghostTarget.classList.toggle("test__ghost--ahead", this.ghostScore > this.score)
+    this.ghostTarget.classList.toggle("test__ghost--behind", this.ghostScore < this.score)
   }
 
   // Fills the ring's quarters one after another, so a whole minute completes the logo,
@@ -235,6 +258,7 @@ export default class extends Controller {
       feedback.right()
       if (!this.review) this.popGems(ms)
       if (this.bestValue && this.score === this.bestValue + 1) this.passBest()
+      this.showGhostLead()
       this.next()
     } else {
       this.showCorrection()

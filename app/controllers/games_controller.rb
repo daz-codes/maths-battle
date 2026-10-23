@@ -15,6 +15,7 @@ class GamesController < ApplicationController
 
     @level = game_level
     @best = best_to_beat
+    @ghost = @head_to_head.ghost if @mode == "head_to_head" && @head_to_head.sent?
     remember_topic @topic unless @mode.in?(%w[ group head_to_head ])
     @question_sets = question_sets
     @question_sets.each do |set|

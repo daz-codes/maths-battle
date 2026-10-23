@@ -4,7 +4,7 @@
 # (User::HeadToHeadable), or whoever opens the game's link first (Linkable). Wins, losses and draws add up across
 # rematches
 class HeadToHead < ApplicationRecord
-  include Announceable, Decidable, Linkable
+  include Announceable, Decidable, Ghostable, Linkable
 
   TIME_TO_PLAY = 3.days
 

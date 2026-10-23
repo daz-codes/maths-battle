@@ -12,6 +12,7 @@
       data-test-round-value="<%= @round&.id || @head_to_head&.id %>"
       data-test-best-value="<%= @best %>"
       data-test-passed-value="<%= @mode == "head_to_head" ? "Winning!" : "New best!" %>"
+      <% if @ghost %>data-test-ghost-value="<%= @ghost.to_json %>"<% end %>
       data-test-keys-value="<%= @topic.keys(@level).to_json %>"
       data-test-gem-times-value="<%= @topic.gem_times.to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">
@@ -23,6 +24,8 @@
     <span class="test__tally">
       <span class="test__score" data-test-target="score" aria-label="Score">0</span>
       <% if @best.positive? %><span class="test__best" data-test-target="best"><%= @mode == "head_to_head" ? "Beat" : "Best" %> <%= @best %></span><% end %>
+      <%# A head to head races the challenger's game: their score as it was at this point in their minute %>
+      <% if @ghost %><span class="test__ghost" data-test-target="ghost" aria-label="<%= @ghost[:name] %>'s score at this point"><%= @ghost[:name] %> 0</span><% end %>
     </span>
     <% if @mode == "review" %>
       <%= render "clock", hands: false, class: "timer__clock" %>

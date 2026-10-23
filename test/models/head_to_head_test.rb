@@ -132,6 +132,14 @@ class HeadToHeadTest < ActiveSupport::TestCase
     travel(4.days) { assert_not late.claim(carol) }
   end
 
+  test "the ghost: when in the minute each right answer came, with a wrong answer's pause added back" do
+    results = [ { a: 2, b: 3, given: 6, ms: 1000 }, { a: 2, b: 3, given: 7, ms: 2000 }, { a: 2, b: 3, given: 6, ms: 500 } ]
+    head_to_head = HeadToHead.from_game(record_tables_game(@ada, results), opponent: @bob)
+    assert_equal({ name: "Ada", times: [ 1000, 3900 ] }, head_to_head.ghost)
+
+    assert_nil HeadToHead.fresh(challenger: @ada, opponent: @bob, topic: TimesTables, level: 1).ghost, "nothing to race before it's played"
+  end
+
   test "a player who's deleted takes their head to heads with them" do
     sent_game
     assert_difference "HeadToHead.count", -1 do

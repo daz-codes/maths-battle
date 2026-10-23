@@ -115,6 +115,9 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     get play_path("times-tables", head_to_head: head_to_head.id)
     assert_select "[data-test-mode-value=head_to_head][data-test-best-value='4'][data-test-passed-value='Winning!']"
     assert_select ".test__best", text: "Beat 4"
+    ghost = JSON.parse(css_select("[data-controller=test]").first["data-test-ghost-value"])
+    assert_equal({ "name" => "Ada", "times" => [ 1000, 2000, 3000, 4000 ] }, ghost)
+    assert_select ".test__ghost", text: "Ada 0"
     game = play_from_page(@bob, right: 6)
     assert_equal [ "head_to_head", game ], [ game.mode, head_to_head.reload.opponent_attempt ]
     assert_equal @bob, head_to_head.winner
@@ -150,6 +153,7 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     assert_select ".challenge-card", count: 0, message: "not shown until both have played"
     get play_path("times-tables", head_to_head: head_to_head.id)
     assert_select ".test__best", count: 0, message: "nothing to beat when playing first"
+    assert_select ".test__ghost", count: 0
     game = play_from_page(@ada, right: 5)
     assert_equal game, head_to_head.reload.challenger_attempt
 

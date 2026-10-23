@@ -1317,3 +1317,11 @@ body.testing {
 .versus__unknown { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: color-mix(in srgb, var(--ink) 12%, transparent); font-weight: 800; }
 .head-to-head-link__target { font-size: 1.4rem; font-weight: 700; }
 .head-to-head-link__target strong { color: var(--pink-text); font-size: 2.4rem; }
+
+/* A head to head's ghost: the challenger's score at this point in their minute, pink while they're ahead and
+   green once you are */
+.test__ghost { color: var(--muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; transition: color 150ms; }
+.test__ghost--ahead { color: var(--pink-text); }
+.test__ghost--behind { color: var(--green-deep); }
+:root[data-theme="dark"] .test__ghost--behind { color: var(--green); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .test__ghost--behind { color: var(--green); } }
