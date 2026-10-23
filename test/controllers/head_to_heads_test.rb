@@ -147,7 +147,7 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     assert_not head_to_head.sent?
     assert_redirected_to play_path("times-tables", head_to_head: head_to_head.id)
     get groups_path
-    assert_select ".challenge-card", count: 0, message: "not shown until it's been played"
+    assert_select ".challenge-card", count: 0, message: "not shown until both have played"
     get play_path("times-tables", head_to_head: head_to_head.id)
     assert_select ".test__best", count: 0, message: "nothing to beat when playing first"
     game = play_from_page(@ada, right: 5)
@@ -156,7 +156,14 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     get attempt_path(game)
     assert_select ".banner--group", text: "Sent! Bob has 3 days to beat your 5."
     get groups_path
-    assert_select ".challenge-card", text: /You vs Bob.*Waiting for Bob/m
+    assert_select ".challenge-card", count: 0, message: "still waiting for Bob"
+
+    sign_in_as @bob
+    get play_path("times-tables", head_to_head: head_to_head.id)
+    play_from_page(@bob, right: 2)
+    sign_in_as @ada
+    get groups_path
+    assert_select ".challenge-card", text: /You vs Bob.*You won 5–2/m
   end
 
   test "only its two players see a head to head" do

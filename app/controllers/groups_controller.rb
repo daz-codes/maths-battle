@@ -42,11 +42,12 @@ class GroupsController < ApplicationController
   end
 
   private
-    # Once the challenger has played: a rematch started and never played isn't shown. Latest first
+    # Once both have played, the latest first. One still waiting is on its page (and the opponent's home page), so
+    # games played and never sent, or links never shared, don't sit here
     def recent_head_to_heads
       return [] unless @user.persisted?
 
-      @user.head_to_heads.sent
-        .includes(:challenger, :opponent, :challenger_attempt, :opponent_attempt).order(updated_at: :desc).limit(10)
+      @user.head_to_heads.decided
+        .includes(:challenger, :opponent, :challenger_attempt, :opponent_attempt).order(decided_at: :desc).limit(10)
     end
 end
