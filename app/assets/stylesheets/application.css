@@ -1325,3 +1325,16 @@ body.testing {
 .test__ghost--behind { color: var(--green-deep); }
 :root[data-theme="dark"] .test__ghost--behind { color: var(--green); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .test__ghost--behind { color: var(--green); } }
+
+/* Live games: the lobby, the others' scores while playing, and the podium */
+.live-start, .live-status, .live-podium { display: grid; gap: 0.6rem; width: 100%; }
+.live-status__waiting { font-size: 1.2rem; font-weight: 700; }
+.live-players__count { list-style: none; }
+.test--live { grid-template-rows: auto auto 1fr auto; }
+.test__rivals { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem 0.75rem; margin: 0; padding: 0 1rem; list-style: none; }
+.test__rival { color: var(--muted); font-size: 0.85rem; font-weight: 700; white-space: nowrap; transition: color 150ms; }
+.test__rival strong { font-size: 1rem; }
+.test__rival--ahead { color: var(--pink-text); }
+.test__rival--behind { color: var(--green-deep); }
+:root[data-theme="dark"] .test__rival--behind { color: var(--green); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .test__rival--behind { color: var(--green); } }

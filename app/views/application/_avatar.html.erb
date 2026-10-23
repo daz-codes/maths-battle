@@ -1,7 +1,8 @@
 <%# The player's picture, or the first letter of their username on their neon colour. A picture is only ever shown
-    to its owner, so anyone else (on a group's leaderboard) is shown by their letter %>
+    to its owner, so anyone else (on a group's leaderboard) is shown by their letter. letter_only: true for a
+    partial broadcast to many pages, rendered with no request to say whose it is %>
 <% size = local_assigns.fetch(:size, "medium") %>
-<% if user == current_player && user.avatar.attached? %>
+<% if !local_assigns[:letter_only] && user == current_player && user.avatar.attached? %>
   <%= image_tag avatar_path, alt: "", class: "avatar avatar--#{size}", data: local_assigns[:data] %>
 <% else %>
   <span class="avatar avatar--<%= size %> avatar--letter avatar--<%= user.avatar_colour %>" aria-hidden="true"

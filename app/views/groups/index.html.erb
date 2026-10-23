@@ -16,6 +16,13 @@
     <p class="aside">Challenge a friend from any game's results: they play the same questions and try to beat you.</p>
   </section>
 
+  <section class="live-start" aria-labelledby="live-heading">
+    <h2 class="settings__heading" id="live-heading">Live</h2>
+    <p class="aside">Race up to <%= LiveGame::MAX_PLAYERS - 1 %> friends at the same time, on the same questions.</p>
+    <%= button_to safe_join([ icon(:lightning), " Play live" ]), live_games_path, class: "button button--start button--wide", form_class: "wide-form" %>
+    <p class="hint hint--centre"><%= current_topic.title %> · Level <%= current_level %>. Share the link, then start when everyone's in.</p>
+  </section>
+
   <section class="group-list" aria-labelledby="groups-heading">
     <h2 class="settings__heading" id="groups-heading">Groups</h2>
     <% if @groups.any? %>

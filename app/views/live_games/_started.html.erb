@@ -1,0 +1,5 @@
+<%# Sent to everyone in the lobby when the host starts: straight to the game %>
+<section id="live-status" class="live-status" data-controller="live-start" data-live-start-url-value="<%= play_path(live_game.topic_module.slug, live: live_game.code) %>">
+  <p class="live-status__waiting">It's starting!</p>
+  <%= link_to "Play", play_path(live_game.topic_module.slug, live: live_game.code), class: "button button--start button--wide" %>
+</section>

@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { Turbo } from "@hotwired/turbo-rails"
+import { Turbo, cable } from "@hotwired/turbo-rails"
 import { chooseQuestionSet, playerKey, preparePlayer, postGame, saveForLater, watchPlayer } from "lib/offline_games"
 import { finished, shown, typedWith } from "lib/answer_input"
 import * as feedback from "lib/feedback"
@@ -22,8 +22,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // after a warning, and then nothing is saved. A review has no clock or gems: it asks each of its
 // questions once and ends after the last
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "gemIcon", "trophyIcon" ]
-  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, ghost: Object, submitUrl: String, keys: Array, gemTimes: Object }
+  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "rival", "gemIcon", "trophyIcon" ]
+  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, ghost: Object, live: Object, submitUrl: String, keys: Array, gemTimes: Object }
 
   connect() {
     preparePlayer()
@@ -54,7 +54,51 @@ export default class extends Controller {
     document.addEventListener("keydown", this.keydown)
     window.addEventListener("beforeunload", this.beforeUnload)
 
-    this.review ? this.startReview() : this.countdown(COUNTDOWN)
+    if (this.review) this.startReview()
+    else if (this.live) this.joinLive()
+    else this.countdown(COUNTDOWN)
+  }
+
+  // A live game: everyone starts at the same moment, set by the server, and plays the same minute
+  get live() {
+    return this.hasLiveValue
+  }
+
+  joinLive() {
+    this.liveStartAt = performance.now() + this.liveValue.startsInMs
+    cable.subscribeTo({ channel: "LiveGameChannel", pass: this.liveValue.pass }, { received: (data) => this.rivalScored(data) })
+      .then((subscription) => { this.disconnected ? subscription.unsubscribe() : this.liveChannel = subscription })
+    this.waitForLiveStart()
+  }
+
+  // Counts down to the start, or starts at once if it's already begun (the minute is shorter, not longer)
+  waitForLiveStart() {
+    const lead = COUNTDOWN.reduce((total, [ , ms ]) => total + ms, 0)
+    const untilCountdown = this.liveStartAt - lead - performance.now()
+    if (untilCountdown > 0) {
+      this.questionTarget.textContent = "Get ready…"
+      this.countdownTimer = setTimeout(() => this.countdown(COUNTDOWN), untilCountdown)
+    } else {
+      this.countdownTimer = setTimeout(() => this.start(), Math.max(0, this.liveStartAt - performance.now()))
+    }
+  }
+
+  // Another player's score has gone up: shown with theirs, pink while they're ahead
+  rivalScored({ player_id, score }) {
+    const rival = this.rivalTargets.find((element) => element.dataset.playerId === String(player_id))
+    if (!rival) return
+
+    rival.dataset.score = score
+    rival.querySelector("strong").textContent = score
+    this.showRivalLeads()
+  }
+
+  showRivalLeads() {
+    this.rivalTargets.forEach((rival) => {
+      const score = Number(rival.dataset.score || 0)
+      rival.classList.toggle("test__rival--ahead", score > this.score)
+      rival.classList.toggle("test__rival--behind", score < this.score)
+    })
   }
 
   // Mixed practice's or a review's spares are its own, as its questions are mixed from every level, and a group
@@ -69,6 +113,8 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.disconnected = true
+    this.liveChannel?.unsubscribe()
     this.unwatch?.()
     document.removeEventListener("keydown", this.keydown)
     window.removeEventListener("beforeunload", this.beforeUnload)
@@ -89,7 +135,7 @@ export default class extends Controller {
   }
 
   start() {
-    this.endsAt = performance.now() + DURATION
+    this.endsAt = (this.live ? this.liveStartAt : performance.now()) + DURATION
     this.show()
     this.run()
   }
@@ -259,6 +305,10 @@ export default class extends Controller {
       if (!this.review) this.popGems(ms)
       if (this.bestValue && this.score === this.bestValue + 1) this.passBest()
       this.showGhostLead()
+      if (this.live) {
+        this.liveChannel?.perform("score", { score: this.score })
+        this.showRivalLeads()
+      }
       this.next()
     } else {
       this.showCorrection()
@@ -354,12 +404,13 @@ export default class extends Controller {
     this.stopClock()
   }
 
+  // A live game's clock is everyone's, so it keeps going while paused
   resume() {
     this.element.classList.remove("test--paused")
-    if (this.pausedFrom === "countdown") return this.restartCountdown()
+    if (this.pausedFrom === "countdown") return this.live ? this.waitForLiveStart() : this.restartCountdown()
 
     const pausedFor = performance.now() - this.pausedAt
-    this.endsAt += pausedFor
+    if (!this.live) this.endsAt += pausedFor
     // A question shown during the pause (after a correction) starts its timing now
     this.shownAt = this.shownAt < this.pausedAt ? this.shownAt + pausedFor : performance.now()
     this.run()

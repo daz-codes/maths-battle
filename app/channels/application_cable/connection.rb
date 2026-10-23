@@ -1,16 +1,11 @@
 module ApplicationCable
+  # Visitors connect too, with no user: someone opening a live game's link sees its lobby before joining. Turbo's
+  # streams are signed, so only pages the server rendered can listen to one, and channels check who's asking
   class Connection < ActionCable::Connection::Base
     identified_by :current_user
 
     def connect
-      set_current_user || reject_unauthorized_connection
+      self.current_user = Session.find_by(id: cookies.signed[:session_id])&.user
     end
-
-    private
-      def set_current_user
-        if session = Session.find_by(id: cookies.signed[:session_id])
-          self.current_user = session.user
-        end
-      end
   end
 end

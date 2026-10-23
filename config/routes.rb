@@ -18,6 +18,11 @@ Rails.application.routes.draw do
     resources :memberships, only: :destroy, controller: "group_memberships"
   end
   resources :head_to_heads, only: %i[ new create show ]
+  # Live games, at /live/K7Q2MX: its lobby (and podium), joining it, and the host starting it
+  resources :live_games, only: %i[ create show ], path: "live", param: :code do
+    resource :player, only: :create, controller: "live_game_players"
+    resource :start, only: :create, controller: "live_game_starts"
+  end
   # A head to head sent as a link: whoever opens it first and plays is the opponent
   get "c/:token", to: "head_to_head_links#show", as: :head_to_head_link
   post "c/:token", to: "head_to_head_links#create"

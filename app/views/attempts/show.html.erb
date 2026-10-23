@@ -56,6 +56,20 @@
     <div class="results__actions results__actions--one">
       <%= link_to "See the head to head", head_to_head || groups_path, class: "button button--blue" %>
     </div>
+  <% elsif @attempt.live? %>
+    <%# Where they came, and everyone's places as their games come in %>
+    <% live_game = @attempt.live_game %>
+    <% if live_game %>
+      <%= turbo_stream_from live_game %>
+      <% place = live_game.place_of(@attempt.user) %>
+      <p class="banner banner--group" <%= "data-controller=confetti" if place&.rank == 1 %>><%= icon(:lightning) %> <%= place&.rank ? "You came #{place.rank.ordinalize}!" : "Your game's saved" %></p>
+      <%= render "live_games/podium", live_game: live_game %>
+    <% else %>
+      <p class="banner banner--group">Saved to your history: this live game was over before your game was saved.</p>
+    <% end %>
+    <div class="results__actions results__actions--one">
+      <%= button_to safe_join([ icon(:lightning), " Play live again" ]), live_games_path, class: "button button--blue button--wide", form_class: "wide-form" %>
+    </div>
   <% elsif @attempt.review? %>
     <%# Nothing to share without a clock: on to the mistakes still left, or back to practice %>
     <% topic = @attempt.topic_module %>

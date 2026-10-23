@@ -1,0 +1,44 @@
+<% content_for :title, "Live game · MatheMinute" %>
+<% host = @live_game.hosted_by?(@user) %>
+
+<main class="page live-game">
+  <%= turbo_stream_from @live_game %>
+  <%= link_to "← Compete", groups_path, class: "back-link" %>
+  <h1 class="heading"><%= icon(:lightning) %> Live game</h1>
+  <p class="aside"><%= topic_icon(@live_game.topic_module) %> <%= @live_game.title %> · hosted by <%= host ? "you" : @live_game.host.display_name %></p>
+  <%= render "flash" %>
+
+  <% if @live_game.started? %>
+    <% if @live_game.running? && @player && !@player.played? %>
+      <%= render "live_games/started", live_game: @live_game %>
+    <% end %>
+    <%= render "live_games/podium", live_game: @live_game %>
+  <% else %>
+    <section id="live-status" class="live-status">
+      <% if host %>
+        <% url = live_game_url(@live_game) %>
+        <button type="button" class="button button--blue button--wide" data-controller="share"
+                data-share-text-value="Race me at <%= @live_game.title %> on MatheMinute, live! <%= url %>" data-action="share#share">Share the link</button>
+        <p class="hint hint--centre"><%= url %> · code <strong><%= @live_game.code %></strong></p>
+        <%= button_to "Start", live_game_start_path(@live_game), class: "button button--start button--wide", form_class: "wide-form" %>
+        <p class="hint hint--centre">Everyone's game starts together. Start once your friends are in.</p>
+      <% elsif @player %>
+        <p class="live-status__waiting">Waiting for <%= @live_game.host.display_name %> to start…</p>
+      <% elsif @live_game.joinable? %>
+        <%= form_with url: live_game_player_path(@live_game), class: "form" do %>
+          <% if @user.name.blank? && @user.guest? %>
+            <%= label_tag :name, "What should we call you?" %>
+            <%= text_field_tag :name, nil, autocomplete: "given-name", maxlength: User::NAME_LENGTH, required: true %>
+            <p class="hint">The other players see it. A first name is plenty.</p>
+          <% end %>
+          <%= submit_tag "Join the game", class: "button button--go button--wide", name: nil %>
+        <% end %>
+      <% else %>
+        <p class="aside">This lobby is full or has closed.</p>
+      <% end %>
+    </section>
+
+    <h2 class="settings__heading">Players</h2>
+    <%= render "live_games/players", live_game: @live_game %>
+  <% end %>
+</main>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_22_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_23_090000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -185,6 +185,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_090000) do
     t.index ["user_id"], name: "index_lesson_completions_on_user_id"
   end
 
+  create_table "live_game_players", force: :cascade do |t|
+    t.integer "live_game_id", null: false
+    t.integer "user_id", null: false
+    t.integer "attempt_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["attempt_id"], name: "index_live_game_players_on_attempt_id"
+    t.index ["live_game_id", "user_id"], name: "index_live_game_players_on_live_game_id_and_user_id", unique: true
+    t.index ["live_game_id"], name: "index_live_game_players_on_live_game_id"
+    t.index ["user_id"], name: "index_live_game_players_on_user_id"
+  end
+
+  create_table "live_games", force: :cascade do |t|
+    t.integer "host_id", null: false
+    t.string "code", null: false
+    t.string "topic", null: false
+    t.integer "level", null: false
+    t.boolean "mixed", default: false, null: false
+    t.json "questions", null: false
+    t.datetime "starts_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_live_games_on_code", unique: true
+    t.index ["host_id"], name: "index_live_games_on_host_id"
+  end
+
   create_table "push_subscriptions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "endpoint", null: false
@@ -243,6 +269,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_090000) do
   add_foreign_key "head_to_heads", "users", column: "opponent_id"
   add_foreign_key "head_to_heads", "users", column: "winner_id"
   add_foreign_key "lesson_completions", "users"
+  add_foreign_key "live_game_players", "attempts", on_delete: :nullify
+  add_foreign_key "live_game_players", "live_games"
+  add_foreign_key "live_game_players", "users"
+  add_foreign_key "live_games", "users", column: "host_id"
   add_foreign_key "push_subscriptions", "users"
   add_foreign_key "sessions", "users"
 end

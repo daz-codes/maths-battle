@@ -1,0 +1,10 @@
+<%# Who's in the lobby, updated as people join (LiveGame::Startable) %>
+<ul id="live-players" class="rival-rows">
+  <% live_game.players.includes(:user).each do |player| %>
+    <li class="rival-row">
+      <%= render "avatar", user: player.user, size: "small", letter_only: true %>
+      <span class="rival-row__who"><span class="rival-row__name"><%= player.user.display_name %><%= " (host)" if player.user_id == live_game.host_id %></span></span>
+    </li>
+  <% end %>
+  <li class="hint hint--centre live-players__count"><%= live_game.players.size %> of <%= LiveGame::MAX_PLAYERS %> players</li>
+</ul>

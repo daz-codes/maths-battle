@@ -29,8 +29,8 @@ module Attempt::Recordable
     # A game sent again with the same client id (a retried upload) is only recorded once
     # Mixed games are issued at the highest level. That signed level stays valid if an offline upload
     # arrives after another game has unlocked a new one. A group game is at whatever level its challenge set,
-    # unlocked or not, for one of the challenge's players, and a head to head game at its level, for one of its two
-    def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil, mode: "practice", round: nil, head_to_head: nil)
+    # unlocked or not, for one of the challenge's players, and a head to head or live game at its level, for its players
+    def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil, mode: "practice", round: nil, head_to_head: nil, live_game: nil)
       if existing = already_recorded(user, client_id)
         return existing
       end
@@ -39,14 +39,16 @@ module Attempt::Recordable
       case mode
       when "group" then check_round(user, round, topic_module, level)
       when "head_to_head" then check_head_to_head(user, head_to_head, topic_module, level)
+      when "live" then check_live_game(user, live_game, topic_module, level)
       else check_unlocked(user, topic_module, level)
       end
       raise Invalid, "Only a group game has a round" if round && mode != "group"
       raise Invalid, "Only a head to head game has a head to head" if head_to_head && mode != "head_to_head"
+      raise Invalid, "Only a live game has a live game" if live_game && mode != "live"
       cleaned = clean_results(topic_module, level, results, mode)
       raise Invalid, "Answer at least one question to finish the daily challenge" if mode == "challenge" && cleaned.empty?
 
-      create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, results: cleaned)
+      create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, live_game:, results: cleaned)
     rescue ActiveRecord::RecordNotUnique
       already_recorded(user, client_id) || raise
     end
@@ -56,7 +58,7 @@ module Attempt::Recordable
         user.attempts.find_by(client_id: client_id) if client_id.present?
       end
 
-      def create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, results:)
+      def create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, live_game:, results:)
         transaction do
           user.lock!
           played_at = play_time(played_at)
@@ -64,6 +66,7 @@ module Attempt::Recordable
 
           user.attempts.create!(topic: topic, level: level, results: results, client_id: client_id.presence, played_at: played_at, mode: mode, round: round)
             .tap { |attempt| head_to_head&.played(attempt) }
+            .tap { |attempt| live_game&.played(attempt) }
         end
       end
 
@@ -78,6 +81,13 @@ module Attempt::Recordable
         raise Invalid, "That head to head isn't there any more" unless head_to_head
         raise Invalid, "Only its two players can play a head to head" unless head_to_head.player?(user)
         raise Invalid, "Bad question" unless head_to_head.topic_module == topic && head_to_head.level == level
+      end
+
+      def check_live_game(user, live_game, topic, level)
+        raise Invalid, "That live game isn't there any more" unless live_game
+        raise Invalid, "Only its players can play a live game" unless live_game.player?(user)
+        raise Invalid, "That live game hasn't started" unless live_game.started?
+        raise Invalid, "Bad question" unless live_game.topic_module == topic && live_game.level == level
       end
 
       def check_unlocked(user, topic, level)
@@ -138,11 +148,11 @@ module Attempt::Recordable
     def record_high_score
       best_before =
         if daily_challenge? then user.best_daily_challenge(topic_module)
-        elsif review? || group? || head_to_head? || mixed? then Float::INFINITY # mistakes, a rival or a mix: no score to beat
+        elsif review? || group? || head_to_head? || live? || mixed? then Float::INFINITY # mistakes, rivals or a mix: no score to beat
         else user.best_score(topic_module, level)
         end
       self.new_high_score = score.positive? && score > best_before
-      self.best_score = review? || group? || head_to_head? || mixed? ? score : [ score, best_before ].max
+      self.best_score = review? || group? || head_to_head? || live? || mixed? ? score : [ score, best_before ].max
     end
 
     # A snapshot of the streak is kept on the attempt for its results and share pages. Reaching 7 or 30 days

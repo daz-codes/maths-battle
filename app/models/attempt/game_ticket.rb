@@ -5,11 +5,12 @@
 class Attempt::GameTicket
   QUESTION_FIELDS = %w[ a b c d e f n type v flip ].freeze
 
-  # What a verified ticket says about its game: its mode, and for a group game its round, or a head to head's
-  Game = Data.define(:mode, :round_id, :head_to_head_id)
+  # What a verified ticket says about its game: its mode, and for a group game its round, a head to head's, or a live game's
+  Game = Data.define(:mode, :round_id, :head_to_head_id, :live_game_id)
 
-  def self.issue(owner:, topic:, level:, id:, questions:, mode: "practice", round: nil, head_to_head: nil)
-    verifier.generate({ "owner" => owner, "topic" => topic, "level" => level, "id" => id, "mode" => mode, "round" => round&.id, "head_to_head" => head_to_head&.id,
+  def self.issue(owner:, topic:, level:, id:, questions:, mode: "practice", round: nil, head_to_head: nil, live_game: nil)
+    verifier.generate({ "owner" => owner, "topic" => topic, "level" => level, "id" => id, "mode" => mode, "round" => round&.id,
+      "head_to_head" => head_to_head&.id, "live_game" => live_game&.id,
       "questions" => questions.map { |question| question.stringify_keys.slice(*QUESTION_FIELDS) } },
       expires_in: Attempt::MAX_OFFLINE_AGE, purpose: "game")
   end
@@ -30,7 +31,7 @@ class Attempt::GameTicket
     if game["mode"] == "review" && results.size != questions.size
       raise Attempt::Invalid, "Answer every question to finish the review"
     end
-    Game.new(mode: game["mode"] || (game["daily_challenge"] ? "challenge" : "practice"), round_id: game["round"], head_to_head_id: game["head_to_head"])
+    Game.new(mode: game["mode"] || (game["daily_challenge"] ? "challenge" : "practice"), round_id: game["round"], head_to_head_id: game["head_to_head"], live_game_id: game["live_game"])
   end
 
   def self.verifier

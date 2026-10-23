@@ -1,0 +1,13 @@
+<%# The places so far, updated as each player's game is saved (LiveGame::Startable) %>
+<section id="live-podium" class="live-podium" aria-label="Results">
+  <ol class="leaderboard__rows">
+    <% live_game.podium.each do |place| %>
+      <li class="leaderboard__row">
+        <span class="leaderboard__rank <%= "leaderboard__rank--#{place.rank}" if place.rank %>"><%= place.rank || "…" %></span>
+        <%= render "avatar", user: place.user, size: "small", letter_only: true %>
+        <span class="leaderboard__name"><%= place.user.display_name %></span>
+        <span class="leaderboard__score"><%= place.score || tag.span(live_game.over? ? "didn't finish" : "playing…", class: "leaderboard__wrong") %></span>
+      </li>
+    <% end %>
+  </ol>
+</section>

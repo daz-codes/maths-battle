@@ -1,18 +1,19 @@
-<% content_for :title, "#{@topic.title}#{{ "review" => " review", "group" => " group challenge", "mixed" => " mixed practice", "head_to_head" => " head to head" }[@mode]} · MatheMinute" %>
+<% content_for :title, "#{@topic.title}#{{ "review" => " review", "group" => " group challenge", "mixed" => " mixed practice", "head_to_head" => " head to head", "live" => " live" }[@mode]} · MatheMinute" %>
 <% content_for :viewport, "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" %>
 <% content_for :body_class, "testing" %>
 <% content_for :focus_mode, true %>
 <% content_for :head, tag.meta(name: "turbo-cache-control", content: "no-cache") %>
 
-<main class="test test--<%= @topic.slug %>" data-controller="test"
+<main class="test test--<%= @topic.slug %><%= " test--live" if @live %>" data-controller="test"
       data-test-question-sets-value="<%= @question_sets.to_json %>"
       data-test-topic-value="<%= @topic.key %>"
       data-test-level-value="<%= @level %>"
       data-test-mode-value="<%= @mode %>"
-      data-test-round-value="<%= @round&.id || @head_to_head&.id %>"
+      data-test-round-value="<%= @round&.id || @head_to_head&.id || @live&.dig(:id) %>"
       data-test-best-value="<%= @best %>"
       data-test-passed-value="<%= @mode == "head_to_head" ? "Winning!" : "New best!" %>"
       <% if @ghost %>data-test-ghost-value="<%= @ghost.to_json %>"<% end %>
+      <% if @live %>data-test-live-value="<%= @live.to_json %>"<% end %>
       data-test-keys-value="<%= @topic.keys(@level).to_json %>"
       data-test-gem-times-value="<%= @topic.gem_times.to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">
@@ -39,6 +40,15 @@
   <%# Icons the game copies into what floats up: gems for each right answer, the trophy for a new best %>
   <template data-test-target="gemIcon"><%= icon(:gem) %></template>
   <template data-test-target="trophyIcon"><%= icon(:trophy) %></template>
+
+  <%# A live game: everyone else's score as they play %>
+  <% if @live %>
+    <ol class="test__rivals" aria-label="Other players">
+      <% @live[:rivals].each do |rival| %>
+        <li class="test__rival" data-test-target="rival" data-player-id="<%= rival[:id] %>"><%= rival[:name] %> <strong>0</strong></li>
+      <% end %>
+    </ol>
+  <% end %>
 
   <div class="test__stage" data-test-target="stage">
     <p class="question" data-test-target="question" aria-live="off">Ready</p>
