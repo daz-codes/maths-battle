@@ -146,7 +146,9 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     head_to_head = HeadToHead.last
     assert_not head_to_head.sent?
     assert_redirected_to play_path("times-tables", head_to_head: head_to_head.id)
-    follow_redirect!
+    get groups_path
+    assert_select ".challenge-card", count: 0, message: "not shown until it's been played"
+    get play_path("times-tables", head_to_head: head_to_head.id)
     assert_select ".test__best", count: 0, message: "nothing to beat when playing first"
     game = play_from_page(@ada, right: 5)
     assert_equal game, head_to_head.reload.challenger_attempt

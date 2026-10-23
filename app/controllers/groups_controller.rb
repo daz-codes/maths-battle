@@ -42,11 +42,11 @@ class GroupsController < ApplicationController
   end
 
   private
-    # Sent, or still for the player to play first, latest first
+    # Once the challenger has played: a rematch started and never played isn't shown. Latest first
     def recent_head_to_heads
       return [] unless @user.persisted?
 
-      @user.head_to_heads.merge(HeadToHead.sent.or(HeadToHead.where(challenger: @user)))
+      @user.head_to_heads.sent
         .includes(:challenger, :opponent, :challenger_attempt, :opponent_attempt).order(updated_at: :desc).limit(10)
     end
 end
