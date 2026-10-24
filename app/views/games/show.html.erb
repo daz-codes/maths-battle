@@ -48,22 +48,35 @@
   <template data-test-target="speedIcon"><%= icon(:lightning) %></template>
   <template data-test-target="trophyIcon"><%= icon(:trophy) %></template>
 
-  <%# A live game: everyone else's score as they play, or their gems in a Power game %>
+  <%# A live game: everyone else's score as they play, or their gems in a Power game, with its power-ups: the one
+      held, tapped to use, and news of what's hit whom %>
   <% if @live %>
-    <ol class="test__rivals" aria-label="Other players">
-      <% @live[:rivals].each do |rival| %>
-        <li class="test__rival" data-test-target="rival" data-player-id="<%= rival[:id] %>"><%= rival[:name] %> <strong>0</strong><%= icon(:gem) if @live[:power] %></li>
+    <div class="test__live">
+      <ol class="test__rivals" aria-label="Other players">
+        <% @live[:rivals].each do |rival| %>
+          <li class="test__rival" data-test-target="rival" data-player-id="<%= rival[:id] %>" data-name="<%= rival[:name] %>"><%= rival[:name] %> <strong>0</strong><%= icon(:gem) if @live[:power] %></li>
+        <% end %>
+      </ol>
+      <% if @live[:power] %>
+        <div class="test__powers">
+          <button type="button" class="test__power" data-test-target="powerSlot" data-action="test#usePowerUp" hidden></button>
+          <p class="test__power-news" data-test-target="powerNews" aria-live="polite"></p>
+        </div>
+        <% { "shield" => :shield, "shrink" => :shrink, "flip" => :flip, "ink" => :ink, "freeze" => :freeze, "scramble" => :mixed, "lightning" => :lightning }.each do |power_up, icon_name| %>
+          <template data-test-target="powerIcon" data-power-up="<%= power_up %>"><%= icon(icon_name) %></template>
+        <% end %>
       <% end %>
-    </ol>
+    </div>
   <% end %>
 
   <div class="test__stage" data-test-target="stage">
-    <%# A carousel: the next question waits above, smaller and greyed out, and the one just answered goes below
-        with its worked answer, while what was typed stays in the answer until the next one's started %>
-    <p class="question question--next" data-test-target="nextQuestion" aria-hidden="true"></p>
+    <%# The question, then below it the one just answered, marked like a teacher would: "7 × 8 = 56 ✓" or
+        "7 × 8 = 54 ✗ 56" %>
     <p class="question question--current" data-test-target="question" aria-live="off">Ready</p>
     <p class="answer" data-test-target="answer" aria-live="polite"></p>
     <p class="question-previous" data-test-target="previousQuestion" aria-live="polite"></p>
+    <%# Ink splat, a Power game's power-up, covering the question for a while %>
+    <%= tag.div(class: "test__ink", aria: { hidden: true }) if @live&.dig(:power) %>
     <p class="test__status" data-test-target="status" hidden></p>
 
     <div class="offline-result" data-test-target="unavailable" hidden>

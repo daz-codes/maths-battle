@@ -73,7 +73,8 @@ class GamesController < ApplicationController
     # When it starts, from now, so every device counts down to the same moment, and who else is playing
     def live_details
       rivals = @live_game.players.includes(:user).reject { |player| player.user_id == current_player.id }
-      { id: @live_game.id, pass: @live_game.pass_for(current_player), power: @live_game.power?, startsInMs: ((@live_game.starts_at - Time.current) * 1000).round,
+      { id: @live_game.id, me: current_player.id, pass: @live_game.pass_for(current_player), power: @live_game.power?,
+        powerUps: (LiveGame::POWER_UPS if @live_game.power?), boxEveryMs: LiveGame::BOX_EVERY.in_milliseconds, boxes: LiveGame::BOXES, startsInMs: ((@live_game.starts_at - Time.current) * 1000).round,
         rivals: rivals.map { |player| { id: player.user_id, name: player.user.display_name } } }
     end
 

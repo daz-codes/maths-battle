@@ -27,37 +27,32 @@ class TimesTablesTest < ApplicationSystemTestCase
     wrong = (a * b) % 10 == 9 ? a * b - 1 : a * b + 1 # same number of digits, so it's checked straight away
     find("body").send_keys(wrong.to_s)
     assert_selector ".answer--wrong", text: wrong.to_s
-    assert_selector ".question-previous--wrong", text: "#{a} × #{b} = #{a * b}"
+    assert_selector ".question-previous--wrong", text: "#{a} × #{b} = #{wrong} ✗ #{a * b}"
 
     assert_selector ".card__number", text: "2", wait: 8
     assert_text "#{a} × #{b} = #{a * b}"
     assert_equal 2, users(:ada).best_score(TimesTables, 1)
   end
 
-  test "the questions turn like a carousel: the next waits above, and the one answered goes below with its answer" do
+  test "the answered question drops below the next, marked like a teacher would: a tick, or a cross and the right answer" do
     sign_in users(:ada)
     click_on "Play level 1"
     assert_selector ".question--current", text: "×", wait: 5
-    upcoming = find(".question--next").text
-    assert_match(/\A\d+ × \d+\z/, upcoming)
+    size = find(".question--current")[:class]
 
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
-    assert_selector ".question-previous.question-previous--right", text: "✓ #{a} × #{b} = #{a * b}"
-    assert_selector ".question--current", text: upcoming
-    assert_selector ".answer.answer--kept", text: (a * b).to_s
+    assert_selector ".question-previous.question-previous--right", exact_text: "#{a} × #{b} = #{a * b} ✓"
+    assert_selector ".answer", exact_text: "", visible: :all
     assert_selector ".test__gems", text: /\A[1-9]\d*/
 
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     wrong = (a * b) % 10 == 9 ? a * b - 1 : a * b + 1
     find("body").send_keys(wrong.to_s)
     assert_selector ".answer.answer--wrong", text: wrong.to_s
-    assert_selector ".question-previous.question-previous--wrong", text: "✗ #{a} × #{b} = #{a * b}"
-    # What was typed stays until the next answer's started
-    assert_selector ".answer.answer--wrong", text: wrong.to_s
-
-    find("body").send_keys(:backspace)
-    assert_selector ".answer:not(.answer--wrong):not(.answer--kept)", exact_text: ""
+    assert_selector ".question-previous.question-previous--wrong", exact_text: "#{a} × #{b} = #{wrong} ✗ #{a * b}"
+    assert_selector ".answer:not(.answer--wrong)", exact_text: "", visible: :all
+    assert_equal size, find(".question--current")[:class], "every question the same size"
   end
 
   test "gems float up for each right answer and its speed, a combo multiplies them, and a wrong answer loses some" do

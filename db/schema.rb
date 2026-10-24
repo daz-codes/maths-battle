@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_24_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_24_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -191,6 +191,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_24_090000) do
     t.integer "attempt_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "live_gems", default: 0, null: false
+    t.integer "boxes_opened", default: 0, null: false
+    t.string "power_up"
     t.index ["attempt_id"], name: "index_live_game_players_on_attempt_id"
     t.index ["live_game_id", "user_id"], name: "index_live_game_players_on_live_game_id_and_user_id", unique: true
     t.index ["live_game_id"], name: "index_live_game_players_on_live_game_id"

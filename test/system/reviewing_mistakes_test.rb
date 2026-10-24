@@ -18,7 +18,7 @@ class ReviewingMistakesTest < ApplicationSystemTestCase
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b + 1).to_s)
     assert_selector ".answer--wrong", text: (a * b + 1).to_s
-    assert_selector ".question-previous--wrong", text: "#{a} × #{b} = #{a * b}", wait: 3
+    assert_selector ".question-previous--wrong", text: "#{a} × #{b} = #{a * b + 1} ✗ #{a * b}", wait: 3
 
     assert_selector ".result__score", text: /1\s+of 2 right/, wait: 8
     assert_text "Mistakes reviewed +50"

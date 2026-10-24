@@ -1357,17 +1357,13 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 .live-mode { margin: 0; color: var(--muted); }
 .live-mode .icon { width: 1.1em; height: 1.1em; vertical-align: -0.2em; }
 
-/* The question carousel: the next question waits above, smaller and greyed out; the one just answered sits below
-   with its worked answer, ticked green or crossed red; and what was typed stays faded in the answer meanwhile */
-.question.question--next { min-height: 1em; color: var(--muted); opacity: 0.45; zoom: 0.4; }
+/* The question just answered, below the current one, marked: green with a tick, or red with a cross and the answer */
 /* One-line questions grow to fill the room; functions and simultaneous equations keep their own sizes, as they
-   take several lines, and their next question only shows when there's plenty of room */
+   take several lines */
 .test:not(.test--functions, .test--simultaneous-equations) .question--current:not(.question--done, .question--long, .question--longer) {
   font-size: clamp(1.75rem, min(17vw, 30cqh), 8rem);
 }
 .test__stage .answer { height: clamp(1.9rem, min(14vw, 20cqh), 5.5rem); font-size: clamp(1.6rem, min(13vw, 18cqh), 5rem); }
-@container (max-height: 9rem) { .question.question--next { display: none; } }
-@container (max-height: 24rem) { :is(.test--functions, .test--simultaneous-equations) .question.question--next { display: none; } }
 /* Questions over several lines (simultaneous equations, functions, stacked fractions) shrink on a short stage */
 @container (max-height: 22rem) { :is(.test--functions, .test--simultaneous-equations, .test--fractions) .question--current { zoom: 0.75; } }
 @container (max-height: 15rem) { :is(.test--functions, .test--simultaneous-equations, .test--fractions) .question--current { zoom: 0.6; } }
@@ -1387,7 +1383,6 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 .question-previous--wrong { color: var(--wrong); }
 :root[data-theme="dark"] .question-previous--right { color: var(--green); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .question-previous--right { color: var(--green); } }
-.answer.answer--kept { opacity: 0.45; }
 
 /* The gems so far, under the score */
 .test__gems { color: var(--blue-deep); font-size: 0.95rem; font-weight: 800; white-space: nowrap; }
@@ -1395,3 +1390,27 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 :root[data-theme="dark"] .test__gems { color: var(--blue); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .test__gems { color: var(--blue); } }
 .test__rival .icon { width: 0.9em; height: 0.9em; margin-left: 0.1em; vertical-align: -0.1em; }
+
+/* Power-ups in a Power game: the one held, to tap; news of what's hit whom; and each one's effect on the player
+   it hits, for a few seconds. The clock keeps going through them all */
+.test__live { display: grid; gap: 0.3rem; justify-items: center; }
+.test__powers { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.25rem 0.6rem; min-height: 2.25rem; }
+.test__power { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.9rem; border: 0; border-radius: 999px; background: var(--pink); box-shadow: 0 0 16px color-mix(in srgb, var(--pink) 60%, transparent); color: var(--on-neon); cursor: pointer; font: inherit; font-weight: 900; }
+.test__power .icon { width: 1.3em; height: 1.3em; }
+.test__power--shield { background: var(--blue); box-shadow: none; cursor: default; }
+.test__power--new { animation: combo-pulse 450ms ease-out; }
+.test__power-news { margin: 0; color: var(--pink-text); font-size: 0.85rem; font-weight: 800; text-align: center; }
+.test__power-news:empty { display: none; }
+
+.test--flip .question--current { transform: rotate(180deg); transition: transform 300ms; }
+.test--shrink .question--current { transform: scale(0.3); transition: transform 300ms; }
+.test--freeze .keypad { filter: grayscale(1); opacity: 0.45; pointer-events: none; }
+.test--freeze .keypad::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius); background: color-mix(in srgb, var(--blue) 30%, transparent); pointer-events: none; }
+.test--freeze .keypad { position: relative; }
+.test--scramble .keypad__key[data-digit] { animation: combo-pulse 450ms ease-out; }
+.test__ink { position: absolute; inset: 10% 15%; z-index: 3; border-radius: 48% 52% 45% 55% / 55% 45% 55% 45%; background: var(--ink); opacity: 0; pointer-events: none; }
+.test--ink .test__ink { animation: ink-fade 5s ease-in forwards; }
+@keyframes ink-fade { 0% { opacity: 0.97; transform: scale(0.6); } 8% { transform: scale(1.05); } 12% { transform: scale(1); } 60% { opacity: 0.92; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .test--ink .test__ink { animation: none; opacity: 0.9; }
+}

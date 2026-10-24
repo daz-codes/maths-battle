@@ -62,8 +62,13 @@ class LiveGamesTest < ActionDispatch::IntegrationTest
 
     game.start!
     get play_path("times-tables", live: game.code)
-    assert JSON.parse(css_select("[data-controller=test]").first["data-test-live-value"])["power"]
+    live = JSON.parse(css_select("[data-controller=test]").first["data-test-live-value"])
+    assert live["power"]
+    assert_equal [ LiveGame::BOX_EVERY.in_milliseconds, LiveGame::BOXES ], live.values_at("boxEveryMs", "boxes")
+    assert_equal LiveGame::POWER_UPS.keys, live["powerUps"].keys
     assert_select ".test__rival .icon--gem"
+    assert_select "button.test__power[hidden]"
+    assert_select "template[data-power-up=freeze]"
   end
 
   test "a visitor opens the link, gives a name and joins; the host starts it and everyone plays the same minute" do

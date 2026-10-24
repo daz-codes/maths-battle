@@ -24,6 +24,11 @@ module IconsHelper
     # Zzz: right, but sleepy
     slow: %(<path d="M2.5 11h7l-7 9.5h7M12 5.5h5.5L12 13h5.5M18.5 1.8h3.5l-3.5 4.7H22" #{LINE}/>),
     bell: %(<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4" #{LINE}/>),
+    # Power-ups (freeze, lightning and mixed, for Scramble, are above and below)
+    shield: %(<path d="M12 2.5 4 5.5v6c0 4.8 3.4 8.6 8 10 4.6-1.4 8-5.2 8-10v-6z" fill="var(--blue)"/><path d="M8.5 12l2.5 2.5 4.5-5" fill="none" stroke="var(--on-neon, #1d1e17)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>),
+    shrink: %(<path d="M4 4l6 6M10 5v5H5M20 20l-6-6M14 19v-5h5M20 4l-6 6M14 5v5h5M4 20l6-6M5 14h5v5" #{LINE}/>),
+    flip: %(<path d="M12 3v18" #{LINE} stroke-dasharray="2 2.5"/><path d="M9 6 3.5 18H9zM15 6l5.5 12H15z" fill="var(--pink)"/>),
+    ink: %(<path d="M12 3c2.2 0 2.6 2.7 4.6 3.3 2 .6 4.2-.8 5 1.3.8 2-1.4 3.2-1.4 5.4s2.5 3.6 1.2 5.3c-1.3 1.7-3.6.2-5.6 1.2S13.6 22 11.4 21.6c-2.2-.4-2-2.8-3.9-3.9-1.9-1-4.6-.2-5-2.4-.4-2.2 2.2-2.8 2.4-5 .2-2.1-2.2-3.8-.7-5.4C5.7 3.3 8 5 10 4.2 11 3.8 11.2 3 12 3z" fill="currentColor"/>),
     # Two swords crossed, in the two players' colours
     versus: %(<path d="M4 4l11 11M12.5 17.5l5-5M16 16l4 4" fill="none" stroke="var(--blue)" stroke-width="2.4" stroke-linecap="round"/><path d="M20 4 9 15M6.5 12.5l5 5M8 16l-4 4" fill="none" stroke="var(--pink)" stroke-width="2.4" stroke-linecap="round"/>),
     people: %(<circle cx="8" cy="7.5" r="3.5" fill="var(--pink)"/><path d="M1.5 20a6.5 6.5 0 0 1 13 0z" fill="var(--pink)"/><circle cx="16.5" cy="8.5" r="3" fill="var(--green)"/><path d="M12.5 20a5.5 5.5 0 0 1 10-1.5V20z" fill="var(--green)"/>),

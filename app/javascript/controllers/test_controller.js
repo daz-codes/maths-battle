@@ -8,6 +8,10 @@ import confetti from "canvas-confetti"
 const DURATION = 60_000
 // The second pop, for the answer's speed, comes just after the first
 const SPEED_POP_DELAY = 140
+// A Power game's box is asked for just after it's due, so the server's clock agrees it is
+const BOX_DELAY = 150
+const NEWS_TIME = 3_000
+const POWER_UP_VERBS = { shrink: "shrank", flip: "flipped", ink: "splatted", freeze: "froze", scramble: "scrambled", lightning: "zapped" }
 const WRONG_PAUSE = 400
 // A review has no clock, so there's time to take in the right answer
 const REVIEW_WRONG_PAUSE = 1_500
@@ -23,7 +27,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // after a warning, and then nothing is saved. A review has no clock or gems: it asks each of its
 // questions once and ends after the last
 export default class extends Controller {
-  static targets = [ "question", "nextQuestion", "previousQuestion", "answer", "gems", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "rival", "combo", "gemIcon", "speedIcon", "trophyIcon" ]
+  static targets = [ "question", "previousQuestion", "answer", "gems", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "rival", "combo", "powerSlot", "powerNews", "powerIcon", "gemIcon", "speedIcon", "trophyIcon" ]
   static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, ghost: Object, live: Object, submitUrl: String, keys: Array, gemRules: Object }
 
   connect() {
@@ -41,6 +45,7 @@ export default class extends Controller {
       return
     }
     this.questions = this.questionSet.questions
+    this.fitQuestions()
     this.player = playerKey()
     this.state = "countdown"
     this.index = 0
@@ -69,7 +74,7 @@ export default class extends Controller {
 
   joinLive() {
     this.liveStartAt = performance.now() + this.liveValue.startsInMs
-    cable.subscribeTo({ channel: "LiveGameChannel", pass: this.liveValue.pass }, { received: (data) => this.rivalScored(data) })
+    cable.subscribeTo({ channel: "LiveGameChannel", pass: this.liveValue.pass }, { received: (data) => this.liveMessage(data) })
       .then((subscription) => { this.disconnected ? subscription.unsubscribe() : this.liveChannel = subscription })
     this.waitForLiveStart()
   }
@@ -84,6 +89,129 @@ export default class extends Controller {
     } else {
       this.countdownTimer = setTimeout(() => this.start(), Math.max(0, this.liveStartAt - performance.now()))
     }
+  }
+
+  liveMessage(data) {
+    if (data.type === "box") this.gotPowerUp(data.power_up)
+    else if (data.type === "power_up") this.powerUpUsed(data)
+    else this.rivalScored(data)
+  }
+
+  // A Power game's boxes come at 15, 30 and 45 seconds into everyone's minute. The server says what's inside
+  askForBoxes() {
+    if (!this.live || !this.liveValue.power) return
+
+    const { boxEveryMs, boxes } = this.liveValue
+    this.boxTimers = Array.from({ length: boxes }, (_, i) =>
+      setTimeout(() => this.liveChannel?.perform("open_box"), this.liveStartAt + boxEveryMs * (i + 1) - performance.now() + BOX_DELAY))
+  }
+
+  // Held one at a time: a new box replaces it. A Shield isn't used, it blocks the next attack while it's held
+  gotPowerUp(powerUp) {
+    this.powerUp = powerUp
+    const { name } = this.liveValue.powerUps[powerUp]
+    const shield = powerUp === "shield"
+    this.powerSlotTarget.replaceChildren(this.powerIcon(powerUp), ` ${shield ? "Shield up" : name}`)
+    this.powerSlotTarget.classList.toggle("test__power--shield", shield)
+    this.powerSlotTarget.disabled = shield
+    this.powerSlotTarget.hidden = false
+    this.powerSlotTarget.classList.remove("test__power--new")
+    void this.powerSlotTarget.offsetWidth // so the pulse plays again
+    this.powerSlotTarget.classList.add("test__power--new")
+    this.news(shield ? "You've got a Shield: it'll block the next attack" : `You've got ${name}! Tap it, or press Space, to use it`)
+  }
+
+  usePowerUp() {
+    if (!this.powerUp || this.powerUp === "shield" || this.state !== "running") return
+
+    this.liveChannel?.perform("use_power_up")
+    this.clearPowerUp()
+  }
+
+  clearPowerUp() {
+    this.powerUp = null
+    this.powerSlotTarget.hidden = true
+  }
+
+  // Someone used one: it hit them, or a Shield blocked it, and it's news to everyone it touched
+  powerUpUsed({ power_up, from, hit, blocked }) {
+    const me = this.liveValue.me
+    const { name } = this.liveValue.powerUps[power_up]
+    if (hit.includes(me)) {
+      this.hitBy(power_up)
+      this.news(`${this.playerName(from)} ${POWER_UP_VERBS[power_up]} you!`)
+    } else if (blocked.includes(me)) {
+      if (this.powerUp === "shield") this.clearPowerUp()
+      this.news(`Your Shield blocked ${this.playerName(from)}'s ${name}!`)
+    } else if (from === me) {
+      if (hit.length) this.news(`You ${POWER_UP_VERBS[power_up]} ${hit.map((id) => this.playerName(id)).join(" and ")}!`)
+      else if (blocked.length) this.news(`${blocked.map((id) => this.playerName(id)).join(" and ")}'s Shield blocked it!`)
+      else this.news("No one was ahead to hit!")
+    }
+  }
+
+  // Freeze and Lightning stop the keypad; the others change how the question looks or where the keys are.
+  // The clock keeps going, as it's everyone's
+  hitBy(powerUp) {
+    const effect = powerUp === "lightning" ? "freeze" : powerUp
+    const ms = this.liveValue.powerUps[powerUp].seconds * 1000
+    if (effect === "freeze") this.frozenUntil = performance.now() + ms
+    if (effect === "scramble") this.scrambleKeys()
+    this.element.classList.add(`test--${effect}`)
+    clearTimeout(this.effectTimers?.[effect])
+    this.effectTimers = { ...this.effectTimers, [effect]: setTimeout(() => this.endEffect(effect), ms) }
+    feedback.wrong()
+  }
+
+  endEffect(effect) {
+    this.element.classList.remove(`test--${effect}`)
+    if (effect === "scramble") this.unscrambleKeys()
+  }
+
+  // The digits swap places on the keypad (typing on a keyboard still works)
+  scrambleKeys() {
+    const keys = this.digitKeys
+    this.unscrambleKeys()
+    const digits = keys.map((key) => key.dataset.digit)
+    for (let i = digits.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [ digits[i], digits[j] ] = [ digits[j], digits[i] ]
+    }
+    keys.forEach((key, i) => { key.dataset.digit = digits[i]; key.textContent = digits[i] })
+  }
+
+  unscrambleKeys() {
+    this.digitKeys.forEach((key) => { key.dataset.digit = key.dataset.homeDigit; key.textContent = key.dataset.homeDigit })
+  }
+
+  get digitKeys() {
+    return [ ...this.keypadTarget.querySelectorAll("[data-digit]") ].filter((key) => {
+      key.dataset.homeDigit ??= key.dataset.digit
+      return /^[0-9]$/.test(key.dataset.homeDigit)
+    })
+  }
+
+  // Time's up: nothing left to use, and every effect wears off
+  endPowerUps() {
+    if (this.hasPowerSlotTarget) this.clearPowerUp()
+    Object.keys(this.effectTimers ?? {}).forEach((effect) => { clearTimeout(this.effectTimers[effect]); this.endEffect(effect) })
+    this.frozenUntil = 0
+  }
+
+  powerIcon(powerUp) {
+    return this.powerIconTargets.find((template) => template.dataset.powerUp === powerUp).content.cloneNode(true)
+  }
+
+  playerName(id) {
+    return this.rivalTargets.find((rival) => rival.dataset.playerId === String(id))?.dataset.name ?? "Someone"
+  }
+
+  news(message) {
+    if (!this.hasPowerNewsTarget) return
+
+    this.powerNewsTarget.textContent = message
+    clearTimeout(this.newsTimer)
+    this.newsTimer = setTimeout(() => { this.powerNewsTarget.textContent = "" }, NEWS_TIME)
   }
 
   // Another player's score has gone up: shown with theirs (their gems in a Power game), pink while they're ahead
@@ -130,6 +258,9 @@ export default class extends Controller {
   disconnect() {
     this.disconnected = true
     this.liveChannel?.unsubscribe()
+    this.boxTimers?.forEach(clearTimeout)
+    Object.values(this.effectTimers ?? {}).forEach(clearTimeout)
+    clearTimeout(this.newsTimer)
     this.unwatch?.()
     document.removeEventListener("keydown", this.keydown)
     window.removeEventListener("beforeunload", this.beforeUnload)
@@ -151,6 +282,7 @@ export default class extends Controller {
 
   start() {
     this.endsAt = (this.live ? this.liveStartAt : performance.now()) + DURATION
+    this.askForBoxes()
     this.show()
     this.run()
   }
@@ -245,6 +377,9 @@ export default class extends Controller {
     } else if (event.key === "Enter" && !event.target?.closest("button, a, input, textarea, select")) {
       event.preventDefault()
       this.checkAnswer()
+    } else if (event.key === " " && this.powerUp) {
+      event.preventDefault()
+      this.usePowerUp()
     }
   }
 
@@ -259,9 +394,7 @@ export default class extends Controller {
     if (this.typed.length >= this.correctAnswer.length && finished(this.typed)) this.check()
   }
 
-  // The last answer stays until the next one's started
   showTyped() {
-    this.answerTarget.classList.remove("answer--kept", "answer--wrong")
     this.answerTarget.textContent = shown(this.typed)
   }
 
@@ -276,8 +409,9 @@ export default class extends Controller {
     this.showTyped()
   }
 
+  // Not while frozen by a Power game's Freeze or Lightning
   get accepting() {
-    return this.state === "running" && !this.showingCorrection
+    return this.state === "running" && !this.showingCorrection && !(this.frozenUntil > performance.now())
   }
 
   // Questions
@@ -291,47 +425,47 @@ export default class extends Controller {
     return this.current.answer
   }
 
-  // The question text is built on the server from numbers and letters (equations use HTML for fractions). Like a
-  // carousel: the next one waits above, and the one just answered moves below with its worked answer, ticked or
-  // crossed, while what was typed stays in the answer until the next one's started
+  // The question text is built on the server from numbers and letters (equations use HTML for fractions). The one
+  // just answered drops below it, marked
   show() {
     this.questionTarget.innerHTML = this.current.text
-    this.fitQuestion(this.questionTarget)
-    this.nextQuestionTarget.innerHTML = this.questions[this.index + 1]?.text ?? ""
-    this.fitQuestion(this.nextQuestionTarget)
     this.typed = ""
-    if (this.answered) {
-      this.showAnswered(this.answered)
-      this.answerTarget.classList.add("answer--kept")
-    } else {
-      this.answerTarget.textContent = ""
-    }
+    this.answerTarget.textContent = ""
+    this.answerTarget.classList.remove("answer--wrong")
     this.shownAt = performance.now()
     if (this.hasProgressTarget) this.progressTarget.textContent = `${this.index + 1}/${this.questions.length}`
-    if (this.answered) this.turnCarousel()
+    if (this.answered) {
+      this.showAnswered(this.answered)
+      this.moveOn()
+    }
   }
 
-  showAnswered({ solution, right }) {
-    this.previousQuestionTarget.textContent = `${right ? "✓" : "✗"} ${solution}`
+  // Like a teacher's marking: "7 × 8 = 56 ✓", or what they put with a cross and the right answer, "7 × 8 = 54 ✗ 56".
+  // The worked answer ends with the right one ("… = 56", "… so w = 2", "… = 600 cm"), so theirs goes in its place
+  showAnswered({ solution, answer, typed, right }) {
+    const at = solution.lastIndexOf(shown(answer))
+    this.previousQuestionTarget.textContent = right ? `${solution} ✓`
+      : at < 0 ? `${solution} ✗`
+      : `${solution.slice(0, at)}${shown(typed) || "?"}${solution.slice(at + shown(answer).length)} ✗ ${shown(answer)}`
     this.previousQuestionTarget.classList.toggle("question-previous--right", right)
     this.previousQuestionTarget.classList.toggle("question-previous--wrong", !right)
   }
 
-  // Each moves down a place: the next question grows into the current one's, and the answered one drops below
-  turnCarousel() {
+  // The next question comes down into place, and the one answered drops below it
+  moveOn() {
     if (reducedMotion.matches) return
 
-    const timing = { duration: 220, easing: "ease-out" }
-    this.questionTarget.animate([ { transform: "translateY(-55%) scale(0.45)", opacity: 0.4 }, { transform: "none", opacity: 1 } ], timing)
-    this.nextQuestionTarget.animate([ { transform: "translateY(-30%)", opacity: 0 }, { transform: "none" } ], timing)
-    this.previousQuestionTarget.animate([ { transform: "translateY(-120%) scale(1.3)", opacity: 0 }, { transform: "none", opacity: 1 } ], timing)
+    const timing = { duration: 200, easing: "ease-out" }
+    this.questionTarget.animate([ { transform: "translateY(-25%)", opacity: 0 }, { transform: "none", opacity: 1 } ], timing)
+    this.previousQuestionTarget.animate([ { transform: "translateY(-150%)", opacity: 0 }, { transform: "none", opacity: 1 } ], timing)
   }
 
-  // 0.7 × −3000 is longer than 7 × 8, so it's shown smaller to stay on one line
-  fitQuestion(element) {
-    const length = element.textContent.length
-    element.classList.toggle("question--long", length > 8 && length <= 12)
-    element.classList.toggle("question--longer", length > 12)
+  // One size for the whole game, so the questions don't jump about: small enough for the longest in the set, as
+  // 0.7 × −3000 needs more room than 7 × 8
+  fitQuestions() {
+    const length = Math.max(...this.questions.map((question) => question.text.replace(/<[^>]+>/g, "").length))
+    this.questionTarget.classList.toggle("question--long", length > 8 && length <= 12)
+    this.questionTarget.classList.toggle("question--longer", length > 12)
   }
 
   // The question's own details go back with the answer, so the server can check it for itself
@@ -339,7 +473,8 @@ export default class extends Controller {
     const { text, answer, solution, ...question } = this.current
     const ms = Math.round(performance.now() - this.shownAt)
     this.results.push({ ...question, given: this.typed, ms })
-    this.answered = { solution, right: this.typed === answer }
+    // Games kept on a device from before questions had their worked answer get a plain one
+    this.answered = { solution: solution ?? `${text.replace(/<[^>]+>/g, "")} = ${shown(answer)}`, answer, typed: this.typed, right: this.typed === answer }
 
     if (this.typed === answer) {
       this.score++
@@ -445,7 +580,7 @@ export default class extends Controller {
     feedback.fanfare()
   }
 
-  // The wrong answer stays, in red, for a moment, then the question moves below with the right one
+  // The wrong answer stays, in red, for a moment, then the question moves below, marked
   showCorrection() {
     feedback.wrong()
     this.showingCorrection = true
@@ -525,16 +660,16 @@ export default class extends Controller {
 
     this.state = "done"
     this.stopClock()
+    this.endPowerUps()
     this.fillRing(1)
     if (this.hasSecondsTarget) this.secondsTarget.textContent = 0
     this.questionTarget.textContent = this.review ? "All done!" : "Time's up!"
     this.questionTarget.classList.remove("question--long", "question--longer")
     this.questionTarget.classList.add("question--done")
-    this.nextQuestionTarget.textContent = ""
     // The last one answered, a review's final question included, still shows its worked answer
     if (this.answered) this.showAnswered(this.answered)
     this.answerTarget.textContent = ""
-    this.answerTarget.classList.remove("answer--wrong", "answer--kept")
+    this.answerTarget.classList.remove("answer--wrong")
     this.keypadTarget.hidden = true
     this.submit()
   }

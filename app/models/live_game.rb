@@ -2,9 +2,10 @@
 # (/live/K7Q2MX); whoever opens it joins the lobby (Joinable), and when the host starts it everyone's game begins
 # together, on the same questions, with each other's scores ticking over as they play (Startable, LiveGameChannel).
 # Each player has one go, and a podium ranks them as they finish (Rankable). A Classic game is won by the most
-# right answers; a Power game by the most gems, so speed and runs of right answers count too
+# right answers; a Power game by the most gems, so speed and runs of right answers count too, with power-ups
+# to slow the players ahead (Powerable)
 class LiveGame < ApplicationRecord
-  include Joinable, Rankable, Startable
+  include Joinable, Powerable, Rankable, Startable
 
   belongs_to :host, class_name: "User"
   has_many :players, -> { order(:created_at, :id) }, dependent: :destroy

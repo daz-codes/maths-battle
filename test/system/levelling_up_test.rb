@@ -19,6 +19,8 @@ class LevellingUpTest < ApplicationSystemTestCase
     JS
     %w[2 1 0 0].each { |key| find(".keypad__key[data-digit='#{key}']").execute_script("this.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))") }
     assert_selector ".test__score", text: "1"
+    # A question with no worked answer, as kept on a device from before, still gets one
+    assert_selector ".question-previous--right", exact_text: "0.7 × 3000 = 2100 ✓"
 
     page.execute_script(<<~JS)
       const test = window.Stimulus.getControllerForElementAndIdentifier(document.querySelector("[data-controller=test]"), "test")

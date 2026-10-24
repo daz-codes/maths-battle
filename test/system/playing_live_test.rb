@@ -61,4 +61,40 @@ class PlayingLiveTest < ApplicationSystemTestCase
       assert_selector "#live-podium .leaderboard__row", text: /Zara.*60.*2 right/m
     end
   end
+
+  test "a Power game's boxes come at 15 seconds, and a Freeze stops the player ahead's keypad, with news for both" do
+    ada = users(:ada)
+    ada.update!(name: "Ada")
+    game = LiveGame.make(host: ada, topic: TimesTables, level: 1)
+    game.update!(mode: "power")
+    sign_in ada
+    visit live_game_path(game.code)
+
+    using_session :zara do
+      visit live_game_path(game.code)
+      fill_in "What should we call you?", with: "Zara"
+      click_on "Join the game"
+      assert_text "Waiting for Ada to start…"
+    end
+
+    assert_selector "#live-players", text: "Zara", wait: 5
+    click_on "Start"
+    assert_selector ".question--current", text: "×", wait: 10
+    2.times { |answered| answer_right; assert_selector ".test__score", text: /#{answered + 1}/ }
+
+    # Ada leads, so her box could be a Shield, which would block it
+    assert_selector ".test__power:not([hidden])", wait: 20
+    game.player_for(ada).update!(power_up: nil)
+
+    using_session :zara do
+      assert_selector ".test__power:not([hidden])", wait: 5
+      game.player_for(User.find_by(name: "Zara")).update!(power_up: "freeze")
+      find(".test__power").click
+      assert_selector ".test__power-news", text: "You froze Ada!", wait: 5
+    end
+
+    assert_selector ".test.test--freeze", wait: 5
+    assert_selector ".test__power-news", text: "Zara froze you!"
+    assert_no_selector ".test.test--freeze", wait: 5
+  end
 end
