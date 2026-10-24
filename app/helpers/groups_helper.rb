@@ -27,10 +27,10 @@ module GroupsHelper
     end
   end
 
-  # The levels to choose from for a challenge's topic, with their names, then every level mixed
-  def challenge_level_options(topic, selected)
+  # The levels to choose from for a challenge's topic, with their names, then every level mixed (not for a live game)
+  def challenge_level_options(topic, selected, mixed: true)
     levels = topic.levels.map { |level| [ "Level #{level[:number]}: #{level[:name]}", level[:number] ] }
-    options_for_select(levels + [ [ "Mixed: every level", "mixed" ] ], selected)
+    options_for_select(levels + (mixed ? [ [ "Mixed: every level", "mixed" ] ] : []), selected)
   end
 
   # Each topic's level names, so the level menu can follow the topic chosen (challenge-levels controller)

@@ -18,10 +18,10 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".current-topic__name", text: "Equations"
   end
 
-  test "the home page says which topic, and tapping it goes to change it" do
-    get root_path
+  test "Practice says which topic, and tapping it goes to change it" do
+    get practice_path
     assert_select ".current-topic__name", text: "Times tables"
-    assert_select "a.current-topic[href=?][title='Change topic'][aria-label=?]", topics_path, "Times tables. Change topic"
+    assert_select "a.current-topic[href=?][title='Change topic'][aria-label=?]", topics_path(from: :practice), "Times tables. Change topic"
     assert_select "select", count: 0
   end
 

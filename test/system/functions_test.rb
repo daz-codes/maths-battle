@@ -3,9 +3,9 @@ require "application_system_test_case"
 class FunctionsTest < ApplicationSystemTestCase
   test "pick functions from the dropdown, answer with the keyboard, and see the results" do
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Change topic"
     find(".topic-card", text: "Functions").click
-    click_on "Practice"
     assert_selector ".levels__name", text: "Level 1: Linear"
     click_on "Play level 1"
     assert_selector ".question--current .function--ask", wait: 5

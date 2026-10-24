@@ -5,7 +5,7 @@
   <%= turbo_stream_from @live_game %>
   <%= link_to "← Compete", groups_path, class: "back-link" %>
   <h1 class="heading"><%= icon(:lightning) %> Live game</h1>
-  <p class="aside"><%= topic_icon(@live_game.topic_module) %> <%= @live_game.title %> · hosted by <%= host ? "you" : @live_game.host.display_name %></p>
+  <p class="aside">Hosted by <%= host ? "you" : @live_game.host.display_name %></p>
   <%= render "flash" %>
   <%= render "live_games/mode", live_game: @live_game %>
 
@@ -23,6 +23,17 @@
                   class: "board-switch__option", form_class: "board-switch__form", aria: { current: (mode == @live_game.mode) } %>
           <% end %>
         </nav>
+        <%= form_with url: live_game_path(@live_game), method: :patch, class: "live-topic" do %>
+          <div class="form__pair" data-controller="challenge-levels" data-challenge-levels-names-value="<%= challenge_level_names.to_json %>">
+            <%= label_tag :topic, "Topic" %>
+            <%= select_tag :topic, options_for_select(Topic::ALL.map { [ _1.title, _1.key ] }, @live_game.topic),
+                  class: "form__select", data: { action: "challenge-levels#update" } %>
+            <%= label_tag :level, "Level" %>
+            <%= select_tag :level, challenge_level_options(@live_game.topic_module, @live_game.level, mixed: false),
+                  class: "form__select", data: { challenge_levels_target: "level" } %>
+          </div>
+          <%= submit_tag "Change", class: "button", name: nil %>
+        <% end %>
         <% url = live_game_url(@live_game) %>
         <button type="button" class="button button--blue button--wide" data-controller="share"
                 data-share-text-value="Race me at <%= @live_game.title %> on MatheMinute, live! <%= url %>" data-action="share#share">Share the link</button>

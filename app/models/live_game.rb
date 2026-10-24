@@ -45,6 +45,15 @@ class LiveGame < ApplicationRecord
     true
   end
 
+  # A different topic or level is a new set of questions
+  def choose_game(topic:, level:)
+    return false if started? || !topic&.level(level)
+
+    update!(topic: topic.key, level: level, questions: User.new.questions(topic: topic, level: level))
+    broadcast_lobby
+    true
+  end
+
   def hosted_by?(user)
     user.present? && host_id == user.id
   end

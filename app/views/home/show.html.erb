@@ -3,8 +3,6 @@
 <main class="page home">
   <%= render "flash" %>
 
-  <%= render "topics/current", topic: current_topic, from: nil %>
-
   <%# The greeting, with the streak small beside it %>
   <div class="greeting">
     <% if @user.display_name %>
@@ -36,6 +34,14 @@
 
   <%= render "head_to_heads/to_play", user: @user %>
   <%= render "groups/to_play", user: @user %>
+
+  <%# The bests across every game: the most gems from one, and the longest streak %>
+  <% if @user.persisted? %>
+    <dl class="stats">
+      <div><dt>Most gems</dt><dd><%= icon(:gem) %> <%= number_with_delimiter @user.most_gems %></dd></div>
+      <div><dt>Longest streak</dt><dd><%= icon(:flame) %> <%= @user.longest_streak %></dd></div>
+    </dl>
+  <% end %>
 
   <% if @user.guest? && @user.persisted? %>
     <p class="save-nudge">

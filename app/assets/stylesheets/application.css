@@ -1417,7 +1417,7 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 
 /* Home: the greeting with the streak small beside it, then the three ways to play */
 .greeting__hello { margin: 0; font: inherit; }
-.greeting .streak { display: inline-flex; flex-direction: row; align-items: center; gap: 0.1rem; margin: 0; padding: 0.15rem 0.6rem 0.15rem 0.4rem; border-radius: 999px; background: var(--paper-alt); color: var(--muted); font-size: 1.1rem; font-weight: 800; letter-spacing: 0; }
+.greeting .streak { display: inline-flex; flex-direction: row; align-items: center; gap: 0.1rem; margin: 0; color: var(--muted); font-size: 1.3rem; font-weight: 800; letter-spacing: 0; }
 .greeting .streak--done { color: var(--ink); }
 .greeting .streak .streak__flame { width: 1.2em; height: 1.2em; margin: 0; vertical-align: 0; }
 .home-actions { display: grid; gap: 0.9rem; width: var(--panel-width); }
@@ -1427,3 +1427,5 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 .home-action--challenge { --fill: var(--pink-deep); --glow: var(--pink); }
 .home-action--practice { --fill: var(--blue-deep); --glow: var(--blue); }
 .home-action--compete { --fill: var(--green-deep); --glow: var(--green); }
+.live-topic { display: grid; gap: 0.5rem; }
+.live-topic .button { justify-self: center; }

@@ -39,6 +39,29 @@ class LiveGamesTest < ActionDispatch::IntegrationTest
     assert_equal "Wait for someone to join first.", flash[:alert]
   end
 
+  test "the host picks the topic and level in the lobby, a new set of questions, before it starts" do
+    game = LiveGame.make(host: @ada, topic: TimesTables, level: 1)
+    sign_in_as @ada
+    get live_game_path(game.code)
+    assert_select "#live-mode", text: /Times tables · Level 1/
+    assert_select "form[action=?] select[name=topic] option[selected][value=times_tables]", live_game_path(game.code)
+    assert_select "select[name=level] option[value=mixed]", count: 0, message: "a live game is at one level"
+
+    patch live_game_path(game.code), params: { topic: "percentages", level: 3 }
+    game.reload
+    assert_equal [ "percentages", 3 ], [ game.topic, game.level ]
+    assert_match "%", game.questions.first["text"]
+    follow_redirect!
+    assert_select "#live-mode", text: /Percentages · Level 3/
+
+    patch live_game_path(game.code), params: { topic: "percentages", level: 9 }
+    assert_equal 3, game.reload.level, "no such level"
+    game.join(@bob)
+    game.start!
+    patch live_game_path(game.code), params: { topic: "addition", level: 1 }
+    assert_equal "percentages", game.reload.topic, "not once it's started"
+  end
+
   test "the host chooses Classic or Power in the lobby, and everyone sees which" do
     game = LiveGame.make(host: @ada, topic: TimesTables, level: 1)
     sign_in_as @ada

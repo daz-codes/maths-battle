@@ -10,10 +10,14 @@ class LiveGamesController < ApplicationController
     redirect_to live_game
   end
 
-  # Classic or Power, before it starts
+  # Classic or Power, or the topic and level, before it starts
   def update
     live_game = Current.user.hosted_live_games.find_by!(code: params[:code])
-    live_game.choose_mode(params[:mode].to_s)
+    if params[:mode]
+      live_game.choose_mode(params[:mode].to_s)
+    else
+      live_game.choose_game(topic: Topic.find(params[:topic]), level: params[:level].to_i)
+    end
     redirect_to live_game
   end
 

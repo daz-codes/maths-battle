@@ -3,9 +3,9 @@ require "application_system_test_case"
 class NewTopicsTest < ApplicationSystemTestCase
   test "division: pick it, answer with the keyboard, and see the results" do
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Change topic"
     find(".topic-card", text: "Division").click
-    click_on "Practice"
     assert_selector ".levels__name", text: "Level 1: Tables 2–5"
     click_on "Play level 1"
     assert_selector ".question", text: "÷", wait: 5
@@ -22,9 +22,9 @@ class NewTopicsTest < ApplicationSystemTestCase
 
   test "negative numbers: a minus answer typed on the keypad" do
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Change topic"
     find(".topic-card", text: "Negative numbers").click
-    click_on "Practice"
     click_on "Play level 1"
     assert_selector ".question", text: "−", wait: 5
 
@@ -39,9 +39,9 @@ class NewTopicsTest < ApplicationSystemTestCase
 
   test "adding and subtracting: pick it, answer with the keyboard, and see the results" do
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Change topic"
     find(".topic-card", text: "Adding and subtracting").click
-    click_on "Practice"
     assert_selector ".levels__name", text: "Level 1: Single digits"
     click_on "Play level 1"
     assert_selector ".question", text: /[+−]/, wait: 5
@@ -58,9 +58,9 @@ class NewTopicsTest < ApplicationSystemTestCase
 
   test "metric conversions: pick it, answer with the decimal point, and see the results" do
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Change topic"
     find(".topic-card", text: "Metric conversions").click
-    click_on "Practice"
     assert_selector ".levels__name", text: "Level 1: cm and m"
     click_on "Play level 1"
     assert_selector ".question", text: "= ?", wait: 5
@@ -77,9 +77,9 @@ class NewTopicsTest < ApplicationSystemTestCase
 
   test "percentages: pick it, answer with the keyboard, and see the results" do
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Change topic"
     find(".topic-card", text: "Percentages").click
-    click_on "Practice"
     assert_selector ".levels__name", text: "Level 1: 50% and 10%"
     click_on "Play level 1"
     assert_selector ".question", text: "% of", wait: 5

@@ -1,6 +1,7 @@
 require "test_helper"
 
 class HomeControllerTest < ActionDispatch::IntegrationTest
+  include ActionView::Helpers::NumberHelper
   setup { @user = users(:ada) }
 
   test "a new visitor picks a topic first, then the home page is on it" do
@@ -14,6 +15,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     patch topic_path, params: { topic: "equations" }
     assert_redirected_to root_path
     follow_redirect!
+    assert_select ".current-topic", count: 0, message: "the topic is on Practice, not home"
+    get practice_path
     assert_select ".current-topic__name", text: "Equations"
 
     get topics_path
@@ -25,7 +28,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
     cookies.delete("topic")
 
-    get root_path
+    get practice_path
     assert_response :success
     assert_select ".current-topic__name", text: "Functions"
   end
@@ -103,12 +106,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".greeting", text: /Hi Ada!/
   end
 
-  test "the page goes topic, then the greeting with the streak small beside it, then Challenge, Practice and Compete" do
+  test "the page goes the greeting with the streak small beside it, then Challenge, Practice and Compete" do
     @user.update!(name: "Ada")
     sign_in_as @user
     get root_path
 
-    parts = %w[ current-topic greeting streak home-actions ]
+    parts = %w[ greeting streak home-actions ]
     order = css_select(parts.map { ".#{_1}" }.join(", ")).map { |element| (element["class"].split & parts).first }
     assert_equal parts, order
   end
@@ -120,12 +123,19 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
     patch level_path, params: { level: 1 }
 
+    Attempt.record!(user: @user, topic: "equations", results: [ EASY_QUESTIONS.fetch(Equations) ] * 2)
+    @user.update!(current_streak: 12, longest_streak: 15, last_practised_on: @user.today, streak_kept_on: @user.today)
     get root_path
     assert_select ".greeting .streak", text: "12"
     assert_select ".home-action--practice .button__note", count: 0, message: "the streak is safe today"
+    most = @user.attempts.maximum(:gems)
+    assert_select ".stats div", text: /Most gems\s+#{number_with_delimiter(most)}/, message: "from any game"
+    assert_select ".stats div", text: /Longest streak\s+15/
 
     get practice_path
-    assert_select ".stats", text: /41/
+    assert_equal %w[ Best\ score Average\ score Average\ time Most\ gems ], css_select(".stats dt").map(&:text)
+    assert_select ".stats div", text: /Best score\s+41/
+    assert_select ".stats div", text: /Most gems\s+#{number_with_delimiter(@user.attempts.at_level(TimesTables, 1).maximum(:gems))}/
     assert_select "a[href=?]", stats_path("times-tables"), text: "See all stats"
     assert_select "a.button--play[href=?]", play_path("times-tables", level: 1), text: /Play level 1\s+Beat your best: 41/, message: "the streak is safe today, so it's the best to beat"
     assert_select ".levels__level[aria-current=true] .levels__best", text: "41"

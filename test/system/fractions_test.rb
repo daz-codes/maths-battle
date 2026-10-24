@@ -3,9 +3,9 @@ require "application_system_test_case"
 class FractionsTest < ApplicationSystemTestCase
   test "pick fractions, simplify with the keyboard and the fraction key, and see the results" do
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Change topic"
     find(".topic-card", text: "Fractions").click
-    click_on "Practice"
     assert_selector ".levels__name", text: "Level 1: Simplifying"
     click_on "Play level 1"
     assert_selector ".question--current .question__verb", text: "Simplify", wait: 5
