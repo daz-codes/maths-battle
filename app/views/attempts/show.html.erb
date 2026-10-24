@@ -32,8 +32,12 @@
 
   <section class="gems-earned" aria-label="Gems">
     <span class="gems-earned__total">+<%= number_with_delimiter @attempt.gems %> <%= icon(:gem, label: "gems") %></span>
-    <% if @attempt.gem_bonuses.any? %>
+    <% tally = @attempt.review? ? {} : @attempt.gem_tally.except(:longest_run).reject { |_, gems| gems.zero? } %>
+    <% if tally.any? || @attempt.gem_bonuses.any? %>
       <ul class="gems-earned__bonuses">
+        <% tally.each do |part, gems| %>
+          <li class="gems-earned__<%= part %>"><%= Attempt::TALLY_NAMES[part] %><%= " (best run #{@attempt.gem_tally[:longest_run]})" if part == :combo %> <%= gems.negative? ? "−#{-gems}" : "+#{number_with_delimiter gems}" %></li>
+        <% end %>
         <% @attempt.gem_bonuses.each do |bonus, gems| %>
           <li><%= Attempt::BONUS_NAMES[bonus] %> +<%= gems %></li>
         <% end %>

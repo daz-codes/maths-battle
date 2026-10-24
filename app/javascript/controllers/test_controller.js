@@ -6,7 +6,8 @@ import * as feedback from "lib/feedback"
 import confetti from "canvas-confetti"
 
 const DURATION = 60_000
-const GEMS = { right: 10, quick: 20, lightning: 30 }
+// The second pop, for the answer's speed, comes just after the first
+const SPEED_POP_DELAY = 140
 const WRONG_PAUSE = 400
 // A review has no clock, so there's time to take in the right answer
 const REVIEW_WRONG_PAUSE = 1_500
@@ -22,8 +23,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // after a warning, and then nothing is saved. A review has no clock or gems: it asks each of its
 // questions once and ends after the last
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "rival", "gemIcon", "trophyIcon" ]
-  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, ghost: Object, live: Object, submitUrl: String, keys: Array, gemTimes: Object }
+  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "rival", "combo", "gemIcon", "speedIcon", "trophyIcon" ]
+  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, ghost: Object, live: Object, submitUrl: String, keys: Array, gemRules: Object }
 
   connect() {
     preparePlayer()
@@ -45,6 +46,7 @@ export default class extends Controller {
     this.index = 0
     this.typed = ""
     this.score = 0
+    this.inARow = 0
     this.ghostScore = 0
     this.results = []
 
@@ -302,7 +304,7 @@ export default class extends Controller {
       this.scoreTarget.textContent = this.score
       this.flash(this.scoreTarget, "--right")
       feedback.right()
-      if (!this.review) this.popGems(ms)
+      if (!this.review) this.earnGems(ms)
       if (this.bestValue && this.score === this.bestValue + 1) this.passBest()
       this.showGhostLead()
       if (this.live) {
@@ -311,23 +313,66 @@ export default class extends Controller {
       }
       this.next()
     } else {
+      if (!this.review) this.loseGems()
       this.showCorrection()
     }
   }
 
-  // Gems for a right answer float up and fade: +10, +20 if quick, +30 if lightning fast. The server works
-  // out the gems that count from the answers, with the same rules (Attempt::Gemmable)
-  popGems(ms) {
-    const { lightning, quick } = this.gemTimesValue
-    const [ gems, tier ] = ms < lightning ? [ GEMS.lightning, "lightning" ] : ms < quick ? [ GEMS.quick, "quick" ] : [ GEMS.right, "right" ]
-    const pop = Object.assign(document.createElement("span"), { className: `gem-pop gem-pop--${tier}`, textContent: `+${gems} ` })
+  // Gems float up and fade: +10 for a right answer, then its speed's own pop (+10 quick, +20 lightning), each
+  // multiplied by the combo of right answers in a row. A wrong answer loses some and ends the combo. The server
+  // works out the gems that count from the answers, with the same rules (Attempt::Gemmable)
+  earnGems(ms) {
+    const { right, speed, times } = this.gemRulesValue
+    this.inARow++
+    const multiplier = this.multiplier
+    if (multiplier > (this.shownMultiplier || 1)) this.showCombo(multiplier)
+
+    this.popGems(right * multiplier, "right")
+    const tier = ms < times.lightning ? "lightning" : ms < times.quick ? "quick" : null
+    if (tier) setTimeout(() => this.popGems(speed[tier] * multiplier, tier, this.speedIconTarget), SPEED_POP_DELAY)
+  }
+
+  loseGems() {
+    this.inARow = 0
+    if (this.shownMultiplier > 1) this.showCombo(1)
+    this.popGems(this.gemRulesValue.wrong, "wrong")
+  }
+
+  // ×2 from 5 in a row, ×3 from 10, ×4 from 20
+  get multiplier() {
+    return Object.entries(this.gemRulesValue.combos).reduce((multiplier, [ from, times ]) => this.inARow >= Number(from) ? times : multiplier, 1)
+  }
+
+  showCombo(multiplier) {
+    this.shownMultiplier = multiplier
+    if (!this.hasComboTarget) return
+
+    this.comboTarget.hidden = multiplier === 1
+    this.comboTarget.textContent = `×${multiplier}`
+    if (multiplier > 1) {
+      this.comboTarget.classList.remove("test__combo--new")
+      void this.comboTarget.offsetWidth // so the pulse plays again
+      this.comboTarget.classList.add("test__combo--new")
+      this.popText(`×${multiplier}!`, "combo")
+    }
+  }
+
+  // A speed pop has the lightning bolt after its gem
+  popGems(gems, tier, extraIcon) {
+    const pop = this.popText(`${gems < 0 ? "−" : "+"}${Math.abs(gems)} `, tier)
     pop.append(this.gemIconTarget.content.cloneNode(true))
+    if (extraIcon) pop.append(extraIcon.content.cloneNode(true))
+  }
+
+  // Spread out a little, so quick answers in a row don't land on top of each other
+  popText(text, tier) {
+    const pop = Object.assign(document.createElement("span"), { className: `gem-pop gem-pop--${tier}`, textContent: text })
     pop.setAttribute("aria-hidden", "true")
-    // Spread out a little, so quick answers in a row don't land on top of each other
     pop.style.setProperty("--drift", `${Math.round((Math.random() - 0.5) * 180)}px`)
     pop.addEventListener("animationend", () => pop.remove())
     setTimeout(() => pop.remove(), 2_600)
     this.stageTarget.append(pop)
+    return pop
   }
 
   // The moment the score passes the level's best, or a rival's: it turns pink, says so, bursts with confetti from the score

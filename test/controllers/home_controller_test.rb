@@ -61,7 +61,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     Attempt.record!(user: users(:ada), results: answers(*right_answers(5), ms: 2_500))
 
     get root_path
-    assert_select ".site-footer__gems", text: "200", message: "50 for the answers, then a new high score and a level up"
+    assert_select ".site-footer__gems", text: "210", message: "50 for the answers and 10 for the 5th in a row doubled, then a new high score and a level up"
     assert_select "main .gems-total", count: 0
     assert_select "main .freezes", count: 0
   end

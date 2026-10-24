@@ -15,7 +15,7 @@
       <% if @ghost %>data-test-ghost-value="<%= @ghost.to_json %>"<% end %>
       <% if @live %>data-test-live-value="<%= @live.to_json %>"<% end %>
       data-test-keys-value="<%= @topic.keys(@level).to_json %>"
-      data-test-gem-times-value="<%= @topic.gem_times.to_json %>"
+      data-test-gem-rules-value="<%= Attempt.gem_rules(@topic).to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">
   <button type="button" class="test__stop" data-action="test#confirmStop" aria-label="Stop the game">✕</button>
 
@@ -24,6 +24,8 @@
     <%# A level's practice shows the best to beat, and a head to head the challenger's score, celebrating passing it %>
     <span class="test__tally">
       <span class="test__score" data-test-target="score" aria-label="Score">0</span>
+      <%# Right answers in a row multiply the gems: ×2, ×3, ×4 %>
+      <span class="test__combo" data-test-target="combo" aria-live="polite" hidden></span>
       <% if @best.positive? %><span class="test__best" data-test-target="best"><%= @mode == "head_to_head" ? "Beat" : "Best" %> <%= @best %></span><% end %>
       <%# A head to head races the challenger's game: their score as it was at this point in their minute %>
       <% if @ghost %><span class="test__ghost" data-test-target="ghost" aria-label="<%= @ghost[:name] %>'s score at this point"><%= @ghost[:name] %> 0</span><% end %>
@@ -37,8 +39,9 @@
     <% end %>
   </header>
 
-  <%# Icons the game copies into what floats up: gems for each right answer, the trophy for a new best %>
+  <%# Icons the game copies into what floats up: gems for each answer and its speed, the trophy for a new best %>
   <template data-test-target="gemIcon"><%= icon(:gem) %></template>
+  <template data-test-target="speedIcon"><%= icon(:lightning) %></template>
   <template data-test-target="trophyIcon"><%= icon(:trophy) %></template>
 
   <%# A live game: everyone else's score as they play %>

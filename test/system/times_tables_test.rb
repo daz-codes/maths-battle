@@ -33,15 +33,33 @@ class TimesTablesTest < ApplicationSystemTestCase
     assert_equal 2, users(:ada).best_score(TimesTables, 1)
   end
 
-  test "each right answer's stars float up and fade away" do
+  test "gems float up for each right answer and its speed, a combo multiplies them, and a wrong answer loses some" do
     sign_in users(:ada)
     click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
 
     a, b = find(".question").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
-    assert_selector ".gem-pop.gem-pop--lightning .icon--gem", visible: :all
-    assert_selector ".gem-pop.gem-pop--lightning", text: "+30"
+    assert_selector ".gem-pop.gem-pop--right .icon--gem", visible: :all
+    assert_selector ".gem-pop.gem-pop--right", text: "+10"
+    assert_selector ".gem-pop.gem-pop--lightning", text: "+20"
+    assert_selector ".gem-pop.gem-pop--lightning .icon--lightning", visible: :all
+    assert_selector ".test__combo", visible: :hidden
+
+    4.times do |answered|
+      a, b = find(".question").text.split(" × ").map(&:to_i)
+      find("body").send_keys((a * b).to_s)
+      assert_selector ".test__score", text: /#{answered + 2}/
+    end
+    assert_selector ".test__combo", text: "×2"
+    assert_selector ".gem-pop--combo", text: "×2!"
+    assert_selector ".gem-pop.gem-pop--right", text: "+20"
+
+    a, b = find(".question").text.split(" × ").map(&:to_i)
+    wrong = (a * b) % 10 == 9 ? a * b - 1 : a * b + 1
+    find("body").send_keys(wrong.to_s)
+    assert_selector ".gem-pop.gem-pop--wrong", text: "−5"
+    assert_selector ".test__combo", visible: :hidden
     assert_no_selector ".gem-pop", wait: 4
   end
 

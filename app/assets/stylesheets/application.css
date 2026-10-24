@@ -711,8 +711,12 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   animation: star-float 2.2s ease-out forwards;
 }
 
-.gem-pop--quick { color: var(--blue-deep); font-size: 1.8rem; }
-.gem-pop--lightning { color: var(--pink-text); font-size: 2.1rem; }
+/* A right answer's gems, then its speed's just below, so they rise as a pair; losing some for a wrong answer; and
+   a new combo, biggest of all */
+.gem-pop--quick { top: 30%; color: var(--blue-deep); font-size: 1.6rem; }
+.gem-pop--lightning { top: 30%; color: var(--pink-text); font-size: 1.9rem; }
+.gem-pop--wrong { color: var(--wrong); font-size: 1.4rem; }
+.gem-pop--combo { top: 4%; color: var(--pink-text); font-size: 2.3rem; font-weight: 900; }
 
 :root[data-theme="dark"] .gem-pop--right { color: var(--green); }
 :root[data-theme="dark"] .gem-pop--quick { color: var(--blue); }
@@ -738,6 +742,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* What a game earned, on its results page */
 .gems-earned { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; margin: 0; }
 .gems-earned__total { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
+.gems-earned__bonuses .gems-earned__wrong { color: var(--wrong); }
 .gems-earned__bonuses { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
 .gems-earned__bonuses li { padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--paper-alt); color: var(--muted); font-size: 0.85rem; font-weight: 700; }
 
@@ -1320,6 +1325,12 @@ body.testing {
 
 /* A head to head's ghost: the challenger's score at this point in their minute, pink while they're ahead and
    green once you are */
+/* The combo: how much right answers in a row multiply the gems */
+.test__combo { padding: 0.05rem 0.45rem; border-radius: 999px; background: var(--pink); color: var(--on-neon); font-size: 0.85rem; font-weight: 900; }
+.test__combo--new { animation: combo-pulse 450ms ease-out; }
+@keyframes combo-pulse { 0% { transform: scale(1.6); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .test__combo--new { animation: none; } }
+
 .test__ghost { color: var(--muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; transition: color 150ms; }
 .test__ghost--ahead { color: var(--pink-text); }
 .test__ghost--behind { color: var(--green-deep); }
