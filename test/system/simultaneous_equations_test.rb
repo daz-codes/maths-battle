@@ -15,9 +15,9 @@ class SimultaneousEquationsTest < ApplicationSystemTestCase
     assert_selector ".question--current .system__known", text: "x ="
     assert_selector ".question--current .system__ask", text: "y ="
     find("body").send_keys(current_answer)
-    assert_selector ".test__score", text: "2"
+    assert_selector "[data-test-target=right]", text: "2"
 
-    assert_selector ".card__number", text: /\A[23]\z/, wait: 10
+    assert_selector ".result__score", text: /\b[23] right/, wait: 10
     assert_text "SIMULTANEOUS EQUATIONS, LEVEL 1"
     assert_equal "simultaneous", users(:ada).attempts.last.topic
   end

@@ -1,4 +1,4 @@
-<% content_for :title, "#{@attempt.review? ? "#{@attempt.score} of #{@attempt.answered} right" : "#{@attempt.score} in a minute!"} · MatheMinute" %>
+<% content_for :title, "#{@attempt.review? ? "#{@attempt.correct} of #{@attempt.answered} right" : "Scored #{number_with_delimiter @attempt.score}!"} · MatheMinute" %>
 
 <main class="page results" data-controller="reveal">
   <%# Beating a best is the big one: wave after wave of confetti, and the fanfare %>
@@ -15,35 +15,31 @@
   <%= render "card", attempt: @attempt %>
 
   <% if @attempt.practice? && (previous = @attempt.previous_best).positive? %>
-    <%# Beating the level's best is the point: by how much, or how close it was %>
+    <%# Beating the level's best score is the point: by how much, or how close it was. Then how many were right,
+        against the most they've got right %>
     <% if @attempt.score > previous %>
-      <p class="best-line best-line--new"><%= icon(:trophy) %> <%= @attempt.score %>, up from <%= previous %></p>
+      <p class="best-line best-line--new"><%= icon(:trophy) %> <%= number_with_delimiter @attempt.score %>, up from <%= number_with_delimiter previous %></p>
     <% elsif @attempt.score == previous %>
-      <p class="best-line">Level with your best of <%= previous %>! One more next time!</p>
+      <p class="best-line">Level with your best of <%= number_with_delimiter previous %>! A little more next time!</p>
     <% else %>
       <% gap = previous - @attempt.score %>
-      <p class="best-line"><%= gap <= 3 ? "So close! " : "" %><%= gap + 1 %> more to beat your best of <%= previous %></p>
+      <p class="best-line"><%= gap * 10 <= previous ? "So close! " : "" %><%= number_with_delimiter gap + 1 %> more to beat your best of <%= number_with_delimiter previous %></p>
     <% end %>
+    <% most = @attempt.previous_best_correct %>
+    <p class="best-line best-line--right">
+      <%= @attempt.correct %> right<%= if @attempt.correct > most then ", your most yet!" elsif @attempt.correct == most then ", level with your most" else " · your most is #{most}" end %>
+    </p>
   <% end %>
 
-  <% if @attempt.earned_streak_freeze %>
-    <p class="freeze-earned"><%= icon(:freeze) %> <%= @attempt.streak %> day streak! You earned a free streak freeze.</p>
+  <%# Where the score came from %>
+  <% tally = @attempt.review? ? {} : @attempt.score_tally.except(:longest_run).reject { |_, points| points.zero? } %>
+  <% if tally.any? %>
+    <ul class="score-tally" aria-label="Where the score came from">
+      <% tally.each do |part, points| %>
+        <li class="score-tally__<%= part %>"><%= Attempt::TALLY_NAMES[part] %><%= " (best run #{@attempt.score_tally[:longest_run]})" if part == :combo %> <%= points.negative? ? "−#{-points}" : "+#{number_with_delimiter points}" %></li>
+      <% end %>
+    </ul>
   <% end %>
-
-  <section class="gems-earned" aria-label="Gems">
-    <span class="gems-earned__total">+<%= number_with_delimiter @attempt.gems %> <%= icon(:gem, label: "gems") %></span>
-    <% tally = @attempt.review? ? {} : @attempt.gem_tally.except(:longest_run).reject { |_, gems| gems.zero? } %>
-    <% if tally.any? || @attempt.gem_bonuses.any? %>
-      <ul class="gems-earned__bonuses">
-        <% tally.each do |part, gems| %>
-          <li class="gems-earned__<%= part %>"><%= Attempt::TALLY_NAMES[part] %><%= " (best run #{@attempt.gem_tally[:longest_run]})" if part == :combo %> <%= gems.negative? ? "−#{-gems}" : "+#{number_with_delimiter gems}" %></li>
-        <% end %>
-        <% @attempt.gem_bonuses.each do |bonus, gems| %>
-          <li><%= Attempt::BONUS_NAMES[bonus] %> +<%= gems %></li>
-        <% end %>
-      </ul>
-    <% end %>
-  </section>
   <%= render "badges/earned", badges: @attempt.badges, celebrate: !(@attempt.levelled_up || @attempt.new_high_score), reveal: true %>
 
   <% if @attempt.group? && (challenge = @attempt.round&.challenge) %>

@@ -2,9 +2,15 @@
 # their own day. A player holds up to two: bought with gems, or given free when the streak reaches 7 or
 # 30 days. They're used up by themselves when the player comes back after missing days, but only if there
 # are enough to cover every missed day, as otherwise the streak is lost anyway.
-# A frozen day keeps the streak going without adding to it (User::Streakable)
+# A frozen day keeps the streak going without adding to it (User::Streakable).
+# Not offered for now (streak_freezes_offered): none are given, bought or used, and nothing shows them, but the
+# plumbing stays
 module User::StreakFreezable
   extend ActiveSupport::Concern
+
+  included do
+    class_attribute :streak_freezes_offered, default: false
+  end
 
   MAX_STREAK_FREEZES = 2
   # Dear enough to be worth saving up for: a good times tables game earns a few hundred
@@ -18,7 +24,7 @@ module User::StreakFreezable
   end
 
   def can_buy_streak_freeze?
-    can_hold_streak_freeze? && gems >= STREAK_FREEZE_PRICE
+    streak_freezes_offered && can_hold_streak_freeze? && gems >= STREAK_FREEZE_PRICE
   end
 
   def buy_streak_freeze!
@@ -33,7 +39,7 @@ module User::StreakFreezable
   def earn_streak_freeze(grew_by)
     before = current_streak - grew_by
     reached = FREE_STREAK_FREEZES_AT.any? { |days| before < days && current_streak >= days }
-    return false unless reached && can_hold_streak_freeze?
+    return false unless streak_freezes_offered && reached && can_hold_streak_freeze?
 
     update!(streak_freezes: streak_freezes + 1)
   end
@@ -41,7 +47,7 @@ module User::StreakFreezable
   # Covers the days missed since the streak was last kept, if there are freezes for all of them.
   # Returns how many were used
   def use_streak_freezes!
-    return 0 unless streak_kept_on && streak_kept_on < today - 1 && current_streak.positive?
+    return 0 unless streak_freezes_offered && streak_kept_on && streak_kept_on < today - 1 && current_streak.positive?
 
     with_lock do
       missed = missed_days

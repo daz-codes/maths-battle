@@ -42,13 +42,13 @@ class PlayingLiveTest < ApplicationSystemTestCase
     using_session :zara do
       assert_selector ".test__rival", text: "Ada 0", wait: 5
       assert_selector ".question", text: "×", wait: 10
-      2.times { |answered| answer_right; assert_selector ".test__score", text: /#{answered + 1}/ }
+      2.times { |answered| answer_right; assert_selector "[data-test-target=right]", text: /#{answered + 1}/ }
     end
 
     assert_selector ".test__rival.test__rival--ahead", text: "Zara 60", wait: 5
-    3.times { |answered| answer_right; assert_selector ".test__score", text: /#{answered + 1}/ }
+    3.times { |answered| answer_right; assert_selector "[data-test-target=right]", text: /#{answered + 1}/ }
     assert_selector ".test__rival.test__rival--behind", text: "Zara 60"
-    assert_selector ".test__gems", text: "90"
+    assert_selector ".test__score", text: "90"
     using_session(:zara) { assert_selector ".test__rival.test__rival--ahead", text: "Ada 90", wait: 5 }
 
     shorten_the_minute
@@ -80,7 +80,7 @@ class PlayingLiveTest < ApplicationSystemTestCase
     assert_selector "#live-players", text: "Zara", wait: 5
     click_on "Start"
     assert_selector ".question--current", text: "×", wait: 10
-    2.times { |answered| answer_right; assert_selector ".test__score", text: /#{answered + 1}/ }
+    2.times { |answered| answer_right; assert_selector "[data-test-target=right]", text: /#{answered + 1}/ }
 
     # Ada leads, so her box could be a Shield, which would block it
     assert_selector ".test__power:not([hidden])", wait: 20

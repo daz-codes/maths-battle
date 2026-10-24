@@ -30,7 +30,7 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     sign_in_as @ada
     game = practice_game
     get attempt_path(game)
-    assert_select "a.button--challenge[href=?]", new_head_to_head_path(attempt: game), text: "Challenge a friend to beat 10"
+    assert_select "a.button--challenge[href=?]", new_head_to_head_path(attempt: game), text: "Challenge a friend to beat 340"
 
     get new_head_to_head_path(attempt: game)
     assert_select ".rival-row", count: 1
@@ -44,7 +44,7 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     assert_equal [ @ada, @bob, game ], [ head_to_head.challenger, head_to_head.opponent, head_to_head.challenger_attempt ]
     assert_redirected_to head_to_head
     follow_redirect!
-    assert_select ".flash, .notice, p", text: "Sent! Bob has 3 days to beat your 10."
+    assert_select ".flash, .notice, p", text: "Sent! Bob has 3 days to beat your 340."
     assert_select ".banner", text: /Waiting for Bob · 3 days left/
   end
 
@@ -73,13 +73,13 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select "h1", text: /You vs \?/
     assert_select "[data-controller=share][data-share-text-value=?]",
-      "Ada scored 9 in a minute at Times tables · Level 1. Can you beat it? #{head_to_head_link_url(head_to_head.share_token)}"
+      "Ada scored 280 in a minute at Times tables · Level 1. Can you beat it? #{head_to_head_link_url(head_to_head.share_token)}"
     assert_select ".banner", text: /Sent as a link · 3 days left/
     sign_out
 
     get head_to_head_link_path(head_to_head.share_token)
     assert_select "h1", text: /Ada challenged you!/
-    assert_select ".head-to-head-link__target", text: "Beat 9 in a minute"
+    assert_select ".head-to-head-link__target", text: "Beat 280 in a minute"
     assert_select "input[name=name][required]"
     post head_to_head_link_path(head_to_head.share_token)
     assert_redirected_to head_to_head_link_path(head_to_head.share_token), "a name first"
@@ -106,24 +106,24 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
 
     sign_in_as @bob
     get root_path
-    assert_select "a.head-to-head-waiting[href=?]", head_to_head_path(head_to_head), text: /Ada challenged you!.*Times tables · Level 1 · Beat 4/m
+    assert_select "a.head-to-head-waiting[href=?]", head_to_head_path(head_to_head), text: /Ada challenged you!.*Times tables · Level 1 · Beat 80/m
 
     get head_to_head_path(head_to_head)
     assert_select "h1", text: /You vs Ada/
-    assert_select "a.button[href=?]", play_path("times-tables", head_to_head: head_to_head.id), text: "Play · beat 4"
+    assert_select "a.button[href=?]", play_path("times-tables", head_to_head: head_to_head.id), text: "Play · beat 80"
 
     get play_path("times-tables", head_to_head: head_to_head.id)
-    assert_select "[data-test-mode-value=head_to_head][data-test-best-value='4'][data-test-passed-value='Winning!']"
-    assert_select ".test__best", text: "Beat 4"
+    assert_select "[data-test-mode-value=head_to_head][data-test-best-value='80'][data-test-passed-value='Winning!']"
+    assert_select ".test__best", text: "Beat 80"
     ghost = JSON.parse(css_select("[data-controller=test]").first["data-test-ghost-value"])
-    assert_equal({ "name" => "Ada", "times" => [ 1000, 2000, 3000, 4000 ] }, ghost)
+    assert_equal({ "name" => "Ada", "steps" => [ [ 1000, 20 ], [ 2000, 40 ], [ 3000, 60 ], [ 4000, 80 ] ] }, ghost)
     assert_select ".test__ghost", text: "Ada 0"
     game = play_from_page(@bob, right: 6)
     assert_equal [ "head_to_head", game ], [ game.mode, head_to_head.reload.opponent_attempt ]
     assert_equal @bob, head_to_head.winner
 
     get attempt_path(game)
-    assert_select ".banner--group", text: "You won 6–4"
+    assert_select ".banner--group", text: "You won 160–80"
     assert_select "a[href=?]", head_to_head_path(head_to_head), text: "See the head to head"
 
     get play_path("times-tables", head_to_head: head_to_head.id)
@@ -133,8 +133,8 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
 
     sign_in_as @ada
     get head_to_head_path(head_to_head)
-    assert_select ".versus__score", text: "4"
-    assert_select ".versus__player--winner .versus__score", text: "6"
+    assert_select ".versus__score", text: "80"
+    assert_select ".versus__player--winner .versus__score", text: "160"
     assert_select ".head-to-head__record", text: "Against Bob: Lost 1"
     assert_select "form[action=?] button", head_to_heads_path, text: "Rematch"
   end
@@ -158,7 +158,7 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     assert_equal game, head_to_head.reload.challenger_attempt
 
     get attempt_path(game)
-    assert_select ".banner--group", text: "Sent! Bob has 3 days to beat your 5."
+    assert_select ".banner--group", text: "Sent! Bob has 3 days to beat your 120."
     get groups_path
     assert_select ".challenge-card", count: 0, message: "still waiting for Bob"
 
@@ -167,7 +167,7 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     play_from_page(@bob, right: 2)
     sign_in_as @ada
     get groups_path
-    assert_select ".challenge-card", text: /You vs Bob.*You won 5–2/m
+    assert_select ".challenge-card", text: /You vs Bob.*You won 120–40/m
   end
 
   test "only its two players see a head to head" do

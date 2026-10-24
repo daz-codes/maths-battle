@@ -21,7 +21,7 @@ class StoppingAGameTest < ApplicationSystemTestCase
 
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
-    assert_selector ".test__score", text: "1"
+    assert_selector "[data-test-target=right]", text: "1"
   end
 
   test "the clock's hand goes round once in the minute, and stops while paused" do

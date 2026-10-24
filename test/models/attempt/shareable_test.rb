@@ -8,9 +8,10 @@ class Attempt::ShareableTest < ActiveSupport::TestCase
     attempt = record_tables_game(@user, answers([ 7, 8, 56 ], [ 6, 7, 41 ], [ 9, 9, 81 ], [ 2, 2, 4 ], [ 3, 3, 9 ]))
     text = attempt.share_text("https://matheminute.app/s/abc")
 
+    assert_equal 4, attempt.correct
     assert_equal <<~TEXT.chomp, text
-      MatheMinute ✖️ Times tables, level 2: 4 in 60s
-      🔥 1 day streak  🏆 Best: 4
+      MatheMinute ✖️ Times tables, level 2: #{attempt.score} (4 right in 60s)
+      🔥 1 day streak  🏆 Best: #{attempt.score}
       🟩🟥🟩🟩🟩
       https://matheminute.app/s/abc
     TEXT

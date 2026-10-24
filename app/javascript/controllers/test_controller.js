@@ -24,11 +24,11 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 
 // Runs the whole one-minute test in the browser: nothing touches the network until it ends.
 // Offline, the finished game is kept on the device and uploaded later. It can be stopped part way,
-// after a warning, and then nothing is saved. A review has no clock or gems: it asks each of its
+// after a warning, and then nothing is saved. A review has no clock or score: it asks each of its
 // questions once and ends after the last
 export default class extends Controller {
-  static targets = [ "question", "previousQuestion", "answer", "gems", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "rival", "combo", "powerSlot", "powerNews", "powerIcon", "gemIcon", "speedIcon", "trophyIcon" ]
-  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, ghost: Object, live: Object, submitUrl: String, keys: Array, gemRules: Object }
+  static targets = [ "question", "previousQuestion", "answer", "right", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "rival", "combo", "powerSlot", "powerNews", "powerIcon", "speedIcon", "trophyIcon" ]
+  static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, ghost: Object, live: Object, submitUrl: String, keys: Array, scoring: Object }
 
   connect() {
     preparePlayer()
@@ -50,8 +50,8 @@ export default class extends Controller {
     this.state = "countdown"
     this.index = 0
     this.typed = ""
-    this.score = 0
-    this.rawGems = 0
+    this.correct = 0
+    this.rawPoints = 0
     this.inARow = 0
     this.ghostScore = 0
     this.results = []
@@ -214,33 +214,28 @@ export default class extends Controller {
     this.newsTimer = setTimeout(() => { this.powerNewsTarget.textContent = "" }, NEWS_TIME)
   }
 
-  // Another player's score has gone up: shown with theirs (their gems in a Power game), pink while they're ahead
-  rivalScored({ player_id, score, gems }) {
+  // Another player's score has gone up: shown with theirs, pink while they're ahead
+  rivalScored({ player_id, score }) {
     const rival = this.rivalTargets.find((element) => element.dataset.playerId === String(player_id))
     if (!rival) return
 
-    rival.dataset.standing = this.liveValue.power ? gems : score
-    rival.querySelector("strong").textContent = rival.dataset.standing
+    rival.dataset.score = score
+    rival.querySelector("strong").textContent = Number(score).toLocaleString()
     this.showRivalLeads()
-  }
-
-  // What a live game is won by: right answers, or gems in a Power game
-  get standing() {
-    return this.liveValue.power ? this.gems : this.score
   }
 
   showRivalLeads() {
     this.rivalTargets.forEach((rival) => {
-      const standing = Number(rival.dataset.standing || 0)
-      rival.classList.toggle("test__rival--ahead", standing > this.standing)
-      rival.classList.toggle("test__rival--behind", standing < this.standing)
+      const score = Number(rival.dataset.score || 0)
+      rival.classList.toggle("test__rival--ahead", score > this.points)
+      rival.classList.toggle("test__rival--behind", score < this.points)
     })
   }
 
   reportToRivals() {
     if (!this.live) return
 
-    this.liveChannel?.perform("score", { score: this.score, gems: this.gems })
+    this.liveChannel?.perform("score", { score: this.points, correct: this.correct })
     this.showRivalLeads()
   }
 
@@ -324,16 +319,17 @@ export default class extends Controller {
     this.frame = requestAnimationFrame(this.tick)
   }
 
-  // A head to head's challenger, racing alongside: how many they'd got right by this point in their minute,
-  // and whether they're ahead
+  // A head to head's challenger, racing alongside: their score at this point in their minute, and whether
+  // they're ahead
   moveGhost(elapsed) {
     if (!this.hasGhostTarget) return
 
-    const times = this.ghostValue.times || []
+    const steps = this.ghostValue.steps || []
     const before = this.ghostScore
-    while (this.ghostScore < times.length && times[this.ghostScore] <= elapsed) this.ghostScore++
+    this.ghostStep ??= 0
+    while (this.ghostStep < steps.length && steps[this.ghostStep][0] <= elapsed) this.ghostScore = steps[this.ghostStep++][1]
     if (this.ghostScore !== before) {
-      this.ghostTarget.textContent = `${this.ghostValue.name} ${this.ghostScore}`
+      this.ghostTarget.textContent = `${this.ghostValue.name} ${this.ghostScore.toLocaleString()}`
       this.showGhostLead()
     }
   }
@@ -341,8 +337,8 @@ export default class extends Controller {
   showGhostLead() {
     if (!this.hasGhostTarget) return
 
-    this.ghostTarget.classList.toggle("test__ghost--ahead", this.ghostScore > this.score)
-    this.ghostTarget.classList.toggle("test__ghost--behind", this.ghostScore < this.score)
+    this.ghostTarget.classList.toggle("test__ghost--ahead", this.ghostScore > this.points)
+    this.ghostTarget.classList.toggle("test__ghost--behind", this.ghostScore < this.points)
   }
 
   // Fills the ring's quarters one after another, so a whole minute completes the logo,
@@ -477,57 +473,59 @@ export default class extends Controller {
     this.answered = { solution: solution ?? `${text.replace(/<[^>]+>/g, "")} = ${shown(answer)}`, answer, typed: this.typed, right: this.typed === answer }
 
     if (this.typed === answer) {
-      this.score++
-      this.scoreTarget.textContent = this.score
+      this.correct++
+      if (this.hasRightTarget) this.rightTarget.textContent = this.correct
+      if (this.review) this.scoreTarget.textContent = this.correct
+      else this.earnPoints(ms)
       this.flash(this.scoreTarget, "--right")
       feedback.right()
-      if (!this.review) this.earnGems(ms)
-      if (this.bestValue && this.score === this.bestValue + 1) this.passBest()
+      if (this.bestValue && !this.passedBest && this.points > this.bestValue) this.passBest()
       this.showGhostLead()
       this.reportToRivals()
       this.next()
     } else {
-      if (!this.review) this.loseGems()
+      if (!this.review) this.losePoints()
       this.reportToRivals()
       this.showCorrection()
     }
   }
 
-  // Gems float up and fade: +10 for a right answer, then its speed's own pop (+10 quick, +20 lightning), each
-  // multiplied by the combo of right answers in a row. A wrong answer loses some and ends the combo. The server
-  // works out the gems that count from the answers, with the same rules (Attempt::Gemmable)
-  earnGems(ms) {
-    const { right, speed, times } = this.gemRulesValue
+  // The score floats up as it goes: +10 for a right answer, then its speed's own pop (+10 quick, +20 lightning),
+  // each multiplied by the combo of right answers in a row. A wrong answer loses some and ends the combo. The server
+  // works out the score that counts from the answers, with the same rules (Attempt::Scorable)
+  earnPoints(ms) {
+    const { right, speed, times } = this.scoringValue
     this.inARow++
     const multiplier = this.multiplier
     if (multiplier > (this.shownMultiplier || 1)) this.showCombo(multiplier)
 
-    this.popGems(right * multiplier, "right")
+    this.popPoints(right * multiplier, "right")
     const tier = ms < times.lightning ? "lightning" : ms < times.quick ? "quick" : null
-    if (tier) setTimeout(() => this.popGems(speed[tier] * multiplier, tier, this.speedIconTarget), SPEED_POP_DELAY)
-    this.addGems((right + (tier ? speed[tier] : 0)) * multiplier)
+    if (tier) setTimeout(() => this.popPoints(speed[tier] * multiplier, tier, this.speedIconTarget), SPEED_POP_DELAY)
+    this.addPoints((right + (tier ? speed[tier] : 0)) * multiplier)
   }
 
-  loseGems() {
+  losePoints() {
     this.inARow = 0
     if (this.shownMultiplier > 1) this.showCombo(1)
-    this.popGems(this.gemRulesValue.wrong, "wrong")
-    this.addGems(this.gemRulesValue.wrong)
+    this.popPoints(this.scoringValue.wrong, "wrong")
+    this.addPoints(this.scoringValue.wrong)
   }
 
-  // A game's gems never come to less than nothing, though wrong answers can take the running count below it
-  addGems(gems) {
-    this.rawGems += gems
-    if (this.hasGemsTarget) this.gemsTarget.textContent = this.gems.toLocaleString()
+  // A game never scores less than nothing, though wrong answers can take the running count below it
+  addPoints(points) {
+    this.rawPoints += points
+    this.scoreTarget.textContent = this.points.toLocaleString()
   }
 
-  get gems() {
-    return Math.max(0, this.rawGems)
+  // The score so far; a review's is how many are right, as it has no clock
+  get points() {
+    return this.review ? this.correct : Math.max(0, this.rawPoints)
   }
 
   // ×2 from 5 in a row, ×3 from 10, ×4 from 20
   get multiplier() {
-    return Object.entries(this.gemRulesValue.combos).reduce((multiplier, [ from, times ]) => this.inARow >= Number(from) ? times : multiplier, 1)
+    return Object.entries(this.scoringValue.combos).reduce((multiplier, [ from, times ]) => this.inARow >= Number(from) ? times : multiplier, 1)
   }
 
   showCombo(multiplier) {
@@ -544,16 +542,15 @@ export default class extends Controller {
     }
   }
 
-  // A speed pop has the lightning bolt after its gem
-  popGems(gems, tier, extraIcon) {
-    const pop = this.popText(`${gems < 0 ? "−" : "+"}${Math.abs(gems)} `, tier)
-    pop.append(this.gemIconTarget.content.cloneNode(true))
-    if (extraIcon) pop.append(extraIcon.content.cloneNode(true))
+  // A speed pop has the lightning bolt after it
+  popPoints(points, tier, extraIcon) {
+    const pop = this.popText(`${points < 0 ? "−" : "+"}${Math.abs(points)}`, tier)
+    if (extraIcon) pop.append(" ", extraIcon.content.cloneNode(true))
   }
 
   // Spread out a little, so quick answers in a row don't land on top of each other
   popText(text, tier) {
-    const pop = Object.assign(document.createElement("span"), { className: `gem-pop gem-pop--${tier}`, textContent: text })
+    const pop = Object.assign(document.createElement("span"), { className: `score-pop score-pop--${tier}`, textContent: text })
     pop.setAttribute("aria-hidden", "true")
     pop.style.setProperty("--drift", `${Math.round((Math.random() - 0.5) * 180)}px`)
     pop.addEventListener("animationend", () => pop.remove())
@@ -565,12 +562,13 @@ export default class extends Controller {
   // The moment the score passes the level's best, or a rival's: it turns pink, says so, bursts with confetti from the score
   // and plays the fanfare
   passBest() {
+    this.passedBest = true
     const score = this.scoreTarget.getBoundingClientRect()
     const origin = { x: (score.left + score.width / 2) / window.innerWidth, y: (score.top + score.height / 2) / window.innerHeight }
     confetti({ particleCount: 140, spread: 100, startVelocity: 40, origin, colors: [ "#efff2e", "#ff5cc6", "#2be4ff", "#5dff7a" ], disableForReducedMotion: true })
     this.element.classList.add("test--beating")
     if (this.hasBestTarget) this.bestTarget.textContent = this.passedValue
-    const pop = Object.assign(document.createElement("span"), { className: "gem-pop gem-pop--best" })
+    const pop = Object.assign(document.createElement("span"), { className: "score-pop score-pop--best" })
     pop.append(this.trophyIconTarget.content.cloneNode(true), ` ${this.passedValue}`)
     pop.setAttribute("aria-hidden", "true")
     pop.style.setProperty("--drift", "0px")
@@ -718,7 +716,7 @@ export default class extends Controller {
     this.questionTarget.hidden = true
     this.previousQuestionTarget.hidden = true
     this.answerTarget.hidden = true
-    this.offlineScoreTarget.textContent = this.score
+    this.offlineScoreTarget.textContent = this.points.toLocaleString()
     this.offlineResultTarget.hidden = false
   }
 

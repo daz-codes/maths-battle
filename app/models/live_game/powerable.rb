@@ -51,11 +51,11 @@ module LiveGame::Powerable
     end
   end
 
-  # :leading, :middle or :last, by the gems each player last said they had. With two, the one behind is last
+  # :leading, :middle or :last, by the score each player last said they had. With two, the one behind is last
   def place_of_player(player)
-    others = players.where.not(id: player.id).pluck(:live_gems)
-    if others.all? { |gems| gems <= player.live_gems } then :leading
-    elsif others.all? { |gems| gems >= player.live_gems } then :last
+    others = players.where.not(id: player.id).pluck(:live_score)
+    if others.all? { |score| score <= player.live_score } then :leading
+    elsif others.all? { |score| score >= player.live_score } then :last
     else :middle
     end
   end
@@ -70,9 +70,9 @@ module LiveGame::Powerable
     # The player just ahead, or second place for the leader. Lightning hits everyone ahead
     def targets_of(player, power_up)
       others = players.where.not(id: player.id).to_a
-      ahead = others.select { |other| other.live_gems > player.live_gems }
+      ahead = others.select { |other| other.live_score > player.live_score }
       return ahead if power_up == "lightning"
 
-      [ ahead.min_by(&:live_gems) || others.max_by(&:live_gems) ].compact
+      [ ahead.min_by(&:live_score) || others.max_by(&:live_score) ].compact
     end
 end

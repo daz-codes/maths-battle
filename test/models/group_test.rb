@@ -10,6 +10,11 @@ class GroupTest < ActiveSupport::TestCase
     @group.challenges.create!(topic: "times_tables", level: 2, **options)
   end
 
+  # What a game of so many right (at play's speed) scores
+  def points(right)
+    Attempt.new(topic: "times_tables", results: Array.new(right) { { "correct" => true, "ms" => 1000 } }).points
+  end
+
   def play(user, challenge, right:, wrong: 0, played_at: Time.current)
     results = Array.new(right) { { a: 2, b: 3, given: 6, ms: 1000 } } + Array.new(wrong) { { a: 2, b: 3, given: 7, ms: 1000 } }
     Attempt.record!(user: user, topic: "times_tables", level: 2, mode: "group", round: challenge.round, results: results, played_at: played_at.iso8601)
@@ -69,7 +74,7 @@ class GroupTest < ActiveSupport::TestCase
     board = set.leaderboard
     assert_equal [ bob, dan, @owner, cat ], board.map(&:user)
     assert_equal [ 1, 2, 3, 3 ], board.map(&:rank)
-    assert_equal 12, set.entry_for(bob).score
+    assert_equal 12, set.entry_for(bob).attempt.correct
   end
 
   test "players who leave drop off, and games after it ended don't count" do
@@ -165,7 +170,8 @@ class GroupTest < ActiveSupport::TestCase
     travel_to(london(4)) do
       total = set.week_leaderboard(by: :total)
       assert_equal [ @owner, bob ], total.map(&:user)
-      assert_equal [ [ 29, 10, 3 ], [ 20, 15, 2 ] ], total.map { [ _1.total, _1.best, _1.days ] }, "Tuesday's second go was just practice"
+      assert_equal [ [ points(9) + points(10) + points(10), points(10), 3 ], [ points(15) + points(5), points(15), 2 ] ],
+        total.map { [ _1.total, _1.best, _1.days ] }, "Tuesday's second go was just practice"
 
       assert_equal [ bob, @owner ], set.week_leaderboard(by: :best).map(&:user)
       assert_equal [ @owner ], set.leaderboard.map(&:user), "today's"
@@ -190,7 +196,7 @@ class GroupTest < ActiveSupport::TestCase
     play(@owner, set, right: 30, played_at: 2.minutes.ago)
 
     assert_equal first, set.entry_for(@owner).attempt
-    assert_equal 3, set.entry_for(@owner).score
+    assert_equal 3, set.entry_for(@owner).attempt.correct
   end
 
   test "late scores are kept in history but cannot change a closed leaderboard, even when backdated" do
@@ -230,8 +236,8 @@ class GroupTest < ActiveSupport::TestCase
     travel_to(london(16)) do
       assert_no_difference "set.rounds.count" do
         assert_equal final_round, set.round
-        assert_equal [ 5 ], set.leaderboard.map(&:score)
-        assert_equal [ [ 8, 5, 2 ] ], set.week_leaderboard.map { |entry| [ entry.total, entry.best, entry.days ] }
+        assert_equal [ points(5) ], set.leaderboard.map(&:score)
+        assert_equal [ [ points(3) + points(5), points(5), 2 ] ], set.week_leaderboard.map { |entry| [ entry.total, entry.best, entry.days ] }
       end
     end
   end
@@ -242,8 +248,8 @@ class GroupTest < ActiveSupport::TestCase
     travel_to(london(16)) do
       assert_no_difference "set.rounds.count" do
         assert_equal Date.new(2026, 11, 2), set.round.day
-        assert_equal [ 3 ], set.leaderboard.map(&:score)
-        assert_equal [ 3 ], set.week_leaderboard.map(&:total)
+        assert_equal [ points(3) ], set.leaderboard.map(&:score)
+        assert_equal [ points(3) ], set.week_leaderboard.map(&:total)
       end
     end
   end

@@ -26,7 +26,7 @@ module Attempt::Badgeable
   # The rules
 
   def scored?(topic, target)
-    topic_module == topic && score >= target
+    topic_module == topic && correct >= target
   end
 
   # The streak as it stood after this game

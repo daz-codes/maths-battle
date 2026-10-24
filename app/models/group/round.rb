@@ -15,7 +15,7 @@ class Group::Round < ApplicationRecord
       .joins("INNER JOIN groups ON groups.id = group_challenges.group_id")
       .joins("INNER JOIN group_memberships ON group_memberships.group_id = groups.id AND group_memberships.user_id = attempts.user_id")
       .where("group_challenges.owner_plays = ? OR attempts.user_id != groups.owner_id", true)
-      .select(:id, :user_id, :round_id, :score, :answered, :created_at).includes(:user)
+      .select(:id, :user_id, :round_id, :score, :correct, :answered, :created_at).includes(:user)
   end
 
   # Late offline games are still saved for the player, but cannot change a finished leaderboard

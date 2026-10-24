@@ -12,7 +12,7 @@ class LiveGame::PowerableTest < ActiveSupport::TestCase
   def player(user) = @game.player_for(user)
 
   def standings(ada:, bob:, carol:)
-    { @ada => ada, @bob => bob, @carol => carol }.each { |user, gems| player(user).update!(live_gems: gems) }
+    { @ada => ada, @bob => bob, @carol => carol }.each { |user, gems| player(user).update!(live_score: gems) }
   end
 
   test "three boxes, at 15, 30 and 45 seconds, only in a running Power game" do

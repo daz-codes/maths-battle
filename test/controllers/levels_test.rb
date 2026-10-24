@@ -7,8 +7,14 @@ class LevelsTest < ActionDispatch::IntegrationTest
     sign_in_as @user
   end
 
+  # A game with so many right
   def practise(level:, score:)
     Attempt.record!(user: @user, level: level, results: answers(*Array.new(score) { [ 2, 3, 6 ] }, ms: 1000))
+  end
+
+  # What that many right scores
+  def points(right)
+    Attempt.new(topic: "times_tables", results: answers(*Array.new(right) { [ 2, 3, 6 ] }, ms: 1000).map(&:deep_stringify_keys).map { _1.merge("correct" => true) }).points
   end
 
   test "home shows the levels, with locked ones padlocked, stars on the ones that have them, and what's next" do
@@ -19,7 +25,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_select ".levels .levels__level .stars[aria-label='2 of 3 stars']"
     assert_select ".levels__level--locked", 3
     assert_select ".levels__name", text: "Level 2: Tables 2–12"
-    assert_select ".levels__progress", text: "Score 5 for a and unlock level 3"
+    assert_select ".levels__progress", text: "Get 5 right for a and unlock level 3"
     assert_select ".levels__progress .icon--star"
     assert_select "a.button--play[href=?]", play_path("times-tables", level: 2), text: /Play level 2/
     assert_select ".levels-panel > a.button--mixed[href=?]", play_path("times-tables", mixed: 1)
@@ -29,7 +35,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     practise(level: 1, score: 12)
     patch level_path, params: { level: 1 }
     get practice_path
-    assert_select ".levels__progress", text: /Best: 12 · 20 for 3 stars/
+    assert_select ".levels__progress", text: "Best: #{points(12)} · 20 right for 3 stars"
     assert_select ".levels__progress .stars", count: 0, message: "the stars are on the level's circle"
     assert_select ".levels__level .stars[aria-label='2 of 3 stars']"
   end
@@ -38,7 +44,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     practise(level: 1, score: 7)
     get attempt_path(@user.attempts.last)
 
-    assert_select ".level-progress", text: /Best: 7 · 10 for 2 stars/
+    assert_select ".level-progress", text: "Best: #{points(7)} · 10 right for 2 stars"
     assert_select ".level-progress .stars", count: 0
   end
 
@@ -118,7 +124,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     patch topic_path, params: { topic: "equations" }
     get practice_path
 
-    assert_select ".levels__progress", text: "Score 5 for a and unlock level 2"
+    assert_select ".levels__progress", text: "Get 5 right for a and unlock level 2"
     assert_select "a.button--play[href=?]", play_path("equations", level: 1)
   end
 
@@ -161,17 +167,20 @@ class LevelsTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity, "no negatives in times tables"
   end
 
-  test "beating your best: by how much, or how close it was, on the results page" do
+  test "beating your best score: by how much, or how close it was, then how many were right against the most" do
     practise(level: 1, score: 12)
     get attempt_path(practise(level: 1, score: 15))
-    assert_select ".best-line--new", text: "15, up from 12"
+    assert_select ".best-line--new", text: "#{points(15)}, up from #{points(12)}"
+    assert_select ".best-line--right", text: "15 right, your most yet!"
 
-    get attempt_path(practise(level: 1, score: 13))
-    assert_select ".best-line", text: "So close! 3 more to beat your best of 15"
+    get attempt_path(practise(level: 1, score: 14))
+    assert_select ".best-line", text: "So close! #{points(15) - points(14) + 1} more to beat your best of #{points(15)}"
+    assert_select ".best-line--right", text: "14 right · your most is 15"
     get attempt_path(practise(level: 1, score: 15))
-    assert_select ".best-line", text: "Level with your best of 15! One more next time!"
+    assert_select ".best-line", text: "Level with your best of #{points(15)}! A little more next time!"
+    assert_select ".best-line--right", text: "15 right, level with your most"
     get attempt_path(practise(level: 1, score: 6))
-    assert_select ".best-line", text: "10 more to beat your best of 15"
+    assert_select ".best-line", text: "#{points(15) - points(6) + 1} more to beat your best of #{points(15)}"
   end
 
   test "a first game has no best to compare with, and only practice has a best" do
@@ -182,8 +191,8 @@ class LevelsTest < ActionDispatch::IntegrationTest
   test "a level's practice game knows the best to beat; mixed practice and reviews don't" do
     practise(level: 1, score: 12)
     get play_path("times-tables", level: 1)
-    assert_select "[data-test-best-value=12]"
-    assert_select ".test__best", text: "Best 12"
+    assert_select "[data-test-best-value=?]", points(12).to_s
+    assert_select ".test__best", text: "Best #{points(12)}"
 
     get play_path("times-tables", level: 2)
     assert_select "[data-test-best-value=0]"

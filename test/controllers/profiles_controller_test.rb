@@ -23,7 +23,7 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     end
     assert_select "section[aria-labelledby=your-game]" do
       assert_select "a.current-topic"
-      assert_select ".collection .freezes"
+      assert_select ".freezes", count: 0
     end
     assert_select "section[aria-labelledby=app-settings]" do
       assert_select ".reminder"
@@ -88,7 +88,7 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     get root_path
     assert_select ".site-footer a.site-footer__player[href=?][aria-label=Settings]", edit_profile_path
     assert_select ".site-footer a.site-footer__name[href=?]", edit_profile_path, text: "ada"
-    assert_select ".site-footer .site-footer__gems", text: "0"
+    assert_select ".site-footer .site-footer__gems", count: 0
     assert_select ".site-footer a.site-footer__player .avatar"
     assert_select ".site-footer a.site-footer__stats[href=?] svg.icon--stats", stats_path
     assert_select ".site-footer a.site-footer__home[href=?]", root_path, text: "Home"
@@ -97,22 +97,15 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".site-footer", text: /Settings/, count: 0
   end
 
-  test "shows the player's stars and streak freezes, and buys a freeze with stars" do
-    get edit_profile_path
-    assert_select ".collection .gems-total", text: "0 gems"
-    assert_select ".freezes__held", text: /No streak freezes/
-    assert_select ".freezes__hint", text: /Get 10,000 more\s+to buy one/
-
+  test "settings show no gems or streak freezes, and one can't be bought while they're put away" do
     @user.attempts.create!(topic: "times_tables", results: []).update_column(:gems, 10_100)
     get edit_profile_path
-    assert_select "form[action=?] button", streak_freeze_path, text: "Buy one for 10,000"
+    assert_select ".gems-total, .freezes", count: 0
+    assert_select "form[action=?]", streak_freeze_path, count: 0
 
     post streak_freeze_path
     assert_redirected_to edit_profile_path
-    follow_redirect!
-    assert_select ".flash", text: /You bought a streak freeze/
-    assert_select ".freezes__held", text: /1 streak freeze/
-    assert_select ".collection .gems-total", text: "100 gems"
+    assert_equal 0, @user.reload.streak_freezes
   end
 
   test "rejects unknown themes" do

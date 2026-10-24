@@ -9,10 +9,8 @@
         <span class="leaderboard__score">
           <% if place.attempt.nil? %>
             <%= tag.span(live_game.over? ? "didn't finish" : "playing…", class: "leaderboard__wrong") %>
-          <% elsif live_game.power? %>
-            <%= number_with_delimiter place.gems %> <%= icon(:gem, label: "gems") %> <span class="leaderboard__wrong"><%= place.score %> right</span>
           <% else %>
-            <%= place.score %>
+            <%= number_with_delimiter place.score %> <span class="leaderboard__wrong"><%= place.correct %> right</span>
           <% end %>
         </span>
       </li>

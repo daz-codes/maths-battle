@@ -16,12 +16,12 @@ class EquationsTest < ApplicationSystemTestCase
       answer = current_answer
       find("body").send_keys(answer)
       answered << answer
-      assert_selector ".test__score", text: answered.size.to_s
+      assert_selector "[data-test-target=right]", text: answered.size.to_s
     end
     wrong = current_answer == "1" ? "2" : "1"
     find("body").send_keys(wrong) # a one-character answer is checked straight away, so this one's wrong unless the answer is 1
 
-    assert_selector ".card__number", text: /\A[45]\z/, wait: 10
+    assert_selector ".result__score", text: /\b[45] right/, wait: 10
     assert_text "EQUATIONS, LEVEL 1"
     assert_equal "equations", users(:ada).attempts.last.topic
   end
@@ -38,7 +38,7 @@ class EquationsTest < ApplicationSystemTestCase
       test.show()
     JS
     %w[3 / 4].each { |key| find(".keypad__key[data-digit='#{key}']").execute_script("this.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))") }
-    assert_selector ".test__score", text: "1"
+    assert_selector "[data-test-target=right]", text: "1"
   end
 
   private

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_24_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_24_150000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -42,7 +42,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_24_120000) do
   create_table "attempts", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "topic", default: "times_tables", null: false
-    t.integer "score", default: 0, null: false
+    t.integer "correct", default: 0, null: false
     t.integer "answered", default: 0, null: false
     t.json "results", default: [], null: false
     t.boolean "new_high_score", default: false, null: false
@@ -55,11 +55,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_24_120000) do
     t.string "client_id"
     t.integer "level", default: 1, null: false
     t.boolean "levelled_up", default: false, null: false
-    t.integer "best_score", default: 0, null: false
+    t.integer "best_correct", default: 0, null: false
     t.integer "gems", default: 0, null: false
     t.boolean "earned_streak_freeze", default: false, null: false
     t.string "mode", default: "practice", null: false
     t.integer "round_id"
+    t.integer "score", default: 0, null: false
+    t.integer "best_score", default: 0, null: false
     t.index ["round_id", "user_id"], name: "index_attempts_on_round_id_and_user_id"
     t.index ["round_id"], name: "index_attempts_on_round_id"
     t.index ["share_token"], name: "index_attempts_on_share_token", unique: true
@@ -191,7 +193,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_24_120000) do
     t.integer "attempt_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "live_gems", default: 0, null: false
+    t.integer "live_score", default: 0, null: false
     t.integer "boxes_opened", default: 0, null: false
     t.string "power_up"
     t.index ["attempt_id"], name: "index_live_game_players_on_attempt_id"

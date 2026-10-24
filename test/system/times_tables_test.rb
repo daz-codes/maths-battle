@@ -21,7 +21,7 @@ class TimesTablesTest < ApplicationSystemTestCase
     2.times do
       a, b = find(".question--current").text.split(" × ").map(&:to_i)
       find("body").send_keys((a * b).to_s)
-      assert_selector ".test__score", text: /#{_1 + 1}/
+      assert_selector "[data-test-target=right]", text: /#{_1 + 1}/
     end
 
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
@@ -30,9 +30,9 @@ class TimesTablesTest < ApplicationSystemTestCase
     assert_selector ".answer--wrong", text: wrong.to_s
     assert_selector ".question-previous--wrong", text: "#{a} × #{b} = #{wrong} ✗ #{a * b}"
 
-    assert_selector ".card__number", text: "2", wait: 8
+    assert_selector ".result__score", text: /\b2 right/, wait: 8
     assert_text "#{a} × #{b} = #{a * b}"
-    assert_equal 2, users(:ada).best_score(TimesTables, 1)
+    assert_equal 2, users(:ada).best_correct(TimesTables, 1)
   end
 
   test "the answered question drops below the next, marked like a teacher would: a tick, or a cross and the right answer" do
@@ -46,7 +46,8 @@ class TimesTablesTest < ApplicationSystemTestCase
     find("body").send_keys((a * b).to_s)
     assert_selector ".question-previous.question-previous--right", exact_text: "#{a} × #{b} = #{a * b} ✓"
     assert_selector ".answer", exact_text: "", visible: :all
-    assert_selector ".test__gems", text: /\A[1-9]\d*/
+    assert_selector ".test__score", text: /\A[1-9]\d*\z/
+    assert_selector "[data-test-target=right]", text: "1"
 
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     wrong = (a * b) % 10 == 9 ? a * b - 1 : a * b + 1
@@ -65,27 +66,27 @@ class TimesTablesTest < ApplicationSystemTestCase
 
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
-    assert_selector ".gem-pop.gem-pop--right .icon--gem", visible: :all
-    assert_selector ".gem-pop.gem-pop--right", text: "+10"
-    assert_selector ".gem-pop.gem-pop--lightning", text: "+20"
-    assert_selector ".gem-pop.gem-pop--lightning .icon--lightning", visible: :all
+    assert_no_selector ".score-pop .icon--gem", visible: :all
+    assert_selector ".score-pop.score-pop--right", text: "+10"
+    assert_selector ".score-pop.score-pop--lightning", text: "+20"
+    assert_selector ".score-pop.score-pop--lightning .icon--lightning", visible: :all
     assert_selector ".test__combo", visible: :hidden
 
     4.times do |answered|
       a, b = find(".question--current").text.split(" × ").map(&:to_i)
       find("body").send_keys((a * b).to_s)
-      assert_selector ".test__score", text: /#{answered + 2}/
+      assert_selector "[data-test-target=right]", text: /#{answered + 2}/
     end
     assert_selector ".test__combo", text: "×2"
-    assert_selector ".gem-pop--combo", text: "×2!"
-    assert_selector ".gem-pop.gem-pop--right", text: "+20"
+    assert_selector ".score-pop--combo", text: "×2!"
+    assert_selector ".score-pop.score-pop--right", text: "+20"
 
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     wrong = (a * b) % 10 == 9 ? a * b - 1 : a * b + 1
     find("body").send_keys(wrong.to_s)
-    assert_selector ".gem-pop.gem-pop--wrong", text: "−5"
+    assert_selector ".score-pop.score-pop--wrong", text: "−5"
     assert_selector ".test__combo", visible: :hidden
-    assert_no_selector ".gem-pop", wait: 4
+    assert_no_selector ".score-pop", wait: 4
   end
 
   test "one game played to the end keeps the streak, and Play stops asking for one" do
@@ -104,18 +105,18 @@ class TimesTablesTest < ApplicationSystemTestCase
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
 
-    assert_selector ".card__number", text: "1", wait: 8
+    assert_selector ".result__score", text: /\b1 right/, wait: 8
     visit root_path
     assert_selector ".greeting .streak", text: "1"
     assert_no_selector ".home-action--practice .button__note", text: /streak/i
   end
 
   test "passing your best mid-game: the score turns pink and says so" do
-    Attempt.record!(user: users(:ada), results: answers([ 2, 3, 6 ]))
+    Attempt.record!(user: users(:ada), results: answers([ 2, 3, 6 ], ms: 500)) # one lightning fast answer: 30
     sign_in users(:ada)
     click_on "Practice"
     click_on "Play level 1"
-    assert_selector ".test__best", text: "Best 1"
+    assert_selector ".test__best", text: "Best 30"
     assert_selector ".question", text: "×", wait: 5
 
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
@@ -125,7 +126,7 @@ class TimesTablesTest < ApplicationSystemTestCase
     find("body").send_keys((a * b).to_s)
 
     assert_selector ".test--beating .test__best", text: "New best!"
-    assert_selector ".gem-pop--best .icon--trophy", visible: :all
-    assert_selector ".gem-pop--best", text: "New best!"
+    assert_selector ".score-pop--best .icon--trophy", visible: :all
+    assert_selector ".score-pop--best", text: "New best!"
   end
 end

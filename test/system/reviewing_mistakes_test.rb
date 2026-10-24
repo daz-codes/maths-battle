@@ -14,7 +14,7 @@ class ReviewingMistakesTest < ApplicationSystemTestCase
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
     assert_selector ".test__bar", text: "2/2"
-    assert_no_selector ".gem-pop"
+    assert_no_selector ".score-pop"
 
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b + 1).to_s)
@@ -22,7 +22,7 @@ class ReviewingMistakesTest < ApplicationSystemTestCase
     assert_selector ".question-previous--wrong", text: "#{a} × #{b} = #{a * b + 1} ✗ #{a * b}", wait: 3
 
     assert_selector ".result__score", text: /1\s+of 2 right/, wait: 8
-    assert_text "Mistakes reviewed +50"
+    assert_no_text "+50"
     click_on "Review 1 more"
     assert_selector ".question", text: "#{a} × #{b}", wait: 5
   end

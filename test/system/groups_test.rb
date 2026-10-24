@@ -39,12 +39,12 @@ class GroupsTest < ApplicationSystemTestCase
     JS
     2.times do |i|
       find("body").send_keys(page.evaluate_script(%(window.Stimulus.getControllerForElementAndIdentifier(document.querySelector("[data-controller=test]"), "test").current.answer)))
-      assert_selector ".test__score", text: (i + 1).to_s
+      assert_selector "[data-test-target=right]", text: (i + 1).to_s
     end
 
     assert_selector ".banner--group", text: "You're 1st of 1 in Class 4B", wait: 10
     click_on "See the leaderboard"
-    assert_selector ".leaderboard__row--you", text: /bob\s*2/
+    assert_selector ".leaderboard__row--you", text: /bob\s*#{Attempt.last.score}/
   end
 
   test "the owner changes invitations and removes a player, then invites them back; leaving also permits a return" do
@@ -95,23 +95,23 @@ class GroupsTest < ApplicationSystemTestCase
     JS
     2.times do |i|
       find("body").send_keys(page.evaluate_script('window.Stimulus.getControllerForElementAndIdentifier(document.querySelector("[data-controller=test]"), "test").current.answer'))
-      assert_selector ".test__score", text: (i + 1).to_s
+      assert_selector "[data-test-target=right]", text: (i + 1).to_s
     end
     assert_selector ".banner--group", text: "You're 1st of 1 today in Class 4B", wait: 10
     click_on "See the leaderboard"
     click_on "Week total"
-    assert_selector ".leaderboard__row--you", text: /Zara\s*2\s*1 day/
+    assert_selector ".leaderboard__row--you", text: /Zara\s*#{Attempt.last.score}\s*1 day/
     click_on "Best day"
-    assert_selector ".leaderboard__row--you", text: /Zara\s*2\s*total 2/
+    assert_selector ".leaderboard__row--you", text: /Zara\s*#{Attempt.last.score}\s*total #{Attempt.last.score}/
     assert page.evaluate_script("document.documentElement.scrollWidth <= window.innerWidth")
 
     challenge.close!
     travel 2.weeks do
       visit group_challenge_path(group, challenge)
       assert_selector ".board-switch a", text: "Final day"
-      assert_selector ".leaderboard__row--you", text: /Zara\s*2/
+      assert_selector ".leaderboard__row--you", text: /Zara\s*#{Attempt.last.score}/
       click_on "Final week", exact: true
-      assert_selector ".leaderboard__row--you", text: /Zara\s*2\s*1 day/
+      assert_selector ".leaderboard__row--you", text: /Zara\s*#{Attempt.last.score}\s*1 day/
       assert page.evaluate_script("document.documentElement.scrollWidth <= window.innerWidth")
       page.save_screenshot("/tmp/matheminute-group-fixed-final-board.png")
     end

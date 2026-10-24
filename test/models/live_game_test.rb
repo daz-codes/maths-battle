@@ -78,14 +78,14 @@ class LiveGameTest < ActiveSupport::TestCase
     end
 
     podium = @game.podium
-    assert_equal [ [ 1, @bob, 12 ], [ 2, @ada, 10 ], [ 2, carol, 10 ], [ nil, dan, nil ] ], podium.map { [ _1.rank, _1.user, _1.score ] }
+    assert_equal [ [ 1, @bob, 12 ], [ 2, @ada, 10 ], [ 2, carol, 10 ], [ nil, dan, nil ] ], podium.map { [ _1.rank, _1.user, _1.correct ] }
     assert_equal 2, @game.place_of(carol).rank
 
     travel(5.minutes) { play(dan, right: 40) }
     assert_nil @game.place_of(dan).rank, "saved too late to count"
   end
 
-  test "a Power game's podium goes by the gems the answers earned, so speed and runs count; Classic by right answers" do
+  test "Classic or Power, the podium goes by score, so speed and runs of right answers count, not just how many" do
     @game.join(@bob)
     assert_turbo_stream_broadcasts(@game) { assert @game.choose_mode("power") }
     assert_not @game.choose_mode("chaos")
@@ -97,10 +97,10 @@ class LiveGameTest < ActiveSupport::TestCase
       Attempt.record!(user: @bob, topic: "times_tables", level: 1, mode: "live", live_game: @game, results: Array.new(8) { { a: 2, b: 3, given: 6, ms: 3000 } })
     end
 
-    assert_equal [ [ 1, @ada, 6, 240 ], [ 2, @bob, 8, 120 ] ], @game.podium.map { [ _1.rank, _1.user, _1.score, _1.gems ] },
+    assert_equal [ [ 1, @ada, 240, 6 ], [ 2, @bob, 120, 8 ] ], @game.podium.map { [ _1.rank, _1.user, _1.score, _1.correct ] },
       "6 lightning answers, the 5th and 6th doubled, beat 8 slow ones"
     @game.update!(mode: "classic")
-    assert_equal [ @bob, @ada ], @game.podium.map(&:user)
+    assert_equal [ @ada, @bob ], @game.podium.map(&:user)
   end
 
   test "a live game doesn't change a level's best" do

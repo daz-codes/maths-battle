@@ -1,7 +1,24 @@
 require "test_helper"
 
+# Freezes aren't offered for now, but the plumbing is kept working for when they are
 class User::StreakFreezableTest < ActiveSupport::TestCase
-  setup { @user = users(:ada) }
+  setup do
+    @user = users(:ada)
+    User.streak_freezes_offered = true
+  end
+
+  teardown { User.streak_freezes_offered = false }
+
+  test "while they're not offered, none are given, bought or used" do
+    User.streak_freezes_offered = false
+    @user.attempts.create!(topic: "times_tables", results: []).update_column(:gems, 30_500)
+    assert_not @user.reload.can_buy_streak_freeze?
+    @user.update!(current_streak: 6)
+    assert_not @user.earn_streak_freeze(1)
+
+    @user.update!(streak_freezes: 2, current_streak: 4, streak_kept_on: @user.today - 3)
+    assert_equal 0, @user.use_streak_freezes!
+  end
 
   def day(number) = Date.new(2026, 11, number)
 

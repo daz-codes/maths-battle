@@ -101,11 +101,11 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "best scores and stats are per topic" do
-    Attempt.record!(user: @user, results: answers(*right_answers(20)))
+    tables = Attempt.record!(user: @user, results: answers(*right_answers(20)))
     equations = Attempt.record!(user: @user, topic: "equations", results: [ { type: "ax=b", a: 3, b: 12, v: "x", flip: false, given: "4", ms: 2000 } ] * 6)
 
     assert equations.new_high_score, "a first equations game is a best, even after a bigger times tables score"
-    assert_equal [ 20, 6 ], [ @user.best_score(TimesTables, 1), @user.best_score(Equations, 1) ]
+    assert_equal [ tables.score, equations.score ], [ @user.best_score(TimesTables, 1), @user.best_score(Equations, 1) ]
 
     get stats_path("equations", level: 1)
     assert_select ".current-topic__name", text: "Equations"

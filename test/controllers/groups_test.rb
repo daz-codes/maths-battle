@@ -126,8 +126,8 @@ class GroupsTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", group_challenge_path(@group, challenge), text: "See the leaderboard"
 
     get group_challenge_path(@group, challenge)
-    assert_select ".challenge__you", text: "You scored 7: 1st of 1"
-    assert_select ".leaderboard__row--you .leaderboard__score", text: "7"
+    assert_select ".challenge__you", text: "You scored 200: 1st of 1"
+    assert_select ".leaderboard__row--you .leaderboard__score", text: "200", message: "7 right, quick, the 5th to 7th doubled"
     assert_select "a.button", text: "Play again (just for practice)"
   end
 
@@ -184,9 +184,9 @@ class GroupsTest < ActionDispatch::IntegrationTest
 
     get group_challenge_path(@group, challenge, board: "total")
     assert_select ".board-switch a[aria-current=true]", text: "Week total"
-    assert_select ".leaderboard__row--you .leaderboard__score", text: /6\s+1 day/
+    assert_select ".leaderboard__row--you .leaderboard__score", text: /160\s+1 day/
     get group_challenge_path(@group, challenge, board: "best")
-    assert_select ".leaderboard__row--you .leaderboard__score", text: /6\s+total 6/
+    assert_select ".leaderboard__row--you .leaderboard__score", text: /160\s+total 160/
 
     yesterday = challenge.round
     travel 1.day do
@@ -299,15 +299,15 @@ class GroupsTest < ActionDispatch::IntegrationTest
     travel 2.weeks do
       assert_no_difference "challenge.rounds.count" do
         get group_challenge_path(@group, challenge)
-        assert_select ".leaderboard__row--you .leaderboard__score", text: "6"
+        assert_select ".leaderboard__row--you .leaderboard__score", text: "160"
         assert_select ".board-switch a", text: "Final day"
         assert_select "a.button", text: /Play/, count: 0
         get group_challenge_path(@group, challenge, board: "total")
-        assert_select ".leaderboard__row--you .leaderboard__score", text: /6\s+1 day/
+        assert_select ".leaderboard__row--you .leaderboard__score", text: /160\s+1 day/
         get group_challenge_path(@group, challenge, board: "best")
-        assert_select ".leaderboard__row--you .leaderboard__score", text: /6\s+total 6/
+        assert_select ".leaderboard__row--you .leaderboard__score", text: /160\s+total 160/
         get group_path(@group)
-        assert_select ".challenge-card__you", text: /Final day: You scored 6/
+        assert_select ".challenge-card__you", text: /Final day: You scored 160/
       end
     end
   end

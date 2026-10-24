@@ -1,4 +1,4 @@
-<%# Fixed to the bottom of every page except the test: who's playing (tap for settings) with their gems, then
+<%# Fixed to the bottom of every page except the test: who's playing (tap for settings), then
     home, awards and stats. Compete is one of the home page's three, so it isn't here. Guests get sign in and sign up links in place of a name %>
 <% player = current_player %>
 <footer class="site-footer">
@@ -13,7 +13,6 @@
       <% else %>
         <%= link_to player.username, edit_profile_path, class: "site-footer__name" %>
       <% end %>
-      <span class="site-footer__gems"><%= number_with_delimiter player.gems %> <%= icon(:gem, label: "gems") %></span>
     </span>
   </div>
 

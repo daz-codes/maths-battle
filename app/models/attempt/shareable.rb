@@ -14,19 +14,19 @@ module Attempt::Shareable
   end
 
   def share_title
-    "#{score} in a minute! 🔥 #{streak} day streak"
+    review? ? "#{correct} of #{answered} right! 🔥 #{streak} day streak" : "Scored #{score.to_fs(:delimited)}! 🔥 #{streak} day streak"
   end
 
   def share_description
-    "A MatheMinute player got #{score} #{topic_module.title.downcase} right in 60 seconds. Can you beat it?"
+    "A MatheMinute player scored #{score.to_fs(:delimited)}, getting #{correct} #{topic_module.title.downcase} right in 60 seconds. Can you beat it?"
   end
 
   def share_headline
-    "MatheMinute #{topic_module.emoji} #{topic_and_level}: #{score} in 60s"
+    "MatheMinute #{topic_module.emoji} #{topic_and_level}: #{score.to_fs(:delimited)} (#{correct} right in 60s)"
   end
 
   def share_stats
-    "🔥 #{streak} day streak  🏆 Best: #{best_score}"
+    "🔥 #{streak} day streak  🏆 Best: #{best_score.to_fs(:delimited)}"
   end
 
   # "Times tables, level 3" where a topic has levels

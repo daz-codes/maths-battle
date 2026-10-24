@@ -16,7 +16,7 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_response :created
     attempt = @user.attempts.last
     assert_equal attempt_path(attempt), response.parsed_body["url"]
-    assert_equal 1, attempt.score
+    assert_equal 1, attempt.correct
   end
 
   test "an offline game uploaded again isn't saved twice" do
@@ -54,7 +54,7 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :created
     attempt = @user.attempts.last
-    assert_equal [ "equations", 1, 2 ], [ attempt.topic, attempt.score, attempt.answered ]
+    assert_equal [ "equations", 1, 2 ], [ attempt.topic, attempt.correct, attempt.answered ]
     assert_equal [ true, false ], attempt.results.map { _1["correct"] }
   end
 
@@ -75,26 +75,27 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Results must be a list", response.parsed_body["error"]
   end
 
-  test "results page shows the stars the game earned, with its bonuses" do
-    attempt = Attempt.record!(user: @user, results: answers(*right_answers(5), ms: 500))
+  test "results page shows the score and where it came from, with no gems or bonuses" do
+    attempt = Attempt.record!(user: @user, results: answers(*right_answers(5), ms: 500) + answers([ 2, 3, 7 ]))
 
     get attempt_path(attempt)
-    assert_select ".gems-earned__total", text: "+330"
-    assert_select ".gems-earned__total .icon--gem[aria-label=gems]"
-    assert_select ".gems-earned__right", text: "Right answers +50"
-    assert_select ".gems-earned__speed", text: "Speed +100"
-    assert_select ".gems-earned__combo", text: "Combos (best run 5) +30"
-    assert_select ".gems-earned__wrong", count: 0
-    assert_select ".gems-earned__bonuses li", text: "New high score +50"
-    assert_select ".gems-earned__bonuses li", text: "Level up +100"
+    assert_select ".card__number", text: "175"
+    assert_select ".result__score", text: /175\s+5 right in a minute/
+    assert_select ".score-tally__right", text: "Right answers +50"
+    assert_select ".score-tally__speed", text: "Speed +100"
+    assert_select ".score-tally__combo", text: "Combos (best run 5) +30"
+    assert_select ".score-tally__wrong", text: "Wrong answers −5"
+    assert_select ".icon--gem", count: 0
+    assert_select ".gems-earned", count: 0
   end
 
-  test "results page says when the game earned a free streak freeze" do
+  test "results page never mentions streak freezes, even for a game that earned one before they were put away" do
     attempt = Attempt.record!(user: @user, results: answers(*right_answers(5)))
     attempt.update_columns(earned_streak_freeze: true, streak: 7)
 
     get attempt_path(attempt)
-    assert_select ".freeze-earned", text: "7 day streak! You earned a free streak freeze."
+    assert_select ".freeze-earned", count: 0
+    assert_no_match(/freeze/i, response.body.gsub(/<[^>]+>/, ""))
   end
 
   test "results page shows the score, feedback and missed facts" do
@@ -102,7 +103,8 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
 
     get attempt_path(attempt)
     assert_response :success
-    assert_select ".card__number", text: "2"
+    assert_select ".card__number", text: attempt.score.to_s
+    assert_select ".result__score", text: /2 right in a minute/
     assert_select ".banner", text: /New high score/
     assert_select ".feedback", text: /Practise your/
     assert_select ".missed li", text: "7 × 8 = 56"

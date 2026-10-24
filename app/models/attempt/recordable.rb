@@ -1,4 +1,4 @@
-# Saves an attempt from the answers the browser sent. The score is worked out here rather than trusted
+# Saves an attempt from the answers the browser sent. How many were right, and the score, are worked out here rather than trusted
 # from the client, and answers that couldn't have come from a real one-minute test are refused
 module Attempt::Recordable
   extend ActiveSupport::Concern
@@ -133,8 +133,9 @@ module Attempt::Recordable
 
   private
     def score_results
-      self.score = results.count { |result| result["correct"] }
+      self.correct = results.count { |result| result["correct"] }
       self.answered = results.size
+      self.score = points
     end
 
     # The day the game counts towards, in the player's time zone
@@ -143,16 +144,18 @@ module Attempt::Recordable
       self.played_on = played_at.in_time_zone(user.time_zone).to_date
     end
 
-    # Best in this topic and level: a good times tables score shouldn't make equations look bad.
-    # Kept on the attempt as it stood then, like the streak, so a shared result doesn't change later
+    # Best in this topic and level, the score and how many were right: a good times tables score shouldn't make
+    # equations look bad. Kept on the attempt as they stood then, like the streak, so a shared result doesn't change later
     def record_high_score
+      no_best = review? || group? || head_to_head? || live? || mixed? # mistakes, rivals or a mix: no score to beat
       best_before =
         if daily_challenge? then user.best_daily_challenge(topic_module)
-        elsif review? || group? || head_to_head? || live? || mixed? then Float::INFINITY # mistakes, rivals or a mix: no score to beat
+        elsif no_best then Float::INFINITY
         else user.best_score(topic_module, level)
         end
       self.new_high_score = score.positive? && score > best_before
-      self.best_score = review? || group? || head_to_head? || live? || mixed? ? score : [ score, best_before ].max
+      self.best_score = no_best ? score : [ score, best_before ].max
+      self.best_correct = no_best || daily_challenge? ? correct : [ correct, user.best_correct(topic_module, level) ].max
     end
 
     # A snapshot of the streak is kept on the attempt for its results and share pages. Reaching 7 or 30 days

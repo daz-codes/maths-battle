@@ -57,6 +57,6 @@ module HeadToHead::Decidable
     end
 
     def wrong(attempt)
-      attempt.answered - attempt.score
+      attempt.answered - attempt.correct
     end
 end

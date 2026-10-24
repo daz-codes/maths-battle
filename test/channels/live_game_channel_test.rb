@@ -19,29 +19,29 @@ class LiveGameChannelTest < ActionCable::Channel::TestCase
     assert_has_stream_for @game
   end
 
-  test "a score and gems while the game's running go to everyone in it; not before, and never more than a game could have" do
+  test "a score and how many are right while the game's running go to everyone in it; not before, and never more than a game could have" do
     stub_connection current_user: nil
     subscribe pass: @game.pass_for(@bob)
     assert_no_broadcasts(LiveGameChannel.broadcasting_for(@game)) { perform :score, score: 3 }
 
     @game.start!
     travel 10.seconds do
-      assert_broadcast_on(LiveGameChannel.broadcasting_for(@game), { type: "score", player_id: @bob.id, score: 3, gems: 70 }) { perform :score, score: 3, gems: 70 }
-      assert_broadcast_on(LiveGameChannel.broadcasting_for(@game), { type: "score", player_id: @bob.id, score: Attempt::MAX_ANSWERS, gems: LiveGameChannel::MAX_GEMS }) do
-        perform :score, score: 9999, gems: 99_999_999
+      assert_broadcast_on(LiveGameChannel.broadcasting_for(@game), { type: "score", player_id: @bob.id, score: 70, correct: 3 }) { perform :score, score: 70, correct: 3 }
+      assert_broadcast_on(LiveGameChannel.broadcasting_for(@game), { type: "score", player_id: @bob.id, score: LiveGameChannel::MAX_SCORE, correct: Attempt::MAX_ANSWERS }) do
+        perform :score, score: 99_999_999, correct: 9999
       end
     end
   end
 
-  test "in a Power game, gems said are kept to know who's ahead; a box goes only to its player; a power-up used goes to everyone" do
+  test "in a Power game, scores said are kept to know who's ahead; a box goes only to its player; a power-up used goes to everyone" do
     @game.update!(mode: "power")
     stub_connection current_user: nil
     subscribe pass: @game.pass_for(@bob)
     @game.start!
 
     travel_to(@game.reload.starts_at + 16.seconds) do
-      perform :score, score: 3, gems: 70
-      assert_equal 70, @game.player_for(@bob).live_gems
+      perform :score, score: 70, correct: 3
+      assert_equal 70, @game.player_for(@bob).live_score
 
       perform :open_box
       dealt = @game.player_for(@bob).power_up

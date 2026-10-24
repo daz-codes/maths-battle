@@ -109,13 +109,14 @@ class HeadToHeadTest < ActiveSupport::TestCase
       pushes = pushes_sent { perform_enqueued_jobs { head_to_head = sent_game(right: 10) } }
       assert_equal [ "https://fcm.googleapis.com/fcm/send/bob" ], pushes.map { _1[:endpoint] }
       assert_equal "⚔️ Ada has challenged you!", pushes.first[:message][:title]
-      assert_equal "Beat 10 at Times tables · Level 2. Same questions, one go each.", pushes.first[:message][:body]
+      assert_equal "Beat #{head_to_head.challenger_attempt.score} at Times tables · Level 2. Same questions, one go each.", pushes.first[:message][:body]
       assert_equal "/head_to_heads/#{head_to_head.id}", pushes.first[:message][:url]
 
       pushes = pushes_sent { perform_enqueued_jobs { play(@bob, head_to_head, right: 12) } }
       assert_equal [ "https://fcm.googleapis.com/fcm/send/ada" ], pushes.map { _1[:endpoint] }
       assert_equal "😮 Bob beat you!", pushes.first[:message][:title]
-      assert_equal "10–12 at Times tables · Level 2. Fancy a rematch?", pushes.first[:message][:body]
+      scores = [ head_to_head.reload.challenger_attempt.score, head_to_head.opponent_attempt.score ]
+      assert_equal "#{scores.join("–")} at Times tables · Level 2. Fancy a rematch?", pushes.first[:message][:body]
     end
   end
 
@@ -132,10 +133,11 @@ class HeadToHeadTest < ActiveSupport::TestCase
     travel(4.days) { assert_not late.claim(carol) }
   end
 
-  test "the ghost: when in the minute each right answer came, with a wrong answer's pause added back" do
+  test "the ghost: the challenger's score through their minute, with a wrong answer's pause added back" do
     results = [ { a: 2, b: 3, given: 6, ms: 1000 }, { a: 2, b: 3, given: 7, ms: 2000 }, { a: 2, b: 3, given: 6, ms: 500 } ]
     head_to_head = HeadToHead.from_game(record_tables_game(@ada, results), opponent: @bob)
-    assert_equal({ name: "Ada", times: [ 1000, 3900 ] }, head_to_head.ghost)
+    assert_equal({ name: "Ada", steps: [ [ 1000, 20 ], [ 3000, 15 ], [ 3900, 45 ] ] }, head_to_head.ghost,
+      "quick, then wrong, then after the pause lightning fast")
 
     assert_nil HeadToHead.fresh(challenger: @ada, opponent: @bob, topic: TimesTables, level: 1).ghost, "nothing to race before it's played"
   end

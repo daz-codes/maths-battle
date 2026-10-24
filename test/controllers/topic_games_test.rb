@@ -34,7 +34,7 @@ class TopicGamesTest < ActionDispatch::IntegrationTest
             client_id: set["id"], ticket: set["ticket"], results: results } }, as: :json
           assert_response :created
           attempt = user.attempts.find_by!(client_id: set["id"])
-          assert_equal [ topic.key, level, mode, results.size ], [ attempt.topic, attempt.level, attempt.mode, attempt.score ]
+          assert_equal [ topic.key, level, mode, results.size ], [ attempt.topic, attempt.level, attempt.mode, attempt.correct ]
           get response.parsed_body["url"]
           assert_response :success
         end

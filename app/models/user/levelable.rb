@@ -28,7 +28,7 @@ module User::Levelable
 
   # The most stars a level's games have earned, 0 to 3
   def stars(topic, level)
-    Attempt.stars_for(best_score(topic, level), topic)
+    Attempt.stars_for(best_correct(topic, level), topic)
   end
 
   private

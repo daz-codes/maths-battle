@@ -40,11 +40,10 @@ class User::TrackableTest < ActiveSupport::TestCase
   end
 
   test "average score counts real games only" do
-    Attempt.record!(user: @user, results: answers(*right_answers(10)))
-    Attempt.record!(user: @user, results: answers(*right_answers(20)))
+    games = [ 10, 20 ].map { |right| Attempt.record!(user: @user, results: answers(*right_answers(right))) }
     Attempt.record!(user: @user, results: answers(*right_answers(2)))
 
-    assert_equal 15, @user.average_score(TimesTables, 1)
+    assert_equal (games.sum(&:score) / 2.0).round, @user.average_score(TimesTables, 1), "the 2 answer game is too short to count"
     assert_nil User.new.average_score(TimesTables, 1)
   end
 

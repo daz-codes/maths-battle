@@ -124,10 +124,11 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2, @user.current_streak
   end
 
-  test "best score is the highest in a topic" do
-    Attempt.record!(user: @user, results: answers(*right_answers(10)))
+  test "best score is the highest in a topic, and the most right is kept too" do
+    best = Attempt.record!(user: @user, results: answers(*right_answers(10)))
     Attempt.record!(user: @user, results: answers(*right_answers(8)))
-    assert_equal 10, @user.best_score(TimesTables, 1)
+    assert_equal best.score, @user.best_score(TimesTables, 1)
+    assert_equal 10, @user.best_correct(TimesTables, 1)
   end
 end
 

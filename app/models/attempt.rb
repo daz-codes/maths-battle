@@ -1,5 +1,5 @@
 class Attempt < ApplicationRecord
-  include Badgeable, Gemmable, Gradable, Rateable, Recordable, Reviewable, Shareable
+  include Badgeable, Gemmable, Gradable, Rateable, Recordable, Reviewable, Scorable, Shareable
 
   belongs_to :user
   belongs_to :round, class_name: "Group::Round", optional: true
@@ -57,7 +57,7 @@ class Attempt < ApplicationRecord
   end
 
   def perfect?
-    answered.positive? && score == answered
+    answered.positive? && correct == answered
   end
 
   private

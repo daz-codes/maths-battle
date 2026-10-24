@@ -8,7 +8,7 @@ module Group::Challenge::Rankable
 
   Entry = Data.define(:rank, :user, :attempt) do
     def score = attempt.score
-    def wrong = attempt.answered - attempt.score
+    def wrong = attempt.answered - attempt.correct
   end
 
   WeekEntry = Data.define(:rank, :user, :total, :best, :days)
@@ -17,7 +17,7 @@ module Group::Challenge::Rankable
     return [] unless for_round
 
     goes = (attempts || Group::Round.first_goes([ for_round ])).select { |attempt| for_round.counts?(attempt) }
-    ranked = goes.sort_by { |attempt| [ -attempt.score, attempt.answered - attempt.score, attempt.created_at, attempt.id ] }
+    ranked = goes.sort_by { |attempt| [ -attempt.score, attempt.answered - attempt.correct, attempt.created_at, attempt.id ] }
     entries = ranked.map { |attempt| Entry.new(rank: nil, user: attempt.user, attempt: attempt) }
     with_ranks(entries) { |entry| [ entry.score, entry.wrong ] }
   end

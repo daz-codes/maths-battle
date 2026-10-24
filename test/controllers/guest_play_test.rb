@@ -29,7 +29,7 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
       post attempts_path, params: game_upload(results: answers(*right_answers(6))), as: :json
     end
     assert_equal 2, User.last.attempts.count
-    assert_equal 6, User.last.best_score(TimesTables, 1)
+    assert_equal 6, User.last.best_correct(TimesTables, 1)
   end
 
   test "a visitor's footer offers sign in and sign up beside their picture, then home, awards and stats" do

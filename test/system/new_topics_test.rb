@@ -13,10 +13,10 @@ class NewTopicsTest < ApplicationSystemTestCase
 
     3.times do |i|
       find("body").send_keys(current_answer)
-      assert_selector ".test__score", text: (i + 1).to_s
+      assert_selector "[data-test-target=right]", text: (i + 1).to_s
     end
 
-    assert_selector ".card__number", text: "3", wait: 10
+    assert_selector ".result__score", text: /\b3 right/, wait: 10
     assert_equal "division", users(:ada).attempts.last.topic
   end
 
@@ -34,7 +34,7 @@ class NewTopicsTest < ApplicationSystemTestCase
       test.show()
     JS
     %w[- 5].each { |key| find(".keypad__key[data-digit='#{key}']").execute_script("this.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))") }
-    assert_selector ".test__score", text: "1"
+    assert_selector "[data-test-target=right]", text: "1"
   end
 
   test "adding and subtracting: pick it, answer with the keyboard, and see the results" do
@@ -49,10 +49,10 @@ class NewTopicsTest < ApplicationSystemTestCase
 
     3.times do |i|
       find("body").send_keys(current_answer)
-      assert_selector ".test__score", text: (i + 1).to_s
+      assert_selector "[data-test-target=right]", text: (i + 1).to_s
     end
 
-    assert_selector ".card__number", text: "3", wait: 10
+    assert_selector ".result__score", text: /\b3 right/, wait: 10
     assert_equal "addition", users(:ada).attempts.last.topic
   end
 
@@ -68,10 +68,10 @@ class NewTopicsTest < ApplicationSystemTestCase
 
     3.times do |i|
       find("body").send_keys(current_answer)
-      assert_selector ".test__score", text: (i + 1).to_s
+      assert_selector "[data-test-target=right]", text: (i + 1).to_s
     end
 
-    assert_selector ".card__number", text: "3", wait: 10
+    assert_selector ".result__score", text: /\b3 right/, wait: 10
     assert_equal "conversions", users(:ada).attempts.last.topic
   end
 
@@ -87,10 +87,10 @@ class NewTopicsTest < ApplicationSystemTestCase
 
     3.times do |i|
       find("body").send_keys(current_answer)
-      assert_selector ".test__score", text: (i + 1).to_s
+      assert_selector "[data-test-target=right]", text: (i + 1).to_s
     end
 
-    assert_selector ".card__number", text: "3", wait: 10
+    assert_selector ".result__score", text: /\b3 right/, wait: 10
     assert_equal "percentages", users(:ada).attempts.last.topic
   end
 

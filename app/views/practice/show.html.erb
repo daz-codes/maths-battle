@@ -10,10 +10,10 @@
 
   <% if @user.persisted? %>
     <dl class="stats">
-      <div><dt>Best score</dt><dd><%= icon(:trophy) %> <%= @user.best_score(current_topic, current_level) %></dd></div>
-      <div><dt>Average score</dt><dd><%= @user.average_score(current_topic, current_level) || "—" %></dd></div>
+      <div><dt>Best score</dt><dd><%= icon(:trophy) %> <%= number_with_delimiter @user.best_score(current_topic, current_level) %></dd></div>
+      <div><dt>Average score</dt><dd><%= (average = @user.average_score(current_topic, current_level)) ? number_with_delimiter(average) : "—" %></dd></div>
       <div><dt>Average time</dt><dd><%= seconds(@user.overall_stats(current_topic, current_level).average_ms) %></dd></div>
-      <div><dt>Most gems</dt><dd><%= icon(:gem) %> <%= number_with_delimiter @user.most_gems(current_topic, current_level) %></dd></div>
+      <div><dt>Most right</dt><dd><%= icon(:check) %> <%= @user.best_correct(current_topic, current_level) %></dd></div>
     </dl>
     <%= link_to "See all stats", stats_path(current_topic.slug) %>
   <% end %>

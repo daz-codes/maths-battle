@@ -19,7 +19,7 @@ class LevellingUpTest < ApplicationSystemTestCase
       test.show()
     JS
     %w[2 1 0 0].each { |key| find(".keypad__key[data-digit='#{key}']").execute_script("this.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))") }
-    assert_selector ".test__score", text: "1"
+    assert_selector "[data-test-target=right]", text: "1"
     # A question with no worked answer, as kept on a device from before, still gets one
     assert_selector ".question-previous--right", exact_text: "0.7 × 3000 = 2100 ✓"
 
@@ -29,6 +29,6 @@ class LevellingUpTest < ApplicationSystemTestCase
       test.show()
     JS
     find("body").send_keys(".24") # a point before any digit starts the number with 0
-    assert_selector ".test__score", text: "2"
+    assert_selector "[data-test-target=right]", text: "2"
   end
 end

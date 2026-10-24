@@ -101,7 +101,7 @@ class ReviewTest < ActionDispatch::IntegrationTest
     assert_select ".label", text: /Times tables, review/
     assert_select ".result__score", text: "1 of 2 right"
     assert_select ".result__stats", text: /Best/, count: 0
-    assert_select ".gems-earned__bonuses li", text: "Mistakes reviewed +50"
+    assert_select ".score-tally", count: 0, message: "a review has no score, just how many were right"
     assert_select ".button--share", count: 0
     assert_select ".results__actions a[href=?]", play_path("times-tables", review: 1), text: "Review 1 more"
     assert_select ".level-progress", count: 0

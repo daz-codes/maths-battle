@@ -132,7 +132,7 @@ class User::ReviewableTest < ActiveSupport::TestCase
     play(wrong(3, 5), wrong(2, 5))
     game = review(right(3, 5, ms: 70_000), right(2, 5, ms: 90_000))
 
-    assert_equal 2, game.score
+    assert_equal 2, game.correct
     assert_raises(Attempt::Invalid) { play(right(3, 5, ms: 70_000)) }
   end
 
@@ -140,7 +140,7 @@ class User::ReviewableTest < ActiveSupport::TestCase
     play(wrong(3, 5), wrong(2, 5))
     game = review(right(3, 5, ms: 500), wrong(2, 5))
 
-    assert_equal 0, game.answer_gems
+    assert_equal 0, game.points
     assert_equal({ review: 50 }, game.gem_bonuses)
     assert_equal 50, game.gems
     assert_empty game.badges

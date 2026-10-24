@@ -693,11 +693,11 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 .tables__example { display: block; color: var(--muted); font-size: 0.75rem; font-weight: 500; }
 
-/* ── Gems ───────────────────────────────────────── */
+/* ── Score pops ─────────────────────────────────── */
 
-/* Each right answer's gems start on the question, float up above it and fade slowly, so a fast run leaves
+/* Each right answer's score starts on the question, float up above it and fade slowly, so a fast run leaves
    several on screen at once. Bigger and brighter the quicker the answer was */
-.gem-pop {
+.score-pop {
   --drift: 0px;
   position: absolute;
   top: 18%;
@@ -713,16 +713,16 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* A right answer's gems, then its speed's just below, so they rise as a pair; losing some for a wrong answer; and
    a new combo, biggest of all */
-.gem-pop--quick { top: 30%; color: var(--blue-deep); font-size: 1.6rem; }
-.gem-pop--lightning { top: 30%; color: var(--pink-text); font-size: 1.9rem; }
-.gem-pop--wrong { color: var(--wrong); font-size: 1.4rem; }
-.gem-pop--combo { top: 4%; color: var(--pink-text); font-size: 2.3rem; font-weight: 900; }
+.score-pop--quick { top: 30%; color: var(--blue-deep); font-size: 1.6rem; }
+.score-pop--lightning { top: 30%; color: var(--pink-text); font-size: 1.9rem; }
+.score-pop--wrong { color: var(--wrong); font-size: 1.4rem; }
+.score-pop--combo { top: 4%; color: var(--pink-text); font-size: 2.3rem; font-weight: 900; }
 
-:root[data-theme="dark"] .gem-pop--right { color: var(--green); }
-:root[data-theme="dark"] .gem-pop--quick { color: var(--blue); }
+:root[data-theme="dark"] .score-pop--right { color: var(--green); }
+:root[data-theme="dark"] .score-pop--quick { color: var(--blue); }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .gem-pop--right { color: var(--green); }
-  :root:not([data-theme="light"]) .gem-pop--quick { color: var(--blue); }
+  :root:not([data-theme="light"]) .score-pop--right { color: var(--green); }
+  :root:not([data-theme="light"]) .score-pop--quick { color: var(--blue); }
 }
 
 @keyframes star-float {
@@ -734,17 +734,16 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* Without motion they just fade where they appear */
 @media (prefers-reduced-motion: reduce) {
-  .gem-pop { animation: star-fade 2.2s ease-out forwards !important; transform: translateX(-50%); }
+  .score-pop { animation: star-fade 2.2s ease-out forwards !important; transform: translateX(-50%); }
 }
 
 @keyframes star-fade { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
 
 /* What a game earned, on its results page */
-.gems-earned { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; margin: 0; }
-.gems-earned__total { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
-.gems-earned__bonuses .gems-earned__wrong { color: var(--wrong); }
-.gems-earned__bonuses { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
-.gems-earned__bonuses li { padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--paper-alt); color: var(--muted); font-size: 0.85rem; font-weight: 700; }
+/* Where a game's score came from: right answers, speed, combos, and what wrong ones lost */
+.score-tally { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
+.score-tally .score-tally__wrong { color: var(--wrong); }
+.score-tally li { padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--paper-alt); color: var(--muted); font-size: 0.85rem; font-weight: 700; }
 
 /* The player's collection, on the home page under the streak */
 .gems-total { margin: -0.5rem 0 0; color: var(--muted); font-weight: 700; }
@@ -1001,8 +1000,8 @@ body.testing {
 .test__best { color: var(--muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
 .test--beating .test__score { color: var(--pink-text); text-shadow: 0 0 14px color-mix(in srgb, var(--pink) var(--glow-strength), transparent); }
 .test--beating .test__best { color: var(--pink-text); }
-.gem-pop--best { color: var(--pink-text); font-size: 1.9rem; font-weight: 900; }
-.gem-pop .icon { width: 1em; height: 1em; vertical-align: -0.12em; }
+.score-pop--best { color: var(--pink-text); font-size: 1.9rem; font-weight: 900; }
+.score-pop .icon { width: 1em; height: 1em; vertical-align: -0.12em; }
 
 .test__score {
   justify-self: end;
@@ -1384,11 +1383,8 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 :root[data-theme="dark"] .question-previous--right { color: var(--green); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .question-previous--right { color: var(--green); } }
 
-/* The gems so far, under the score */
-.test__gems { color: var(--blue-deep); font-size: 0.95rem; font-weight: 800; white-space: nowrap; }
-.test__gems .icon { width: 1em; height: 1em; vertical-align: -0.12em; }
-:root[data-theme="dark"] .test__gems { color: var(--blue); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .test__gems { color: var(--blue); } }
+/* How many are right so far, under the score */
+.test__right { color: var(--muted); font-size: 0.85rem; font-weight: 800; white-space: nowrap; }
 .test__rival .icon { width: 0.9em; height: 0.9em; margin-left: 0.1em; vertical-align: -0.1em; }
 
 /* Power-ups in a Power game: the one held, to tap; news of what's hit whom; and each one's effect on the player

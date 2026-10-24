@@ -66,13 +66,13 @@ class LiveGamesTest < ActionDispatch::IntegrationTest
     game = LiveGame.make(host: @ada, topic: TimesTables, level: 1)
     sign_in_as @ada
     get live_game_path(game.code)
-    assert_select "#live-mode", text: /Classic mode: the most right answers wins/
+    assert_select "#live-mode", text: /Classic mode: the highest score wins/
     assert_select "form[action=?] button[aria-current=true]", live_game_path(game.code), text: "Classic"
 
     patch live_game_path(game.code), params: { mode: "power" }
     assert game.reload.power?
     follow_redirect!
-    assert_select "#live-mode", text: /Power mode: the most gems wins/
+    assert_select "#live-mode", text: /Power mode: the highest score wins, with power-ups/
 
     sign_in_as @bob
     game.join(@bob)
@@ -89,7 +89,7 @@ class LiveGamesTest < ActionDispatch::IntegrationTest
     assert live["power"]
     assert_equal [ LiveGame::BOX_EVERY.in_milliseconds, LiveGame::BOXES ], live.values_at("boxEveryMs", "boxes")
     assert_equal LiveGame::POWER_UPS.keys, live["powerUps"].keys
-    assert_select ".test__rival .icon--gem"
+    assert_select ".icon--gem", count: 0
     assert_select "button.test__power[hidden]"
     assert_select "template[data-power-up=freeze]"
   end

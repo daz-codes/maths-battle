@@ -6,7 +6,7 @@ class AttemptTest < ActiveSupport::TestCase
   test "the score is worked out on the server" do
     attempt = record_tables_game(@user, answers([ 7, 8, 56 ], [ 6, 7, 41 ], [ 9, 9, 81 ]).map { |r| r.merge(correct: true, score: 99) })
 
-    assert_equal 2, attempt.score
+    assert_equal 2, attempt.correct
     assert_equal 3, attempt.answered
     assert_equal [ true, false, true ], attempt.results.map { |r| r["correct"] }
     assert_equal({ "a" => "6", "b" => "7", "given" => "41", "correct" => false, "ms" => 1000 }, attempt.results[1])
@@ -39,7 +39,7 @@ class AttemptTest < ActiveSupport::TestCase
 
     attempt = Attempt.record!(user: @user, level: 5, results: results)
     assert_equal [ false, true, false ], attempt.results.map { _1["correct"] }
-    assert_equal 1, attempt.score
+    assert_equal 1, attempt.correct
   end
 
   test "an invalid attempt saves nothing" do
@@ -121,7 +121,7 @@ class AttemptTest < ActiveSupport::TestCase
 
     assert first.new_high_score
     assert_not worse.new_high_score
-    assert_equal 6, @user.best_score(TimesTables, 1)
+    assert_equal first.score, @user.best_score(TimesTables, 1)
   end
 
   test "keeps the best score as it was when the game was played" do
@@ -129,7 +129,7 @@ class AttemptTest < ActiveSupport::TestCase
     first = Attempt.record!(user: @user, results: answers(*right_answers(6)))
     Attempt.record!(user: @user, results: answers(*right_answers(9)))
 
-    assert_equal 6, first.reload.best_score
-    assert_equal "🔥 1 day streak  🏆 Best: 6", first.share_stats, "a later, better game doesn't change an old share"
+    assert_equal first.score, first.reload.best_score
+    assert_equal "🔥 1 day streak  🏆 Best: #{first.score}", first.share_stats, "a later, better game doesn't change an old share"
   end
 end

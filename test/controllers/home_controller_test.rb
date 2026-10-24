@@ -76,26 +76,26 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".tagline", text: "Improve your math in minutes"
   end
 
-  test "stars stay in the footer, and stars and freezes are on the settings page, not here" do
+  test "no gems or streak freezes anywhere: it's just the score" do
     sign_in_as users(:ada)
     Attempt.record!(user: users(:ada), results: answers(*right_answers(5), ms: 2_500))
 
     get root_path
-    assert_select ".site-footer__gems", text: "210", message: "50 for the answers and 10 for the 5th in a row doubled, then a new high score and a level up"
-    assert_select "main .gems-total", count: 0
-    assert_select "main .freezes", count: 0
+    assert_select ".site-footer__gems", count: 0
+    assert_select ".icon--gem", count: 0
+    assert_select ".gems-total, .freezes", count: 0
   end
 
-  test "coming back after a missed day says a freeze kept the streak" do
+  test "a missed day loses the streak: a freeze held from before isn't used" do
     user = users(:ada)
     [ 4, 3, 2 ].each { |ago| travel_to(ago.days.ago) { play_daily_challenge(user) } }
     user.update!(streak_freezes: 1)
     sign_in_as user
 
     get root_path
-    assert_select ".flash", text: "A streak freeze kept your 3 day streak going!"
-    assert_select ".greeting .streak[aria-label=?]", "3 day streak", text: "3"
-    assert_equal 0, user.reload.streak_freezes
+    assert_select ".flash", text: /freeze/i, count: 0
+    assert_select ".greeting .streak", text: "0"
+    assert_equal 1, user.reload.streak_freezes
   end
 
   test "greets the player by name" do
@@ -118,7 +118,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
   test "shows the streak, best score and start button" do
     @user.update!(current_streak: 12, last_practised_on: @user.today, streak_kept_on: @user.today)
-    Attempt.record!(user: @user, results: answers(*right_answers(41), ms: 1000))
+    best = Attempt.record!(user: @user, results: answers(*right_answers(41), ms: 1000)).score
     @user.update!(current_streak: 12, last_practised_on: @user.today, streak_kept_on: @user.today)
     sign_in_as @user
     patch level_path, params: { level: 1 }
@@ -128,17 +128,16 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
     assert_select ".greeting .streak", text: "12"
     assert_select ".home-action--practice .button__note", count: 0, message: "the streak is safe today"
-    most = @user.attempts.maximum(:gems)
-    assert_select ".stats div", text: /Most gems\s+#{number_with_delimiter(most)}/, message: "from any game"
+    assert_select ".stats div", text: /Best score\s+#{number_with_delimiter(@user.attempts.maximum(:score))}/, message: "from any game"
     assert_select ".stats div", text: /Longest streak\s+15/
 
     get practice_path
-    assert_equal %w[ Best\ score Average\ score Average\ time Most\ gems ], css_select(".stats dt").map(&:text)
-    assert_select ".stats div", text: /Best score\s+41/
-    assert_select ".stats div", text: /Most gems\s+#{number_with_delimiter(@user.attempts.at_level(TimesTables, 1).maximum(:gems))}/
+    assert_equal %w[ Best\ score Average\ score Average\ time Most\ right ], css_select(".stats dt").map(&:text)
+    assert_select ".stats div", text: /Best score\s+#{number_with_delimiter(best)}/
+    assert_select ".stats div", text: /Most right\s+41/
     assert_select "a[href=?]", stats_path("times-tables"), text: "See all stats"
-    assert_select "a.button--play[href=?]", play_path("times-tables", level: 1), text: /Play level 1\s+Beat your best: 41/, message: "the streak is safe today, so it's the best to beat"
-    assert_select ".levels__level[aria-current=true] .levels__best", text: "41"
+    assert_select "a.button--play[href=?]", play_path("times-tables", level: 1), text: /Play level 1\s+Beat your best: #{best}/, message: "the streak is safe today, so it's the best to beat"
+    assert_select ".levels__level[aria-current=true] .levels__best", text: best.to_s
     assert_select ".nudge", count: 0
   end
 
