@@ -13,7 +13,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
 
   test "home shows the levels, with locked ones padlocked, stars on the ones that have them, and what's next" do
     practise(level: 1, score: 12)
-    get root_path
+    get practice_path
 
     assert_select ".levels .levels__level[aria-current=true]", text: /2/, message: "the bronze unlocked level 2, which Play goes to"
     assert_select ".levels .levels__level .stars[aria-label='2 of 3 stars']"
@@ -28,7 +28,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
   test "a level's stars and the next to aim for" do
     practise(level: 1, score: 12)
     patch level_path, params: { level: 1 }
-    get root_path
+    get practice_path
     assert_select ".levels__progress", text: /Best: 12 · 20 for 3 stars/
     assert_select ".levels__progress .stars", count: 0, message: "the stars are on the level's circle"
     assert_select ".levels__level .stars[aria-label='2 of 3 stars']"
@@ -50,7 +50,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     get response.parsed_body["url"]
     assert_select ".banner--level[data-controller~=fanfare]", text: /Level up! You've unlocked Level 2: Tables 2–12/
 
-    get root_path
+    get practice_path
     assert_select ".levels__name", text: "Level 2: Tables 2–12"
   end
 
@@ -66,7 +66,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     patch level_path, params: { level: 1 }
 
     post attempts_path, params: game_upload(level: 1, results: answers(*Array.new(10) { [ 2, 3, 6 ] }, ms: 1000)), as: :json
-    get root_path
+    get practice_path
     assert_select ".levels__name", text: "Level 2: Tables 2–12"
   end
 
@@ -75,14 +75,14 @@ class LevelsTest < ActionDispatch::IntegrationTest
     patch level_path, params: { level: 1 }
 
     get attempt_path(levelled_up)
-    get root_path
+    get practice_path
     assert_select ".levels__name", text: "Level 1: Tables 2–5"
   end
 
   test "an easier unlocked level can be picked, and is what Practise plays" do
     practise(level: 1, score: 10)
     patch level_path, params: { level: 1 }
-    get root_path
+    get practice_path
     assert_select ".levels__name", text: "Level 1: Tables 2–5"
     assert_select "a.button--play[href=?]", play_path("times-tables", level: 1), text: /Play level 1/
 
@@ -116,7 +116,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
 
   test "every topic has stars and Play, at 5, 10 and 20" do
     patch topic_path, params: { topic: "equations" }
-    get root_path
+    get practice_path
 
     assert_select ".levels__progress", text: "Score 5 for a and unlock level 2"
     assert_select "a.button--play[href=?]", play_path("equations", level: 1)

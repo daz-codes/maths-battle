@@ -5,6 +5,7 @@ class SimultaneousEquationsTest < ApplicationSystemTestCase
     sign_in users(:ada)
     click_on "Change topic"
     find(".topic-card", text: "Simultaneous equations").click
+    click_on "Practice"
     assert_selector ".levels__name", text: "Level 1: Subtract"
     click_on "Play level 1"
     assert_selector ".question--current .system__ask", text: "x =", wait: 5

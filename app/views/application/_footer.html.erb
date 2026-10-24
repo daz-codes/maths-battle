@@ -1,5 +1,5 @@
 <%# Fixed to the bottom of every page except the test: who's playing (tap for settings) with their gems, then
-    home, compete (head to heads and groups), awards and stats. Guests get sign in and sign up links in place of a name %>
+    home, awards and stats. Compete is one of the home page's three, so it isn't here. Guests get sign in and sign up links in place of a name %>
 <% player = current_player %>
 <footer class="site-footer">
   <div class="site-footer__start">
@@ -20,11 +20,6 @@
   <%= link_to root_path, class: "site-footer__tab site-footer__home" do %>
     <%= icon(:home, class: "footer-icon") %>
     <span>Home</span>
-  <% end %>
-
-  <%= link_to groups_path, class: "site-footer__tab site-footer__groups" do %>
-    <%= icon(:people, class: "footer-icon") %>
-    <span>Compete</span>
   <% end %>
 
   <%= link_to awards_path, class: "site-footer__tab site-footer__awards" do %>

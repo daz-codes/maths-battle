@@ -2,6 +2,7 @@ require "application_system_test_case"
 
 class AnswerControlsTest < ApplicationSystemTestCase
   test "a shorter wrong answer can be submitted with Enter or the check button" do
+    click_on "Practice"
     click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
     # Pick a real issued question with a two-digit answer, rather than changing its maths.
@@ -22,6 +23,7 @@ class AnswerControlsTest < ApplicationSystemTestCase
   end
 
   test "a focused keypad button responds to Enter and Space without duplicate input" do
+    click_on "Practice"
     click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
     page.execute_script(<<~JS)
@@ -37,6 +39,7 @@ class AnswerControlsTest < ApplicationSystemTestCase
   end
 
   test "a shorter lesson answer can be checked and retried" do
+    click_on "Practice"
     click_on "Learn how"
     4.times { click_on "Next" }
     find("body").send_keys("3", :enter)

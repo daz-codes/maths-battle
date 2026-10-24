@@ -3,6 +3,7 @@ require "application_system_test_case"
 class LearningALevelTest < ApplicationSystemTestCase
   test "tap through the worked example, get the one to try wrong then right, and go to play" do
     visit root_path
+    click_on "Practice"
     click_on "Learn how"
     assert_selector ".lesson__show", text: "4 × 3"
 

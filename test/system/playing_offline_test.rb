@@ -9,6 +9,7 @@ class PlayingOfflineTest < ApplicationSystemTestCase
   teardown { go_online }
 
   test "a game finished offline is kept on the device, then uploaded once back online" do
+    click_on "Practice"
     click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
     end_game_in(3_000)
@@ -22,6 +23,7 @@ class PlayingOfflineTest < ApplicationSystemTestCase
     go_online
     assert_difference -> { @user.attempts.count }, 1 do
       visit root_path
+      click_on "Practice"
       assert_selector ".levels__name", text: "Level 2", wait: 8 # the 5 right was a bronze
     end
     assert_equal 0, unsent_games
@@ -36,7 +38,7 @@ class PlayingOfflineTest < ApplicationSystemTestCase
     assert_equal 1, @user.attempts.where(client_id: "same-game").count
 
     queue_game(game)
-    visit root_path
+    visit practice_path
     assert_selector ".stats dd", text: "1", wait: 5
     assert_equal 0, unsent_games
     assert_equal 1, @user.attempts.where(client_id: "same-game").count
@@ -58,6 +60,7 @@ class PlayingOfflineTest < ApplicationSystemTestCase
   end
 
   test "a failed device write offers retry instead of claiming an offline save" do
+    click_on "Practice"
     click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
     5.times { answer_question }

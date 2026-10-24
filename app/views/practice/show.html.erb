@@ -1,0 +1,20 @@
+<% content_for :title, "Practice · MatheMinute" %>
+
+<main class="page practice">
+  <%= link_to "← Home", root_path, class: "back-link" %>
+  <%= render "flash" %>
+  <%= render "topics/current", topic: current_topic, from: :practice %>
+
+  <%= render "topics/play", user: @user, topic: current_topic, level: current_level %>
+  <%= render "topics/chooser", choosing: :play, user: @user, topic: current_topic, level: current_level %>
+
+  <% if @user.persisted? %>
+    <dl class="stats">
+      <div><dt>Best</dt><dd><%= icon(:trophy) %> <%= @user.best_score(current_topic, current_level) %></dd></div>
+      <div><dt>Longest streak</dt><dd><%= @user.longest_streak %></dd></div>
+      <div><dt>Average score</dt><dd><%= @user.average_score(current_topic, current_level) || "—" %></dd></div>
+      <div><dt>Average time</dt><dd><%= seconds(@user.overall_stats(current_topic, current_level).average_ms) %></dd></div>
+    </dl>
+    <%= link_to "See all stats", stats_path(current_topic.slug) %>
+  <% end %>
+</main>

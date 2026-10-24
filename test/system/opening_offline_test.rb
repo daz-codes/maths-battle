@@ -8,13 +8,14 @@ class OpeningOfflineTest < ApplicationSystemTestCase
     wait_for_service_worker
   end
 
-  test "the home, game and stats pages are kept for offline use" do
+  test "the home, practice, game and stats pages are kept for offline use" do
     visit play_path("times-tables")
     assert_selector ".question", text: "×", wait: 5
     visit stats_path
+    visit practice_path
     visit root_path
 
-    assert_equal [ "/", "/play/times-tables", "/stats" ], kept_pages.sort
+    assert_equal [ "/", "/play/times-tables", "/practice", "/stats" ], kept_pages.sort
   end
 
   test "each level's game page is kept separately" do

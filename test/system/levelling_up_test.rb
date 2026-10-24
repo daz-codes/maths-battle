@@ -6,6 +6,7 @@ class LevellingUpTest < ApplicationSystemTestCase
     (1..4).each { |level| Attempt.record!(user: user, level: level, results: answers(*Array.new(20) { [ 2, 3, 6 ] }, ms: 1000)) }
     sign_in user
 
+    click_on "Practice"
     assert_selector ".levels__name", text: "Level 5: Zeroes and decimals"
     click_on "Play level 5"
     assert_selector ".question", text: "×", wait: 5

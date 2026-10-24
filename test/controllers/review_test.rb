@@ -13,12 +13,12 @@ class ReviewTest < ActionDispatch::IntegrationTest
     { attempt: { topic: "times_tables", level: 1, client_id: set["id"], ticket: set["ticket"], results: results } }
   end
 
-  test "the home page offers a review only when there's something to review" do
-    get root_path
+  test "Practice offers a review only when there's something to review" do
+    get practice_path
     assert_select "a.button--review", count: 0
 
     Attempt.record!(user: @user, results: answers([ 3, 5, 14 ], [ 2, 5, 11 ], [ 2, 3, 6 ]))
-    get root_path
+    get practice_path
     assert_select "a.button--review[href=?]", play_path("times-tables", review: 1), text: "Review mistakes (2)"
   end
 

@@ -36,10 +36,27 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".site-header .tagline", text: "Improve your math in minutes"
+    assert_select ".greeting .streak", text: "0"
+    assert_select ".home-actions a.button", 3
+    assert_select ".home-actions a[href=?]", challenge_path, text: "Challenge"
+    assert_select ".home-actions a[href=?]", practice_path, text: /Practice\s+Play to start a streak/
+    assert_select ".home-actions a[href=?]", groups_path, text: "Compete"
+    assert_select "a.button--play", count: 0, message: "playing is on Practice"
+    assert_select "a[href=?]", new_registration_path
+
+    get practice_path
     assert_select "a.button--play[href=?]", play_path("times-tables", level: 1), text: /Play level 1\s+Play to start a streak/
     assert_select "a.button--mixed", count: 0, message: "nothing to mix with only level 1"
-    assert_select ".streak__number", text: /0/
-    assert_select "a[href=?]", new_registration_path
+  end
+
+  test "Practice and the daily challenge have pages of their own, with the way home" do
+    choose_topic
+    get practice_path
+    assert_select "a.back-link[href=?]", root_path
+    assert_select ".levels"
+    get challenge_path
+    assert_select "h1", text: /Daily challenge/
+    assert_select "a.back-link[href=?]", root_path
   end
 
   test "says maths to browsers set to the UK, and math to everyone else" do
@@ -74,7 +91,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     get root_path
     assert_select ".flash", text: "A streak freeze kept your 3 day streak going!"
-    assert_select ".streak__number", text: /3/
+    assert_select ".greeting .streak[aria-label=?]", "3 day streak", text: "3"
     assert_equal 0, user.reload.streak_freezes
   end
 
@@ -86,12 +103,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".greeting", text: /Hi Ada!/
   end
 
-  test "the page goes topic, greeting, streak, then the daily challenge right under it" do
+  test "the page goes topic, then the greeting with the streak small beside it, then Challenge, Practice and Compete" do
     @user.update!(name: "Ada")
     sign_in_as @user
     get root_path
 
-    parts = %w[ current-topic greeting streak button--play levels ]
+    parts = %w[ current-topic greeting streak home-actions ]
     order = css_select(parts.map { ".#{_1}" }.join(", ")).map { |element| (element["class"].split & parts).first }
     assert_equal parts, order
   end
@@ -104,7 +121,10 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     patch level_path, params: { level: 1 }
 
     get root_path
-    assert_select ".streak__number", text: /12/
+    assert_select ".greeting .streak", text: "12"
+    assert_select ".home-action--practice .button__note", count: 0, message: "the streak is safe today"
+
+    get practice_path
     assert_select ".stats", text: /41/
     assert_select "a[href=?]", stats_path("times-tables"), text: "See all stats"
     assert_select "a.button--play[href=?]", play_path("times-tables", level: 1), text: /Play level 1\s+Beat your best: 41/, message: "the streak is safe today, so it's the best to beat"
@@ -117,6 +137,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
+    assert_select ".home-action--practice .button__note", text: "Play to start a streak"
+    get practice_path
     assert_select ".button--play .button__note", text: "Play to start a streak"
   end
 
@@ -125,6 +147,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
+    assert_select ".home-action--practice .button__note", text: "Don't lose your streak!"
+    get practice_path
     assert_select ".button--play .button__note", text: "Don't lose your streak!"
   end
 
@@ -134,6 +158,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
+    assert_select ".button__note", count: 0
+    get practice_path
     assert_select ".button--play", text: "Play level 1"
     assert_select ".button__note", count: 0
   end
@@ -141,7 +167,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   test "mixed practice once there's a second level to mix in, as often as they like" do
     unlock(@user, TimesTables, 2)
     sign_in_as @user
-    get root_path
+    get practice_path
     assert_select ".levels-panel a.button--mixed[href=?]", play_path("times-tables", mixed: 1), text: "Mixed practice"
   end
 end

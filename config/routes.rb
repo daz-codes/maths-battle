@@ -5,6 +5,9 @@ Rails.application.routes.draw do
   resource :registration, only: %i[new create]
   resource :profile, only: %i[edit update]
   resource :avatar, only: :show
+  # The home page's three: practice (any level, mixed, reviewing mistakes), the daily challenge, and Compete (groups)
+  resource :practice, only: :show, controller: "practice"
+  resource :challenge, only: :show, controller: "daily_challenge"
   resource :topic, only: :update
   get "topics", to: "topics#index", as: :topics
   resource :level, only: :update

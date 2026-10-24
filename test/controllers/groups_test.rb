@@ -11,11 +11,12 @@ class GroupsTest < ActionDispatch::IntegrationTest
     @group.challenges.last
   end
 
-  test "groups are in the footer; the page lists a player's groups, joining by code, and starting one" do
+  test "Compete is on the home page, not the footer; the page lists a player's groups, joining by code, and starting one" do
     sign_in_as @owner
     get groups_path
 
-    assert_select ".site-footer a.site-footer__groups[href=?]", groups_path, text: "Compete"
+    assert_select ".site-footer a.site-footer__groups", count: 0, message: "Compete is on the home page instead"
+    assert_select ".home-actions", count: 0
     assert_select "a.group-card[href=?]", group_path(@group), text: /Class 4B.*1 player · You run it/m
     assert_select "form[action=?][method=get] input[name=code]", join_group_path
     assert_select "a[href=?]", new_group_path, text: "Start a group"

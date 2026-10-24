@@ -3,6 +3,7 @@ require "application_system_test_case"
 class TimesTablesTest < ApplicationSystemTestCase
   test "plays a test with the keyboard and sees the results" do
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Play level 1"
 
     # Shorten the minute so the test runs quickly; the countdown still plays first
@@ -36,6 +37,7 @@ class TimesTablesTest < ApplicationSystemTestCase
 
   test "the answered question drops below the next, marked like a teacher would: a tick, or a cross and the right answer" do
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Play level 1"
     assert_selector ".question--current", text: "×", wait: 5
     size = find(".question--current")[:class]
@@ -57,6 +59,7 @@ class TimesTablesTest < ApplicationSystemTestCase
 
   test "gems float up for each right answer and its speed, a combo multiplies them, and a wrong answer loses some" do
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
 
@@ -87,6 +90,7 @@ class TimesTablesTest < ApplicationSystemTestCase
 
   test "one game played to the end keeps the streak, and Play stops asking for one" do
     sign_in users(:ada)
+    click_on "Practice"
     assert_selector ".button--play", text: /Play to start a streak/i
     click_on "Play level 1"
     page.execute_script(<<~JS)
@@ -102,13 +106,14 @@ class TimesTablesTest < ApplicationSystemTestCase
 
     assert_selector ".card__number", text: "1", wait: 8
     visit root_path
-    assert_selector ".streak__number", text: "1"
-    assert_no_selector ".button--play .button__note", text: /streak/i
+    assert_selector ".greeting .streak", text: "1"
+    assert_no_selector ".home-action--practice .button__note", text: /streak/i
   end
 
   test "passing your best mid-game: the score turns pink and says so" do
     Attempt.record!(user: users(:ada), results: answers([ 2, 3, 6 ]))
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Play level 1"
     assert_selector ".test__best", text: "Best 1"
     assert_selector ".question", text: "×", wait: 5

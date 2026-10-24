@@ -16,6 +16,7 @@ class TopicsController < ApplicationController
     def back_path
       case params[:from]
       when "stats" then stats_path
+      when "practice" then practice_path
       when "profile" then edit_profile_path
       else root_path
       end

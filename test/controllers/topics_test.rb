@@ -6,12 +6,13 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
   end
 
-  test "the switcher changes what Play plays, and is remembered" do
-    get root_path
+  test "the switcher changes what Play plays, and is remembered, back on the page it was changed from" do
+    get practice_path
     assert_select "a.button--play[href=?]", play_path("times-tables", level: 1)
+    assert_select "a.current-topic[href=?]", topics_path(from: :practice)
 
-    patch topic_path, params: { topic: "equations" }
-    assert_redirected_to root_path
+    patch topic_path, params: { topic: "equations", from: "practice" }
+    assert_redirected_to practice_path
     follow_redirect!
     assert_select "a.button--play[href=?]", play_path("equations", level: 1)
     assert_select ".current-topic__name", text: "Equations"
@@ -73,7 +74,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
 
   test "playing a topic makes it the current one" do
     get play_path("equations")
-    get root_path
+    get practice_path
     assert_select "a.button--play[href=?]", play_path("equations", level: 1)
   end
 

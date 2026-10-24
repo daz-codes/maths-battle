@@ -5,6 +5,7 @@ class EquationsTest < ApplicationSystemTestCase
     sign_in users(:ada)
     click_on "Change topic"
     find(".topic-card", text: "Equations").click
+    click_on "Practice"
     assert_selector ".levels__name", text: "Level 1: One step"
     click_on "Play level 1"
     assert_selector ".question--current var", wait: 5

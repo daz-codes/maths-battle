@@ -54,11 +54,11 @@ class LessonsControllerTest < ActionDispatch::IntegrationTest
 
   test "the home page offers the lesson for the level picked, in every topic" do
     choose_topic
-    get root_path
+    get practice_path
     assert_select ".levels__learn a[href=?]", lesson_path("times-tables", 1), text: "Learn how"
 
     patch topic_path, params: { topic: "functions" }
-    get root_path
+    get practice_path
     assert_select ".levels__learn a[href=?]", lesson_path("functions", 1)
   end
 

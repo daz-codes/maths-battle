@@ -5,6 +5,7 @@ class FunctionsTest < ApplicationSystemTestCase
     sign_in users(:ada)
     click_on "Change topic"
     find(".topic-card", text: "Functions").click
+    click_on "Practice"
     assert_selector ".levels__name", text: "Level 1: Linear"
     click_on "Play level 1"
     assert_selector ".question--current .function--ask", wait: 5

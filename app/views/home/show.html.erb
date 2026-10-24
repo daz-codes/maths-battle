@@ -5,35 +5,37 @@
 
   <%= render "topics/current", topic: current_topic, from: nil %>
 
-  <% if @user.display_name %>
-    <h1 class="greeting">
+  <%# The greeting, with the streak small beside it %>
+  <div class="greeting">
+    <% if @user.display_name %>
       <%= link_to edit_profile_path, class: "greeting__avatar", aria: { label: "Settings" } do %>
         <%= render "avatar", user: @user, size: "greeting" %>
       <% end %>
-      Hi <%= @user.display_name %>!
-    </h1>
-  <% end %>
+      <h1 class="greeting__hello">Hi <%= @user.display_name %>!</h1>
+    <% end %>
+    <span class="streak <%= "streak--done" if @user.practised_today? %>" aria-label="<%= @user.streak %> day streak"
+          title="<%= @user.streak %> day streak"><%= icon(:flame, class: "streak__flame") %><%= @user.streak %></span>
+  </div>
 
-  <section class="streak <%= "streak--done" if @user.practised_today? %>" aria-label="Streak">
-    <span class="streak__number"><%= icon(:flame, class: "streak__flame") %><%= @user.streak %></span>
-    <span class="streak__label">day streak</span>
-  </section>
+  <nav class="home-actions" aria-label="Play">
+    <%= link_to challenge_path, class: "button button--wide home-action home-action--challenge" do %>
+      <span class="home-action__label"><%= icon(:target) %> Challenge</span>
+    <% end %>
+    <%= link_to practice_path, class: "button button--wide home-action home-action--practice" do %>
+      <span class="home-action__label"><%= icon(:lightning) %> Practice</span>
+      <% if @user.streak_at_risk? %>
+        <span class="button__note">Don't lose your streak!</span>
+      <% elsif !@user.practised_today? %>
+        <span class="button__note">Play to start a streak</span>
+      <% end %>
+    <% end %>
+    <%= link_to groups_path, class: "button button--wide home-action home-action--compete" do %>
+      <span class="home-action__label"><%= icon(:people) %> Compete</span>
+    <% end %>
+  </nav>
 
-  <%= render "topics/play", user: @user, topic: current_topic, level: current_level %>
   <%= render "head_to_heads/to_play", user: @user %>
   <%= render "groups/to_play", user: @user %>
-
-  <%= render "topics/chooser", choosing: :play, user: current_player, topic: current_topic, level: current_level %>
-
-  <% if @user.persisted? %>
-    <dl class="stats">
-      <div><dt>Best</dt><dd><%= icon(:trophy) %> <%= @user.best_score(current_topic, current_level) %></dd></div>
-      <div><dt>Longest streak</dt><dd><%= @user.longest_streak %></dd></div>
-      <div><dt>Average score</dt><dd><%= @user.average_score(current_topic, current_level) || "—" %></dd></div>
-      <div><dt>Average time</dt><dd><%= seconds(@user.overall_stats(current_topic, current_level).average_ms) %></dd></div>
-    </dl>
-    <%= link_to "See all stats", stats_path(current_topic.slug) %>
-  <% end %>
 
   <% if @user.guest? && @user.persisted? %>
     <p class="save-nudge">

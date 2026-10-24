@@ -1,9 +1,9 @@
 <% content_for :title, "Compete · MatheMinute" %>
 
 <main class="page groups">
+  <%= link_to "← Home", root_path, class: "back-link" %>
   <h1 class="heading">Compete</h1>
   <%= render "flash" %>
-  <p class="aside">Take on a friend head to head, or your whole class in a group. Everyone plays the same questions.</p>
 
   <section class="head-to-heads" aria-labelledby="head-to-heads-heading">
     <h2 class="settings__heading" id="head-to-heads-heading">Head to head</h2>
@@ -11,16 +11,14 @@
       <ul class="challenge-cards">
         <%= render partial: "head_to_heads/card", collection: @head_to_heads, as: :head_to_head, locals: { user: @user } %>
       </ul>
+    <% else %>
+      <p class="aside">No head to heads yet.</p>
     <% end %>
-
-    <p class="aside">Challenge a friend from any game's results: they play the same questions and try to beat you.</p>
   </section>
 
   <section class="live-start" aria-labelledby="live-heading">
     <h2 class="settings__heading" id="live-heading">Live</h2>
-    <p class="aside">Race up to <%= LiveGame::MAX_PLAYERS - 1 %> friends at the same time, on the same questions.</p>
     <%= button_to safe_join([ icon(:lightning), " Play live" ]), live_games_path, class: "button button--start button--wide", form_class: "wide-form" %>
-    <p class="hint hint--centre"><%= current_topic.title %> · Level <%= current_level %>. Share the link, then start when everyone's in.</p>
   </section>
 
   <section class="group-list" aria-labelledby="groups-heading">
@@ -41,7 +39,7 @@
         <% end %>
       </ul>
     <% else %>
-      <p class="aside">You're not in a group yet. Join one with its code, or start your own.</p>
+      <p class="aside">No groups yet.</p>
     <% end %>
   </section>
 

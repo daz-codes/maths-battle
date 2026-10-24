@@ -4,6 +4,7 @@ class ReviewingMistakesTest < ApplicationSystemTestCase
   test "a review asks each mistake once with no clock, shows the answer to one got wrong, then says how it went" do
     Attempt.record!(user: users(:ada), results: answers([ 3, 5, 14 ], [ 2, 5, 11 ], [ 2, 3, 6 ]))
     sign_in users(:ada)
+    click_on "Practice"
     click_on "Review mistakes (2)"
 
     assert_selector ".question", text: "×", wait: 5
