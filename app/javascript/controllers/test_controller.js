@@ -23,7 +23,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // after a warning, and then nothing is saved. A review has no clock or gems: it asks each of its
 // questions once and ends after the last
 export default class extends Controller {
-  static targets = [ "question", "answer", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "rival", "combo", "gemIcon", "speedIcon", "trophyIcon" ]
+  static targets = [ "question", "nextQuestion", "previousQuestion", "answer", "gems", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "rival", "combo", "gemIcon", "speedIcon", "trophyIcon" ]
   static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, ghost: Object, live: Object, submitUrl: String, keys: Array, gemRules: Object }
 
   connect() {
@@ -46,6 +46,7 @@ export default class extends Controller {
     this.index = 0
     this.typed = ""
     this.score = 0
+    this.rawGems = 0
     this.inARow = 0
     this.ghostScore = 0
     this.results = []
@@ -85,22 +86,34 @@ export default class extends Controller {
     }
   }
 
-  // Another player's score has gone up: shown with theirs, pink while they're ahead
-  rivalScored({ player_id, score }) {
+  // Another player's score has gone up: shown with theirs (their gems in a Power game), pink while they're ahead
+  rivalScored({ player_id, score, gems }) {
     const rival = this.rivalTargets.find((element) => element.dataset.playerId === String(player_id))
     if (!rival) return
 
-    rival.dataset.score = score
-    rival.querySelector("strong").textContent = score
+    rival.dataset.standing = this.liveValue.power ? gems : score
+    rival.querySelector("strong").textContent = rival.dataset.standing
     this.showRivalLeads()
+  }
+
+  // What a live game is won by: right answers, or gems in a Power game
+  get standing() {
+    return this.liveValue.power ? this.gems : this.score
   }
 
   showRivalLeads() {
     this.rivalTargets.forEach((rival) => {
-      const score = Number(rival.dataset.score || 0)
-      rival.classList.toggle("test__rival--ahead", score > this.score)
-      rival.classList.toggle("test__rival--behind", score < this.score)
+      const standing = Number(rival.dataset.standing || 0)
+      rival.classList.toggle("test__rival--ahead", standing > this.standing)
+      rival.classList.toggle("test__rival--behind", standing < this.standing)
     })
+  }
+
+  reportToRivals() {
+    if (!this.live) return
+
+    this.liveChannel?.perform("score", { score: this.score, gems: this.gems })
+    this.showRivalLeads()
   }
 
   // Mixed practice's or a review's spares are its own, as its questions are mixed from every level, and a group
@@ -246,7 +259,9 @@ export default class extends Controller {
     if (this.typed.length >= this.correctAnswer.length && finished(this.typed)) this.check()
   }
 
+  // The last answer stays until the next one's started
   showTyped() {
+    this.answerTarget.classList.remove("answer--kept", "answer--wrong")
     this.answerTarget.textContent = shown(this.typed)
   }
 
@@ -276,28 +291,55 @@ export default class extends Controller {
     return this.current.answer
   }
 
-  // The question text is built on the server from numbers and letters (equations use HTML for fractions)
+  // The question text is built on the server from numbers and letters (equations use HTML for fractions). Like a
+  // carousel: the next one waits above, and the one just answered moves below with its worked answer, ticked or
+  // crossed, while what was typed stays in the answer until the next one's started
   show() {
     this.questionTarget.innerHTML = this.current.text
-    this.fitQuestion()
+    this.fitQuestion(this.questionTarget)
+    this.nextQuestionTarget.innerHTML = this.questions[this.index + 1]?.text ?? ""
+    this.fitQuestion(this.nextQuestionTarget)
     this.typed = ""
-    this.answerTarget.textContent = ""
+    if (this.answered) {
+      this.showAnswered(this.answered)
+      this.answerTarget.classList.add("answer--kept")
+    } else {
+      this.answerTarget.textContent = ""
+    }
     this.shownAt = performance.now()
     if (this.hasProgressTarget) this.progressTarget.textContent = `${this.index + 1}/${this.questions.length}`
+    if (this.answered) this.turnCarousel()
+  }
+
+  showAnswered({ solution, right }) {
+    this.previousQuestionTarget.textContent = `${right ? "✓" : "✗"} ${solution}`
+    this.previousQuestionTarget.classList.toggle("question-previous--right", right)
+    this.previousQuestionTarget.classList.toggle("question-previous--wrong", !right)
+  }
+
+  // Each moves down a place: the next question grows into the current one's, and the answered one drops below
+  turnCarousel() {
+    if (reducedMotion.matches) return
+
+    const timing = { duration: 220, easing: "ease-out" }
+    this.questionTarget.animate([ { transform: "translateY(-55%) scale(0.45)", opacity: 0.4 }, { transform: "none", opacity: 1 } ], timing)
+    this.nextQuestionTarget.animate([ { transform: "translateY(-30%)", opacity: 0 }, { transform: "none" } ], timing)
+    this.previousQuestionTarget.animate([ { transform: "translateY(-120%) scale(1.3)", opacity: 0 }, { transform: "none", opacity: 1 } ], timing)
   }
 
   // 0.7 × −3000 is longer than 7 × 8, so it's shown smaller to stay on one line
-  fitQuestion() {
-    const length = this.questionTarget.textContent.length
-    this.questionTarget.classList.toggle("question--long", length > 8 && length <= 12)
-    this.questionTarget.classList.toggle("question--longer", length > 12)
+  fitQuestion(element) {
+    const length = element.textContent.length
+    element.classList.toggle("question--long", length > 8 && length <= 12)
+    element.classList.toggle("question--longer", length > 12)
   }
 
   // The question's own details go back with the answer, so the server can check it for itself
   check() {
-    const { text, answer, ...question } = this.current
+    const { text, answer, solution, ...question } = this.current
     const ms = Math.round(performance.now() - this.shownAt)
     this.results.push({ ...question, given: this.typed, ms })
+    this.answered = { solution, right: this.typed === answer }
 
     if (this.typed === answer) {
       this.score++
@@ -307,13 +349,11 @@ export default class extends Controller {
       if (!this.review) this.earnGems(ms)
       if (this.bestValue && this.score === this.bestValue + 1) this.passBest()
       this.showGhostLead()
-      if (this.live) {
-        this.liveChannel?.perform("score", { score: this.score })
-        this.showRivalLeads()
-      }
+      this.reportToRivals()
       this.next()
     } else {
       if (!this.review) this.loseGems()
+      this.reportToRivals()
       this.showCorrection()
     }
   }
@@ -330,12 +370,24 @@ export default class extends Controller {
     this.popGems(right * multiplier, "right")
     const tier = ms < times.lightning ? "lightning" : ms < times.quick ? "quick" : null
     if (tier) setTimeout(() => this.popGems(speed[tier] * multiplier, tier, this.speedIconTarget), SPEED_POP_DELAY)
+    this.addGems((right + (tier ? speed[tier] : 0)) * multiplier)
   }
 
   loseGems() {
     this.inARow = 0
     if (this.shownMultiplier > 1) this.showCombo(1)
     this.popGems(this.gemRulesValue.wrong, "wrong")
+    this.addGems(this.gemRulesValue.wrong)
+  }
+
+  // A game's gems never come to less than nothing, though wrong answers can take the running count below it
+  addGems(gems) {
+    this.rawGems += gems
+    if (this.hasGemsTarget) this.gemsTarget.textContent = this.gems.toLocaleString()
+  }
+
+  get gems() {
+    return Math.max(0, this.rawGems)
   }
 
   // ×2 from 5 in a row, ×3 from 10, ×4 from 20
@@ -393,15 +445,13 @@ export default class extends Controller {
     feedback.fanfare()
   }
 
-  // Show the right answer briefly so it sticks, then carry on
+  // The wrong answer stays, in red, for a moment, then the question moves below with the right one
   showCorrection() {
     feedback.wrong()
     this.showingCorrection = true
-    this.answerTarget.textContent = shown(this.correctAnswer)
     this.answerTarget.classList.add("answer--wrong")
     this.correctionTimer = setTimeout(() => {
       this.showingCorrection = false
-      this.answerTarget.classList.remove("answer--wrong")
       if (this.state === "running" || this.state === "paused") this.next()
     }, this.review ? REVIEW_WRONG_PAUSE : WRONG_PAUSE)
   }
@@ -480,8 +530,11 @@ export default class extends Controller {
     this.questionTarget.textContent = this.review ? "All done!" : "Time's up!"
     this.questionTarget.classList.remove("question--long", "question--longer")
     this.questionTarget.classList.add("question--done")
+    this.nextQuestionTarget.textContent = ""
+    // The last one answered, a review's final question included, still shows its worked answer
+    if (this.answered) this.showAnswered(this.answered)
     this.answerTarget.textContent = ""
-    this.answerTarget.classList.remove("answer--wrong")
+    this.answerTarget.classList.remove("answer--wrong", "answer--kept")
     this.keypadTarget.hidden = true
     this.submit()
   }
@@ -528,6 +581,7 @@ export default class extends Controller {
     this.state = "saved"
     this.statusTarget.hidden = true
     this.questionTarget.hidden = true
+    this.previousQuestionTarget.hidden = true
     this.answerTarget.hidden = true
     this.offlineScoreTarget.textContent = this.score
     this.offlineResultTarget.hidden = false

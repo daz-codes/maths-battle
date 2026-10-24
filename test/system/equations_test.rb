@@ -7,7 +7,7 @@ class EquationsTest < ApplicationSystemTestCase
     find(".topic-card", text: "Equations").click
     assert_selector ".levels__name", text: "Level 1: One step"
     click_on "Play level 1"
-    assert_selector ".question var", wait: 5
+    assert_selector ".question--current var", wait: 5
     end_game_in(6_000)
 
     answered = []
@@ -29,7 +29,7 @@ class EquationsTest < ApplicationSystemTestCase
     unlock(users(:ada), Equations, 5)
     sign_in users(:ada)
     visit play_path("equations", level: 5)
-    assert_selector ".question var", wait: 5
+    assert_selector ".question--current var", wait: 5
 
     page.execute_script(<<~JS)
       const test = window.Stimulus.getControllerForElementAndIdentifier(document.querySelector("[data-controller=test]"), "test")

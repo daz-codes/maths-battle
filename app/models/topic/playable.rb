@@ -49,6 +49,12 @@ module Topic::Playable
     [ question(fact, level: level, random: random) ]
   end
 
+  # A question with its worked answer, "7 × 8 = 56" or "4w = 8, so w = 2", shown under the next one once it's answered
+  def with_solution(question)
+    question = question.to_h.symbolize_keys
+    question.merge(solution: label(question.stringify_keys.slice(*Attempt::GameTicket::QUESTION_FIELDS)))
+  end
+
   # Under how many ms a right answer earns the quick and lightning gems
   def gem_times
     self::GEM_TIMES

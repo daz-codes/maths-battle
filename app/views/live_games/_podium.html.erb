@@ -6,7 +6,15 @@
         <span class="leaderboard__rank <%= "leaderboard__rank--#{place.rank}" if place.rank %>"><%= place.rank || "…" %></span>
         <%= render "avatar", user: place.user, size: "small", letter_only: true %>
         <span class="leaderboard__name"><%= place.user.display_name %></span>
-        <span class="leaderboard__score"><%= place.score || tag.span(live_game.over? ? "didn't finish" : "playing…", class: "leaderboard__wrong") %></span>
+        <span class="leaderboard__score">
+          <% if place.attempt.nil? %>
+            <%= tag.span(live_game.over? ? "didn't finish" : "playing…", class: "leaderboard__wrong") %>
+          <% elsif live_game.power? %>
+            <%= number_with_delimiter place.gems %> <%= icon(:gem, label: "gems") %> <span class="leaderboard__wrong"><%= place.score %> right</span>
+          <% else %>
+            <%= place.score %>
+          <% end %>
+        </span>
       </li>
     <% end %>
   </ol>

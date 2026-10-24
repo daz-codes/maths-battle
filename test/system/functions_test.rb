@@ -7,7 +7,7 @@ class FunctionsTest < ApplicationSystemTestCase
     find(".topic-card", text: "Functions").click
     assert_selector ".levels__name", text: "Level 1: Linear"
     click_on "Play level 1"
-    assert_selector ".question .function--ask", wait: 5
+    assert_selector ".question--current .function--ask", wait: 5
     end_game_in(6_000)
 
     3.times do |i|
@@ -24,7 +24,7 @@ class FunctionsTest < ApplicationSystemTestCase
     unlock(users(:ada), Functions, 2)
     sign_in users(:ada)
     visit play_path("functions", level: 2)
-    assert_selector ".question .function--ask", wait: 5
+    assert_selector ".question--current .function--ask", wait: 5
 
     page.execute_script(<<~JS)
       const test = window.Stimulus.getControllerForElementAndIdentifier(document.querySelector("[data-controller=test]"), "test")

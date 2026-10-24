@@ -18,19 +18,46 @@ class TimesTablesTest < ApplicationSystemTestCase
 
     # Two right answers then a wrong one, typed with no Enter key
     2.times do
-      a, b = find(".question").text.split(" × ").map(&:to_i)
+      a, b = find(".question--current").text.split(" × ").map(&:to_i)
       find("body").send_keys((a * b).to_s)
       assert_selector ".test__score", text: /#{_1 + 1}/
     end
 
-    a, b = find(".question").text.split(" × ").map(&:to_i)
+    a, b = find(".question--current").text.split(" × ").map(&:to_i)
     wrong = (a * b) % 10 == 9 ? a * b - 1 : a * b + 1 # same number of digits, so it's checked straight away
     find("body").send_keys(wrong.to_s)
-    assert_selector ".answer--wrong", text: (a * b).to_s
+    assert_selector ".answer--wrong", text: wrong.to_s
+    assert_selector ".question-previous--wrong", text: "#{a} × #{b} = #{a * b}"
 
     assert_selector ".card__number", text: "2", wait: 8
     assert_text "#{a} × #{b} = #{a * b}"
     assert_equal 2, users(:ada).best_score(TimesTables, 1)
+  end
+
+  test "the questions turn like a carousel: the next waits above, and the one answered goes below with its answer" do
+    sign_in users(:ada)
+    click_on "Play level 1"
+    assert_selector ".question--current", text: "×", wait: 5
+    upcoming = find(".question--next").text
+    assert_match(/\A\d+ × \d+\z/, upcoming)
+
+    a, b = find(".question--current").text.split(" × ").map(&:to_i)
+    find("body").send_keys((a * b).to_s)
+    assert_selector ".question-previous.question-previous--right", text: "✓ #{a} × #{b} = #{a * b}"
+    assert_selector ".question--current", text: upcoming
+    assert_selector ".answer.answer--kept", text: (a * b).to_s
+    assert_selector ".test__gems", text: /\A[1-9]\d*/
+
+    a, b = find(".question--current").text.split(" × ").map(&:to_i)
+    wrong = (a * b) % 10 == 9 ? a * b - 1 : a * b + 1
+    find("body").send_keys(wrong.to_s)
+    assert_selector ".answer.answer--wrong", text: wrong.to_s
+    assert_selector ".question-previous.question-previous--wrong", text: "✗ #{a} × #{b} = #{a * b}"
+    # What was typed stays until the next answer's started
+    assert_selector ".answer.answer--wrong", text: wrong.to_s
+
+    find("body").send_keys(:backspace)
+    assert_selector ".answer:not(.answer--wrong):not(.answer--kept)", exact_text: ""
   end
 
   test "gems float up for each right answer and its speed, a combo multiplies them, and a wrong answer loses some" do
@@ -38,7 +65,7 @@ class TimesTablesTest < ApplicationSystemTestCase
     click_on "Play level 1"
     assert_selector ".question", text: "×", wait: 5
 
-    a, b = find(".question").text.split(" × ").map(&:to_i)
+    a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
     assert_selector ".gem-pop.gem-pop--right .icon--gem", visible: :all
     assert_selector ".gem-pop.gem-pop--right", text: "+10"
@@ -47,7 +74,7 @@ class TimesTablesTest < ApplicationSystemTestCase
     assert_selector ".test__combo", visible: :hidden
 
     4.times do |answered|
-      a, b = find(".question").text.split(" × ").map(&:to_i)
+      a, b = find(".question--current").text.split(" × ").map(&:to_i)
       find("body").send_keys((a * b).to_s)
       assert_selector ".test__score", text: /#{answered + 2}/
     end
@@ -55,7 +82,7 @@ class TimesTablesTest < ApplicationSystemTestCase
     assert_selector ".gem-pop--combo", text: "×2!"
     assert_selector ".gem-pop.gem-pop--right", text: "+20"
 
-    a, b = find(".question").text.split(" × ").map(&:to_i)
+    a, b = find(".question--current").text.split(" × ").map(&:to_i)
     wrong = (a * b) % 10 == 9 ? a * b - 1 : a * b + 1
     find("body").send_keys(wrong.to_s)
     assert_selector ".gem-pop.gem-pop--wrong", text: "−5"
@@ -75,7 +102,7 @@ class TimesTablesTest < ApplicationSystemTestCase
       }, 10)
     JS
     assert_selector ".question", text: "×", wait: 5
-    a, b = find(".question").text.split(" × ").map(&:to_i)
+    a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
 
     assert_selector ".card__number", text: "1", wait: 8
@@ -91,10 +118,10 @@ class TimesTablesTest < ApplicationSystemTestCase
     assert_selector ".test__best", text: "Best 1"
     assert_selector ".question", text: "×", wait: 5
 
-    a, b = find(".question").text.split(" × ").map(&:to_i)
+    a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
     assert_no_selector ".test--beating"
-    a, b = find(".question").text.split(" × ").map(&:to_i)
+    a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
 
     assert_selector ".test--beating .test__best", text: "New best!"

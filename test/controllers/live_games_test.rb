@@ -39,6 +39,33 @@ class LiveGamesTest < ActionDispatch::IntegrationTest
     assert_equal "Wait for someone to join first.", flash[:alert]
   end
 
+  test "the host chooses Classic or Power in the lobby, and everyone sees which" do
+    game = LiveGame.make(host: @ada, topic: TimesTables, level: 1)
+    sign_in_as @ada
+    get live_game_path(game.code)
+    assert_select "#live-mode", text: /Classic mode: the most right answers wins/
+    assert_select "form[action=?] button[aria-current=true]", live_game_path(game.code), text: "Classic"
+
+    patch live_game_path(game.code), params: { mode: "power" }
+    assert game.reload.power?
+    follow_redirect!
+    assert_select "#live-mode", text: /Power mode: the most gems wins/
+
+    sign_in_as @bob
+    game.join(@bob)
+    get live_game_path(game.code)
+    assert_select "#live-mode", text: /Power mode/
+    assert_select "form[action=?][method=post] input[name=_method][value=patch]", live_game_path(game.code), count: 0
+    patch live_game_path(game.code), params: { mode: "classic" }
+    assert_response :not_found
+    assert game.reload.power?
+
+    game.start!
+    get play_path("times-tables", live: game.code)
+    assert JSON.parse(css_select("[data-controller=test]").first["data-test-live-value"])["power"]
+    assert_select ".test__rival .icon--gem"
+  end
+
   test "a visitor opens the link, gives a name and joins; the host starts it and everyone plays the same minute" do
     game = LiveGame.make(host: @ada, topic: TimesTables, level: 1)
 

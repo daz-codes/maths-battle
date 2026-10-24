@@ -1,0 +1,8 @@
+<%# Which way the game is won, updated for everyone in the lobby when the host changes it %>
+<p id="live-mode" class="live-mode">
+  <% if live_game.power? %>
+    <%= icon(:gem) %> <strong>Power mode:</strong> the most gems wins, so speed and runs of right answers count
+  <% else %>
+    <%= icon(:check) %> <strong>Classic mode:</strong> the most right answers wins
+  <% end %>
+</p>

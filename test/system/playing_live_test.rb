@@ -13,11 +13,11 @@ class PlayingLiveTest < ApplicationSystemTestCase
   end
 
   def answer_right
-    a, b = find(".question").text.split(" × ").map(&:to_i)
+    a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
   end
 
-  test "a lobby from a link, starting together, and each other's scores as they play" do
+  test "a lobby from a link, a Power game starting together, and each other's gems as they play" do
     users(:ada).update!(name: "Ada")
     sign_in users(:ada)
     visit groups_path
@@ -33,6 +33,9 @@ class PlayingLiveTest < ApplicationSystemTestCase
     end
 
     assert_selector "#live-players", text: "Zara", wait: 5
+    click_on "Power"
+    assert_selector "#live-mode", text: "Power mode"
+    using_session(:zara) { assert_selector "#live-mode", text: "Power mode", wait: 5 }
     click_on "Start"
     assert_selector ".test__rival", text: "Zara 0"
 
@@ -42,10 +45,11 @@ class PlayingLiveTest < ApplicationSystemTestCase
       2.times { |answered| answer_right; assert_selector ".test__score", text: /#{answered + 1}/ }
     end
 
-    assert_selector ".test__rival.test__rival--ahead", text: "Zara 2", wait: 5
+    assert_selector ".test__rival.test__rival--ahead", text: "Zara 60", wait: 5
     3.times { |answered| answer_right; assert_selector ".test__score", text: /#{answered + 1}/ }
-    assert_selector ".test__rival.test__rival--behind", text: "Zara 2"
-    using_session(:zara) { assert_selector ".test__rival.test__rival--ahead", text: "Ada 3", wait: 5 }
+    assert_selector ".test__rival.test__rival--behind", text: "Zara 60"
+    assert_selector ".test__gems", text: "90"
+    using_session(:zara) { assert_selector ".test__rival.test__rival--ahead", text: "Ada 90", wait: 5 }
 
     shorten_the_minute
     using_session(:zara) { shorten_the_minute }
@@ -53,8 +57,8 @@ class PlayingLiveTest < ApplicationSystemTestCase
     assert_selector ".banner", text: "You came", wait: 15
     using_session :zara do
       assert_selector ".banner", text: "You came", wait: 15
-      assert_selector "#live-podium .leaderboard__row", text: /Ada.*3/m, wait: 5
-      assert_selector "#live-podium .leaderboard__row", text: /Zara.*2/m
+      assert_selector "#live-podium .leaderboard__row", text: /Ada.*90.*3 right/m, wait: 5
+      assert_selector "#live-podium .leaderboard__row", text: /Zara.*60.*2 right/m
     end
   end
 end

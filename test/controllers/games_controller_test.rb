@@ -10,7 +10,9 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1 + User::Practisable::SPARE_QUESTION_SETS, sets.size, "spares for playing offline"
     assert_equal sets.size, sets.map { _1["id"] }.uniq.size
     assert_equal User::Practisable::QUESTION_COUNT, sets.first["questions"].size
-    assert_equal %w[a b text answer], sets.first["questions"].first.keys
+    question = sets.first["questions"].first
+    assert_equal %w[a b text answer solution], question.keys
+    assert_equal "#{question["a"]} × #{question["b"]} = #{question["answer"]}", question["solution"], "shown under the next question once it's answered"
     assert_select "meta[name=viewport][content*='maximum-scale=1']"
     assert_select "a.logo", count: 0, message: "nothing to tap away to mid-test"
     assert_select ".site-footer", count: 0

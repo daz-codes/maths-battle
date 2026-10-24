@@ -7,12 +7,12 @@ class SimultaneousEquationsTest < ApplicationSystemTestCase
     find(".topic-card", text: "Simultaneous equations").click
     assert_selector ".levels__name", text: "Level 1: Subtract"
     click_on "Play level 1"
-    assert_selector ".question .system__ask", text: "x =", wait: 5
+    assert_selector ".question--current .system__ask", text: "x =", wait: 5
     end_game_in(6_000)
 
     find("body").send_keys(current_answer)
-    assert_selector ".question .system__known", text: "x ="
-    assert_selector ".question .system__ask", text: "y ="
+    assert_selector ".question--current .system__known", text: "x ="
+    assert_selector ".question--current .system__ask", text: "y ="
     find("body").send_keys(current_answer)
     assert_selector ".test__score", text: "2"
 

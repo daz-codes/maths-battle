@@ -22,6 +22,7 @@ class GamesController < ApplicationController
     remember_topic @topic unless @mode.in?(%w[ group head_to_head live ])
     @question_sets = question_sets
     @question_sets.each do |set|
+      set[:questions] = set[:questions].map { |question| @topic.with_solution(question) }
       set[:ticket] = Attempt::GameTicket.issue(owner: player_key, topic: @topic.key, level: @level, mode: @mode, round: @round,
         head_to_head: @head_to_head, live_game: @live_game, **set.slice(:id, :questions))
     end
@@ -72,7 +73,7 @@ class GamesController < ApplicationController
     # When it starts, from now, so every device counts down to the same moment, and who else is playing
     def live_details
       rivals = @live_game.players.includes(:user).reject { |player| player.user_id == current_player.id }
-      { id: @live_game.id, pass: @live_game.pass_for(current_player), startsInMs: ((@live_game.starts_at - Time.current) * 1000).round,
+      { id: @live_game.id, pass: @live_game.pass_for(current_player), power: @live_game.power?, startsInMs: ((@live_game.starts_at - Time.current) * 1000).round,
         rivals: rivals.map { |player| { id: player.user_id, name: player.user.display_name } } }
     end
 

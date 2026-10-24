@@ -121,7 +121,7 @@ class PlayingOfflineTest < ApplicationSystemTestCase
     end
 
     def answer_question
-      a, b = find(".question").text.split(" × ").map(&:to_i)
+      a, b = find(".question--current").text.split(" × ").map(&:to_i)
       find("body").send_keys((a * b).to_s)
     end
 

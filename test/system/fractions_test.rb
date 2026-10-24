@@ -7,8 +7,8 @@ class FractionsTest < ApplicationSystemTestCase
     find(".topic-card", text: "Fractions").click
     assert_selector ".levels__name", text: "Level 1: Simplifying"
     click_on "Play level 1"
-    assert_selector ".question .question__verb", text: "Simplify", wait: 5
-    assert_selector ".question .frac", count: 1
+    assert_selector ".question--current .question__verb", text: "Simplify", wait: 5
+    assert_selector ".question--current .frac", count: 1
     end_game_in(6_000)
 
     3.times do |i|
@@ -25,7 +25,7 @@ class FractionsTest < ApplicationSystemTestCase
     unlock(users(:ada), Fractions, 3)
     sign_in users(:ada)
     visit play_path("fractions", level: 3)
-    assert_selector ".question .frac", count: 2, wait: 5
+    assert_selector ".question--current .frac", count: 2, wait: 5
 
     page.execute_script(<<~JS)
       const test = window.Stimulus.getControllerForElementAndIdentifier(document.querySelector("[data-controller=test]"), "test")

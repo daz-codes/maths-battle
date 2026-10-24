@@ -85,6 +85,24 @@ class LiveGameTest < ActiveSupport::TestCase
     assert_nil @game.place_of(dan).rank, "saved too late to count"
   end
 
+  test "a Power game's podium goes by the gems the answers earned, so speed and runs count; Classic by right answers" do
+    @game.join(@bob)
+    assert_turbo_stream_broadcasts(@game) { assert @game.choose_mode("power") }
+    assert_not @game.choose_mode("chaos")
+    @game.start!
+    assert_not @game.choose_mode("classic"), "not once it's started"
+
+    travel 30.seconds do
+      Attempt.record!(user: @ada, topic: "times_tables", level: 1, mode: "live", live_game: @game, results: Array.new(6) { { a: 2, b: 3, given: 6, ms: 500 } })
+      Attempt.record!(user: @bob, topic: "times_tables", level: 1, mode: "live", live_game: @game, results: Array.new(8) { { a: 2, b: 3, given: 6, ms: 3000 } })
+    end
+
+    assert_equal [ [ 1, @ada, 6, 240 ], [ 2, @bob, 8, 120 ] ], @game.podium.map { [ _1.rank, _1.user, _1.score, _1.gems ] },
+      "6 lightning answers, the 5th and 6th doubled, beat 8 slow ones"
+    @game.update!(mode: "classic")
+    assert_equal [ @bob, @ada ], @game.podium.map(&:user)
+  end
+
   test "a live game doesn't change a level's best" do
     @game.join(@bob)
     @game.start!

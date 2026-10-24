@@ -18,7 +18,7 @@ class GhostRaceTest < ApplicationSystemTestCase
     assert_selector ".test__ghost.test__ghost--ahead", text: "Ada 2", wait: 3
 
     3.times do |answered|
-      a, b = find(".question").text.split(" × ").map(&:to_i)
+      a, b = find(".question--current").text.split(" × ").map(&:to_i)
       find("body").send_keys((a * b).to_s)
       assert_selector ".test__score", text: /#{answered + 1}/
     end

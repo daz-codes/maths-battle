@@ -15,6 +15,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   setup do
+    # Back to the usual size, as a test can make the window smaller for its own checks
+    page.current_window.resize_to(400, 800)
     visit root_path
     page.evaluate_async_script(<<~JS)
       const done = arguments[0]

@@ -13,7 +13,7 @@ class AnswerControlsTest < ApplicationSystemTestCase
     find("body").send_keys("1", :enter)
     assert_selector ".answer--wrong"
     assert_equal 1, result_count
-    assert_no_selector ".answer--wrong", wait: 2
+    assert_selector ".question-previous--wrong", wait: 2, text: "✗"
 
     # A synthetic click is how assistive technologies activate the native keypad buttons.
     page.execute_script("document.querySelector('.keypad [data-digit=\"1\"]').click()")

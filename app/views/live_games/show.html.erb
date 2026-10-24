@@ -7,6 +7,7 @@
   <h1 class="heading"><%= icon(:lightning) %> Live game</h1>
   <p class="aside"><%= topic_icon(@live_game.topic_module) %> <%= @live_game.title %> · hosted by <%= host ? "you" : @live_game.host.display_name %></p>
   <%= render "flash" %>
+  <%= render "live_games/mode", live_game: @live_game %>
 
   <% if @live_game.started? %>
     <% if @live_game.running? && @player && !@player.played? %>
@@ -16,6 +17,12 @@
   <% else %>
     <section id="live-status" class="live-status">
       <% if host %>
+        <nav class="board-switch" aria-label="How the game is won">
+          <% { "classic" => "Classic", "power" => "Power" }.each do |mode, label| %>
+            <%= button_to label, live_game_path(@live_game), method: :patch, params: { mode: mode },
+                  class: "board-switch__option", form_class: "board-switch__form", aria: { current: (mode == @live_game.mode) } %>
+          <% end %>
+        </nav>
         <% url = live_game_url(@live_game) %>
         <button type="button" class="button button--blue button--wide" data-controller="share"
                 data-share-text-value="Race me at <%= @live_game.title %> on MatheMinute, live! <%= url %>" data-action="share#share">Share the link</button>

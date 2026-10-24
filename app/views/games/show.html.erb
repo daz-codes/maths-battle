@@ -24,6 +24,10 @@
     <%# A level's practice shows the best to beat, and a head to head the challenger's score, celebrating passing it %>
     <span class="test__tally">
       <span class="test__score" data-test-target="score" aria-label="Score">0</span>
+      <%# The gems the answers have earned so far (not a review's: it has no clock) %>
+      <% unless @mode == "review" %>
+        <span class="test__gems"><span data-test-target="gems" aria-label="Gems">0</span> <%= icon(:gem) %></span>
+      <% end %>
       <%# Right answers in a row multiply the gems: ×2, ×3, ×4 %>
       <span class="test__combo" data-test-target="combo" aria-live="polite" hidden></span>
       <% if @best.positive? %><span class="test__best" data-test-target="best"><%= @mode == "head_to_head" ? "Beat" : "Best" %> <%= @best %></span><% end %>
@@ -44,18 +48,22 @@
   <template data-test-target="speedIcon"><%= icon(:lightning) %></template>
   <template data-test-target="trophyIcon"><%= icon(:trophy) %></template>
 
-  <%# A live game: everyone else's score as they play %>
+  <%# A live game: everyone else's score as they play, or their gems in a Power game %>
   <% if @live %>
     <ol class="test__rivals" aria-label="Other players">
       <% @live[:rivals].each do |rival| %>
-        <li class="test__rival" data-test-target="rival" data-player-id="<%= rival[:id] %>"><%= rival[:name] %> <strong>0</strong></li>
+        <li class="test__rival" data-test-target="rival" data-player-id="<%= rival[:id] %>"><%= rival[:name] %> <strong>0</strong><%= icon(:gem) if @live[:power] %></li>
       <% end %>
     </ol>
   <% end %>
 
   <div class="test__stage" data-test-target="stage">
-    <p class="question" data-test-target="question" aria-live="off">Ready</p>
+    <%# A carousel: the next question waits above, smaller and greyed out, and the one just answered goes below
+        with its worked answer, while what was typed stays in the answer until the next one's started %>
+    <p class="question question--next" data-test-target="nextQuestion" aria-hidden="true"></p>
+    <p class="question question--current" data-test-target="question" aria-live="off">Ready</p>
     <p class="answer" data-test-target="answer" aria-live="polite"></p>
+    <p class="question-previous" data-test-target="previousQuestion" aria-live="polite"></p>
     <p class="test__status" data-test-target="status" hidden></p>
 
     <div class="offline-result" data-test-target="unavailable" hidden>

@@ -1,7 +1,8 @@
 # Players racing each other at the same moment. The host makes one from the Compete page and shares its link
 # (/live/K7Q2MX); whoever opens it joins the lobby (Joinable), and when the host starts it everyone's game begins
 # together, on the same questions, with each other's scores ticking over as they play (Startable, LiveGameChannel).
-# Each player has one go, and a podium ranks them as they finish (Rankable)
+# Each player has one go, and a podium ranks them as they finish (Rankable). A Classic game is won by the most
+# right answers; a Power game by the most gems, so speed and runs of right answers count too
 class LiveGame < ApplicationRecord
   include Joinable, Rankable, Startable
 
@@ -9,7 +10,10 @@ class LiveGame < ApplicationRecord
   has_many :players, -> { order(:created_at, :id) }, dependent: :destroy
   has_many :users, through: :players
 
+  MODES = %w[ classic power ]
+
   validates :topic, inclusion: { in: Topic.keys }
+  validates :mode, inclusion: { in: MODES }
   validate :level_in_topic
 
   # The host's game, at their topic and level. Unweighted questions, like a group's, so no one's history shapes them
@@ -27,6 +31,17 @@ class LiveGame < ApplicationRecord
 
   def title
     "#{topic_module.title} · Level #{level}"
+  end
+
+  def power? = mode == "power"
+
+  # The host picks, in the lobby, before it starts
+  def choose_mode(mode)
+    return false if started? || MODES.exclude?(mode)
+
+    update!(mode: mode)
+    broadcast_lobby
+    true
   end
 
   def hosted_by?(user)

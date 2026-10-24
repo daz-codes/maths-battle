@@ -18,7 +18,7 @@ class StoppingAGameTest < ApplicationSystemTestCase
     assert_no_selector "dialog[open]"
     assert_operator find(".test__seconds").text.to_i, :>=, seconds.to_i - 1, "no time lost while paused"
 
-    a, b = find(".question").text.split(" × ").map(&:to_i)
+    a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
     assert_selector ".test__score", text: "1"
   end
@@ -39,7 +39,7 @@ class StoppingAGameTest < ApplicationSystemTestCase
   end
 
   test "stop game: back home and nothing saved" do
-    a, b = find(".question").text.split(" × ").map(&:to_i)
+    a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
 
     assert_no_difference -> { Attempt.count } do

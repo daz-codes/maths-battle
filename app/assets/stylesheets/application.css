@@ -1011,14 +1011,16 @@ body.testing {
   line-height: 1;
 }
 
+/* Sized to the room left between the clock and the keypad (cqh), so the carousel's three rows fit on any phone */
 .test__stage {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   min-height: 0;
+  container-type: size;
 }
 
 .question {
@@ -1349,3 +1351,47 @@ body.testing {
 .test__rival--behind { color: var(--green-deep); }
 :root[data-theme="dark"] .test__rival--behind { color: var(--green); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .test__rival--behind { color: var(--green); } }
+.live-status .board-switch { grid-template-columns: 1fr 1fr; }
+.board-switch__form { margin: 0; }
+button.board-switch__option { width: 100%; border: 0; background: transparent; cursor: pointer; font: inherit; font-size: 0.9rem; font-weight: 700; }
+.live-mode { margin: 0; color: var(--muted); }
+.live-mode .icon { width: 1.1em; height: 1.1em; vertical-align: -0.2em; }
+
+/* The question carousel: the next question waits above, smaller and greyed out; the one just answered sits below
+   with its worked answer, ticked green or crossed red; and what was typed stays faded in the answer meanwhile */
+.question.question--next { min-height: 1em; color: var(--muted); opacity: 0.45; zoom: 0.4; }
+/* One-line questions grow to fill the room; functions and simultaneous equations keep their own sizes, as they
+   take several lines, and their next question only shows when there's plenty of room */
+.test:not(.test--functions, .test--simultaneous-equations) .question--current:not(.question--done, .question--long, .question--longer) {
+  font-size: clamp(1.75rem, min(17vw, 30cqh), 8rem);
+}
+.test__stage .answer { height: clamp(1.9rem, min(14vw, 20cqh), 5.5rem); font-size: clamp(1.6rem, min(13vw, 18cqh), 5rem); }
+@container (max-height: 9rem) { .question.question--next { display: none; } }
+@container (max-height: 24rem) { :is(.test--functions, .test--simultaneous-equations) .question.question--next { display: none; } }
+/* Questions over several lines (simultaneous equations, functions, stacked fractions) shrink on a short stage */
+@container (max-height: 22rem) { :is(.test--functions, .test--simultaneous-equations, .test--fractions) .question--current { zoom: 0.75; } }
+@container (max-height: 15rem) { :is(.test--functions, .test--simultaneous-equations, .test--fractions) .question--current { zoom: 0.6; } }
+@container (max-height: 11rem) { :is(.test--functions, .test--simultaneous-equations) .question--current { zoom: 0.48; } }
+
+/* Short phones: shorter keys, like a lesson's, leaving room for the questions */
+@media (max-height: 760px) {
+  .test .keypad__key { min-height: 52px; height: clamp(52px, 7.5dvh, 72px); }
+  .test .keypad { gap: 0.45rem; }
+}
+@media (max-height: 600px) {
+  .test .keypad__key { min-height: 44px; height: 44px; }
+  .test .keypad { gap: 0.35rem; }
+}
+.question-previous { min-height: 1.5em; margin: 0; color: var(--muted); font-size: clamp(1.05rem, 4.6vw, 1.35rem); font-weight: 700; text-align: center; }
+.question-previous--right { color: var(--green-deep); }
+.question-previous--wrong { color: var(--wrong); }
+:root[data-theme="dark"] .question-previous--right { color: var(--green); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .question-previous--right { color: var(--green); } }
+.answer.answer--kept { opacity: 0.45; }
+
+/* The gems so far, under the score */
+.test__gems { color: var(--blue-deep); font-size: 0.95rem; font-weight: 800; white-space: nowrap; }
+.test__gems .icon { width: 1em; height: 1em; vertical-align: -0.12em; }
+:root[data-theme="dark"] .test__gems { color: var(--blue); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .test__gems { color: var(--blue); } }
+.test__rival .icon { width: 0.9em; height: 0.9em; margin-left: 0.1em; vertical-align: -0.1em; }

@@ -18,8 +18,9 @@ Rails.application.routes.draw do
     resources :memberships, only: :destroy, controller: "group_memberships"
   end
   resources :head_to_heads, only: %i[ new create show ]
-  # Live games, at /live/K7Q2MX: its lobby (and podium), joining it, and the host starting it
-  resources :live_games, only: %i[ create show ], path: "live", param: :code do
+  # Live games, at /live/K7Q2MX: its lobby (and podium), the host choosing Classic or Power, joining it, and the
+  # host starting it
+  resources :live_games, only: %i[ create show update ], path: "live", param: :code do
     resource :player, only: :create, controller: "live_game_players"
     resource :start, only: :create, controller: "live_game_starts"
   end
