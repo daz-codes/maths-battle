@@ -37,7 +37,7 @@ module Attempt::Badgeable
   # Playing a level means it was reached; levelling up reaches the next one. Not a group game, which can be at
   # a level the player hasn't reached
   def reached_level?(topic, number)
-    topic_module == topic && !group? && (levelled_up ? level + 1 : level) >= number
+    topic_module == topic && !(group? || head_to_head? || live? || daily_test?) && (levelled_up ? level + 1 : level) >= number
   end
 
   def perfect_game?

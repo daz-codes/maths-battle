@@ -12,7 +12,7 @@ class SharesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".card__number", text: @attempt.score.to_s
-    assert_select ".result__score", text: /6 right in a minute/
+    assert_select ".result__score", text: /6\s+right/
     assert_select "body", text: /A MatheMinute player/
     assert_no_match(/squirrel/i, response.body)
     assert_select "main .avatar", count: 0, message: "the sharer's picture is never shown"

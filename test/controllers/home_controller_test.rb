@@ -41,8 +41,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".site-header .tagline", text: "Improve your math in minutes"
     assert_select ".greeting .streak", text: "0"
     assert_select ".home-actions a.button", 3
-    assert_select ".home-actions a[href=?]", challenge_path, text: "Challenge"
-    assert_select ".home-actions a[href=?]", practice_path, text: /Practice\s+Play to start a streak/
+    assert_select ".home-actions a[href=?]", challenge_path, text: /Challenge\s+Daily Tables Test/
+    assert_select ".home-actions a[href=?]", practice_path, text: "Practice"
     assert_select ".home-actions a[href=?]", groups_path, text: "Compete"
     assert_select "a.button--play", count: 0, message: "playing is on Practice"
     assert_select "a[href=?]", new_registration_path
@@ -58,7 +58,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "a.back-link[href=?]", root_path
     assert_select ".levels"
     get challenge_path
-    assert_select "h1", text: /Daily challenge/
+    assert_select "h1", text: /Daily Tables Test/
     assert_select "a.back-link[href=?]", root_path
   end
 
@@ -146,7 +146,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
-    assert_select ".home-action--practice .button__note", text: "Play to start a streak"
+    assert_select ".home-action--practice .button__note", count: 0, message: "any game keeps the streak, not just practice"
     get practice_path
     assert_select ".button--play .button__note", text: "Play to start a streak"
   end
@@ -156,7 +156,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
-    assert_select ".home-action--practice .button__note", text: "Don't lose your streak!"
+    assert_select ".home-action--practice .button__note", count: 0
     get practice_path
     assert_select ".button--play .button__note", text: "Don't lose your streak!"
   end
@@ -167,7 +167,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
-    assert_select ".button__note", count: 0
+    assert_select ".home-action--practice .button__note", count: 0
     get practice_path
     assert_select ".button--play", text: "Play level 1"
     assert_select ".button__note", count: 0

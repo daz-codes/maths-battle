@@ -3,7 +3,7 @@
 <% mine, theirs = @head_to_head.attempt_of(Current.user), (@head_to_head.attempt_of(@rival) if @rival) %>
 <% result = @head_to_head.result_for(Current.user) %>
 
-<main class="page head-to-head">
+<main class="page head-to-head" data-celebration-id="head-to-head-<%= @head_to_head.id %>">
   <%= link_to "← Compete", groups_path, class: "back-link" %>
   <h1 class="heading"><%= icon(:versus) %> You vs <%= rival_name %></h1>
   <p class="aside"><%= topic_icon(@head_to_head.topic_module) %> <%= @head_to_head.title %></p>

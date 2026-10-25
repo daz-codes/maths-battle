@@ -42,7 +42,7 @@
               <span class="bar"><span class="bar__fill" style="width: <%= row.percent || 0 %>%"></span></span>
             </td>
             <td><%= percent(row.percent) %></td>
-            <td><%= seconds(row.average_ms) %><%= tag.span(icon(:slow, label: "slower than usual"), title: "Slower than usual", class: "slow-mark") if row.slow? %></td>
+            <td <%= tag.attributes(class: ("slow-time" if row.slow?), title: ("Slower than usual" if row.slow?)) %>><%= seconds(row.average_ms) %></td>
           </tr>
         <% end %>
       </tbody>
@@ -50,7 +50,7 @@
 
     <p class="hint hint--centre">
       Speed is the average time for a right answer.
-      <% if @user.group_stats(@topic, @level).any?(&:slow?) %><%= icon(:slow) %> means slower than your usual.<% end %>
+      <% if @user.group_stats(@topic, @level).any?(&:slow?) %>Times in yellow are slower than your usual.<% end %>
     </p>
   <% else %>
     <p class="aside">Play a game of <%= @topic.title.downcase %> and your stats will show up here.</p>

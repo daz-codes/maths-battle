@@ -4,7 +4,7 @@ class GamesController < ApplicationController
   # A level's practice (that level's questions only), mixed practice (?mixed=1: every level up to the player's),
   # a review (?review=1: their recent mistakes, asked again), a group challenge (?round=: its one set of
   # questions), a head to head (?head_to_head=: its set, with the challenger's score to beat), or a live game
-  # (?live=: its set, starting when everyone's does). There's no daily challenge any more: a link to one, from a page kept offline, is mixed practice
+  # (?live=: its set, starting when everyone's does), or the Daily Tables Test (?daily=1: today's set, once a day). There's no daily challenge any more: a link to one, from a page kept offline, is mixed practice
   def show
     @topic = topic_from_slug
     return redirect_to(play_path(@topic.slug, mixed: 1)) if params[:challenge].present?
@@ -14,17 +14,18 @@ class GamesController < ApplicationController
     return redirect_to(groups_path, notice: "That group challenge has finished.") if @mode == "group" && !group_round
     return redirect_to(groups_path, notice: "That head to head has been played or has run out.") if @mode == "head_to_head" && !head_to_head
     return redirect_to(live_game_path(params[:live].to_s)) if @mode == "live" && !live_game
+    return redirect_to(challenge_path) if @mode == "daily" && (@topic != DailyTest::TOPIC || current_player.daily_test_on)
 
     @level = game_level
     @best = best_to_beat
     @ghost = @head_to_head.ghost if @mode == "head_to_head" && @head_to_head.sent?
     @live = live_details if @mode == "live"
-    remember_topic @topic unless @mode.in?(%w[ group head_to_head live ])
+    remember_topic @topic unless @mode.in?(%w[ group head_to_head live daily ])
     @question_sets = question_sets
     @question_sets.each do |set|
       set[:questions] = set[:questions].map { |question| @topic.with_solution(question) }
       set[:ticket] = Attempt::GameTicket.issue(owner: player_key, topic: @topic.key, level: @level, mode: @mode, round: @round,
-        head_to_head: @head_to_head, live_game: @live_game, **set.slice(:id, :questions))
+        head_to_head: @head_to_head, live_game: @live_game, day: (@daily_test.day if @daily_test), **set.slice(:id, :questions))
     end
   end
 
@@ -33,6 +34,7 @@ class GamesController < ApplicationController
       if params[:round].present? then "group"
       elsif params[:head_to_head].present? then "head_to_head"
       elsif params[:live].present? then "live"
+      elsif params[:daily].present? then "daily"
       elsif params[:mixed].present? then "mixed"
       elsif params[:review].present? then "review"
       else "practice"
@@ -45,6 +47,7 @@ class GamesController < ApplicationController
       when "group" then @round.challenge.level
       when "head_to_head" then @head_to_head.level
       when "live" then @live_game.level
+      when "daily" then DailyTest::LEVEL
       else current_player.unlocked_level(@topic)
       end
     end
@@ -93,6 +96,7 @@ class GamesController < ApplicationController
       when "group" then [ { id: SecureRandom.hex(16), questions: @round.questions } ]
       when "head_to_head" then [ { id: SecureRandom.hex(16), questions: @head_to_head.questions } ]
       when "live" then [ { id: SecureRandom.hex(16), questions: @live_game.questions } ]
+      when "daily" then [ { id: SecureRandom.hex(16), questions: (@daily_test = DailyTest.new(current_player.today)).questions } ]
       else current_player.question_sets(topic: @topic, level: @level, mix: @mode == "mixed" ? :all_levels : :level_only)
       end
     end

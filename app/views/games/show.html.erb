@@ -1,4 +1,4 @@
-<% content_for :title, "#{@topic.title}#{{ "review" => " review", "group" => " group challenge", "mixed" => " mixed practice", "head_to_head" => " head to head", "live" => " live" }[@mode]} · MatheMinute" %>
+<% content_for :title, "#{@topic.title}#{{ "review" => " review", "group" => " group challenge", "mixed" => " mixed practice", "head_to_head" => " head to head", "live" => " live", "daily" => " Daily Tables Test" }[@mode]} · MatheMinute" %>
 <% content_for :viewport, "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" %>
 <% content_for :body_class, "testing" %>
 <% content_for :focus_mode, true %>
@@ -23,11 +23,13 @@
   <header class="test__bar">
     <%# A level's practice shows the best to beat, and a head to head the challenger's score, celebrating passing it %>
     <span class="test__tally">
-      <%# The score, then how many are right (a review's number is how many are right: it has no clock) %>
-      <span class="test__score" data-test-target="score" aria-label="<%= @mode == "review" ? "Right" : "Score" %>">0</span>
-      <% unless @mode == "review" %>
-        <span class="test__right"><span data-test-target="right">0</span> right</span>
-      <% end %>
+      <%# The score and how many are right, side by side (a review's one number is how many are right: it has no clock) %>
+      <span class="test__counts">
+        <span class="test__count"><span class="test__score" data-test-target="score" aria-label="<%= @mode == "review" ? "Right" : "Score" %>">0</span><span class="test__count-label"><%= @mode == "review" ? "right" : "score" %></span></span>
+        <% unless @mode == "review" %>
+          <span class="test__count"><span class="test__right" data-test-target="right" aria-label="Right">0</span><span class="test__count-label">right</span></span>
+        <% end %>
+      </span>
       <%# Right answers in a row multiply the score: ×2, ×3, ×4 %>
       <span class="test__combo" data-test-target="combo" aria-live="polite" hidden></span>
       <% if @best.positive? %><span class="test__best" data-test-target="best"><%= @mode == "head_to_head" ? "Beat" : "Best" %> <%= @best %></span><% end %>

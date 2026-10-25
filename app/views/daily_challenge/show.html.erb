@@ -1,7 +1,19 @@
-<% content_for :title, "Daily challenge · MatheMinute" %>
+<% content_for :title, "Daily Tables Test · MatheMinute" %>
 
 <main class="page daily-challenge">
   <%= link_to "← Home", root_path, class: "back-link" %>
-  <h1 class="heading"><%= icon(:target) %> Daily challenge</h1>
-  <p class="aside">Coming soon!</p>
+  <h1 class="heading"><%= icon(:target) %> Daily Tables Test</h1>
+  <p class="aside">#<%= @daily_test.number %> · <%= l(@daily_test.day, format: :long) %></p>
+  <%= render "flash" %>
+
+  <% if @attempt %>
+    <%= render "daily_challenge/standing", attempt: @attempt %>
+    <p class="hint hint--centre">A new test tomorrow.</p>
+  <% else %>
+    <%= link_to "Play today's test", play_path(DailyTest::TOPIC.slug, daily: 1), class: "button button--start button--wide" %>
+    <p class="hint hint--centre">Times tables 2 to 12. Everyone gets the same questions today, and one go each.</p>
+    <% if (players = @daily_test.players).positive? %>
+      <p class="aside"><%= pluralize(players, "player") %> so far today</p>
+    <% end %>
+  <% end %>
 </main>

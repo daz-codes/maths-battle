@@ -21,8 +21,6 @@ module IconsHelper
     mixed: %(<path d="M3 7h3.5c4.5 0 6.5 10 11 10H21M3 17h3.5c1.6 0 2.8-1.3 3.8-3M13.7 10c1-1.7 2.2-3 3.8-3H21" #{LINE}/><path d="M18 4l3 3-3 3M18 14l3 3-3 3" #{LINE}/>),
     book: %(<path d="M12 6.5C9.5 4.5 6 4.2 3 5v13.5c3-.8 6.5-.5 9 1.5 2.5-2 6-2.3 9-1.5V5c-3-.8-6.5-.5-9 1.5zM12 6.5V20" #{LINE}/>),
     bulb: %(<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z" #{LINE}/>),
-    # Zzz: right, but sleepy
-    slow: %(<path d="M2.5 11h7l-7 9.5h7M12 5.5h5.5L12 13h5.5M18.5 1.8h3.5l-3.5 4.7H22" #{LINE}/>),
     bell: %(<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4" #{LINE}/>),
     # Power-ups (freeze, lightning and mixed, for Scramble, are above and below)
     shield: %(<path d="M12 2.5 4 5.5v6c0 4.8 3.4 8.6 8 10 4.6-1.4 8-5.2 8-10v-6z" fill="var(--blue)"/><path d="M8.5 12l2.5 2.5 4.5-5" fill="none" stroke="var(--on-neon, #1d1e17)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>),

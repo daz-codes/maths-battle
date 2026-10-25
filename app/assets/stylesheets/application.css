@@ -1235,26 +1235,12 @@ body.testing {
   transform: rotate(-2deg);
 }
 
-/* The score sits inside a big copy of the logo's ring of four neon quarters */
+/* A big score, then how many were right */
 .result { display: grid; justify-items: center; gap: 0.75rem; width: 100%; }
+.result__right { display: block; font-size: clamp(1.5rem, 7vw, 2rem); font-weight: 700; }
 
-.result__ring {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: min(17rem, 78vw);
-  aspect-ratio: 1;
-}
-
-.result__clock {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--blue) var(--glow-strength), transparent));
-}
-
-.result__score { position: relative; margin: 0; font-size: 1.15rem; font-weight: 600; }
+.result__score { margin: 0; font-size: 1.15rem; font-weight: 600; text-align: center; }
+.slow-time { background: color-mix(in srgb, var(--yellow) 30%, transparent); }
 
 .card__number {
   display: block;
@@ -1384,7 +1370,10 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .question-previous--right { color: var(--green); } }
 
 /* How many are right so far, under the score */
-.test__right { color: var(--muted); font-size: 0.85rem; font-weight: 800; white-space: nowrap; }
+.test__counts { display: flex; gap: 0.6rem; }
+.test__count { display: flex; flex-direction: column; align-items: center; }
+.test__count .test__score, .test__count .test__right { padding: 0 0.15rem; font-size: clamp(1.6rem, 7vw, 2.1rem); font-weight: 700; line-height: 1; }
+.test__count-label { color: var(--muted); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .test__rival .icon { width: 0.9em; height: 0.9em; margin-left: 0.1em; vertical-align: -0.1em; }
 
 /* Power-ups in a Power game: the one held, to tap; news of what's hit whom; and each one's effect on the player
@@ -1413,15 +1402,21 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 
 /* Home: the greeting with the streak small beside it, then the three ways to play */
 .greeting__hello { margin: 0; font: inherit; }
-.greeting .streak { display: inline-flex; flex-direction: row; align-items: center; gap: 0.1rem; margin: 0; color: var(--muted); font-size: 1.3rem; font-weight: 800; letter-spacing: 0; }
+/* The flame as tall as the avatar beside the greeting */
+.greeting .streak { display: inline-flex; flex-direction: row; align-items: center; gap: 0.1rem; margin: 0; color: var(--muted); font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; }
 .greeting .streak--done { color: var(--ink); }
-.greeting .streak .streak__flame { width: 1.2em; height: 1.2em; margin: 0; vertical-align: 0; }
+.greeting .streak .streak__flame { width: 4.3rem; height: 4.3rem; margin: -0.35rem -0.5rem -0.35rem -0.35rem; vertical-align: 0; }
 .home-actions { display: grid; gap: 0.9rem; width: var(--panel-width); }
 .home-action { flex-direction: column; gap: 0.15rem; min-height: 4.5rem; font-size: clamp(1.4rem, 6.5vw, 1.75rem); }
 .home-action__label { display: inline-flex; align-items: center; gap: 0.5rem; }
 .home-action .icon { width: 1.1em; height: 1.1em; }
-.home-action--challenge { --fill: var(--pink-deep); --glow: var(--pink); }
-.home-action--practice { --fill: var(--blue-deep); --glow: var(--blue); }
-.home-action--compete { --fill: var(--green-deep); --glow: var(--green); }
+/* Quiet, off-white buttons; their icons keep their colour */
+.home-action { --fill: var(--paper-alt); --glow: transparent; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); box-shadow: none; color: var(--ink); font-weight: 700; text-shadow: none; text-transform: none; }
+.home-action:hover { --fill: color-mix(in srgb, var(--ink) 6%, var(--paper-alt)); }
+.home-action .button__note { color: var(--muted); }
 .live-topic { display: grid; gap: 0.5rem; }
 .live-topic .button { justify-self: center; }
+
+/* The Daily Tables Test: today's score and where it stands among everyone's */
+.daily-challenge, .daily-standing { display: grid; justify-items: center; gap: 0.75rem; width: 100%; }
+.daily-standing__score { margin: 0; text-align: center; }

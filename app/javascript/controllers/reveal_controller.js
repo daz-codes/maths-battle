@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { celebrating } from "lib/celebrations"
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 const FIRST_AFTER = 400
@@ -12,12 +13,13 @@ const CENTRE = "translate(-50%, -50%) perspective(800px)"
 // The results page's news, one after another: a new best, level up or stars, then each new award. Each spins in
 // big in the middle of the screen, like a coin, then flies back to where it sits. A copy does the spinning, fixed
 // to the middle of the screen, so the page settling around it doesn't matter; where the real one sits is
-// measured just before the copy flies back to it. Nothing moves for anyone whose device asks for less motion
+// measured just before the copy flies back to it. Nothing moves for anyone whose device asks for less motion, or
+// once the result has been shown before (lib/celebrations)
 export default class extends Controller {
   static targets = [ "item" ]
 
   connect() {
-    if (reducedMotion.matches || !this.element.animate) return
+    if (reducedMotion.matches || !this.element.animate || !celebrating(this.element)) return
 
     this.timers = this.itemTargets.map((item, i) => {
       item.style.visibility = "hidden"

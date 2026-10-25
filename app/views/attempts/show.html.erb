@@ -1,6 +1,6 @@
 <% content_for :title, "#{@attempt.review? ? "#{@attempt.correct} of #{@attempt.answered} right" : "Scored #{number_with_delimiter @attempt.score}!"} · MatheMinute" %>
 
-<main class="page results" data-controller="reveal">
+<main class="page results" data-controller="reveal" data-celebration-id="attempt-<%= @attempt.id %>">
   <%# Beating a best is the big one: wave after wave of confetti, and the fanfare %>
   <% best_beaten = @attempt.practice? && @attempt.new_high_score && @attempt.previous_best.positive? %>
   <% if @attempt.levelled_up %>
@@ -70,6 +70,15 @@
     <div class="results__actions results__actions--one">
       <%= button_to safe_join([ icon(:lightning), " Play live again" ]), live_games_path, class: "button button--blue button--wide", form_class: "wide-form" %>
     </div>
+  <% elsif @attempt.daily_test? %>
+    <%# Where it stands among everyone's today %>
+    <% standing = @attempt.daily_test.standing_of(@attempt) %>
+    <p class="banner banner--group" <%= "data-controller=confetti" if standing.top_percent <= 10 && standing.players > 1 %>><%= icon(:target) %> <%= daily_standing_message(standing) %></p>
+    <div class="results__actions">
+      <button type="button" class="button button--share" data-controller="share"
+              data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>
+      <%= link_to "See today's results", challenge_path, class: "button button--blue" %>
+    </div>
   <% elsif @attempt.review? %>
     <%# Nothing to share without a clock: on to the mistakes still left, or back to practice %>
     <% topic = @attempt.topic_module %>
@@ -110,10 +119,10 @@
       <% end %>
       <%# The slow ones after what they are %>
       <% if @attempt.slow_facts.any? %>
-        <p class="hint hint--centre"><%= icon(:slow) %> Right, but slow. Practise these to get quicker.</p>
+        <p class="hint hint--centre">Right, but slow. Practise these to get quicker.</p>
         <ul class="missed__slow-list">
           <% @attempt.slow_facts.each do |fact| %>
-            <li class="missed__slow"><%= fact %> <span title="Right, but slow"><%= icon(:slow, label: "right, but slow") %></span></li>
+            <li class="missed__slow" title="Right, but slow"><%= fact %></li>
           <% end %>
         </ul>
       <% end %>

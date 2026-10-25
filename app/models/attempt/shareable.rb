@@ -10,7 +10,7 @@ module Attempt::Shareable
   end
 
   def share_text(url)
-    [ share_headline, share_stats, emoji_row, url ].compact_blank.join("\n")
+    [ share_headline, (daily_test? ? daily_share_stats : share_stats), emoji_row, url ].compact_blank.join("\n")
   end
 
   def share_title
@@ -29,9 +29,17 @@ module Attempt::Shareable
     "🔥 #{streak} day streak  🏆 Best: #{best_score.to_fs(:delimited)}"
   end
 
+  # The Daily Tables Test's: where it stands today, not a best
+  def daily_share_stats
+    standing = daily_test.standing_of(self)
+    place = standing.top_percent <= 50 ? "Top #{standing.top_percent}%" : "Beat #{standing.beaten_percent}%"
+    "🎯 #{place} today  🔥 #{streak} day streak"
+  end
+
   # "Times tables, level 3" where a topic has levels
   def topic_and_level
-    if daily_challenge? then "#{topic_module.title}, daily challenge"
+    if daily_test? then "Daily Tables Test ##{daily_test.number}"
+    elsif daily_challenge? then "#{topic_module.title}, daily challenge"
     elsif review? then "#{topic_module.title}, review"
     elsif mixed? then "#{topic_module.title}, mixed practice"
     elsif group? then "#{topic_module.title}, level #{level}, group challenge"

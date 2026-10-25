@@ -9,9 +9,10 @@ class Attempt < ApplicationRecord
 
   # A level's practice; mixed practice, mixing every level up to the player's; a review of their recent mistakes;
   # a group challenge's round (Group::Challenge); a head to head's game against one other player (HeadToHead); or a
-  # live game, played at the same time as others (LiveGame). There was a daily challenge (once a day, mixed) until 21 October
+  # live game, played at the same time as others (LiveGame); or the Daily Tables Test, the same for everyone (DailyTest).
+  # There was a daily challenge (once a day, mixed) until 21 October
   # 2026, and its games are kept. Only practice belongs to a level: earning stars and unlocking the next one
-  MODES = %w[ practice challenge mixed review group head_to_head live ]
+  MODES = %w[ practice challenge mixed review group head_to_head live daily ]
 
   validates :topic, inclusion: { in: Topic.keys }
   validates :mode, inclusion: { in: MODES }
@@ -27,6 +28,11 @@ class Attempt < ApplicationRecord
   def group? = mode == "group"
   def head_to_head? = mode == "head_to_head"
   def live? = mode == "live"
+  def daily_test? = mode == "daily"
+
+  def daily_test
+    DailyTest.new(played_on) if daily_test?
+  end
 
   # The live game it was played in
   def live_game

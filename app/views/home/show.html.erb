@@ -18,14 +18,14 @@
   <nav class="home-actions" aria-label="Play">
     <%= link_to challenge_path, class: "button button--wide home-action home-action--challenge" do %>
       <span class="home-action__label"><%= icon(:target) %> Challenge</span>
+      <% if (today = @user.daily_test_on) %>
+        <span class="button__note">Done · <%= daily_standing_message(today.daily_test.standing_of(today)) %></span>
+      <% else %>
+        <span class="button__note">Daily Tables Test</span>
+      <% end %>
     <% end %>
     <%= link_to practice_path, class: "button button--wide home-action home-action--practice" do %>
       <span class="home-action__label"><%= icon(:lightning) %> Practice</span>
-      <% if @user.streak_at_risk? %>
-        <span class="button__note">Don't lose your streak!</span>
-      <% elsif !@user.practised_today? %>
-        <span class="button__note">Play to start a streak</span>
-      <% end %>
     <% end %>
     <%= link_to groups_path, class: "button button--wide home-action home-action--compete" do %>
       <span class="home-action__label"><%= icon(:people) %> Compete</span>

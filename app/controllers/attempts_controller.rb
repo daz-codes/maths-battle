@@ -11,7 +11,7 @@ class AttemptsController < ApplicationController
     head_to_head = HeadToHead.find_by(id: game.head_to_head_id) if game.head_to_head_id
     live_game = LiveGame.find_by(id: game.live_game_id) if game.live_game_id
     attempt = Attempt.record!(user: player, topic: topic_param, level: level_param, results: results, mode: game.mode, round: round,
-      head_to_head: head_to_head, live_game: live_game, **upload_params)
+      head_to_head: head_to_head, live_game: live_game, day: game.day, **upload_params)
     forget_level(attempt.topic_module) if attempt.levelled_up
     render json: { url: attempt_path(attempt) }, status: :created
   rescue Attempt::Invalid => error

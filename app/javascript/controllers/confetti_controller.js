@@ -1,14 +1,18 @@
 import { Controller } from "@hotwired/stimulus"
 import confetti from "canvas-confetti"
+import { celebrating } from "lib/celebrations"
 
 const COLOURS = [ "#efff2e", "#ff5cc6", "#2be4ff", "#5dff7a" ]
 
 // Celebrates a new high score with bursts from both sides. A big one (beating a best) keeps going: wave after
-// wave from the sides, then a shower from the top
+// wave from the sides, then a shower from the top. Only the first time the result's shown (lib/celebrations)
 export default class extends Controller {
   static values = { big: Boolean }
 
   connect() {
+    this.timers = []
+    if (!celebrating(this.element)) return
+
     const burst = (options) => confetti({ colors: COLOURS, disableForReducedMotion: true, ...options })
     const sides = (count) => {
       burst({ particleCount: count, spread: 70, angle: 60, origin: { x: 0, y: 0.7 } })

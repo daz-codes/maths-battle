@@ -1,14 +1,11 @@
-<%# The result as shared: the score inside the logo's ring of four neon quarters, how many were right, then streak
-    and best. A review has no clock or best, so it's just how many were right. Nothing about who the player is %>
+<%# The result as shared: a big score and how many were right, then streak and best. A review has no clock or best,
+    so it's just how many were right. Nothing about who the player is %>
 <section class="result">
   <p class="label"><%= topic_icon(attempt.topic_module) %> <%= attempt.topic_and_level %></p>
-  <div class="result__ring">
-    <%= render "clock", hands: false, class: "result__clock" %>
-    <% if attempt.review? %>
-      <p class="result__score"><span class="card__number"><%= attempt.correct %></span> of <%= attempt.answered %> right</p>
-    <% else %>
-      <p class="result__score"><span class="card__number"><%= number_with_delimiter attempt.score %></span> <%= attempt.correct %> right in a minute</p>
-    <% end %>
-  </div>
-  <p class="result__stats"><%= icon(:flame) %> <%= attempt.streak %> day streak<% unless attempt.review? %> · <%= icon(:trophy) %> Best: <%= number_with_delimiter attempt.best_score %><% end %></p>
+  <% if attempt.review? %>
+    <p class="result__score"><span class="card__number"><%= attempt.correct %></span> of <%= attempt.answered %> right</p>
+  <% else %>
+    <p class="result__score"><span class="card__number"><%= number_with_delimiter attempt.score %></span> <span class="result__right"><%= attempt.correct %> right</span></p>
+  <% end %>
+  <p class="result__stats"><%= icon(:flame) %> <%= attempt.streak %> day streak<% unless attempt.review? || attempt.daily_test? %> · <%= icon(:trophy) %> Best: <%= number_with_delimiter attempt.best_score %><% end %></p>
 </section>

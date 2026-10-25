@@ -30,7 +30,8 @@ module Attempt::Recordable
     # Mixed games are issued at the highest level. That signed level stays valid if an offline upload
     # arrives after another game has unlocked a new one. A group game is at whatever level its challenge set,
     # unlocked or not, for one of the challenge's players, and a head to head or live game at its level, for its players
-    def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil, mode: "practice", round: nil, head_to_head: nil, live_game: nil)
+    # The Daily Tables Test's game must be saved on the day it was for, one a day
+    def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil, mode: "practice", round: nil, head_to_head: nil, live_game: nil, day: nil)
       if existing = already_recorded(user, client_id)
         return existing
       end
@@ -40,6 +41,7 @@ module Attempt::Recordable
       when "group" then check_round(user, round, topic_module, level)
       when "head_to_head" then check_head_to_head(user, head_to_head, topic_module, level)
       when "live" then check_live_game(user, live_game, topic_module, level)
+      when "daily" then check_daily_test(topic_module, level)
       else check_unlocked(user, topic_module, level)
       end
       raise Invalid, "Only a group game has a round" if round && mode != "group"
@@ -48,7 +50,7 @@ module Attempt::Recordable
       cleaned = clean_results(topic_module, level, results, mode)
       raise Invalid, "Answer at least one question to finish the daily challenge" if mode == "challenge" && cleaned.empty?
 
-      create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, live_game:, results: cleaned)
+      create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, live_game:, day:, results: cleaned)
     rescue ActiveRecord::RecordNotUnique
       already_recorded(user, client_id) || raise
     end
@@ -58,11 +60,13 @@ module Attempt::Recordable
         user.attempts.find_by(client_id: client_id) if client_id.present?
       end
 
-      def create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, live_game:, results:)
+      def create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, live_game:, day:, results:)
         transaction do
           user.lock!
           played_at = play_time(played_at)
-          raise Invalid, "Today's daily challenge is already done" if mode == "challenge" && user.daily_challenge_on(topic_named(topic), played_at.in_time_zone(user.time_zone).to_date)
+          played_on = played_at.in_time_zone(user.time_zone).to_date
+          raise Invalid, "Today's daily challenge is already done" if mode == "challenge" && user.daily_challenge_on(topic_named(topic), played_on)
+          check_daily_test_day(user, day, played_on) if mode == "daily"
 
           user.attempts.create!(topic: topic, level: level, results: results, client_id: client_id.presence, played_at: played_at, mode: mode, round: round)
             .tap { |attempt| head_to_head&.played(attempt) }
@@ -88,6 +92,15 @@ module Attempt::Recordable
         raise Invalid, "Only its players can play a live game" unless live_game.player?(user)
         raise Invalid, "That live game hasn't started" unless live_game.started?
         raise Invalid, "Bad question" unless live_game.topic_module == topic && live_game.level == level
+      end
+
+      def check_daily_test(topic, level)
+        raise Invalid, "Bad question" unless topic == DailyTest::TOPIC && level == DailyTest::LEVEL
+      end
+
+      def check_daily_test_day(user, day, played_on)
+        raise Invalid, "That Daily Tables Test was for another day" unless day.to_s == played_on.iso8601
+        raise Invalid, "Today's Daily Tables Test is already done" if user.daily_test_on(played_on)
       end
 
       def check_unlocked(user, topic, level)
@@ -147,7 +160,7 @@ module Attempt::Recordable
     # Best in this topic and level, the score and how many were right: a good times tables score shouldn't make
     # equations look bad. Kept on the attempt as they stood then, like the streak, so a shared result doesn't change later
     def record_high_score
-      no_best = review? || group? || head_to_head? || live? || mixed? # mistakes, rivals or a mix: no score to beat
+      no_best = review? || group? || head_to_head? || live? || daily_test? || mixed? # mistakes, rivals or a mix: no score to beat
       best_before =
         if daily_challenge? then user.best_daily_challenge(topic_module)
         elsif no_best then Float::INFINITY
