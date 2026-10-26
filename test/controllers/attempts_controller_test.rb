@@ -98,6 +98,15 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/freeze/i, response.body.gsub(/<[^>]+>/, ""))
   end
 
+  test "results go back to where the game was played from: Practice, to change level or topic" do
+    get attempt_path(record_tables_game(@user, answers([ 7, 8, 56 ])))
+    assert_select "a.back-link[href=?]", practice_path, text: "← Practice"
+
+    daily = Attempt.record!(user: @user, topic: "times_tables", level: 2, mode: "daily", day: @user.today.iso8601, results: answers([ 7, 8, 56 ]))
+    get attempt_path(daily)
+    assert_select "a.back-link[href=?]", challenge_path, text: "← Daily Challenge"
+  end
+
   test "results page shows the score, feedback and missed facts" do
     attempt = record_tables_game(@user, answers([ 7, 8, 54 ], [ 6, 7, 42 ], [ 3, 3, 9 ]))
 

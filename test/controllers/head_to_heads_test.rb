@@ -123,6 +123,7 @@ class HeadToHeadsTest < ActionDispatch::IntegrationTest
     assert_equal @bob, head_to_head.winner
 
     get attempt_path(game)
+    assert_select "a.back-link[href=?]", groups_path, text: "← Compete"
     assert_select ".banner--group", text: "You won 160–80"
     assert_select "a[href=?]", head_to_head_path(head_to_head), text: "See the head to head"
 

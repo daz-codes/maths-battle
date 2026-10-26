@@ -41,7 +41,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".site-header .tagline", text: "Improve your math in minutes"
     assert_select ".greeting .streak", text: "0"
     assert_select ".home-actions a.button", 3
-    assert_select ".home-actions a[href=?]", challenge_path, text: /Challenge\s+Daily Tables Test/
+    assert_select ".home-actions a[href=?]", challenge_path, text: /Daily Challenge\s+Daily Tables Test/
     assert_select ".home-actions a[href=?]", practice_path, text: "Practice"
     assert_select ".home-actions a[href=?]", groups_path, text: "Compete"
     assert_select "a.button--play", count: 0, message: "playing is on Practice"

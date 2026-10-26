@@ -23,6 +23,8 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     assert_select ".home-action--challenge .button__note", text: "Daily Tables Test"
     get challenge_path
     assert_select "h1", text: /Daily Tables Test/
+    assert_select ".stats", count: 0, message: "no stats before a first test"
+    assert_select "button.button--share", count: 0
     assert_select "a.button[href=?]", play_path("times-tables", daily: 1), text: "Play today's test"
     assert_select ".aside", text: "3 players so far today"
 
@@ -44,11 +46,26 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     assert_select ".daily-standing .card__number", text: game.score.to_s
     assert_select ".daily-standing .aside", text: "1st of 4 players so far today"
     assert_select "a.button", text: "Play today's test", count: 0
+    assert_select "button.button--share[data-share-text-value*=?]", "🎯 Top 25% today", text: "Share", message: "always there once it's played"
+    assert_match /Best score\s+#{game.score}/, css_select(".stats div").map { _1.text.squish }.join(" · ")
+    assert_match /Tests played\s*1/, css_select(".stats div").map { _1.text.squish }.join(" · ")
     get root_path
     assert_select ".home-action--challenge .button__note", text: "Done · Top score today!"
 
     get play_path("times-tables", daily: 1)
     assert_redirected_to challenge_path, "one go a day"
+  end
+
+  test "stats from every Daily Tables Test played: the best, the average, and how many" do
+    scores = [ 3, 9 ].map.with_index do |right, ago|
+      Attempt.record!(user: @ada, topic: "times_tables", level: 2, mode: "daily", day: (Date.current - ago - 1).iso8601,
+        played_at: (Time.current - (ago + 1).days).iso8601, results: Array.new(right) { { a: 2, b: 3, given: 6, ms: 1000 } }).score
+    end
+    get challenge_path
+    assert_match /Best score\s+#{scores.max}/, css_select(".stats div").map { _1.text.squish }.join(" · ")
+    assert_match /Average score\s*#{(scores.sum / 2.0).round}/, css_select(".stats div").map { _1.text.squish }.join(" · ")
+    assert_match /Tests played\s*2/, css_select(".stats div").map { _1.text.squish }.join(" · ")
+    assert_select "a.button", text: "Play today's test"
   end
 
   test "the top half hear their top percentage, then how many they beat, and last place that there's always tomorrow" do

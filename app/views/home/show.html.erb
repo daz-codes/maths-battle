@@ -17,7 +17,7 @@
 
   <nav class="home-actions" aria-label="Play">
     <%= link_to challenge_path, class: "button button--wide home-action home-action--challenge" do %>
-      <span class="home-action__label"><%= icon(:target) %> Challenge</span>
+      <span class="home-action__label"><%= icon(:target) %> Daily Challenge</span>
       <% if (today = @user.daily_test_on) %>
         <span class="button__note">Done · <%= daily_standing_message(today.daily_test.standing_of(today)) %></span>
       <% else %>

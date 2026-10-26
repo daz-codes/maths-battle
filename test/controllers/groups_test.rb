@@ -122,6 +122,7 @@ class GroupsTest < ActionDispatch::IntegrationTest
     assert_equal [ "group", challenge.round ], [ game.mode, game.round ]
 
     get attempt_path(game)
+    assert_select "a.back-link[href=?]", group_path(@group), text: "← Class 4B"
     assert_select ".banner--group", text: "You're 1st of 1 in Class 4B"
     assert_select "a[href=?]", group_challenge_path(@group, challenge), text: "See the leaderboard"
 

@@ -1,6 +1,7 @@
 <% content_for :title, "#{@attempt.review? ? "#{@attempt.correct} of #{@attempt.answered} right" : "Scored #{number_with_delimiter @attempt.score}!"} · MatheMinute" %>
 
 <main class="page results" data-controller="reveal" data-celebration-id="attempt-<%= @attempt.id %>">
+  <%= results_back_link(@attempt) %>
   <%# Beating a best is the big one: wave after wave of confetti, and the fanfare %>
   <% best_beaten = @attempt.practice? && @attempt.new_high_score && @attempt.previous_best.positive? %>
   <% if @attempt.levelled_up %>
