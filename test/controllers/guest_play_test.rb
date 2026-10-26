@@ -32,15 +32,15 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
     assert_equal 6, User.last.best_correct(TimesTables, 1)
   end
 
-  test "a visitor's footer offers sign in and sign up beside their picture, then home, awards and stats" do
+  test "a visitor can sign in or save progress, and the navigation keeps the main destinations" do
     choose_topic
     get root_path
 
-    assert_select ".site-footer a.site-footer__player[aria-label=Settings][href=?]", edit_profile_path
-    assert_select ".site-footer .site-footer__auth a[href=?]", new_session_path, text: "Sign in"
-    assert_select ".site-footer .site-footer__auth a[href=?]", new_registration_path, text: "Sign up"
-    assert_select ".site-footer > a", 3
-    assert_select ".site-footer > a:first-of-type[href=?]", root_path, text: "Home"
+    assert_select ".site-header a.ui-profile[aria-label=Settings][href=?]", edit_profile_path
+    assert_select ".site-header a[href=?]", new_session_path, text: "Sign in"
+    assert_select ".save-nudge a[href=?]", new_registration_path, text: "Save your progress"
+    assert_select ".site-footer nav > a", 5
+    assert_select ".site-footer nav > a:first-of-type[href=?]", root_path, text: "Home"
   end
 
   test "visiting pages doesn't create guests" do

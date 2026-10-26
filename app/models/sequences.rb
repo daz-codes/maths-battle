@@ -1,15 +1,18 @@
 # The sequences topic: five terms, and the next to find, by spotting the pattern. First linear (the same step each
 # time, up or down), then quadratic (the step grows by the same each time, as square numbers do), then geometric
 # (multiplying each time, or halving), then Fibonacci style (each term the two before added), then two-step (two
-# steps taking turns). Every answer is a whole number, and every question has one answer: five terms are shown,
-# and a question that another kind of sequence would continue differently is never asked (Patternz, the daily
-# challenge, mixes them all, so the kind has to be spotted too)
+# steps taking turns). Every answer is a whole number, and every question has one answer: five terms are shown (5
+# to 7 for two steps, so the next isn't always the first step), and a question that another kind of sequence would
+# continue differently is never asked (Patternz, the daily challenge, mixes them all, so the kind has to be
+# spotted too)
 module Sequences
   TOPIC = "sequences"
   SLUG = "sequences"
   NAME = "Sequences"
   EMOJI = "🔢"
   SHOWN = 5
+  # Two steps taking turns show a varied number of terms (n), so the next step could be either; 6 is most often
+  TWO_STEP_SHOWN = [ 5, 6, 6, 7 ]
 
   # Each kind of sequence is a "fact": accuracy and speed are tracked per kind, and the weighting picks kinds.
   # a, b and c describe the sequence, as each kind says
@@ -139,10 +142,15 @@ module Sequences
     terms(question).last
   end
 
-  # The five shown, then the next
+  # How many are shown: five, or for two steps, as many as the question says
+  def shown(question)
+    question[:type] == "alternate" && question[:n].to_i.positive? ? question[:n].to_i : SHOWN
+  end
+
+  # The ones shown, then the next
   def terms(question)
     a, b, c = question.values_at(:a, :b, :c)
-    count = SHOWN + 1
+    count = shown(question) + 1
     case question[:type]
     when "add" then Array.new(count) { |i| a + b * i }
     when "subtract" then Array.new(count) { |i| a - b * i }
@@ -165,10 +173,10 @@ module Sequences
       type = result["type"]
       raise Attempt::Invalid, "Bad question" unless TYPES.key?(type)
 
-      a, b, c = result.values_at("a", "b", "c").map { |number| number.nil? ? 0 : Integer(number, exception: false) }
-      raise Attempt::Invalid, "Bad question" unless a && b && c
+      a, b, c, n = result.values_at("a", "b", "c", "n").map { |number| number.nil? ? 0 : Integer(number, exception: false) }
+      raise Attempt::Invalid, "Bad question" unless a && b && c && n
 
-      { type: type, a: a, b: b, c: c }
+      { type: type, a: a, b: b, c: c, n: (n if n.positive?) }.compact
     end
 
     # Numbers its kind could use, before checking it has one answer
@@ -183,7 +191,7 @@ module Sequences
       when "times" then { b: (ratio = RATIOS.sample(random: random)), a: pick[1..(MOST / ratio**SHOWN).clamp(1, 5)], c: 0 }
       when "halve" then { a: 2**SHOWN * pick[1..9], b: 0, c: 0 }
       when "fibonacci" then { a: pick[1..9], b: pick[1..12], c: 0 }
-      when "alternate" then { a: pick[1..20], b: pick[1..12], c: pick[-6..12] }
+      when "alternate" then { a: pick[1..20], b: pick[1..12], c: pick[-6..12], n: TWO_STEP_SHOWN.sample(random: random) }
       end
     end
 
@@ -199,9 +207,10 @@ module Sequences
       when "times" then RATIOS.include?(b) && a.between?(1, 5) && a * b**SHOWN <= MOST && c.zero?
       when "halve" then (a % 2**SHOWN).zero? && (a / 2**SHOWN).between?(1, 9) && b.zero? && c.zero?
       when "fibonacci" then a.between?(1, 9) && b.between?(1, 12) && c.zero?
-      when "alternate" then a.between?(1, 20) && b.between?(1, 12) && c.between?(-6, 12) && !c.zero? && c != b
+      when "alternate" then a.between?(1, 20) && b.between?(1, 12) && c.between?(-6, 12) && !c.zero? && c != b && (question[:n].to_i.zero? || TWO_STEP_SHOWN.include?(question[:n]))
       end
-      fits && (terms = terms(question)).all?(&:positive?) && one_answer?(terms.first(SHOWN), terms.last)
+      fits &&= question[:n].to_i.zero? || question[:type] == "alternate"
+      fits && (terms = terms(question)).all?(&:positive?) && one_answer?(terms.first(shown(question)), terms.last)
     end
 
     # Every kind of sequence the shown terms fit continues them the same way
@@ -224,6 +233,6 @@ module Sequences
     end
 
     def written(question)
-      "#{terms(question).first(SHOWN).join(", ")}, …"
+      "#{terms(question).first(shown(question)).join(", ")}, …"
     end
 end

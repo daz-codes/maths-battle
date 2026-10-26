@@ -1,51 +1,62 @@
-<% content_for :tagline, "Improve your #{maths} in minutes" %>
+<% content_for :title, "Your next minute · MatheMinute" %>
+<% daily_tests = DailyTest.on(@user.today) %>
+<% completed = daily_tests.count { |test| @user.daily_game(test) } %>
+<% all_done = completed == daily_tests.size %>
 
-<main class="page home">
+<main class="page home ui-home">
   <%= render "flash" %>
 
-  <%# The greeting, with the streak small beside it %>
-  <div class="greeting">
-    <% if @user.display_name %>
-      <%= link_to edit_profile_path, class: "greeting__avatar", aria: { label: "Settings" } do %>
-        <%= render "avatar", user: @user, size: "greeting" %>
-      <% end %>
-      <h1 class="greeting__hello">Hi <%= @user.display_name %>!</h1>
-    <% end %>
-    <span class="streak <%= "streak--done" if @user.practised_today? %>" aria-label="<%= @user.streak %> day streak"
-          title="<%= @user.streak %> day streak"><%= icon(:flame, class: "streak__flame") %><%= @user.streak %></span>
+  <div class="ui-welcome">
+    <div>
+      <p class="ui-eyebrow"><%= @user.display_name ? "Hi #{@user.display_name}! Ready for another round?" : "Your next personal best starts here" %></p>
+      <h1 class="ui-home__heading">
+        One minute.<br><span>All in.</span>
+      </h1>
+    </div>
+    <div class="streak ui-streak" aria-label="<%= @user.streak %> day streak">
+      <%= icon(:flame) %><strong><%= @user.streak %></strong><span>day streak</span>
+    </div>
   </div>
 
-  <nav class="home-actions" aria-label="Play">
-    <%= link_to challenge_path, class: "button button--wide home-action home-action--challenge" do %>
-      <span class="home-action__label"><%= icon(:target) %> Daily Challenge</span>
-      <% done = DailyTest.on(@user.today).count { @user.daily_game(_1) } %>
-      <span class="button__note"><%= { 0 => DailyTest::KINDS.values.map { _1[:name] }.join(" · "), DailyTest::KINDS.size => "All done for today" }.fetch(done) { "#{done} of #{DailyTest::KINDS.size} done today" } %></span>
+  <nav class="home-actions ui-actions" aria-label="Play">
+    <%= link_to challenge_path, class: "button home-action home-action--challenge ui-daily" do %>
+      <span class="ui-daily__info">
+        <span class="ui-eyebrow"><span class="ui-live-dot" aria-hidden="true"></span> Today's main event</span>
+        <span class="home-action__label">Daily Challenge</span>
+        <span class="ui-daily__description">Pick a daily game. Same questions.<br>See how you stack up.</span>
+        <span class="ui-daily__meta"><span>60 seconds</span><span>One go per game</span></span>
+        <span class="ui-daily__cta"><%= all_done ? "See your results" : "Let's play" %> <span aria-hidden="true">↗</span></span>
+        <span class="ui-daily__edition"><%= completed.positive? ? "#{completed} of #{daily_tests.size} done today" : daily_tests.map(&:name).join(" · ") %> · <%= @user.today.strftime("%a, %-d %b") %></span>
+      </span>
+      <%= render "home/daily_art" %>
     <% end %>
-    <%= link_to practice_path, class: "button button--wide home-action home-action--practice" do %>
-      <span class="home-action__label"><%= icon(:lightning) %> Practice</span>
+
+    <%= link_to practice_path, class: "button home-action home-action--practice ui-secondary" do %>
+      <span class="ui-secondary__top"><span class="ui-secondary__icon"><%= icon(:lightning) %></span><span class="ui-secondary__arrow" aria-hidden="true">↗</span></span>
+      <span class="home-action__label">Practice</span>
+      <span class="ui-secondary__description"><%= Topic::ALL.size %> topics. Your pace.<br>Keep chasing your best.</span>
     <% end %>
-    <%= link_to groups_path, class: "button button--wide home-action home-action--compete" do %>
-      <span class="home-action__label"><%= icon(:people) %> Compete</span>
+    <%= link_to groups_path, class: "button home-action home-action--compete ui-secondary" do %>
+      <span class="ui-secondary__top"><span class="ui-secondary__icon"><%= icon(:people) %></span><span class="ui-secondary__arrow" aria-hidden="true">↗</span></span>
+      <span class="home-action__label">Compete</span>
+      <span class="ui-secondary__description">Bring your friends.<br>Give them a score to beat.</span>
     <% end %>
   </nav>
 
   <%= render "head_to_heads/to_play", user: @user %>
   <%= render "groups/to_play", user: @user %>
 
-  <%# The bests across every game: the best score from one, and the longest streak %>
-  <% if @user.persisted? %>
+  <section class="ui-progress" aria-labelledby="ui-progress-heading">
+    <div class="ui-section-heading"><h2 id="ui-progress-heading">Your personal scoreboard</h2><%= link_to "All stats ↗", stats_path %></div>
     <dl class="stats">
-      <div><dt>Best score</dt><dd><%= icon(:trophy) %> <%= number_with_delimiter @user.best_score %></dd></div>
-      <div><dt>Longest streak</dt><dd><%= icon(:flame) %> <%= @user.longest_streak %></dd></div>
+      <div><dt>Personal best</dt><dd><%= @user.persisted? ? number_with_delimiter(@user.best_score) : "—" %><span class="ui-stat-caption">A score worth chasing</span></dd></div>
+      <div><dt>Longest streak</dt><dd><%= @user.persisted? ? @user.longest_streak : 0 %><span class="ui-stat-unit"> <%= "day".pluralize(@user.longest_streak) %></span><span class="ui-stat-caption">Little by little, every day</span></dd></div>
     </dl>
-  <% end %>
+  </section>
 
-  <% if @user.guest? && @user.persisted? %>
-    <p class="save-nudge">
-      Your streak is only saved on this device.
-      <%= link_to "Make an account", new_registration_path %> to keep it safe.
-    </p>
+  <p class="ui-home__footnote">A minute to play. A reason to come back.</p>
+  <% if @user.guest? %>
+    <p class="save-nudge">No account needed to play. <%= link_to "Save your progress", new_registration_path %> to keep your scores across devices.</p>
   <% end %>
-
   <%= render "install" %>
 </main>

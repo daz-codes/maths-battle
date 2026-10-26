@@ -70,13 +70,13 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
 
     @user.update!(name: "Ada")
     get root_path
-    assert_select ".greeting img.avatar"
+    assert_select ".site-header img.avatar"
   end
 
   test "without a picture the home page shows a letter" do
     @user.update!(name: "Ada")
     get root_path
-    assert_select ".greeting .avatar--letter", text: "A"
+    assert_select ".site-header .avatar--letter", text: "A"
   end
 
   test "registered players sign out from settings" do
@@ -84,12 +84,11 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?] button", session_path, text: "Sign out"
   end
 
-  test "the footer shows the player and links to settings and stats" do
+  test "the header links the player's avatar to settings and the footer keeps the main destinations" do
     get root_path
-    assert_select ".site-footer a.site-footer__player[href=?][aria-label=Settings]", edit_profile_path
-    assert_select ".site-footer a.site-footer__name[href=?]", edit_profile_path, text: "ada"
+    assert_select ".site-header a.ui-profile[href=?][aria-label=Settings]", edit_profile_path
     assert_select ".site-footer .site-footer__gems", count: 0
-    assert_select ".site-footer a.site-footer__player .avatar"
+    assert_select ".site-header a.ui-profile .avatar"
     assert_select ".site-footer a.site-footer__stats[href=?] svg.icon--stats", stats_path
     assert_select ".site-footer a.site-footer__home[href=?]", root_path, text: "Home"
     assert_select ".site-footer a.site-footer__home svg.footer-icon"

@@ -43,8 +43,9 @@ sequentially because concurrent browser workers can contend for SQLite writes.
 ## Application flow
 
 A new player picks a topic first; on a new device it's the one last played.
-Home (the current topic, changed on its own page with progress in each, then the streak with Play under it)
-→ play the level picked, or learn it, or mixed practice → score and practice feedback → stats or play again.
+Home puts the Daily Challenge first, with Practice and Compete alongside it and a personal scoreboard below.
+Practice shows the current topic and level, with topic selection, a worked example, mixed practice and review
+available from there. A finished game leads to its score and feedback, then stats or another game.
 The server generates questions weighted towards facts the player finds difficult. Any game played to the end
 keeps the streak going, and a level's first star unlocks the next level.
 The first saved game creates a guest account; registering preserves that guest's history. Signing into
@@ -117,6 +118,10 @@ so a player's total is the sum of their games.
 The settings page has three parts: about you (picture and name, saved with its button), the game (the topic,
 gems and streak freezes) and app settings (the daily reminder, colours, and sounds and vibration, which save as
 they're changed).
+
+Arcade is the shared design throughout the app. Dark mode uses ink, lime and lilac; light mode uses blue
+and fluorescent orange on pale surfaces. Colours can follow the device or stay light or dark, including
+during games. There is no separate design preview switcher.
 
 ## Groups
 

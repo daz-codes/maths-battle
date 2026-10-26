@@ -20,11 +20,12 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
       day: Date.current.iso8601, results: Array.new(2 + i) { { a: 2, b: 3, given: 6, ms: 3000 } }) }
 
     get root_path
-    assert_select ".home-action--challenge .button__note", text: "Daily Tables Test · Patternz"
+    assert_select ".home-action--challenge .ui-daily__edition", text: /Daily Tables Test · Patternz/
     get challenge_path
     assert_select "h1", text: /Daily Challenge/
-    assert_select ".daily-test h2", text: /Daily Tables Test #\d+/
-    assert_select ".daily-test h2", text: /Patternz #\d+/
+    assert_select "details.daily-test:not([open]) summary .daily-test__name", text: /Daily Tables Test #\d+/, message: "a button to open each"
+    assert_select "details.daily-test summary .daily-test__name", text: /Patternz #\d+/
+    assert_select ".daily-test__status", text: "Not played yet", count: 2
     assert_select ".stats", count: 0, message: "no stats before a first game"
     assert_select "button.button--share", count: 0
     assert_select "a.button[href=?]", play_path("times-tables", daily: "tables"), text: "Play"
@@ -46,6 +47,7 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     assert_select "[data-share-text-value*=?]", "🎯 Top 25% today"
 
     get challenge_path
+    assert_select ".daily-test--tables summary .daily-test__status", text: "Done · Top score today!", message: "what's inside, while it's closed"
     assert_select ".daily-test--tables .daily-standing .card__number", text: game.score.to_s
     assert_select ".daily-test--tables .daily-standing .aside", text: "1st of 4 players so far today"
     assert_select ".daily-test--tables a.button", text: "Play", count: 0
@@ -54,7 +56,7 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     assert_match /Best score\s+#{game.score}/, css_select(".stats div").map { _1.text.squish }.join(" · ")
     assert_match /Played\s*1/, css_select(".stats div").map { _1.text.squish }.join(" · ")
     get root_path
-    assert_select ".home-action--challenge .button__note", text: "1 of 2 done today"
+    assert_select ".home-action--challenge .ui-daily__edition", text: /1 of 2 done today/
 
     get play_path("times-tables", daily: "tables")
     assert_redirected_to challenge_path, "one go a day"

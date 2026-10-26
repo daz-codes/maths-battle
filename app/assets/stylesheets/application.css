@@ -1,75 +1,49 @@
-/*
-  MatheMinute. Warm paper and a dark ink with four neon colours (after Breadboarder's palette, pushed to full neon),
-  thin borders and no drop shadows. The logo is a clock ringed by a minute in four neon quarters; the same
-  clock is the test timer, and the quarter colours run through the app. In dark mode the neon glows.
-*/
+/* Arcade: one responsive game interface, with blue and fluorescent orange in light mode,
+   and ink, lime and lilac in dark mode. The saved theme can also follow the device. */
 
 :root {
-  --yellow: #efff2e;
-  --pink: #ff5cc6;
-  --blue: #2be4ff;
-  --green: #5dff7a;
-  --wrong: #ff2d6f;
-  --pink-text: #e5139a;
-  --on-pink-text: #fff;
-
-  /* A soft dark grey rather than black for the main text */
-  --ink: #3a3b35;
-  --on-neon: #24251f;
-  /* Deeper shades of the neons that white button text can be read on (4.5:1 or better) */
-  --blue-deep: #0078b8;
-  --green-deep: #0c7f37;
-  --pink-deep: #d4148c;
-  --grey-deep: #3d3e38;
-  --muted: #6f7064;
-  --paper: #fffef9;
-  --paper-alt: #f3f2e9;
-  --line: var(--ink);
-  --glow-strength: 0%;
-  /* The trophy: neon yellow is lost on paper, so in light mode it's gold with a brown outline */
-  --trophy: #f5c400;
-  --trophy-outline: #8a5a00;
-
-  --radius: 10px;
-  --radius-big: 16px;
-  --font: "Nunito", ui-rounded, "SF Pro Rounded", ui-sans-serif, system-ui, sans-serif;
-
-  color-scheme: light dark;
+  --paper: #f3f6fb; --paper-alt: #fff; --ink: #152541; --muted: #596a80; --line: #dce3ee;
+  --yellow: #ff7900; --pink: #ff7900; --blue: #2858e8; --green: #2858e8;
+  --blue-deep: #2858e8; --green-deep: #2858e8; --pink-deep: #bd4700; --grey-deep: #263852;
+  --pink-text: #2858e8; --on-pink-text: #fff; --wrong: #ce2d50; --on-neon: #152541;
+  --trophy: #ff7900; --trophy-outline: transparent;
+  --ui-accent: #2858e8; --ui-accent-ink: #fff; --ui-pop: #ff7900;
+  --ui-hero: #2858e8; --ui-hero-ink: #fff; --ui-soft: #eaf0ff; --ui-hero-line: #587cf0;
+  --ui-art-shadow: #b7caff; --ui-grid: #2858e815;
+  --ui-practice-ink: #bd4700; --ui-practice-surface: #fff0e3; --ui-compete-surface: #eaf0ff;
+  --right-text: #2858e8;
+  --font: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --radius: 14px; --radius-big: 20px; --glow-strength: 0%;
+  color-scheme: light;
 }
 
-/* Dark colours: a midnight purple-blue, after Priority's dark mode. Used when chosen in settings,
-   or when following a device set to dark */
 :root[data-theme="dark"] {
-  --ink: #eceef7;
-  --muted: #a5aabe;
-  --paper: #181a32;
-  --paper-alt: #232641;
-  --line: #414563;
-  --grey-deep: #3c405d;
-  --glow-strength: 55%;
-  --pink-text: var(--pink);
-  --on-pink-text: var(--on-neon);
-  --trophy: var(--yellow);
-  --trophy-outline: transparent;
+  --paper: #10121b; --paper-alt: #1b1e2c; --ink: #f5f6fb; --muted: #afb5cc; --line: #34394f;
+  --yellow: #d1f879; --pink: #b59bff; --blue: #b59bff; --green: #d1f879;
+  --blue-deep: #7260b9; --green-deep: #507b25; --pink-deep: #7260b9; --grey-deep: #33394e;
+  --pink-text: #d1f879; --on-pink-text: #14191a; --wrong: #ff8caa; --on-neon: #14191a;
+  --trophy: #d1f879; --trophy-outline: transparent;
+  --ui-accent: #d1f879; --ui-accent-ink: #14191a; --ui-pop: #d1f879;
+  --ui-hero: #222638; --ui-hero-ink: #f5f6fb; --ui-soft: #2a3040; --ui-hero-line: #4c526b;
+  --ui-art-shadow: #9d7bff; --ui-grid: #afb5cc15;
+  --ui-practice-ink: #c1aaff; --ui-practice-surface: #312d4b; --ui-compete-surface: #303a2b;
+  --right-text: #d1f879;
   color-scheme: dark;
 }
 
-
-:root[data-theme="light"] { color-scheme: light; }
-
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ink: #eceef7;
-    --muted: #a5aabe;
-    --paper: #181a32;
-    --paper-alt: #232641;
-    --line: #414563;
-    --grey-deep: #3c405d;
-    --glow-strength: 55%;
-    --pink-text: var(--pink);
-    --on-pink-text: var(--on-neon);
-    --trophy: var(--yellow);
-    --trophy-outline: transparent;
+    --paper: #10121b; --paper-alt: #1b1e2c; --ink: #f5f6fb; --muted: #afb5cc; --line: #34394f;
+    --yellow: #d1f879; --pink: #b59bff; --blue: #b59bff; --green: #d1f879;
+    --blue-deep: #7260b9; --green-deep: #507b25; --pink-deep: #7260b9; --grey-deep: #33394e;
+    --pink-text: #d1f879; --on-pink-text: #14191a; --wrong: #ff8caa; --on-neon: #14191a;
+    --trophy: #d1f879; --trophy-outline: transparent;
+    --ui-accent: #d1f879; --ui-accent-ink: #14191a; --ui-pop: #d1f879;
+    --ui-hero: #222638; --ui-hero-ink: #f5f6fb; --ui-soft: #2a3040; --ui-hero-line: #4c526b;
+    --ui-art-shadow: #9d7bff; --ui-grid: #afb5cc15;
+    --ui-practice-ink: #c1aaff; --ui-practice-surface: #312d4b; --ui-compete-surface: #303a2b;
+    --right-text: #d1f879;
+    color-scheme: dark;
   }
 }
 
@@ -100,7 +74,7 @@ a {
   text-underline-offset: 4px;
 }
 
-/* Text links (and the sign out button, styled as one): green underline and a faint wash on hover.
+/* Text links (and the sign out button, styled as one): accent underline and a faint wash on hover.
    The wash is a touch of ink mixed into the paper, so it's slightly darker in light mode and lighter in dark */
 a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab, .site-footer__name, .badge-summary, .daily-done, .current-topic, .group-card, .challenge-card, .group-waiting, .board-switch__option, .back-link), .link-button {
   margin: 0 -0.2em;
@@ -1422,7 +1396,15 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 .daily-standing__score { margin: 0; text-align: center; }
 
 /* Sequences: five terms and a gap on one line, so smaller, the same size for every question */
-.test--sequences .question--current:not(.question--done) { font-size: clamp(1.5rem, 6.4vw, 2.6rem); letter-spacing: -0.02em; }
-.daily-test { display: grid; justify-items: center; gap: 0.75rem; width: 100%; padding-top: 0.5rem; }
-.daily-test + .daily-test { border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); padding-top: 1.25rem; }
+.test--sequences .question--current:not(.question--done) { max-width: 100%; font-size: clamp(2rem, min(9.5vw, 16cqh), 3.4rem); letter-spacing: -0.02em; line-height: 1.15; text-align: center; text-wrap: balance; white-space: normal; }
+/* Each daily game is a button that opens it: its name and whether it's done, then once open, the rest */
+.daily-test { width: 100%; }
+.daily-test__toggle { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 0.4rem; cursor: pointer; list-style: none; text-align: center; }
+.daily-test__toggle::-webkit-details-marker { display: none; }
+.daily-test__toggle::after { content: "▾"; color: var(--muted); font-size: 1rem; transition: transform 150ms; }
+.daily-test[open] .daily-test__toggle::after { transform: rotate(180deg); }
+.daily-test__name { font-size: 1.25rem; font-weight: 800; }
+.daily-test__name .icon { width: 1.1em; height: 1.1em; vertical-align: -0.15em; }
+.daily-test__status { color: var(--muted); font-size: 0.9rem; font-weight: 700; }
+.daily-test__body { display: grid; justify-items: center; gap: 0.75rem; margin-top: 0.75rem; }
 .daily-test__number { color: var(--muted); font-weight: 700; }

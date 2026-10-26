@@ -1,8 +1,8 @@
 <%# Where a Daily Tables Test game stands among everyone's that day %>
 <% standing = attempt.daily_test.standing_of(attempt) %>
-<section class="daily-standing" aria-label="Today's result" data-celebration-id="attempt-<%= attempt.id %>">
+<section class="daily-standing" aria-label="Today's result">
   <p class="daily-standing__score"><span class="card__number"><%= number_with_delimiter attempt.score %></span> <span class="result__right"><%= attempt.correct %> right</span></p>
-  <p class="banner banner--group" <%= "data-controller=confetti" if standing.top_percent <= 10 && standing.players > 1 %>>
+  <p class="banner banner--group">
     <%= icon(:target) %> <%= daily_standing_message(standing) %>
   </p>
   <p class="aside"><%= standing.rank.ordinalize %> of <%= pluralize(standing.players, "player") %> so far today</p>

@@ -1,33 +1,9 @@
-<%# Fixed to the bottom of every page except the test: who's playing (tap for settings), then
-    home, awards and stats. Compete is one of the home page's three, so it isn't here. Guests get sign in and sign up links in place of a name %>
-<% player = current_player %>
-<footer class="site-footer">
-  <div class="site-footer__start">
-    <%= link_to edit_profile_path, class: "site-footer__player", aria: { label: "Settings" } do %>
-      <%= render "avatar", user: player, size: "small" %>
-    <% end %>
-
-    <span class="site-footer__who">
-      <% if player.guest? %>
-        <span class="site-footer__auth"><%= link_to "Sign in", new_session_path %> · <%= link_to "Sign up", new_registration_path %></span>
-      <% else %>
-        <%= link_to player.username, edit_profile_path, class: "site-footer__name" %>
+<footer class="site-footer ui-navigation">
+  <nav aria-label="Main navigation">
+    <% primary_navigation.each do |label, symbol, path, active| %>
+      <%= link_to path, class: "site-footer__tab site-footer__#{label.downcase}", aria: { current: ("page" if active) } do %>
+        <%= icon(symbol, class: "footer-icon") %><span><%= label %></span>
       <% end %>
-    </span>
-  </div>
-
-  <%= link_to root_path, class: "site-footer__tab site-footer__home" do %>
-    <%= icon(:home, class: "footer-icon") %>
-    <span>Home</span>
-  <% end %>
-
-  <%= link_to awards_path, class: "site-footer__tab site-footer__awards" do %>
-    <%= icon(:trophy, class: "footer-icon") %>
-    <span>Awards</span>
-  <% end %>
-
-  <%= link_to stats_path, class: "site-footer__tab site-footer__stats" do %>
-    <%= icon(:stats, class: "footer-icon") %>
-    <span>Stats</span>
-  <% end %>
+    <% end %>
+  </nav>
 </footer>

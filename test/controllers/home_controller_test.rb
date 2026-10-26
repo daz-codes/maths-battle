@@ -39,11 +39,11 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".site-header .tagline", text: "Improve your math in minutes"
-    assert_select ".greeting .streak", text: "0"
+    assert_select ".ui-welcome .streak strong", text: "0"
     assert_select ".home-actions a.button", 3
-    assert_select ".home-actions a[href=?]", challenge_path, text: /Daily Challenge\s+Daily Tables Test/
-    assert_select ".home-actions a[href=?]", practice_path, text: "Practice"
-    assert_select ".home-actions a[href=?]", groups_path, text: "Compete"
+    assert_select ".home-actions a[href=?]", challenge_path, text: /Daily Challenge.*Daily Tables Test/m
+    assert_select ".home-actions a[href=?] .home-action__label", practice_path, text: "Practice"
+    assert_select ".home-actions a[href=?] .home-action__label", groups_path, text: "Compete"
     assert_select "a.button--play", count: 0, message: "playing is on Practice"
     assert_select "a[href=?]", new_registration_path
 
@@ -94,7 +94,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     get root_path
     assert_select ".flash", text: /freeze/i, count: 0
-    assert_select ".greeting .streak", text: "0"
+    assert_select ".ui-welcome .streak strong", text: "0"
     assert_equal 1, user.reload.streak_freezes
   end
 
@@ -103,7 +103,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
-    assert_select ".greeting", text: /Hi Ada!/
+    assert_select ".ui-welcome", text: /Hi Ada!/
   end
 
   test "the page goes the greeting with the streak small beside it, then Challenge, Practice and Compete" do
@@ -111,7 +111,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
     get root_path
 
-    parts = %w[ greeting streak home-actions ]
+    parts = %w[ ui-welcome streak home-actions ]
     order = css_select(parts.map { ".#{_1}" }.join(", ")).map { |element| (element["class"].split & parts).first }
     assert_equal parts, order
   end
@@ -126,10 +126,10 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     Attempt.record!(user: @user, topic: "equations", results: [ EASY_QUESTIONS.fetch(Equations) ] * 2)
     @user.update!(current_streak: 12, longest_streak: 15, last_practised_on: @user.today, streak_kept_on: @user.today)
     get root_path
-    assert_select ".greeting .streak", text: "12"
+    assert_select ".ui-welcome .streak strong", text: "12"
     assert_select ".home-action--practice .button__note", count: 0, message: "the streak is safe today"
-    assert_select ".stats div", text: /Best score\s+#{number_with_delimiter(@user.attempts.maximum(:score))}/, message: "from any game"
-    assert_select ".stats div", text: /Longest streak\s+15/
+    assert_select ".stats div", text: /Personal best\s*#{number_with_delimiter(@user.attempts.maximum(:score))}/, message: "from any game"
+    assert_select ".stats div", text: /Longest streak\s*15/
 
     get practice_path
     assert_equal %w[ Best\ score Average\ score Average\ time Most\ right ], css_select(".stats dt").map(&:text)

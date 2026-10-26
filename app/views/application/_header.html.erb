@@ -1,0 +1,13 @@
+<header class="site-header ui-header">
+  <%= link_to root_path, class: "logo ui-brand", aria: { label: "MatheMinute home" } do %>
+    <span class="ui-brand__mark"><%= render "clock", class: "logo__mark" %></span>
+    <span>mathe<span class="ui-brand__minute">minute</span><span class="ui-brand__period">.</span></span>
+  <% end %>
+  <span class="ui-header__promise tagline">Improve your <%= maths %> in minutes</span>
+  <div class="ui-header__tools">
+    <%= link_to "Sign in", new_session_path, class: "header-sign-in" if current_player.guest? %>
+    <%= link_to edit_profile_path, class: "ui-profile", aria: { label: "Settings" } do %>
+      <%= render "avatar", user: current_player, size: "small" %>
+    <% end %>
+  </div>
+</header>

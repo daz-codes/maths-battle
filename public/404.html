@@ -9,46 +9,46 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --yellow: #efff2e; --green: #5dff7a; --pink: #ff5cc6; --blue: #2be4ff; --ink: #3a3b35; --muted: #6f7064; --paper: #fffef9; --paper-alt: #f1f0e8; --pink-text: #e5139a; --blue-deep: #0078b8; --glow: 0%; color-scheme: light; }
+    :root { --yellow: #ff7900; --green: #2858e8; --pink: #ff7900; --blue: #2858e8; --ink: #152541; --muted: #596a80; --paper: #f3f6fb; --paper-alt: #fff; --accent: #2858e8; --on-accent: #fff; color-scheme: light; }
     @media (prefers-color-scheme: dark) {
-      :root { --ink: #eceef7; --muted: #a5aabe; --paper: #181a32; --paper-alt: #22254a; --pink-text: #ff5cc6; --glow: 60%; color-scheme: dark; }
+      :root { --yellow: #d1f879; --green: #d1f879; --pink: #b59bff; --blue: #b59bff; --ink: #f5f6fb; --muted: #afb5cc; --paper: #10121b; --paper-alt: #1b1e2c; --accent: #d1f879; --on-accent: #14191a; color-scheme: dark; }
     }
     *, *::before, *::after { box-sizing: border-box; }
     body { margin: 0; min-height: 100dvh; background: var(--paper); color: var(--ink); text-align: center;
-      font-family: "Nunito", ui-rounded, "SF Pro Rounded", ui-sans-serif, system-ui, sans-serif; }
+      font-family: "Manrope", ui-sans-serif, system-ui, sans-serif; }
     .site-header { display: flex; flex-direction: column; align-items: center; padding: calc(1.5rem + env(safe-area-inset-top)) 1rem 0; }
-    .logo { display: inline-flex; align-items: center; gap: 0.65rem; color: var(--ink); text-decoration: none; }
+    .logo { display: inline-flex; align-items: center; gap: 0.65rem; color: var(--ink); text-decoration: none; font-size: 24px; font-weight: 800; letter-spacing: -1.5px; }
     .clock { display: block; color: var(--ink); overflow: visible; }
-    .logo__mark { width: clamp(3.2rem, 14.4vw, 4rem); height: clamp(3.2rem, 14.4vw, 4rem); }
-    .logo__word { display: block; height: clamp(1.9rem, 8.6vw, 2.4rem); width: auto; overflow: visible; }
-    .logo__word path { stroke: currentColor; stroke-width: 2.2; stroke-linejoin: round; }
-    .logo__minute { fill: var(--pink-text); stroke: var(--pink-text) !important; }
+    .logo__mark { width: 32px; height: 32px; }
+    .logo__minute { font-weight: 500; }
+    .logo__period { color: var(--accent); }
     main { display: flex; flex-direction: column; align-items: center; gap: 1rem; max-width: 26rem; margin: 0 auto; padding: 3rem 1rem; }
-    .error__emoji { margin: 0; font-size: 3.5rem; line-height: 1; }
+    .error__icon { margin: 0; color: var(--accent); }
+    .error__icon svg { width: 4rem; height: 4rem; }
     h1 { margin: 0; font-size: clamp(1.9rem, 8vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; }
     p { margin: 0; color: var(--muted); font-size: 1.1rem; font-weight: 600; }
     .button { display: inline-flex; align-items: center; justify-content: center; min-height: 3.25rem; margin-top: 0.5rem; padding: 0.6rem 1.6rem;
-      border-radius: 10px; background: var(--blue-deep); box-shadow: 0 0 22px color-mix(in srgb, var(--blue) var(--glow), transparent);
-      color: #fff; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.06em; text-decoration: none; text-transform: uppercase; }
+      border-radius: 12px; background: var(--accent);
+      color: var(--on-accent); font-size: 1rem; font-weight: 800; text-decoration: none; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
     .error__code { color: var(--muted); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; }
   </style>
 </head>
 <body>
   <header class="site-header">
-    <!-- BEGIN app/views/application/_logo.html.erb
---><a class="logo" aria-label="MatheMinute home" href="/">
-  <!-- BEGIN app/views/application/_clock.html.erb
+    <a class="logo" aria-label="MatheMinute home" href="/">
+      <!-- BEGIN app/views/application/_clock.html.erb
 --><svg class="clock logo__mark" viewBox="0 0 48 48" aria-hidden="true">
   <defs>
-    <mask id="clock-gaps-a7a9091d" maskUnits="userSpaceOnUse" x="0" y="0" width="48" height="48">
+    <mask id="clock-gaps-b7c9c5df" maskUnits="userSpaceOnUse" x="0" y="0" width="48" height="48">
       <rect width="48" height="48" fill="white"/>
       <rect x="22.75" width="2.5" height="48" fill="black"/>
       <rect y="22.75" width="48" height="2.5" fill="black"/>
     </mask>
   </defs>
-  <g transform="rotate(-90 24 24)" fill="none" stroke-width="6" mask="url(#clock-gaps-a7a9091d)">
+  <g transform="rotate(-90 24 24)" fill="none" stroke-width="6" mask="url(#clock-gaps-b7c9c5df)">
       <circle cx="24" cy="24" r="20" pathLength="100" stroke="var(--yellow)"
               stroke-dasharray="25 75" stroke-dashoffset="0"
                />
@@ -71,16 +71,11 @@
     <circle cx="24" cy="24" r="2.4" fill="currentColor"/>
 </svg>
 <!-- END app/views/application/_clock.html.erb -->
-  <!-- BEGIN app/views/application/_wordmark.html.erb
---><svg class="logo__word" viewBox="1 35 592.4 75.1" aria-hidden="true">
-  <path fill="currentColor" d="M24.8 41.2L41.8 86.4L42 86.4L59.1 41.2L78.9 41.2L78.9 49.3L75.6 49.6C73.6 49.8 72.6 51 72.7 53.1L75.2 98.9L81.4 99.2L81.4 107.7L57.3 107.7L57.3 99.6L60.9 99.3C62.7 99.2 63.6 98.3 63.5 96.7L61.6 61.4L61.4 61.4L46 101.3L36.5 101.3L21.3 61.8L21.1 61.8L19.1 98.9L25.6 99.2L25.6 107.7L2 107.7L2 99.6L5.6 99.3C7.1 99.2 8 98.3 8.1 96.6L10.8 50.1L4.7 49.7L4.7 41.2ZM24.8 41.2M131.6 59.4L131.6 96.6C131.6 97.7 131.8 98.4 132.2 98.8C132.5 99.2 133.2 99.4 134.1 99.5L137.3 99.7L137.3 107.7L121.4 107.7L121.4 101.9L121.1 101.8C117.8 106.6 113.2 109 107.4 109C100.6 109 95.6 106.8 92.3 102.5C89 98.2 87.4 92.2 87.4 84.7C87.4 75.6 89.6 68.6 94 63.5C98.4 58.4 105 55.9 113.8 55.9C119.5 55.9 125.4 57.1 131.6 59.4ZM120 91.8L120 65.9C118.1 65 115.6 64.6 112.3 64.6C107.8 64.6 104.6 66.4 102.6 70C100.6 73.6 99.6 78.4 99.6 84.3C99.6 95.1 103.1 100.5 110 100.5C112.9 100.5 115.3 99.6 117.2 97.9C119.1 96.1 120 94.1 120 91.8ZM120 91.8M152.5 46.8L159 46.8L159 57.4L172.3 57.4L171.3 65.8L159 65.8L159 92.1C159 95 159.5 97.1 160.6 98.3C161.7 99.4 163.3 100 165.6 100C167.8 100 170 99.3 172.3 97.9L175.3 105.6C172 107.9 167.7 109.1 162.6 109.1C159.6 109.1 157.1 108.7 155 108C152.9 107.2 151.4 106.3 150.4 105.4C149.4 104.5 148.6 103.1 148.1 101.3C147.6 99.5 147.3 98.1 147.2 97.1C147.1 96 147.1 94.5 147.1 92.5L147.1 65.8L140 65.8L141 58.5C144.1 58.2 146.5 57.1 148.1 55.2C149.7 53.2 151.2 50.4 152.5 46.8ZM152.5 46.8M185.2 96.5L185.2 47.8C185.2 46.7 185 46 184.7 45.6C184.3 45.2 183.6 45 182.7 44.9L179.2 44.7L179.2 36.4L197 36.4L197 63.3C200.5 58.4 205.3 55.9 211.6 55.9C216.7 55.9 220.6 57.4 223.4 60.3C226.1 63.2 227.5 67.5 227.5 73.3L227.5 99.4L233.2 99.7L233.2 107.7L209.4 107.7L209.4 100.1L212.7 99.8C213.7 99.7 214.4 99.4 214.9 99C215.4 98.5 215.6 97.7 215.6 96.5L215.6 75.9C215.6 72.4 215.1 69.8 214 67.9C212.9 66 210.7 65.1 207.6 65.1C204.4 65.1 201.9 66.1 200 68.1C198.1 70 197.1 72.4 197.1 75.2L197.1 99.4L202.8 99.7L202.8 107.7L179 107.7L179 100.1L182.3 99.8C183.3 99.7 184 99.4 184.5 99C185 98.5 185.2 97.7 185.2 96.5ZM185.2 96.5M264.2 55.9C269.2 55.9 273.2 57.1 276.1 59.6C279 62 280.5 65.4 280.5 69.8C280.5 72.7 279.9 75.3 278.6 77.6C277.3 79.8 275.8 81.5 273.9 82.8C272 84.1 269.8 85.1 267.1 85.9C262.6 87.2 257.6 87.9 252 87.9C252.2 91.4 253.3 94.3 255.3 96.5C257.3 98.6 260.4 99.7 264.5 99.7C268.6 99.7 272.8 98.2 276.9 95.3L280.7 103.4C279.4 104.6 277.1 105.8 274 107.1C270.8 108.4 267.2 109 263.1 109C255 109 249 106.8 245.2 102.3C241.4 97.8 239.5 91.6 239.5 83.7C239.5 75.8 241.7 69.2 246 63.9C250.3 58.6 256.4 55.9 264.2 55.9ZM259.7 78.8C262.1 78.3 264.3 77.4 266.4 75.9C268.5 74.4 269.5 72.6 269.5 70.5C269.5 66.4 267.5 64.4 263.5 64.4C259.8 64.4 256.9 65.9 254.9 68.9C252.9 71.8 251.8 75.4 251.6 79.5C254.5 79.4 257.2 79.2 259.7 78.8ZM259.7 78.8"/>
-  <path class="logo__minute" d="M309 41.2L326 86.4L326.2 86.4L343.3 41.2L363.1 41.2L363.1 49.3L359.8 49.6C357.8 49.8 356.9 51 356.9 53.1L359.4 98.9L365.6 99.2L365.6 107.7L341.5 107.7L341.5 99.6L345.1 99.3C346.9 99.2 347.8 98.3 347.7 96.7L345.8 61.4L345.6 61.4L330.2 101.3L320.7 101.3L305.5 61.8L305.3 61.8L303.3 98.9L309.8 99.2L309.8 107.7L286.2 107.7L286.2 99.6L289.8 99.3C291.4 99.2 292.2 98.3 292.3 96.6L295 50.1L288.9 49.7L288.9 41.2ZM309 41.2M389 57.4L389 99.4L394.7 99.7L394.7 107.7L370.9 107.7L370.9 100.1L374.2 99.8C376.2 99.6 377.1 98.5 377.1 96.6L377.1 68.8C377.1 67.7 376.9 66.9 376.6 66.5C376.2 66.1 375.6 65.9 374.6 65.9L371.1 65.7L371.1 57.4ZM376.4 48.8C375 47.4 374.3 45.6 374.3 43.5C374.3 41.4 375 39.6 376.4 38.2C377.8 36.7 379.7 36 381.9 36C384.2 36 386 36.7 387.5 38.2C388.9 39.6 389.6 41.4 389.6 43.5C389.6 45.6 388.9 47.4 387.5 48.8C386 50.1 384.2 50.8 381.9 50.8C379.7 50.8 377.8 50.1 376.4 48.8ZM376.4 48.8M399.9 65.4L399.9 57.4L416.8 57.4L416.8 63.9C418.6 61.4 420.9 59.5 423.7 58.1C426.6 56.6 429.7 55.9 433 55.9C438.1 55.9 442 57.4 444.8 60.3C447.5 63.2 448.9 67.5 448.9 73.3L448.9 99.4L454.6 99.7L454.6 107.7L430.8 107.7L430.8 100.1L434.1 99.8C435.1 99.7 435.9 99.4 436.3 99C436.8 98.5 437 97.7 437 96.5L437 75.9C437 72.2 436.5 69.5 435.3 67.8C434.2 66 432 65.1 428.9 65.1C425.7 65.1 423.2 66.1 421.3 68.1C419.5 70.1 418.5 72.5 418.5 75.2L418.5 99.4L424.2 99.7L424.2 107.7L400.4 107.7L400.4 100.1L403.7 99.8C404.7 99.7 405.5 99.4 405.9 99C406.4 98.5 406.6 97.7 406.6 96.5L406.6 68.8C406.6 66.8 405.8 65.8 404.1 65.7ZM399.9 65.4M510 99.8L510 107.7L493.8 107.7L493.8 101.2C490.2 106.4 484.8 109 477.6 109C467.3 109 462.1 103.2 462.1 91.7L462.1 68.6C462.1 66.8 461.3 65.9 459.6 65.8L456.4 65.6L456.4 57.4L474 57.4L474 89.1C474 92.6 474.5 95.3 475.5 97.1C476.5 98.9 478.6 99.8 481.7 99.8C484.9 99.8 487.4 98.8 489.3 96.9C491.2 95 492.1 92.6 492.1 89.9L492.1 68.8C492.1 67.7 491.9 67 491.6 66.6C491.2 66.1 490.6 65.9 489.6 65.8L486.4 65.6L486.4 57.4L504 57.4L504 96.6C504 97.7 504.2 98.4 504.5 98.8C504.9 99.1 505.5 99.4 506.5 99.5ZM510 99.8M524.2 46.8L530.7 46.8L530.7 57.4L544 57.4L543 65.8L530.7 65.8L530.7 92.1C530.7 95 531.2 97.1 532.3 98.3C533.4 99.4 535 100 537.3 100C539.5 100 541.7 99.3 544 97.9L547 105.6C543.7 107.9 539.4 109.1 534.3 109.1C531.3 109.1 528.8 108.7 526.7 108C524.6 107.2 523.1 106.3 522.1 105.4C521.1 104.5 520.3 103.1 519.8 101.3C519.3 99.5 519 98.1 518.9 97.1C518.8 96 518.8 94.5 518.8 92.5L518.8 65.8L511.7 65.8L512.7 58.5C515.8 58.2 518.2 57.1 519.8 55.2C521.4 53.2 522.9 50.4 524.2 46.8ZM524.2 46.8M575.9 55.9C580.9 55.9 584.9 57.1 587.8 59.6C590.8 62 592.2 65.4 592.2 69.8C592.2 72.7 591.6 75.3 590.3 77.6C589.1 79.8 587.5 81.5 585.6 82.8C583.8 84.1 581.5 85.1 578.8 85.9C574.3 87.2 569.3 87.9 563.7 87.9C563.9 91.4 565 94.3 567 96.5C569 98.6 572.1 99.7 576.2 99.7C580.3 99.7 584.5 98.2 588.6 95.3L592.4 103.4C591.1 104.6 588.8 105.8 585.7 107.1C582.5 108.4 578.9 109 574.8 109C566.7 109 560.7 106.8 556.9 102.3C553.1 97.8 551.2 91.6 551.2 83.7C551.2 75.8 553.4 69.2 557.7 63.9C562.1 58.6 568.1 55.9 575.9 55.9ZM571.4 78.8C573.8 78.3 576.1 77.4 578.1 75.9C580.2 74.4 581.2 72.6 581.2 70.5C581.2 66.4 579.2 64.4 575.2 64.4C571.5 64.4 568.6 65.9 566.6 68.9C564.6 71.8 563.5 75.4 563.3 79.5C566.2 79.4 568.9 79.2 571.4 78.8ZM571.4 78.8"/>
-</svg>
-<!-- END app/views/application/_wordmark.html.erb -->
-</a><!-- END app/views/application/_logo.html.erb -->
+      <span>mathe<span class="logo__minute">minute</span><span class="logo__period">.</span></span>
+    </a>
   </header>
   <main>
-    <p class="error__emoji" aria-hidden="true">🔍</p>
+    <p class="error__icon"><svg viewBox="0 0 24 24" class="icon icon--search" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 15.5 21 21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
     <h1>We couldn&#39;t find that page</h1>
     <p>It may have moved, or the link might not be quite right.</p>
     <a class="button" href="/">Back to home</a>

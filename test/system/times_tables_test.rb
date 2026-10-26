@@ -107,7 +107,7 @@ class TimesTablesTest < ApplicationSystemTestCase
 
     assert_selector ".result__score", text: /\b1 right/, wait: 8
     visit root_path
-    assert_selector ".greeting .streak", text: "1"
+    assert_selector ".ui-welcome .streak strong", text: "1"
     assert_no_selector ".home-action--practice .button__note", text: /streak/i
   end
 

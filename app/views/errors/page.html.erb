@@ -11,36 +11,39 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --yellow: #efff2e; --green: #5dff7a; --pink: #ff5cc6; --blue: #2be4ff; --ink: #3a3b35; --muted: #6f7064; --paper: #fffef9; --paper-alt: #f1f0e8; --pink-text: #e5139a; --blue-deep: #0078b8; --glow: 0%; color-scheme: light; }
+    :root { --yellow: #ff7900; --green: #2858e8; --pink: #ff7900; --blue: #2858e8; --ink: #152541; --muted: #596a80; --paper: #f3f6fb; --paper-alt: #fff; --accent: #2858e8; --on-accent: #fff; color-scheme: light; }
     @media (prefers-color-scheme: dark) {
-      :root { --ink: #eceef7; --muted: #a5aabe; --paper: #181a32; --paper-alt: #22254a; --pink-text: #ff5cc6; --glow: 60%; color-scheme: dark; }
+      :root { --yellow: #d1f879; --green: #d1f879; --pink: #b59bff; --blue: #b59bff; --ink: #f5f6fb; --muted: #afb5cc; --paper: #10121b; --paper-alt: #1b1e2c; --accent: #d1f879; --on-accent: #14191a; color-scheme: dark; }
     }
     *, *::before, *::after { box-sizing: border-box; }
     body { margin: 0; min-height: 100dvh; background: var(--paper); color: var(--ink); text-align: center;
-      font-family: "Nunito", ui-rounded, "SF Pro Rounded", ui-sans-serif, system-ui, sans-serif; }
+      font-family: "Manrope", ui-sans-serif, system-ui, sans-serif; }
     .site-header { display: flex; flex-direction: column; align-items: center; padding: calc(1.5rem + env(safe-area-inset-top)) 1rem 0; }
-    .logo { display: inline-flex; align-items: center; gap: 0.65rem; color: var(--ink); text-decoration: none; }
+    .logo { display: inline-flex; align-items: center; gap: 0.65rem; color: var(--ink); text-decoration: none; font-size: 24px; font-weight: 800; letter-spacing: -1.5px; }
     .clock { display: block; color: var(--ink); overflow: visible; }
-    .logo__mark { width: clamp(3.2rem, 14.4vw, 4rem); height: clamp(3.2rem, 14.4vw, 4rem); }
-    .logo__word { display: block; height: clamp(1.9rem, 8.6vw, 2.4rem); width: auto; overflow: visible; }
-    .logo__word path { stroke: currentColor; stroke-width: 2.2; stroke-linejoin: round; }
-    .logo__minute { fill: var(--pink-text); stroke: var(--pink-text) !important; }
+    .logo__mark { width: 32px; height: 32px; }
+    .logo__minute { font-weight: 500; }
+    .logo__period { color: var(--accent); }
     main { display: flex; flex-direction: column; align-items: center; gap: 1rem; max-width: 26rem; margin: 0 auto; padding: 3rem 1rem; }
-    .error__icon { margin: 0; color: var(--pink-text); }
+    .error__icon { margin: 0; color: var(--accent); }
     .error__icon svg { width: 4rem; height: 4rem; }
     h1 { margin: 0; font-size: clamp(1.9rem, 8vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; }
     p { margin: 0; color: var(--muted); font-size: 1.1rem; font-weight: 600; }
     .button { display: inline-flex; align-items: center; justify-content: center; min-height: 3.25rem; margin-top: 0.5rem; padding: 0.6rem 1.6rem;
-      border-radius: 10px; background: var(--blue-deep); box-shadow: 0 0 22px color-mix(in srgb, var(--blue) var(--glow), transparent);
-      color: #fff; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.06em; text-decoration: none; text-transform: uppercase; }
+      border-radius: 12px; background: var(--accent);
+      color: var(--on-accent); font-size: 1rem; font-weight: 800; text-decoration: none; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
     .error__code { color: var(--muted); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; }
   </style>
 </head>
 <body>
   <header class="site-header">
-    <%= render "logo" %>
+    <a class="logo" aria-label="MatheMinute home" href="/">
+      <%= render "clock", class: "logo__mark" %>
+      <span>mathe<span class="logo__minute">minute</span><span class="logo__period">.</span></span>
+    </a>
   </header>
   <main>
     <p class="error__icon"><%= icon(local_assigns[:icon]) %></p>

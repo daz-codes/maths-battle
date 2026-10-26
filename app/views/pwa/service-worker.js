@@ -20,7 +20,8 @@ function within(promise, ms) {
 }
 
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.add(OFFLINE_URL)).then(() => self.skipWaiting()))
+  // Refresh the fallback's appearance without discarding assets used by saved offline pages.
+  event.waitUntil(caches.open(CACHE).then(cache => cache.add(new Request(OFFLINE_URL, { cache: "reload" }))).then(() => self.skipWaiting()))
 })
 
 self.addEventListener("activate", event => {

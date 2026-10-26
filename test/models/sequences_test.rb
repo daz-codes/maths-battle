@@ -23,7 +23,7 @@ class SequencesTest < ActiveSupport::TestCase
         question = Sequences.question(type, random: random)
         terms = Sequences.terms(question)
         assert terms.all? { _1.is_a?(Integer) && _1.positive? }, question[:text]
-        assert Sequences.send(:next_terms, terms.first(5)).all?(terms.last), "#{question[:text]} has more than one answer"
+        assert Sequences.send(:next_terms, terms.first(Sequences.shown(question))).all?(terms.last), "#{question[:text]} has more than one answer"
         assert_operator terms.last, :<=, Sequences::MOST
       end
     end
@@ -36,6 +36,19 @@ class SequencesTest < ActiveSupport::TestCase
     assert_raises(Attempt::Invalid, "two equal steps are just linear: a level 5 question must take turns") do
       Sequences.clean_result({ "type" => "alternate", "a" => 4, "b" => 3, "c" => 3, "given" => "19" }, level: 5)
     end
+  end
+
+  test "two steps show 5 to 7 terms, so the next step isn't always the first one" do
+    six = Sequences.worked(type: "alternate", a: 4, b: 5, c: 2, n: 6)
+    assert_equal [ "4, 9, 11, 16, 18, 23, …", "25" ], six.values_at(:text, :answer), "after six, it's the second step"
+    assert_equal "23", Sequences.worked(type: "alternate", a: 4, b: 5, c: 2)[:answer], "five, as a lesson's, is the first step again"
+
+    random = Random.new(2)
+    shown = Array.new(60) { Sequences.question("alternate", random: random)[:n] }.tally
+    assert_equal [ 5, 6, 7 ], shown.keys.sort
+    assert_operator shown[6], :>, shown[5], "half the time the next is the second step"
+    assert_raises(Attempt::Invalid, "only two steps vary") { Sequences.clean_result({ "type" => "add", "a" => 3, "b" => 4, "c" => 0, "n" => 6, "given" => "27" }) }
+    assert_raises(Attempt::Invalid) { Sequences.clean_result({ "type" => "alternate", "a" => 4, "b" => 5, "c" => 2, "n" => 9, "given" => "1" }, level: 5) }
   end
 
   test "a level asks only its own kinds, mixed practice the ones before too, and answers are only digits" do

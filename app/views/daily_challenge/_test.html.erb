@@ -1,26 +1,31 @@
-<%# One of the day's challenges: to play, or once played, where it stands and its share, then the player's stats
-    from every one of its kind %>
+<%# One of the day's challenges, as a button that opens it: to play, or once played, where it stands and its share,
+    then the player's stats from every one of its kind. Closed, it just says whether it's done %>
 <% attempt = user.daily_game(daily_test) %>
-<section class="daily-test daily-test--<%= daily_test.kind %>" aria-labelledby="daily-<%= daily_test.kind %>">
-  <h2 class="settings__heading" id="daily-<%= daily_test.kind %>"><%= topic_icon(daily_test.topic) %> <%= daily_test.name %> <span class="daily-test__number">#<%= daily_test.number %></span></h2>
+<details class="daily-test daily-test--<%= daily_test.kind %>">
+  <summary class="daily-test__toggle">
+    <span class="daily-test__name"><%= topic_icon(daily_test.topic) %> <%= daily_test.name %> <span class="daily-test__number">#<%= daily_test.number %></span></span>
+    <span class="daily-test__status"><%= attempt ? "Done · #{daily_standing_message(attempt.daily_test.standing_of(attempt))}" : "Not played yet" %></span>
+  </summary>
 
-  <% if attempt %>
-    <%= render "daily_challenge/standing", attempt: attempt %>
-    <button type="button" class="button button--share button--wide" data-controller="share"
-            data-share-text-value="<%= attempt.share_text(share_url(attempt.share_token)) %>" data-action="share#share">Share</button>
-  <% else %>
-    <p class="aside"><%= daily_test.about %>. Everyone gets the same questions today, one go each.</p>
-    <%= link_to "Play", play_path(daily_test.topic.slug, daily: daily_test.kind), class: "button button--start button--wide" %>
-    <% if (players = daily_test.players).positive? %>
-      <p class="aside"><%= pluralize(players, "player") %> so far today</p>
+  <div class="daily-test__body">
+    <% if attempt %>
+      <%= render "daily_challenge/standing", attempt: attempt %>
+      <button type="button" class="button button--share button--wide" data-controller="share"
+              data-share-text-value="<%= attempt.share_text(share_url(attempt.share_token)) %>" data-action="share#share">Share</button>
+    <% else %>
+      <p class="aside"><%= daily_test.about %>. Everyone gets the same questions today, one go each.</p>
+      <%= link_to "Play", play_path(daily_test.topic.slug, daily: daily_test.kind), class: "button button--start button--wide" %>
+      <% if (players = daily_test.players).positive? %>
+        <p class="aside"><%= pluralize(players, "player") %> so far today</p>
+      <% end %>
     <% end %>
-  <% end %>
 
-  <% if user.persisted? && (played = user.daily_games(daily_test.kind).count).positive? %>
-    <dl class="stats">
-      <div><dt>Best score</dt><dd><%= icon(:trophy) %> <%= number_with_delimiter user.best_daily_game(daily_test.kind) %></dd></div>
-      <div><dt>Average score</dt><dd><%= number_with_delimiter user.average_daily_game(daily_test.kind) %></dd></div>
-      <div><dt>Played</dt><dd><%= played %></dd></div>
-    </dl>
-  <% end %>
-</section>
+    <% if user.persisted? && (played = user.daily_games(daily_test.kind).count).positive? %>
+      <dl class="stats">
+        <div><dt>Best score</dt><dd><%= icon(:trophy) %> <%= number_with_delimiter user.best_daily_game(daily_test.kind) %></dd></div>
+        <div><dt>Average score</dt><dd><%= number_with_delimiter user.average_daily_game(daily_test.kind) %></dd></div>
+        <div><dt>Played</dt><dd><%= played %></dd></div>
+      </dl>
+    <% end %>
+  </div>
+</details>
