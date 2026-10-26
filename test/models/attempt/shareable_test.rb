@@ -11,7 +11,7 @@ class Attempt::ShareableTest < ActiveSupport::TestCase
     assert_equal 4, attempt.correct
     assert_equal <<~TEXT.chomp, text
       MatheMinute ✖️ Times tables, level 2: #{attempt.score} (4 right in 60s)
-      🔥 1 day streak  🏆 Best: #{attempt.score}
+      🔥 1 day streak  🏆 High score: #{attempt.score}
       🟩🟥🟩🟩🟩
       https://matheminute.app/s/abc
     TEXT

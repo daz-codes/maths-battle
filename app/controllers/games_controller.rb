@@ -24,7 +24,6 @@ class GamesController < ApplicationController
     remember_topic @topic unless @mode.in?(%w[ group head_to_head live daily ])
     @question_sets = question_sets
     @question_sets.each do |set|
-      set[:questions] = set[:questions].map { |question| @topic.with_solution(question) }
       set[:ticket] = Attempt::GameTicket.issue(owner: player_key, topic: @topic.key, level: @level, mode: @mode, round: @round,
         head_to_head: @head_to_head, live_game: @live_game, day: (@daily_test.day if @daily_test), **set.slice(:id, :questions))
     end

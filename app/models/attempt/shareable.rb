@@ -26,7 +26,7 @@ module Attempt::Shareable
   end
 
   def share_stats
-    "🔥 #{streak} day streak  🏆 Best: #{best_score.to_fs(:delimited)}"
+    "🔥 #{streak} day streak  🏆 High score: #{best_score.to_fs(:delimited)}"
   end
 
   # The Daily Tables Test's: where it stands today, not a best

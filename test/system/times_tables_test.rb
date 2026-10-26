@@ -28,14 +28,13 @@ class TimesTablesTest < ApplicationSystemTestCase
     wrong = (a * b) % 10 == 9 ? a * b - 1 : a * b + 1 # same number of digits, so it's checked straight away
     find("body").send_keys(wrong.to_s)
     assert_selector ".answer--wrong", text: wrong.to_s
-    assert_selector ".question-previous--wrong", text: "#{a} × #{b} = #{wrong} ✗ #{a * b}"
 
-    assert_selector ".result__score", text: /\b2 right/, wait: 8
+    assert_selector ".result__score", text: /\b2 correct answer/, wait: 8
     assert_text "#{a} × #{b} = #{a * b}"
     assert_equal 2, users(:ada).best_correct(TimesTables, 1)
   end
 
-  test "the answered question drops below the next, marked like a teacher would: a tick, or a cross and the right answer" do
+  test "no corrections under the question: just what floats up, then the next one, every question the same size" do
     sign_in users(:ada)
     click_on "Practice"
     click_on "Play level 1"
@@ -44,7 +43,7 @@ class TimesTablesTest < ApplicationSystemTestCase
 
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
-    assert_selector ".question-previous.question-previous--right", exact_text: "#{a} × #{b} = #{a * b} ✓"
+    assert_selector ".score-pop.score-pop--right"
     assert_selector ".answer", exact_text: "", visible: :all
     assert_selector ".test__score", text: /\A[1-9]\d*\z/
     assert_selector "[data-test-target=right]", text: "1"
@@ -53,8 +52,10 @@ class TimesTablesTest < ApplicationSystemTestCase
     wrong = (a * b) % 10 == 9 ? a * b - 1 : a * b + 1
     find("body").send_keys(wrong.to_s)
     assert_selector ".answer.answer--wrong", text: wrong.to_s
-    assert_selector ".question-previous.question-previous--wrong", exact_text: "#{a} × #{b} = #{wrong} ✗ #{a * b}"
-    assert_selector ".answer:not(.answer--wrong)", exact_text: "", visible: :all
+    assert_selector ".score-pop.score-pop--wrong", text: "−5"
+    assert_selector ".answer:not(.answer--wrong)", exact_text: "", visible: :all, wait: 2
+    assert_no_selector ".question-previous", visible: :all
+    assert_no_text "#{a} × #{b} = #{a * b}"
     assert_equal size, find(".question--current")[:class], "every question the same size"
   end
 
@@ -105,7 +106,7 @@ class TimesTablesTest < ApplicationSystemTestCase
     a, b = find(".question--current").text.split(" × ").map(&:to_i)
     find("body").send_keys((a * b).to_s)
 
-    assert_selector ".result__score", text: /\b1 right/, wait: 8
+    assert_selector ".result__score", text: /\b1 correct answer/, wait: 8
     visit root_path
     assert_selector ".ui-welcome .streak strong", text: "1"
     assert_no_selector ".home-action--practice .button__note", text: /streak/i

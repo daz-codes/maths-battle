@@ -38,7 +38,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
-    assert_select ".site-header .tagline", text: "Improve your math in minutes"
+    assert_select ".ui-home__heading", text: "Master Math in Minutes"
+    assert_select ".site-header .ui-header__hello", text: "Hi there!"
     assert_select ".ui-welcome .streak strong", text: "0"
     assert_select ".home-actions a.button", 3
     assert_select ".home-actions a[href=?]", challenge_path, text: /Daily Challenge.*Daily Tables Test/m
@@ -65,15 +66,15 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   test "says maths to browsers set to the UK, and math to everyone else" do
     choose_topic
     get root_path, headers: { "Accept-Language" => "en-GB,en;q=0.9" }
-    assert_select ".tagline", text: "Improve your maths in minutes"
+    assert_select ".ui-home__heading", text: "Master Maths in Minutes"
     assert_select "html[lang=en-GB]"
 
     get root_path, headers: { "Accept-Language" => "en-US,en;q=0.9" }
-    assert_select ".tagline", text: "Improve your math in minutes"
+    assert_select ".ui-home__heading", text: "Master Math in Minutes"
     assert_select "html[lang=en-US]"
 
     get root_path, headers: { "Accept-Language" => "fr-FR" }
-    assert_select ".tagline", text: "Improve your math in minutes"
+    assert_select ".ui-home__heading", text: "Master Math in Minutes"
   end
 
   test "no gems or streak freezes anywhere: it's just the score" do
@@ -103,7 +104,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
 
     get root_path
-    assert_select ".ui-welcome", text: /Hi Ada!/
+    assert_select ".site-header .ui-header__hello", text: "Hi Ada!", message: "under the logo, beside their picture"
+    assert_select ".site-header .ui-header__who a.ui-profile[href=?]", edit_profile_path
   end
 
   test "the page goes the greeting with the streak small beside it, then Challenge, Practice and Compete" do
@@ -128,12 +130,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
     assert_select ".ui-welcome .streak strong", text: "12"
     assert_select ".home-action--practice .button__note", count: 0, message: "the streak is safe today"
-    assert_select ".stats div", text: /Personal best\s*#{number_with_delimiter(@user.attempts.maximum(:score))}/, message: "from any game"
+    assert_select ".stats div", text: /High score\s*#{number_with_delimiter(@user.attempts.maximum(:score))}/, message: "from any game"
     assert_select ".stats div", text: /Longest streak\s*15/
 
     get practice_path
-    assert_equal %w[ Best\ score Average\ score Average\ time Most\ right ], css_select(".stats dt").map(&:text)
-    assert_select ".stats div", text: /Best score\s+#{number_with_delimiter(best)}/
+    assert_equal %w[ High\ score Average\ score Average\ time Most\ right ], css_select(".stats dt").map(&:text)
+    assert_select ".stats div", text: /High score\s+#{number_with_delimiter(best)}/
     assert_select ".stats div", text: /Most right\s+41/
     assert_select "a[href=?]", stats_path("times-tables"), text: "See all stats"
     assert_select "a.button--play[href=?]", play_path("times-tables", level: 1), text: /Play level 1\s+Beat your best: #{best}/, message: "the streak is safe today, so it's the best to beat"

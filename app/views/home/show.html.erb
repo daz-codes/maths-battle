@@ -8,9 +8,9 @@
 
   <div class="ui-welcome">
     <div>
-      <p class="ui-eyebrow"><%= @user.display_name ? "Hi #{@user.display_name}! Ready for another round?" : "Your next personal best starts here" %></p>
+      <p class="ui-eyebrow"><%= @user.persisted? ? "Ready for another round?" : "Your next personal best starts here" %></p>
       <h1 class="ui-home__heading">
-        One minute.<br><span>All in.</span>
+        Master <%= maths.capitalize %> in <span>Minutes</span>
       </h1>
     </div>
     <div class="streak ui-streak" aria-label="<%= @user.streak %> day streak">
@@ -21,12 +21,12 @@
   <nav class="home-actions ui-actions" aria-label="Play">
     <%= link_to challenge_path, class: "button home-action home-action--challenge ui-daily" do %>
       <span class="ui-daily__info">
-        <span class="ui-eyebrow"><span class="ui-live-dot" aria-hidden="true"></span> Today's main event</span>
+        <span class="ui-eyebrow"><span class="ui-live-dot" aria-hidden="true"></span> <%= @user.today.strftime("%A %-d %B") %></span>
         <span class="home-action__label">Daily Challenge</span>
         <span class="ui-daily__description">Pick a daily game. Same questions.<br>See how you stack up.</span>
         <span class="ui-daily__meta"><span>60 seconds</span><span>One go per game</span></span>
         <span class="ui-daily__cta"><%= all_done ? "See your results" : "Let's play" %> <span aria-hidden="true">↗</span></span>
-        <span class="ui-daily__edition"><%= completed.positive? ? "#{completed} of #{daily_tests.size} done today" : daily_tests.map(&:name).join(" · ") %> · <%= @user.today.strftime("%a, %-d %b") %></span>
+        <span class="ui-daily__edition"><%= completed.positive? ? "#{completed} of #{daily_tests.size} done today" : daily_tests.map(&:name).join(" · ") %></span>
       </span>
       <%= render "home/daily_art" %>
     <% end %>
@@ -49,8 +49,8 @@
   <section class="ui-progress" aria-labelledby="ui-progress-heading">
     <div class="ui-section-heading"><h2 id="ui-progress-heading">Your personal scoreboard</h2><%= link_to "All stats ↗", stats_path %></div>
     <dl class="stats">
-      <div><dt>Personal best</dt><dd><%= @user.persisted? ? number_with_delimiter(@user.best_score) : "—" %><span class="ui-stat-caption">A score worth chasing</span></dd></div>
-      <div><dt>Longest streak</dt><dd><%= @user.persisted? ? @user.longest_streak : 0 %><span class="ui-stat-unit"> <%= "day".pluralize(@user.longest_streak) %></span><span class="ui-stat-caption">Little by little, every day</span></dd></div>
+      <div><dt>High score</dt><dd><%= icon(:trophy) %> <%= @user.persisted? ? number_with_delimiter(@user.best_score) : "—" %></dd></div>
+      <div><dt>Longest streak</dt><dd><%= icon(:flame) %> <%= @user.persisted? ? @user.longest_streak : 0 %><span class="ui-stat-unit"> <%= "day".pluralize(@user.longest_streak) %></span></dd></div>
     </dl>
   </section>
 

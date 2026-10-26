@@ -11,8 +11,7 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     assert_equal sets.size, sets.map { _1["id"] }.uniq.size
     assert_equal User::Practisable::QUESTION_COUNT, sets.first["questions"].size
     question = sets.first["questions"].first
-    assert_equal %w[a b text answer solution], question.keys
-    assert_equal "#{question["a"]} × #{question["b"]} = #{question["answer"]}", question["solution"], "shown under the next question once it's answered"
+    assert_equal %w[a b text answer], question.keys
     assert_select "meta[name=viewport][content*='maximum-scale=1']"
     assert_select "a.logo", count: 0, message: "nothing to tap away to mid-test"
     assert_select ".site-footer", count: 0

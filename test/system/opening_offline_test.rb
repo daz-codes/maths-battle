@@ -77,7 +77,7 @@ class OpeningOfflineTest < ApplicationSystemTestCase
     fill_in "Username", with: "bob"
     fill_in "Password", with: "password"
     click_button "Sign in"
-    assert_selector ".ui-welcome", text: "Hi bob!"
+    assert_selector ".ui-header__hello", text: "Hi bob!"
     assert_not Attempt.exists?(client_id: "adas-pending-game")
     assert_nil page.evaluate_script("localStorage.getItem(arguments[0])", "matheminute:unsent-games:#{owner}")
     cache_names = page.evaluate_async_script("caches.keys().then(arguments[0])")
@@ -91,9 +91,9 @@ class OpeningOfflineTest < ApplicationSystemTestCase
       fill_in "Username", with: "bob"
       fill_in "Password", with: "password"
       click_button "Sign in"
-      assert_selector ".ui-welcome", text: "Hi bob!"
+      assert_selector ".ui-header__hello", text: "Hi bob!"
     end
-    assert_selector ".ui-welcome", text: "Hi bob!", wait: 8
+    assert_selector ".ui-header__hello", text: "Hi bob!", wait: 8
   ensure
     other&.close
   end

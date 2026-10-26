@@ -47,7 +47,8 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     assert_select "[data-share-text-value*=?]", "🎯 Top 25% today"
 
     get challenge_path
-    assert_select ".daily-test--tables summary .daily-test__status", text: "Done · Top score today!", message: "what's inside, while it's closed"
+    assert_select ".daily-test--tables summary .daily-test__score", text: /#{game.score}\s+8 correct answers/, message: "the score on the button"
+    assert_select ".daily-test--tables summary .daily-test__status", text: "Top score today!"
     assert_select ".daily-test--tables .daily-standing .card__number", text: game.score.to_s
     assert_select ".daily-test--tables .daily-standing .aside", text: "1st of 4 players so far today"
     assert_select ".daily-test--tables a.button", text: "Play", count: 0

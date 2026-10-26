@@ -35,7 +35,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     practise(level: 1, score: 12)
     patch level_path, params: { level: 1 }
     get practice_path
-    assert_select ".levels__progress", text: "Best: #{points(12)} · 20 right for 3 stars"
+    assert_select ".levels__progress", text: "High score: #{points(12)} · 20 right for 3 stars"
     assert_select ".levels__progress .stars", count: 0, message: "the stars are on the level's circle"
     assert_select ".levels__level .stars[aria-label='2 of 3 stars']"
   end
@@ -44,7 +44,7 @@ class LevelsTest < ActionDispatch::IntegrationTest
     practise(level: 1, score: 7)
     get attempt_path(@user.attempts.last)
 
-    assert_select ".level-progress", text: "Best: #{points(7)} · 10 right for 2 stars"
+    assert_select ".level-progress", text: "High score: #{points(7)} · 10 right for 2 stars"
     assert_select ".level-progress .stars", count: 0
   end
 
@@ -171,14 +171,14 @@ class LevelsTest < ActionDispatch::IntegrationTest
     practise(level: 1, score: 12)
     get attempt_path(practise(level: 1, score: 15))
     assert_select ".best-line--new", text: "#{points(15)}, up from #{points(12)}"
-    assert_select ".best-line--right", text: "15 right, your most yet!"
+    assert_select ".best-line--right", text: "15 correct answers, your most yet!"
 
     get attempt_path(practise(level: 1, score: 14))
     assert_select ".best-line", text: "So close! #{points(15) - points(14) + 1} more to beat your best of #{points(15)}"
-    assert_select ".best-line--right", text: "14 right · your most is 15"
+    assert_select ".best-line--right", text: "14 correct answers · your most is 15"
     get attempt_path(practise(level: 1, score: 15))
     assert_select ".best-line", text: "Level with your best of #{points(15)}! A little more next time!"
-    assert_select ".best-line--right", text: "15 right, level with your most"
+    assert_select ".best-line--right", text: "15 correct answers, level with your most"
     get attempt_path(practise(level: 1, score: 6))
     assert_select ".best-line", text: "#{points(15) - points(6) + 1} more to beat your best of #{points(15)}"
   end

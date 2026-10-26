@@ -6,7 +6,7 @@ class AppearanceTest < ActionDispatch::IntegrationTest
     assert_no_difference "User.count" do
       get root_path
       assert_select "body.app-shell"
-      assert_select ".ui-home__heading", text: /One minute.*All in/m
+      assert_select ".ui-home__heading", text: /Master Maths? in Minutes/
       assert_select ".ui-header .ui-brand"
       assert_select ".ui-navigation a", 5
       assert_select "html[data-design], .design-picker", count: 0
@@ -38,7 +38,7 @@ class AppearanceTest < ActionDispatch::IntegrationTest
     begin
       Rails.env = "production"
       get root_path, params: { design: "sprint" }
-      assert_select "body.app-shell .ui-home__heading", text: /All in/
+      assert_select "body.app-shell .ui-home__heading span", text: "Minutes"
       assert_select "html[data-design], .design-picker", count: 0
     ensure
       Rails.env = environment

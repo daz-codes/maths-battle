@@ -16,7 +16,7 @@ class FunctionsTest < ApplicationSystemTestCase
       assert_selector "[data-test-target=right]", text: (i + 1).to_s
     end
 
-    assert_selector ".result__score", text: /\b3 right/, wait: 10
+    assert_selector ".result__score", text: /\b3 correct answer/, wait: 10
     assert_text "FUNCTIONS, LEVEL 1"
     assert_equal "functions", users(:ada).attempts.last.topic
   end

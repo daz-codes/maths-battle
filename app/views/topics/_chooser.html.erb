@@ -26,7 +26,7 @@
   <p class="levels__name">Level <%= level %>: <%= topic.level(level)[:name] %></p>
   <p class="levels__progress"><%= star_progress(user, topic, level) %></p>
   <% if topic.lesson(level) %>
-    <p class="levels__learn"><%= link_to safe_join([ icon(:book), " Learn how" ]), lesson_path(topic.slug, level) %></p>
+    <p class="levels__learn"><%= link_to safe_join([ icon(:book), " Learn how" ]), lesson_path(topic.slug, level), class: "button button--share button--wide" %></p>
   <% end %>
 <% end %>
 <%= link_to "Play level #{level}", play_path(topic.slug, level: level), class: "button button--blue button--practise" if choosing == :stats %>

@@ -28,7 +28,7 @@
     <% end %>
     <% most = @attempt.previous_best_correct %>
     <p class="best-line best-line--right">
-      <%= @attempt.correct %> right<%= if @attempt.correct > most then ", your most yet!" elsif @attempt.correct == most then ", level with your most" else " · your most is #{most}" end %>
+      <%= pluralize(@attempt.correct, "correct answer") %><%= if @attempt.correct > most then ", your most yet!" elsif @attempt.correct == most then ", level with your most" else " · your most is #{most}" end %>
     </p>
   <% end %>
 

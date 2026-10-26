@@ -16,7 +16,7 @@ class NewTopicsTest < ApplicationSystemTestCase
       assert_selector "[data-test-target=right]", text: (i + 1).to_s
     end
 
-    assert_selector ".result__score", text: /\b3 right/, wait: 10
+    assert_selector ".result__score", text: /\b3 correct answer/, wait: 10
     assert_equal "division", users(:ada).attempts.last.topic
   end
 
@@ -52,7 +52,7 @@ class NewTopicsTest < ApplicationSystemTestCase
       assert_selector "[data-test-target=right]", text: (i + 1).to_s
     end
 
-    assert_selector ".result__score", text: /\b3 right/, wait: 10
+    assert_selector ".result__score", text: /\b3 correct answer/, wait: 10
     assert_equal "addition", users(:ada).attempts.last.topic
   end
 
@@ -71,7 +71,7 @@ class NewTopicsTest < ApplicationSystemTestCase
       assert_selector "[data-test-target=right]", text: (i + 1).to_s
     end
 
-    assert_selector ".result__score", text: /\b3 right/, wait: 10
+    assert_selector ".result__score", text: /\b3 correct answer/, wait: 10
     assert_equal "conversions", users(:ada).attempts.last.topic
   end
 
@@ -90,7 +90,7 @@ class NewTopicsTest < ApplicationSystemTestCase
       assert_selector "[data-test-target=right]", text: (i + 1).to_s
     end
 
-    assert_selector ".result__score", text: /\b3 right/, wait: 10
+    assert_selector ".result__score", text: /\b3 correct answer/, wait: 10
     assert_equal "percentages", users(:ada).attempts.last.topic
   end
 

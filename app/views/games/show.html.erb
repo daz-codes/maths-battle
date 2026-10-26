@@ -71,11 +71,8 @@
   <% end %>
 
   <div class="test__stage" data-test-target="stage">
-    <%# The question, then below it the one just answered, marked like a teacher would: "7 × 8 = 56 ✓" or
-        "7 × 8 = 54 ✗ 56" %>
     <p class="question question--current" data-test-target="question" aria-live="off">Ready</p>
     <p class="answer" data-test-target="answer" aria-live="polite"></p>
-    <p class="question-previous" data-test-target="previousQuestion" aria-live="polite"></p>
     <%# Ink splat, a Power game's power-up, covering the question for a while %>
     <%= tag.div(class: "test__ink", aria: { hidden: true }) if @live&.dig(:power) %>
     <p class="test__status" data-test-target="status" hidden></p>

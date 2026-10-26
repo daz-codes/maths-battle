@@ -21,7 +21,7 @@ class EquationsTest < ApplicationSystemTestCase
     wrong = current_answer == "1" ? "2" : "1"
     find("body").send_keys(wrong) # a one-character answer is checked straight away, so this one's wrong unless the answer is 1
 
-    assert_selector ".result__score", text: /\b[45] right/, wait: 10
+    assert_selector ".result__score", text: /\b[45] correct answer/, wait: 10
     assert_text "EQUATIONS, LEVEL 1"
     assert_equal "equations", users(:ada).attempts.last.topic
   end

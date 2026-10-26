@@ -1,10 +1,15 @@
 <%# One of the day's challenges, as a button that opens it: to play, or once played, where it stands and its share,
-    then the player's stats from every one of its kind. Closed, it just says whether it's done %>
+    then the player's stats from every one of its kind. Closed, it says the score and where it stands, or that it's to play %>
 <% attempt = user.daily_game(daily_test) %>
 <details class="daily-test daily-test--<%= daily_test.kind %>">
   <summary class="daily-test__toggle">
     <span class="daily-test__name"><%= topic_icon(daily_test.topic) %> <%= daily_test.name %> <span class="daily-test__number">#<%= daily_test.number %></span></span>
-    <span class="daily-test__status"><%= attempt ? "Done · #{daily_standing_message(attempt.daily_test.standing_of(attempt))}" : "Not played yet" %></span>
+    <% if attempt %>
+      <span class="daily-test__score"><%= number_with_delimiter attempt.score %> <span><%= pluralize(attempt.correct, "correct answer") %></span></span>
+      <span class="daily-test__status"><%= daily_standing_message(attempt.daily_test.standing_of(attempt)) %></span>
+    <% else %>
+      <span class="daily-test__status">Not played yet</span>
+    <% end %>
   </summary>
 
   <div class="daily-test__body">

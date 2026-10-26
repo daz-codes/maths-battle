@@ -80,7 +80,7 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
 
     get attempt_path(attempt)
     assert_select ".card__number", text: "175"
-    assert_select ".result__score", text: /175\s+5 right/
+    assert_select ".result__score", text: /175\s+5 correct answers/
     assert_select ".score-tally__right", text: "Right answers +50"
     assert_select ".score-tally__speed", text: "Speed +100"
     assert_select ".score-tally__combo", text: "Combos (best run 5) +30"
@@ -113,7 +113,7 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
     get attempt_path(attempt)
     assert_response :success
     assert_select ".card__number", text: attempt.score.to_s
-    assert_select ".result__score", text: /2\s+right/
+    assert_select ".result__score", text: /2\s+correct answers/
     assert_select ".banner", text: /New high score/
     assert_select ".feedback", text: /Practise your/
     assert_select ".missed li", text: "7 × 8 = 56"

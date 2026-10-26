@@ -130,6 +130,6 @@ class AttemptTest < ActiveSupport::TestCase
     Attempt.record!(user: @user, results: answers(*right_answers(9)))
 
     assert_equal first.score, first.reload.best_score
-    assert_equal "🔥 1 day streak  🏆 Best: #{first.score}", first.share_stats, "a later, better game doesn't change an old share"
+    assert_equal "🔥 1 day streak  🏆 High score: #{first.score}", first.share_stats, "a later, better game doesn't change an old share"
   end
 end

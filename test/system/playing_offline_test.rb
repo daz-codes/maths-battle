@@ -76,7 +76,7 @@ class PlayingOfflineTest < ApplicationSystemTestCase
     assert_no_selector ".offline-result"
     page.execute_script("window.fetch = window.originalFetch; Storage.prototype.setItem = window.originalSetItem")
     click_button "Try saving again"
-    assert_selector ".result__score", text: /\b5 right/, wait: 8
+    assert_selector ".result__score", text: /\b5 correct answer/, wait: 8
     assert_equal 1, @user.attempts.count
   end
 

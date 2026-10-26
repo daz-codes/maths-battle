@@ -27,7 +27,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // after a warning, and then nothing is saved. A review has no clock or score: it asks each of its
 // questions once and ends after the last
 export default class extends Controller {
-  static targets = [ "question", "previousQuestion", "answer", "right", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "rival", "combo", "powerSlot", "powerNews", "powerIcon", "speedIcon", "trophyIcon" ]
+  static targets = [ "question", "answer", "right", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "offlineResult", "offlineScore", "unavailable", "stage", "progress", "best", "ghost", "rival", "combo", "powerSlot", "powerNews", "powerIcon", "speedIcon", "trophyIcon" ]
   static values = { questionSets: Array, topic: String, level: Number, mode: String, round: String, best: Number, passed: { type: String, default: "New best!" }, ghost: Object, live: Object, submitUrl: String, keys: Array, scoring: Object }
 
   connect() {
@@ -421,8 +421,7 @@ export default class extends Controller {
     return this.current.answer
   }
 
-  // The question text is built on the server from numbers and letters (equations use HTML for fractions). The one
-  // just answered drops below it, marked
+  // The question text is built on the server from numbers and letters (equations use HTML for fractions)
   show() {
     this.questionTarget.innerHTML = this.current.text
     this.typed = ""
@@ -430,30 +429,14 @@ export default class extends Controller {
     this.answerTarget.classList.remove("answer--wrong")
     this.shownAt = performance.now()
     if (this.hasProgressTarget) this.progressTarget.textContent = `${this.index + 1}/${this.questions.length}`
-    if (this.answered) {
-      this.showAnswered(this.answered)
-      this.moveOn()
-    }
+    if (this.index > 0) this.moveOn()
   }
 
-  // Like a teacher's marking: "7 × 8 = 56 ✓", or what they put with a cross and the right answer, "7 × 8 = 54 ✗ 56".
-  // The worked answer ends with the right one ("… = 56", "… so w = 2", "… = 600 cm"), so theirs goes in its place
-  showAnswered({ solution, answer, typed, right }) {
-    const at = solution.lastIndexOf(shown(answer))
-    this.previousQuestionTarget.textContent = right ? `${solution} ✓`
-      : at < 0 ? `${solution} ✗`
-      : `${solution.slice(0, at)}${shown(typed) || "?"}${solution.slice(at + shown(answer).length)} ✗ ${shown(answer)}`
-    this.previousQuestionTarget.classList.toggle("question-previous--right", right)
-    this.previousQuestionTarget.classList.toggle("question-previous--wrong", !right)
-  }
-
-  // The next question comes down into place, and the one answered drops below it
+  // The next question comes down into place. Whether the last was right shows in what floats up (popPoints)
   moveOn() {
     if (reducedMotion.matches) return
 
-    const timing = { duration: 200, easing: "ease-out" }
-    this.questionTarget.animate([ { transform: "translateY(-25%)", opacity: 0 }, { transform: "none", opacity: 1 } ], timing)
-    this.previousQuestionTarget.animate([ { transform: "translateY(-150%)", opacity: 0 }, { transform: "none", opacity: 1 } ], timing)
+    this.questionTarget.animate([ { transform: "translateY(-25%)", opacity: 0 }, { transform: "none", opacity: 1 } ], { duration: 200, easing: "ease-out" })
   }
 
   // One size for the whole game, so the questions don't jump about: small enough for the longest in the set, as
@@ -466,11 +449,10 @@ export default class extends Controller {
 
   // The question's own details go back with the answer, so the server can check it for itself
   check() {
+    // A question kept on a device from when they had a worked answer still sends just its own details
     const { text, answer, solution, ...question } = this.current
     const ms = Math.round(performance.now() - this.shownAt)
     this.results.push({ ...question, given: this.typed, ms })
-    // Games kept on a device from before questions had their worked answer get a plain one
-    this.answered = { solution: solution ?? `${text.replace(/<[^>]+>/g, "")} = ${shown(answer)}`, answer, typed: this.typed, right: this.typed === answer }
 
     if (this.typed === answer) {
       this.correct++
@@ -664,8 +646,6 @@ export default class extends Controller {
     this.questionTarget.textContent = this.review ? "All done!" : "Time's up!"
     this.questionTarget.classList.remove("question--long", "question--longer")
     this.questionTarget.classList.add("question--done")
-    // The last one answered, a review's final question included, still shows its worked answer
-    if (this.answered) this.showAnswered(this.answered)
     this.answerTarget.textContent = ""
     this.answerTarget.classList.remove("answer--wrong")
     this.keypadTarget.hidden = true
@@ -714,7 +694,6 @@ export default class extends Controller {
     this.state = "saved"
     this.statusTarget.hidden = true
     this.questionTarget.hidden = true
-    this.previousQuestionTarget.hidden = true
     this.answerTarget.hidden = true
     this.offlineScoreTarget.textContent = this.points.toLocaleString()
     this.offlineResultTarget.hidden = false

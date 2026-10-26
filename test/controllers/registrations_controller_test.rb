@@ -17,7 +17,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to topics_path, "a new player picks a topic first"
     patch topic_path, params: { topic: "functions" }
     follow_redirect!
-    assert_select ".ui-welcome", text: /Hi Zara!/
+    assert_select ".ui-header__hello", text: "Hi Zara!"
   end
 
   test "a name, username and password are all needed" do

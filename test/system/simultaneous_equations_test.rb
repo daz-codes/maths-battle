@@ -17,7 +17,7 @@ class SimultaneousEquationsTest < ApplicationSystemTestCase
     find("body").send_keys(current_answer)
     assert_selector "[data-test-target=right]", text: "2"
 
-    assert_selector ".result__score", text: /\b[23] right/, wait: 10
+    assert_selector ".result__score", text: /\b[23] correct answer/, wait: 10
     assert_text "SIMULTANEOUS EQUATIONS, LEVEL 1"
     assert_equal "simultaneous", users(:ada).attempts.last.topic
   end

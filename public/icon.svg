@@ -1,25 +1,16 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <filter id="glow" filterUnits="userSpaceOnUse" x="-20" y="-20" width="90" height="90"><feGaussianBlur stdDeviation="1.8"/></filter>
-  </defs>
-  <rect width="512" height="512" rx="96" fill="#121310"/>
+  <rect width="512" height="512" rx="96" fill="#10121b"/>
   <g transform="translate(64 64) scale(8)">
     <g transform="rotate(-90 24 24)" fill="none" stroke-width="6">
-      <g filter="url(#glow)" opacity=".7">
-        <circle cx="24" cy="24" r="20" stroke="#efff2e" stroke-dasharray="28.90 96.76"/>
-        <circle cx="24" cy="24" r="20" stroke="#5dff7a" stroke-dasharray="28.90 96.76" stroke-dashoffset="-31.42"/>
-        <circle cx="24" cy="24" r="20" stroke="#2be4ff" stroke-dasharray="28.90 96.76" stroke-dashoffset="-62.83"/>
-        <circle cx="24" cy="24" r="20" stroke="#ff5cc6" stroke-dasharray="28.90 96.76" stroke-dashoffset="-94.25"/>
-      </g>
-      <circle cx="24" cy="24" r="20" stroke="#efff2e" stroke-dasharray="28.90 96.76"/>
-      <circle cx="24" cy="24" r="20" stroke="#5dff7a" stroke-dasharray="28.90 96.76" stroke-dashoffset="-31.42"/>
-      <circle cx="24" cy="24" r="20" stroke="#2be4ff" stroke-dasharray="28.90 96.76" stroke-dashoffset="-62.83"/>
-      <circle cx="24" cy="24" r="20" stroke="#ff5cc6" stroke-dasharray="28.90 96.76" stroke-dashoffset="-94.25"/>
+      <circle cx="24" cy="24" r="20" stroke="#d1f879" stroke-dasharray="28.90 96.76"/>
+      <circle cx="24" cy="24" r="20" stroke="#d1f879" stroke-dasharray="28.90 96.76" stroke-dashoffset="-31.42"/>
+      <circle cx="24" cy="24" r="20" stroke="#b59bff" stroke-dasharray="28.90 96.76" stroke-dashoffset="-62.83"/>
+      <circle cx="24" cy="24" r="20" stroke="#b59bff" stroke-dasharray="28.90 96.76" stroke-dashoffset="-94.25"/>
     </g>
-    <g stroke="#f4f4ea" stroke-linecap="round">
+    <g stroke="#f5f6fb" stroke-linecap="round">
       <line x1="24" y1="24" x2="24" y2="10.5" stroke-width="3"/>
       <line x1="24" y1="24" x2="30.5" y2="27.75" stroke-width="3.5"/>
     </g>
-    <circle cx="24" cy="24" r="2.4" fill="#f4f4ea"/>
+    <circle cx="24" cy="24" r="2.4" fill="#f5f6fb"/>
   </g>
 </svg>
