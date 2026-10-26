@@ -1,4 +1,4 @@
-<% content_for :title, "#{@topic.title}#{{ "review" => " review", "group" => " group challenge", "mixed" => " mixed practice", "head_to_head" => " head to head", "live" => " live", "daily" => " Daily Tables Test" }[@mode]} · MatheMinute" %>
+<% content_for :title, "#{@topic.title}#{{ "review" => " review", "group" => " group challenge", "mixed" => " mixed practice", "head_to_head" => " head to head", "live" => " live", "daily" => " #{@daily_test&.name}" }[@mode]} · MatheMinute" %>
 <% content_for :viewport, "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" %>
 <% content_for :body_class, "testing" %>
 <% content_for :focus_mode, true %>

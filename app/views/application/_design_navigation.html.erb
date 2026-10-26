@@ -1,0 +1,9 @@
+<footer class="site-footer design-navigation">
+  <nav aria-label="Main navigation">
+    <% design_navigation.each do |label, symbol, path, active| %>
+      <%= link_to path, class: "site-footer__tab", aria: { current: ("page" if active) } do %>
+        <%= icon(symbol, class: "footer-icon") %><span><%= label %></span>
+      <% end %>
+    <% end %>
+  </nav>
+</footer>

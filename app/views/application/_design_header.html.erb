@@ -1,0 +1,13 @@
+<header class="site-header design-header">
+  <%= link_to root_path, class: "design-brand", aria: { label: "MatheMinute home" } do %>
+    <span class="design-brand__mark"><%= render "clock", class: "logo__mark" %></span>
+    <span>mathe<span class="design-brand__minute">minute</span><span class="design-brand__period">.</span></span>
+  <% end %>
+  <span class="design-header__promise">A little practice. A new personal best.</span>
+  <div class="design-header__tools">
+    <%= render "design_picker" %>
+    <%= link_to edit_profile_path, class: "design-profile", aria: { label: "Settings" } do %>
+      <%= render "avatar", user: current_player, size: "small" %>
+    <% end %>
+  </div>
+</header>

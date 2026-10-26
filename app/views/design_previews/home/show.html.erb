@@ -1,0 +1,66 @@
+<% content_for :title, "Your next minute · MatheMinute" %>
+<% daily_tests = DailyTest.on(@user.today) %>
+<% completed = daily_tests.count { |test| @user.daily_game(test) } %>
+<% all_done = completed == daily_tests.size %>
+
+<main class="page home design-home">
+  <%= render "flash" %>
+
+  <div class="design-welcome">
+    <div>
+      <p class="design-eyebrow"><%= @user.display_name ? "Hey, #{@user.display_name}. Ready for another round?" : "Your next personal best starts here" %></p>
+      <h1 class="design-home__heading">
+        <% case design_preview %>
+        <% when "sprint" %>One minute.<br><span>Make it count.</span>
+        <% when "bunch" %>Small sums.<br><span>Big energy.</span>
+        <% when "arcade" %>One minute.<br><span>All in.</span>
+        <% end %>
+      </h1>
+    </div>
+    <div class="design-streak" aria-label="<%= @user.streak %> day streak">
+      <%= icon(:flame) %><strong><%= @user.streak %></strong><span>day streak</span>
+    </div>
+  </div>
+
+  <nav class="home-actions design-actions" aria-label="Play">
+    <%= link_to challenge_path, class: "button home-action home-action--challenge design-daily" do %>
+      <span class="design-daily__info">
+        <span class="design-eyebrow"><span class="design-live-dot" aria-hidden="true"></span> Today's main event</span>
+        <span class="home-action__label">Daily Challenge</span>
+        <span class="design-daily__description">Pick a daily game. Same questions.<br>See how you stack up.</span>
+        <span class="design-daily__meta"><span>60 seconds</span><span>One go per game</span></span>
+        <span class="design-daily__cta"><%= all_done ? "See your results" : "Let's play" %> <span aria-hidden="true">↗</span></span>
+        <span class="design-daily__edition"><%= completed.positive? ? "#{completed} of #{daily_tests.size} done today" : daily_tests.map(&:name).join(" · ") %> · <%= @user.today.strftime("%a, %-d %b") %></span>
+      </span>
+      <%= render "home/daily_art" %>
+    <% end %>
+
+    <%= link_to practice_path, class: "button home-action home-action--practice design-secondary" do %>
+      <span class="design-secondary__top"><span class="design-secondary__icon"><%= icon(:lightning) %></span><span class="design-secondary__arrow" aria-hidden="true">↗</span></span>
+      <span class="home-action__label">Practice</span>
+      <span class="design-secondary__description"><%= Topic::ALL.size %> topics. Your pace.<br>Keep chasing your best.</span>
+    <% end %>
+    <%= link_to groups_path, class: "button home-action home-action--compete design-secondary" do %>
+      <span class="design-secondary__top"><span class="design-secondary__icon"><%= icon(:people) %></span><span class="design-secondary__arrow" aria-hidden="true">↗</span></span>
+      <span class="home-action__label">Compete</span>
+      <span class="design-secondary__description">Bring your friends.<br>Give them a score to beat.</span>
+    <% end %>
+  </nav>
+
+  <%= render "head_to_heads/to_play", user: @user %>
+  <%= render "groups/to_play", user: @user %>
+
+  <section class="design-progress" aria-labelledby="design-progress-heading">
+    <div class="design-section-heading"><h2 id="design-progress-heading">Your personal scoreboard</h2><%= link_to "All stats ↗", stats_path %></div>
+    <dl class="stats">
+      <div><dt>Personal best</dt><dd><%= @user.persisted? ? number_with_delimiter(@user.best_score) : "—" %></dd><span class="design-stat-caption">A score worth chasing</span></div>
+      <div><dt>Longest streak</dt><dd><%= @user.persisted? ? @user.longest_streak : 0 %><span class="design-stat-unit"> days</span></dd><span class="design-stat-caption">Little by little, every day</span></div>
+    </dl>
+  </section>
+
+  <p class="design-home__footnote">A minute to play. A reason to come back.</p>
+  <% if @user.guest? && @user.persisted? %>
+    <p class="save-nudge">Playing as a guest. <%= link_to "Save your progress", new_registration_path %> to keep it across devices.</p>
+  <% end %>
+  <%= render "install" %>
+</main>

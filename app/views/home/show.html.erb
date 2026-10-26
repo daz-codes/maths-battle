@@ -18,11 +18,8 @@
   <nav class="home-actions" aria-label="Play">
     <%= link_to challenge_path, class: "button button--wide home-action home-action--challenge" do %>
       <span class="home-action__label"><%= icon(:target) %> Daily Challenge</span>
-      <% if (today = @user.daily_test_on) %>
-        <span class="button__note">Done · <%= daily_standing_message(today.daily_test.standing_of(today)) %></span>
-      <% else %>
-        <span class="button__note">Daily Tables Test</span>
-      <% end %>
+      <% done = DailyTest.on(@user.today).count { @user.daily_game(_1) } %>
+      <span class="button__note"><%= { 0 => DailyTest::KINDS.values.map { _1[:name] }.join(" · "), DailyTest::KINDS.size => "All done for today" }.fetch(done) { "#{done} of #{DailyTest::KINDS.size} done today" } %></span>
     <% end %>
     <%= link_to practice_path, class: "button button--wide home-action home-action--practice" do %>
       <span class="home-action__label"><%= icon(:lightning) %> Practice</span>

@@ -1,0 +1,14 @@
+<details class="design-picker">
+  <summary><span class="design-picker__dot" aria-hidden="true"></span> <%= DesignPreviews::DESIGNS.fetch(design_preview)[:name] %> <span aria-hidden="true">⌄</span></summary>
+  <nav class="design-picker__panel" aria-label="Design previews">
+    <p class="design-picker__label">Design studio</p>
+    <% DesignPreviews::DESIGNS.each do |key, details| %>
+      <%= link_to design_preview_path(key), class: "design-picker__option", aria: { current: ("true" if key == design_preview) } do %>
+        <span class="design-picker__swatch design-picker__swatch--<%= key %>" aria-hidden="true"></span>
+        <span><strong><%= details[:name] %></strong><small><%= details[:description] %></small></span>
+        <span class="design-picker__check" aria-hidden="true"><%= "✓" if key == design_preview %></span>
+      <% end %>
+    <% end %>
+    <p class="design-picker__footnote">Local preview · follows you between pages</p>
+  </nav>
+</details>

@@ -34,7 +34,9 @@ module AttemptTestHelper
     Equations => { type: "x+a=b", a: 2, b: 5, v: "x", flip: false, given: "3", ms: 1000 },
     Functions => { type: "x+a", a: 2, n: 3, given: "5", ms: 1000 },
     # 2x + y = 5 and x + y = 3: x = 2
-    SimultaneousEquations => { type: "subtract", a: 2, b: 1, c: 5, d: 1, e: 1, f: 3, v: "x", given: "2", ms: 1000 }
+    SimultaneousEquations => { type: "subtract", a: 2, b: 1, c: 5, d: 1, e: 1, f: 3, v: "x", given: "2", ms: 1000 },
+    # 1, 3, 5, 7, 9: 11
+    Sequences => { type: "add", a: 1, b: 2, c: 0, given: "11", ms: 1000 }
   }
 
   # A daily challenge, the game that keeps the streak going

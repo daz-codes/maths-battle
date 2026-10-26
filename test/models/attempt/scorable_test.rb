@@ -60,7 +60,8 @@ class Attempt::ScorableTest < ActiveSupport::TestCase
     require Rails.root.join("db/migrate/support/points_backfill")
     attempt = Attempt.record!(user: @user, results: answers(*right_answers(12), ms: 900) + answers([ 2, 3, 7 ]) + answers(*right_answers(6), ms: 1_500))
     assert_equal attempt.score, PointsBackfill.new(nil).points(attempt.topic, attempt.results)
-    Topic::ALL.each { |topic| assert_equal topic.gem_times.values_at(:lightning, :quick), PointsBackfill::SPEEDS.fetch(topic.key), topic.title }
+    # Topics there were then (sequences came later)
+    Topic::ALL.select { PointsBackfill::SPEEDS.key?(_1.key) }.each { |topic| assert_equal topic.gem_times.values_at(:lightning, :quick), PointsBackfill::SPEEDS.fetch(topic.key), topic.title }
   end
 
   test "gems are still kept, though not shown: the score with bonuses on top" do

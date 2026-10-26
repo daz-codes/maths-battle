@@ -38,7 +38,7 @@ module Attempt::Shareable
 
   # "Times tables, level 3" where a topic has levels
   def topic_and_level
-    if daily_test? then "Daily Tables Test ##{daily_test.number}"
+    if daily_test? then "#{daily_test.name} ##{daily_test.number}"
     elsif daily_challenge? then "#{topic_module.title}, daily challenge"
     elsif review? then "#{topic_module.title}, review"
     elsif mixed? then "#{topic_module.title}, mixed practice"

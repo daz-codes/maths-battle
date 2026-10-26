@@ -58,7 +58,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "a.back-link[href=?]", root_path
     assert_select ".levels"
     get challenge_path
-    assert_select "h1", text: /Daily Tables Test/
+    assert_select "h1", text: /Daily Challenge/
     assert_select "a.back-link[href=?]", root_path
   end
 

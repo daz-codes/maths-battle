@@ -58,6 +58,8 @@ module IconsHelper
     equations: %(<path d="M12 3.5v17M7.5 20.5h9M4 6.5h16M4 6.5l-2.5 6a3 3 0 0 0 5 0zM20 6.5l-2.5 6a3 3 0 0 0 5 0z" #{LINE}/>),
     # A cog: a ring with eight square teeth
     functions: %(<circle cx="12" cy="12" r="6.6" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 6V2.4M16.24 7.76l2.55-2.55M18 12h3.6M16.24 16.24l2.55 2.55M12 18v3.6M7.76 16.24l-2.55 2.55M6 12H2.4M7.76 7.76 5.21 5.21" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="butt"/>),
+    # Dots growing, one after another: a sequence
+    sequences: %(<circle cx="4" cy="16" r="1.6" fill="currentColor"/><circle cx="9.5" cy="13" r="2.2" fill="currentColor"/><circle cx="16" cy="9.5" r="2.8" fill="currentColor"/><circle cx="21" cy="5" r="1.5" fill="var(--pink)"/>),
     simultaneous: %(<path d="M3 19 21 7M3 9l18 8" #{LINE}/><circle cx="12" cy="13" r="2.4" fill="var(--pink)"/>)
   }.freeze
 

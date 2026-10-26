@@ -19,15 +19,15 @@ class DailyTestTest < ActiveSupport::TestCase
     assert_not_equal test.questions, DailyTest.new(@day + 1).questions
     assert_equal User::QUESTION_COUNT, test.questions.size
     assert test.questions.all? { |question| question[:text].match?(/\A\d+ × \d+\z/) }
-    assert_equal 1, DailyTest.new(DailyTest::FIRST_DAY).number
-    assert_equal 10, DailyTest.new(DailyTest::FIRST_DAY + 9).number
+    assert_equal 1, DailyTest.new(DailyTest::KINDS["tables"][:first_day]).number
+    assert_equal 10, DailyTest.new(DailyTest::KINDS["tables"][:first_day] + 9).number
   end
 
   test "anyone can play it, whatever level they've reached, once a day, on the day it was for" do
     assert_equal 1, @ada.unlocked_level(TimesTables)
     game = play(@ada, right: 5)
     assert game.daily_test?
-    assert_equal game, @ada.daily_test_on(@day)
+    assert_equal game, @ada.daily_game(DailyTest.new(@day))
 
     assert_raises(Attempt::Invalid) { play(@ada, right: 9) }
     assert_raises(Attempt::Invalid, "yesterday's questions can't be played today") { play(@bob, right: 9, day: @day - 1, played_at: Time.current.iso8601) }
@@ -56,8 +56,8 @@ class DailyTestTest < ActiveSupport::TestCase
     test = DailyTest.new(@day)
     assert_equal 4, test.players, "another day's game doesn't count"
     assert_equal DailyTest::Standing.new(rank: 1, players: 4, top_percent: 25, beaten_percent: 75), test.standing_of(top)
-    assert_equal [ 2, 50 ], test.standing_of(@bob.daily_test_on(@day)).then { [ _1.rank, _1.top_percent ] }
-    assert_equal [ 2, 50 ], test.standing_of(carol.daily_test_on(@day)).then { [ _1.rank, _1.top_percent ] }, "a tie shares the place"
+    assert_equal [ 2, 50 ], test.standing_of(@bob.daily_game(DailyTest.new(@day))).then { [ _1.rank, _1.top_percent ] }
+    assert_equal [ 2, 50 ], test.standing_of(carol.daily_game(DailyTest.new(@day))).then { [ _1.rank, _1.top_percent ] }, "a tie shares the place"
     assert_equal [ 4, 100, 0 ], test.standing_of(last).then { [ _1.rank, _1.top_percent, _1.beaten_percent ] }
   end
 end

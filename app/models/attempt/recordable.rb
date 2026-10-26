@@ -66,7 +66,7 @@ module Attempt::Recordable
           played_at = play_time(played_at)
           played_on = played_at.in_time_zone(user.time_zone).to_date
           raise Invalid, "Today's daily challenge is already done" if mode == "challenge" && user.daily_challenge_on(topic_named(topic), played_on)
-          check_daily_test_day(user, day, played_on) if mode == "daily"
+          check_daily_test_day(user, DailyTest.new(played_on, DailyTest.kind_for(topic_named(topic))), day) if mode == "daily"
 
           user.attempts.create!(topic: topic, level: level, results: results, client_id: client_id.presence, played_at: played_at, mode: mode, round: round)
             .tap { |attempt| head_to_head&.played(attempt) }
@@ -95,12 +95,13 @@ module Attempt::Recordable
       end
 
       def check_daily_test(topic, level)
-        raise Invalid, "Bad question" unless topic == DailyTest::TOPIC && level == DailyTest::LEVEL
+        kind = DailyTest.kind_for(topic)
+        raise Invalid, "Bad question" unless kind && level == DailyTest::KINDS.fetch(kind)[:level]
       end
 
-      def check_daily_test_day(user, day, played_on)
-        raise Invalid, "That Daily Tables Test was for another day" unless day.to_s == played_on.iso8601
-        raise Invalid, "Today's Daily Tables Test is already done" if user.daily_test_on(played_on)
+      def check_daily_test_day(user, test, day)
+        raise Invalid, "That #{test.name} was for another day" unless day.to_s == test.day.iso8601
+        raise Invalid, "Today's #{test.name} is already done" if user.daily_game(test)
       end
 
       def check_unlocked(user, topic, level)

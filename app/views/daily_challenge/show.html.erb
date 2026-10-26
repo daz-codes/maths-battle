@@ -1,30 +1,12 @@
-<% content_for :title, "Daily Tables Test · MatheMinute" %>
+<% content_for :title, "Daily Challenge · MatheMinute" %>
 
 <main class="page daily-challenge">
   <%= link_to "← Home", root_path, class: "back-link" %>
-  <h1 class="heading"><%= icon(:target) %> Daily Tables Test</h1>
-  <p class="aside">#<%= @daily_test.number %> · <%= @daily_test.day.strftime("%-d %B %Y") %></p>
+  <h1 class="heading"><%= icon(:target) %> Daily Challenge</h1>
+  <p class="aside"><%= @daily_tests.first.day.strftime("%-d %B %Y") %></p>
   <%= render "flash" %>
 
-  <% if @attempt %>
-    <%= render "daily_challenge/standing", attempt: @attempt %>
-    <button type="button" class="button button--share button--wide" data-controller="share"
-            data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>
-    <p class="hint hint--centre">A new test tomorrow.</p>
-  <% else %>
-    <%= link_to "Play today's test", play_path(DailyTest::TOPIC.slug, daily: 1), class: "button button--start button--wide" %>
-    <p class="hint hint--centre">Times tables 2 to 12. Everyone gets the same questions today, and one go each.</p>
-    <% if (players = @daily_test.players).positive? %>
-      <p class="aside"><%= pluralize(players, "player") %> so far today</p>
-    <% end %>
-  <% end %>
-
-  <%# How they've done in every Daily Tables Test %>
-  <% if @user.persisted? && (played = @user.daily_tests.count).positive? %>
-    <dl class="stats">
-      <div><dt>Best score</dt><dd><%= icon(:trophy) %> <%= number_with_delimiter @user.best_daily_test %></dd></div>
-      <div><dt>Average score</dt><dd><%= number_with_delimiter @user.average_daily_test %></dd></div>
-      <div><dt>Tests played</dt><dd><%= played %></dd></div>
-    </dl>
+  <% @daily_tests.each do |daily_test| %>
+    <%= render "daily_challenge/test", daily_test: daily_test, user: @user %>
   <% end %>
 </main>
