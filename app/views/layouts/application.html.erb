@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<%= language %>" data-theme="<%= current_player.theme %>" data-design="<%= design_preview %>" data-sounds="<%= current_player.sounds? ? "on" : "off" %>">
+<html lang="<%= language %>" data-theme="<%= current_player.theme %>" data-sounds="<%= current_player.sounds? ? "on" : "off" %>">
   <head>
     <title><%= content_for(:title) || "MatheMinute" %></title>
     <meta name="viewport" content="<%= content_for(:viewport) || "width=device-width,initial-scale=1" %>">
@@ -27,30 +27,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400..900;1,500..700&display=swap" rel="stylesheet">
-    <% if design_previews_available? %>
-      <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <% end %>
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="<%= [content_for(:body_class), ("design-preview" if design_preview?)].compact.join(" ") %>"
+  <body class="<%= content_for(:body_class) %>"
         <%= tag.attributes(data: { controller: "sync", sync_upload_url_value: attempts_path, sync_auto_refresh_value: !content_for?(:no_auto_refresh) }) unless content_for?(:focus_mode) %>>
     <%# The logo is the way home from every page, except mid-test where nothing should distract %>
     <% unless content_for?(:focus_mode) %>
-      <% if design_preview? %>
-        <%= render "design_header" %>
-      <% else %>
       <header class="site-header">
         <%= render "logo" %>
         <%= tag.p(yield(:tagline), class: "tagline") if content_for?(:tagline) %>
-        <%= render "design_picker" if design_previews_available? %>
       </header>
-      <% end %>
       <p class="flash flash--alert refused-games" role="alert" data-sync-target="refused" hidden></p>
     <% end %>
     <%= yield %>
-    <%= render(design_preview? ? "design_navigation" : "footer") unless content_for?(:focus_mode) %>
+    <%= render "footer" unless content_for?(:focus_mode) %>
   </body>
 </html>
