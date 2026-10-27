@@ -61,7 +61,7 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     assert_match /Best score\s+#{game.score}/, css_select(".stats div").map { _1.text.squish }.join(" · ")
     assert_match /Played\s*1/, css_select(".stats div").map { _1.text.squish }.join(" · ")
     get root_path
-    assert_select ".home-action--challenge a.ui-daily__game--played[href=?]", attempt_path(game), text: /Daily Tables Test\s*#{game.score} · 8 correct answers\s*Top score today!/, message: "played, it opens the game's results"
+    assert_select ".home-action--challenge a.ui-daily__game--played[href=?]", attempt_path(game), text: /Daily Tables Test\s*#{game.score}\s*8 correct answers\s*Top score today!/, message: "played, it opens the game's results"
     assert_select ".home-action--challenge a.ui-daily__game[href=?]", play_path("sequences", daily: "patternz"), text: /Patternz\s*Play/
 
     get play_path("times-tables", daily: "tables")

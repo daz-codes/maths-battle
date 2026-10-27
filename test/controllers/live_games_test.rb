@@ -22,7 +22,8 @@ class LiveGamesTest < ActionDispatch::IntegrationTest
   test "the host makes a lobby from the Compete page, at their topic and level, with a link to share and a Start button" do
     sign_in_as @ada
     get groups_path
-    assert_select "form[action=?] button", live_games_path, text: /Play live/
+    assert_select "form[action=?] button", live_games_path, text: /Play Live/
+    assert_select "form[action=?] button svg", live_games_path, 1, "with the lightning bolt"
 
     post live_games_path
     game = LiveGame.last

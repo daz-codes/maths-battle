@@ -18,7 +18,7 @@
 
   <section class="live-start" aria-labelledby="live-heading">
     <h2 class="settings__heading" id="live-heading">Live</h2>
-    <%= button_to safe_join([ icon(:lightning), " Play live" ]), live_games_path, class: "button button--start button--wide", form_class: "wide-form" %>
+    <%= button_to safe_join([ icon(:lightning), " Play Live" ]), live_games_path, class: "button button--start button--wide", form_class: "wide-form" %>
   </section>
 
   <section class="group-list" aria-labelledby="groups-heading">
@@ -53,7 +53,7 @@
   </section>
 
   <% if @user.can_make_groups? %>
-    <%= link_to "Start a group", new_group_path, class: "button button--go button--wide" %>
+    <%= link_to safe_join([ icon(:people), " Create a Group" ]), new_group_path, class: "button button--go button--wide" %>
   <% else %>
     <p class="aside"><%= link_to "Make an account", new_registration_path %> to start a group of your own.</p>
   <% end %>

@@ -9,7 +9,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
   test "the switcher changes what Play plays, and is remembered, back on the page it was changed from" do
     get practice_path
     assert_select "a.button--play[href=?]", play_path("times-tables", level: 1)
-    assert_select "a.current-topic[href=?]", topics_path(from: :practice)
+    assert_select "a.current-topic__change[href=?]", topics_path(from: :practice)
 
     patch topic_path, params: { topic: "equations", from: "practice" }
     assert_redirected_to practice_path
@@ -21,14 +21,14 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
   test "Practice says which topic, and tapping it goes to change it" do
     get practice_path
     assert_select ".current-topic__name", text: "Times tables"
-    assert_select "a.current-topic[href=?][title='Change topic'][aria-label=?]", topics_path(from: :practice), "Times tables. Change topic"
+    assert_select "a.current-topic__change[href=?][aria-label=?]", topics_path(from: :practice), "Times tables. Change topic"
     assert_select "select", count: 0
   end
 
   test "the settings page says which topic too, and changing it from there comes back there" do
     get edit_profile_path
     assert_select ".current-topic__name", text: "Times tables"
-    assert_select "a.current-topic[href=?]", topics_path(from: "profile")
+    assert_select "a.current-topic__change[href=?]", topics_path(from: "profile")
 
     patch topic_path, params: { topic: "functions", from: "profile" }
     assert_redirected_to edit_profile_path
@@ -62,7 +62,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to stats_path
     follow_redirect!
     assert_select ".current-topic__name", text: "Equations"
-    assert_select "a.current-topic[href=?]", topics_path(from: "stats")
+    assert_select "a.current-topic__change[href=?]", topics_path(from: "stats")
   end
 
   test "a stats page for a topic can still be linked to" do

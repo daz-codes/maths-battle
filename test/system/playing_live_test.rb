@@ -21,7 +21,7 @@ class PlayingLiveTest < ApplicationSystemTestCase
     users(:ada).update!(name: "Ada")
     sign_in users(:ada)
     visit groups_path
-    click_on "Play live"
+    click_on "Play Live"
     assert_selector "h1", text: "Live game"
     code = LiveGame.last.code
 

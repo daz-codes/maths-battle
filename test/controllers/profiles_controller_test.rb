@@ -22,7 +22,7 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
       assert_select "input[type=submit][value=Save]"
     end
     assert_select "section[aria-labelledby=your-game]" do
-      assert_select "a.current-topic"
+      assert_select "a.current-topic__change", text: "Change topic"
       assert_select ".freezes", count: 0
     end
     assert_select "section[aria-labelledby=app-settings]" do

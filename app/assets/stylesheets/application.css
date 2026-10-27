@@ -1,17 +1,17 @@
-/* Arcade: one responsive game interface, with dodger blue and neon pink in light mode,
-   and ink, lime and lilac in dark mode. The saved theme can also follow the device. */
+/* Arcade: one responsive game interface, in lime and lilac in light and dark mode alike, on pale paper or ink.
+   The saved theme can also follow the device. */
 
 :root {
   --paper: #f3f6fb; --paper-alt: #fff; --ink: #152541; --muted: #596a80; --line: #dce3ee;
-  --yellow: #ff5cc6; --pink: #ff5cc6; --blue: #1e90ff; --green: #1e90ff;
-  --blue-deep: #1677e0; --green-deep: #1677e0; --pink-deep: #d4148c; --grey-deep: #263852;
-  --pink-text: #1677e0; --on-pink-text: #fff; --wrong: #ce2d50; --on-neon: #152541;
-  --trophy: #ff5cc6; --trophy-outline: transparent;
-  --ui-accent: #1677e0; --ui-accent-ink: #fff; --ui-pop: #ff5cc6;
-  --ui-hero: #ff5cc6; --ui-hero-ink: #14191a; --ui-soft: #e8f3ff; --ui-hero-line: #ff5cc6;
-  --ui-art-a: #fff; --ui-art-b: #14191a; --ui-grid: #1e90ff15;
-  --ui-practice-ink: #c2127f; --ui-practice-surface: #ffe6f5; --ui-compete-surface: #e8f3ff;
-  --right-text: #1677e0;
+  --yellow: #d1f879; --pink: #b59bff; --blue: #b59bff; --green: #d1f879;
+  --blue-deep: #6d4fe0; --green-deep: #507b25; --pink-deep: #6d4fe0; --grey-deep: #263852;
+  --pink-text: #6d4fe0; --on-pink-text: #fff; --wrong: #ce2d50; --on-neon: #14191a;
+  --trophy: #9d7bff; --trophy-outline: transparent;
+  --ui-accent: #6d4fe0; --ui-accent-ink: #fff; --ui-pop: #d1f879;
+  --ui-hero: #1d2136; --ui-hero-ink: #f5f6fb; --ui-soft: #f0ebff; --ui-hero-line: #1d2136;
+  --ui-art-a: #d1f879; --ui-art-b: #b59bff; --ui-grid: #6d4fe015;
+  --ui-practice-ink: #6d4fe0; --ui-practice-surface: #f0ebff; --ui-compete-surface: #eef8d6;
+  --right-text: #507b25;
   --font: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --radius: 14px; --radius-big: 20px; --glow-strength: 0%;
   color-scheme: light;
@@ -557,21 +557,10 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   align-items: center;
   gap: 0.15rem;
   width: 100%;
-  padding: 0.65rem 1rem;
-  border-radius: var(--radius-big);
-  background: var(--paper-alt);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--blue) calc(var(--glow-strength) / 2), transparent);
-  color: var(--ink);
-  text-decoration: none;
-  transition: background-color 150ms, transform 100ms;
-  -webkit-tap-highlight-color: transparent;
 }
 
-.current-topic__name { display: flex; align-items: center; gap: 0.45rem; font-size: clamp(1.5rem, 7vw, 1.85rem); font-weight: 800; letter-spacing: -0.02em; }
-.current-topic__change { color: var(--muted); font-size: 0.85rem; font-weight: 700; }
-.current-topic:hover { background: color-mix(in srgb, var(--ink) 7%, var(--paper-alt)); }
-.current-topic:active { transform: scale(0.98); }
-.current-topic:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.current-topic__name { display: flex; align-items: center; gap: 0.45rem; margin: 0; font-size: clamp(2rem, 9vw, 2.6rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.15; }
+.current-topic__change { font-size: 0.95rem; font-weight: 700; }
 
 /* Changing topic: a tile for each, with the player's progress in it */
 .topic-cards { display: grid; gap: 0.75rem; width: 100%; margin: 0; padding: 0; list-style: none; }

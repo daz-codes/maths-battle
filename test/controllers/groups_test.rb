@@ -19,7 +19,8 @@ class GroupsTest < ActionDispatch::IntegrationTest
     assert_select ".home-actions", count: 0
     assert_select "a.group-card[href=?]", group_path(@group), text: /Class 4B.*1 player · You run it/m
     assert_select "form[action=?][method=get] input[name=code]", join_group_path
-    assert_select "a[href=?]", new_group_path, text: "Start a group"
+    assert_select "a[href=?]", new_group_path, text: "Create a Group"
+    assert_select "a[href=?] svg", new_group_path, 1, "with the group icon"
   end
 
   test "starting a group needs an account" do

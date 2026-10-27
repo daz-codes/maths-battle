@@ -4,7 +4,7 @@ class GroupsTest < ApplicationSystemTestCase
   test "an owner starts a group and sets a challenge; a player joins with the code, plays it, and sees the leaderboard" do
     sign_in users(:ada)
     click_on "Compete"
-    click_on "Start a group"
+    click_on "Create a Group"
     fill_in "What's it called?", with: "Class 4B"
     click_on "Start the group"
     code = find(".group-code__code").text

@@ -3,7 +3,8 @@
 <% if attempt %>
   <%= link_to attempt_path(attempt), class: "ui-daily__game ui-daily__game--played daily-game--#{daily_test.kind}" do %>
     <span class="ui-daily__game-name"><%= topic_icon(daily_test.topic) %> <%= daily_test.name %></span>
-    <span class="ui-daily__game-score"><%= number_with_delimiter attempt.score %> · <%= pluralize(attempt.correct, "correct answer") %></span>
+    <span class="ui-daily__game-score"><%= number_with_delimiter attempt.score %></span>
+    <span class="ui-daily__game-correct"><%= pluralize(attempt.correct, "correct answer") %></span>
     <span class="ui-daily__game-status"><%= daily_standing_message(daily_test.standing_of(attempt)) %></span>
   <% end %>
 <% else %>

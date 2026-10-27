@@ -15,6 +15,6 @@
       <div><dt>Average time</dt><dd><%= seconds(@user.overall_stats(current_topic, current_level).average_ms) %></dd></div>
       <div><dt>Most right</dt><dd><%= icon(:check) %> <%= @user.best_correct(current_topic, current_level) %></dd></div>
     </dl>
-    <%= link_to "See all stats", stats_path(current_topic.slug) %>
+    <p class="all-stats"><%= link_to "See all stats", stats_path(current_topic.slug) %></p>
   <% end %>
 </main>

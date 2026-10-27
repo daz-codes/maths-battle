@@ -57,8 +57,8 @@ a.ui-profile { display: flex; align-items: center; min-width: 44px; min-height: 
 .app-shell .ui-home { gap: 30px; }
 .ui-eyebrow { display: flex; align-items: center; gap: 7px; margin: 0; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .025em; }
 /* Master Maths in Minutes under the logo, on one line */
-.ui-home__heading { margin: 0; font-size: clamp(28px, 8vw, 52px); font-weight: 800; letter-spacing: -.065em; line-height: 1.08; text-align: center; white-space: nowrap; }
-.ui-home__heading > span { color: var(--ui-pop); }
+.ui-home__heading { margin: 0; font-size: clamp(22px, 6.2vw, 52px); font-weight: 800; letter-spacing: -.065em; line-height: 1.08; text-align: center; white-space: nowrap; }
+.ui-home__heading > span { color: var(--ui-accent); }
 .app-shell .ui-actions { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); grid-template-rows: 1fr 1fr; gap: 16px; width: 100%; }
 .app-shell .ui-actions .home-action { align-items: stretch; justify-content: flex-start; min-width: 0; margin: 0; padding: 24px; border: 1px solid var(--line); border-radius: var(--radius-big); text-align: left; white-space: normal; }
 .app-shell .ui-actions .ui-daily { position: relative; grid-row: 1 / 3; overflow: hidden; min-height: 330px; padding: 30px; border-color: transparent; background: var(--ui-hero); color: var(--ui-hero-ink); }
@@ -71,16 +71,20 @@ a.ui-profile { display: flex; align-items: center; min-width: 44px; min-height: 
 .ui-daily .home-action__label { display: block; margin-top: 21px; font-size: clamp(25px, 3.3vw, 33px); font-weight: 800; letter-spacing: -.05em; line-height: 1.13; }
 /* Today's games, right on the card: Play, or once played, the score and where it stands (opening its results) */
 .ui-daily__games { display: grid; gap: 10px; width: 100%; margin-top: auto; padding-top: 18px; }
-.app-shell a.ui-daily__game { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px; min-height: 52px; margin: 0; padding: 9px 10px 9px 16px; border: 0; border-radius: 10px; background: #1677e0; box-shadow: 0 3px 0 #0d55a6; color: #fff; text-decoration: none; }
-.app-shell a.ui-daily__game:hover { background: #0f68c9; }
+.app-shell a.ui-daily__game { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px; min-height: 52px; margin: 0; padding: 9px 10px 9px 16px; border: 0; border-radius: 10px; background: var(--game); box-shadow: 0 3px 0 color-mix(in srgb, var(--game) 60%, #000); color: #14191a; text-decoration: none; }
+.app-shell a.ui-daily__game:hover { background: color-mix(in srgb, var(--game) 88%, #000); }
+.daily-game--tables { --game: #d1f879; }
+.daily-game--patternz { --game: #b59bff; }
+.ui-daily__game .icon { --yellow: currentColor; --pink: currentColor; --green: currentColor; --blue: currentColor; }
 .app-shell a.ui-daily__game--played { flex-direction: column; align-items: flex-start; padding-block: 11px; }
 .ui-daily__game--played > span { width: 100%; }
 .ui-daily__game-name { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 800; letter-spacing: -.02em; }
 .ui-daily__game-name .icon { flex: none; width: 22px; height: 22px; }
-.ui-daily__game-play { display: inline-flex; align-items: center; gap: 14px; min-height: 36px; padding: 6px 13px; border-radius: 7px; background: #fff; color: #1677e0; font-size: 13px; font-weight: 800; }
+.ui-daily__game-play { display: inline-flex; align-items: center; gap: 14px; min-height: 36px; padding: 6px 13px; border-radius: 7px; background: #14191a; color: var(--game); font-size: 13px; font-weight: 800; }
 .ui-daily__game-play > span { font-size: 18px; line-height: 1; }
-.ui-daily__game-score { font-family: ui-monospace, monospace; font-size: 14px; font-weight: 800; }
-.ui-daily__game-status { font-size: 13px; font-weight: 600; }
+.ui-daily__game-score { margin-top: 2px; font-size: 40px; font-weight: 800; letter-spacing: -.05em; line-height: 1; }
+.ui-daily__game-correct { font-size: 14px; font-weight: 700; }
+.ui-daily__game-status { margin-top: 4px; font-size: 13px; font-weight: 600; }
 .ui-daily__art { position: absolute; top: -40px; right: -60px; width: 260px; opacity: .3; pointer-events: none; }
 .ui-daily__art { --yellow: var(--ui-art-a); --pink: var(--ui-art-a); --blue: var(--ui-art-b); --green: var(--ui-art-b); }
 .ui-daily__art .clock { width: 100%; height: auto; color: var(--ui-hero-ink); }
@@ -108,9 +112,9 @@ a.ui-profile { display: flex; align-items: center; min-width: 44px; min-height: 
 
 /* Supporting screens use the same surface, type and interaction system. */
 .app-shell .practice, .app-shell .daily-challenge, .app-shell .results { max-width: 720px; }
-.app-shell .current-topic { width: 100%; max-width: none; padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper-alt); }
-.app-shell .current-topic__name { font-size: 18px; font-weight: 800; }
-.app-shell .current-topic__change { font-size: 10px; }
+.app-shell .current-topic { width: 100%; max-width: none; }
+.app-shell .current-topic__name { font-size: clamp(30px, 8vw, 40px); font-weight: 800; }
+.app-shell .current-topic__change { font-size: 14px; }
 .app-shell .button--play { width: 100%; }
 .app-shell .levels-panel { width: 100%; padding: 28px 20px 23px; border: 1px solid var(--line); border-radius: var(--radius-big); background: var(--paper-alt); text-align: center; }
 .app-shell .levels { justify-content: space-around; gap: 8px; }
@@ -248,5 +252,8 @@ html .app-shell :is(.test__ghost--behind, .test__rival--behind) { color: var(--r
 .app-shell .score-tally li { background: var(--ui-pop); color: #14191a; }
 .app-shell .score-tally .score-tally__wrong { background: var(--paper-alt); box-shadow: inset 0 0 0 2px var(--wrong); color: var(--wrong); }
 
-/* Practice's Play level button in pink, lilac in dark mode */
-.app-shell .button--start.button--play { background: var(--pink); color: #14191a; }
+/* Practice's Play level button in lime and Mixed practice in lilac, in both themes; icons on solid buttons in their text's colour */
+.app-shell .button--start.button--play { background: #d1f879; color: #14191a; }
+.app-shell .button--mixed { --fill: #b59bff; --glow: #b59bff; color: #14191a; }
+.app-shell :is(.button--start, .button--go, .button--mixed) .icon { --yellow: currentColor; --pink: currentColor; --green: currentColor; --blue: currentColor; }
+.app-shell .all-stats { margin: 0; text-align: center; }
