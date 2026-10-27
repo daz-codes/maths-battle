@@ -22,6 +22,7 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     get root_path
     assert_select ".home-action--challenge .ui-daily__game", text: /Daily Tables Test\s*Play/
     assert_select ".home-action--challenge .ui-daily__game", text: /Patternz\s*Play/
+    assert_select ".home-action--challenge a.ui-daily__game[data-turbo-prefetch=false]", 2, "not fetched, and kept for offline, on a hover"
     get challenge_path
     assert_select "h1", text: /Daily Challenge/
     assert_select "details.daily-test:not([open]) summary .daily-test__name", text: /Daily Tables Test #\d+/, message: "a button to open each"
