@@ -1,35 +1,29 @@
 <% content_for :title, "Your next minute · MatheMinute" %>
-<% daily_tests = DailyTest.on(@user.today) %>
-<% completed = daily_tests.count { |test| @user.daily_game(test) } %>
-<% all_done = completed == daily_tests.size %>
+<% content_for :beside_hello do %>
+  <span class="streak ui-streak <%= "streak--done" if @user.practised_today? %>" aria-label="<%= @user.streak %> day streak"
+        title="<%= @user.streak %> day streak"><%= icon(:flame) %><strong><%= @user.streak %></strong></span>
+<% end %>
 
 <main class="page home ui-home">
   <%= render "flash" %>
 
-  <div class="ui-welcome">
-    <div>
-      <p class="ui-eyebrow"><%= @user.persisted? ? "Ready for another round?" : "Your next personal best starts here" %></p>
-      <h1 class="ui-home__heading">
-        Master <%= maths.capitalize %> in <span>Minutes</span>
-      </h1>
-    </div>
-    <div class="streak ui-streak" aria-label="<%= @user.streak %> day streak">
-      <%= icon(:flame) %><strong><%= @user.streak %></strong><span>day streak</span>
-    </div>
-  </div>
+  <h1 class="ui-home__heading">Master <%= maths.capitalize %> in <span>Minutes</span></h1>
 
   <nav class="home-actions ui-actions" aria-label="Play">
-    <%= link_to challenge_path, class: "button home-action home-action--challenge ui-daily" do %>
-      <span class="ui-daily__info">
-        <span class="ui-eyebrow"><span class="ui-live-dot" aria-hidden="true"></span> <%= @user.today.strftime("%A %-d %B") %></span>
-        <span class="home-action__label">Daily Challenge</span>
-        <span class="ui-daily__description">Pick a daily game. Same questions.<br>See how you stack up.</span>
-        <span class="ui-daily__meta"><span>60 seconds</span><span>One go per game</span></span>
-        <span class="ui-daily__cta"><%= all_done ? "See your results" : "Let's play" %> <span aria-hidden="true">↗</span></span>
-        <span class="ui-daily__edition"><%= completed.positive? ? "#{completed} of #{daily_tests.size} done today" : daily_tests.map(&:name).join(" · ") %></span>
-      </span>
+    <div class="home-action home-action--challenge ui-daily">
+      <div class="ui-daily__info">
+        <p class="ui-eyebrow"><span class="ui-live-dot" aria-hidden="true"></span> <%= @user.today.strftime("%A %-d %B") %></p>
+        <h2 class="home-action__label">Daily Challenge</h2>
+        <p class="ui-daily__description">Same questions for everyone.<br>See how you stack up.</p>
+        <p class="ui-daily__meta"><span>60 seconds</span><span>One go per game</span></p>
+        <div class="ui-daily__games">
+          <% DailyTest.on(@user.today).each do |daily_test| %>
+            <%= render "home/daily_game", daily_test: daily_test, attempt: @user.daily_game(daily_test) %>
+          <% end %>
+        </div>
+      </div>
       <%= render "home/daily_art" %>
-    <% end %>
+    </div>
 
     <%= link_to practice_path, class: "button home-action home-action--practice ui-secondary" do %>
       <span class="ui-secondary__top"><span class="ui-secondary__icon"><%= icon(:lightning) %></span><span class="ui-secondary__arrow" aria-hidden="true">↗</span></span>
@@ -54,7 +48,6 @@
     </dl>
   </section>
 
-  <p class="ui-home__footnote">A minute to play. A reason to come back.</p>
   <% if @user.guest? %>
     <p class="save-nudge">No account needed to play. <%= link_to "Save your progress", new_registration_path %> to keep your scores across devices.</p>
   <% end %>

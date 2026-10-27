@@ -3,7 +3,7 @@ module AttemptsHelper
   # Challenge, its group, or Compete
   def results_back_link(attempt)
     label, path =
-      if attempt.daily_test? then [ "Daily Challenge", challenge_path ]
+      if attempt.daily_test? then [ "Home", root_path ]
       elsif attempt.group? && (group = attempt.round&.challenge&.group) then [ group.name, group_path(group) ]
       elsif attempt.head_to_head? || attempt.live? then [ "Compete", groups_path ]
       else [ "Practice", practice_path ]

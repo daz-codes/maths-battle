@@ -1,4 +1,5 @@
-<%# The logo across the whole width, then who's playing: their picture (tap for settings) and a hello %>
+<%# The logo across the whole width, then who's playing: their picture (tap for settings) and a hello,
+    with whatever the page puts beside it (the home page's streak) %>
 <header class="site-header ui-header">
   <%= link_to root_path, class: "logo ui-brand", aria: { label: "MatheMinute home" } do %>
     <span class="ui-brand__mark"><%= render "clock", class: "logo__mark" %></span>
@@ -9,6 +10,7 @@
       <%= render "avatar", user: current_player, size: "small" %>
     <% end %>
     <span class="ui-header__hello">Hi <%= current_player.display_name || "there" %>!</span>
+    <%= yield :beside_hello %>
     <%= link_to "Sign in", new_session_path, class: "header-sign-in" if current_player.guest? %>
   </div>
 </header>

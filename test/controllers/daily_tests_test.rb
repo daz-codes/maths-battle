@@ -20,7 +20,8 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
       day: Date.current.iso8601, results: Array.new(2 + i) { { a: 2, b: 3, given: 6, ms: 3000 } }) }
 
     get root_path
-    assert_select ".home-action--challenge .ui-daily__edition", text: /Daily Tables Test · Patternz/
+    assert_select ".home-action--challenge .ui-daily__game", text: /Daily Tables Test\s*Play/
+    assert_select ".home-action--challenge .ui-daily__game", text: /Patternz\s*Play/
     get challenge_path
     assert_select "h1", text: /Daily Challenge/
     assert_select "details.daily-test:not([open]) summary .daily-test__name", text: /Daily Tables Test #\d+/, message: "a button to open each"
@@ -57,7 +58,8 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     assert_match /Best score\s+#{game.score}/, css_select(".stats div").map { _1.text.squish }.join(" · ")
     assert_match /Played\s*1/, css_select(".stats div").map { _1.text.squish }.join(" · ")
     get root_path
-    assert_select ".home-action--challenge .ui-daily__edition", text: /1 of 2 done today/
+    assert_select ".home-action--challenge a.ui-daily__game--played[href=?]", attempt_path(game), text: /Daily Tables Test\s*#{game.score} · 8 correct answers\s*Top score today!/, message: "played, it opens the game's results"
+    assert_select ".home-action--challenge a.ui-daily__game[href=?]", play_path("sequences", daily: "patternz"), text: /Patternz\s*Play/
 
     get play_path("times-tables", daily: "tables")
     assert_redirected_to challenge_path, "one go a day"

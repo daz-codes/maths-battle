@@ -1,17 +1,17 @@
-/* Arcade: one responsive game interface, with blue and fluorescent orange in light mode,
+/* Arcade: one responsive game interface, with dodger blue and neon pink in light mode,
    and ink, lime and lilac in dark mode. The saved theme can also follow the device. */
 
 :root {
   --paper: #f3f6fb; --paper-alt: #fff; --ink: #152541; --muted: #596a80; --line: #dce3ee;
-  --yellow: #ff7900; --pink: #ff7900; --blue: #2858e8; --green: #2858e8;
-  --blue-deep: #2858e8; --green-deep: #2858e8; --pink-deep: #bd4700; --grey-deep: #263852;
-  --pink-text: #2858e8; --on-pink-text: #fff; --wrong: #ce2d50; --on-neon: #152541;
-  --trophy: #ff7900; --trophy-outline: transparent;
-  --ui-accent: #2858e8; --ui-accent-ink: #fff; --ui-pop: #ff7900;
-  --ui-hero: #2858e8; --ui-hero-ink: #fff; --ui-soft: #eaf0ff; --ui-hero-line: #587cf0;
-  --ui-art-shadow: #b7caff; --ui-grid: #2858e815;
-  --ui-practice-ink: #bd4700; --ui-practice-surface: #fff0e3; --ui-compete-surface: #eaf0ff;
-  --right-text: #2858e8;
+  --yellow: #ff5cc6; --pink: #ff5cc6; --blue: #1e90ff; --green: #1e90ff;
+  --blue-deep: #1677e0; --green-deep: #1677e0; --pink-deep: #d4148c; --grey-deep: #263852;
+  --pink-text: #1677e0; --on-pink-text: #fff; --wrong: #ce2d50; --on-neon: #152541;
+  --trophy: #ff5cc6; --trophy-outline: transparent;
+  --ui-accent: #1677e0; --ui-accent-ink: #fff; --ui-pop: #ff5cc6;
+  --ui-hero: #1e90ff; --ui-hero-ink: #fff; --ui-soft: #e8f3ff; --ui-hero-line: #5cadff;
+  --ui-art-shadow: #a6d2ff; --ui-grid: #1e90ff15;
+  --ui-practice-ink: #c2127f; --ui-practice-surface: #ffe6f5; --ui-compete-surface: #e8f3ff;
+  --right-text: #1677e0;
   --font: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --radius: 14px; --radius-big: 20px; --glow-strength: 0%;
   color-scheme: light;

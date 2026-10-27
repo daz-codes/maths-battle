@@ -1,0 +1,14 @@
+<%# One of today's challenges on the Daily Challenge card: to play, or once played, its score and where it stands,
+    opening that game's results %>
+<% if attempt %>
+  <%= link_to attempt_path(attempt), class: "ui-daily__game ui-daily__game--played daily-game--#{daily_test.kind}" do %>
+    <span class="ui-daily__game-name"><%= daily_test.name %></span>
+    <span class="ui-daily__game-score"><%= number_with_delimiter attempt.score %> · <%= pluralize(attempt.correct, "correct answer") %></span>
+    <span class="ui-daily__game-status"><%= daily_standing_message(daily_test.standing_of(attempt)) %></span>
+  <% end %>
+<% else %>
+  <%= link_to play_path(daily_test.topic.slug, daily: daily_test.kind), class: "ui-daily__game daily-game--#{daily_test.kind}" do %>
+    <span class="ui-daily__game-name"><%= daily_test.name %></span>
+    <span class="ui-daily__game-play">Play <span aria-hidden="true">↗</span></span>
+  <% end %>
+<% end %>

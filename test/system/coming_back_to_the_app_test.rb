@@ -4,7 +4,7 @@ class ComingBackToTheAppTest < ApplicationSystemTestCase
   setup do
     @user = users(:ada)
     sign_in @user
-    assert_selector ".ui-welcome .streak strong", text: "0"
+    assert_selector ".ui-header .streak strong", text: "0"
   end
 
   test "the page reloads when the app comes back after a while, so the streak is current" do
@@ -12,7 +12,7 @@ class ComingBackToTheAppTest < ApplicationSystemTestCase
     @user.update!(current_streak: 4, last_practised_on: @user.today, streak_kept_on: @user.today)
     come_back(after: 2.minutes)
 
-    assert_selector ".ui-welcome .streak strong", text: "4", wait: 5
+    assert_selector ".ui-header .streak strong", text: "4", wait: 5
   end
 
   test "a quick look away doesn't reload" do
@@ -21,7 +21,7 @@ class ComingBackToTheAppTest < ApplicationSystemTestCase
     come_back(after: 5.seconds)
 
     sleep 1
-    assert_selector ".ui-welcome .streak strong", text: "0"
+    assert_selector ".ui-header .streak strong", text: "0"
   end
 
   private
