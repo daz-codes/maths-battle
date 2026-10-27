@@ -8,8 +8,8 @@
   --pink-text: #1677e0; --on-pink-text: #fff; --wrong: #ce2d50; --on-neon: #152541;
   --trophy: #ff5cc6; --trophy-outline: transparent;
   --ui-accent: #1677e0; --ui-accent-ink: #fff; --ui-pop: #ff5cc6;
-  --ui-hero: #1e90ff; --ui-hero-ink: #fff; --ui-soft: #e8f3ff; --ui-hero-line: #5cadff;
-  --ui-art-shadow: #a6d2ff; --ui-grid: #1e90ff15;
+  --ui-hero: #ff5cc6; --ui-hero-ink: #14191a; --ui-soft: #e8f3ff; --ui-hero-line: #ff5cc6;
+  --ui-art-a: #fff; --ui-art-b: #14191a; --ui-grid: #1e90ff15;
   --ui-practice-ink: #c2127f; --ui-practice-surface: #ffe6f5; --ui-compete-surface: #e8f3ff;
   --right-text: #1677e0;
   --font: "Manrope", ui-sans-serif, system-ui, sans-serif;
@@ -25,7 +25,7 @@
   --trophy: #d1f879; --trophy-outline: transparent;
   --ui-accent: #d1f879; --ui-accent-ink: #14191a; --ui-pop: #d1f879;
   --ui-hero: #222638; --ui-hero-ink: #f5f6fb; --ui-soft: #2a3040; --ui-hero-line: #4c526b;
-  --ui-art-shadow: #9d7bff; --ui-grid: #afb5cc15;
+  --ui-art-a: #d1f879; --ui-art-b: #b59bff; --ui-grid: #afb5cc15;
   --ui-practice-ink: #c1aaff; --ui-practice-surface: #312d4b; --ui-compete-surface: #303a2b;
   --right-text: #d1f879;
   color-scheme: dark;
@@ -40,7 +40,7 @@
     --trophy: #d1f879; --trophy-outline: transparent;
     --ui-accent: #d1f879; --ui-accent-ink: #14191a; --ui-pop: #d1f879;
     --ui-hero: #222638; --ui-hero-ink: #f5f6fb; --ui-soft: #2a3040; --ui-hero-line: #4c526b;
-    --ui-art-shadow: #9d7bff; --ui-grid: #afb5cc15;
+    --ui-art-a: #d1f879; --ui-art-b: #b59bff; --ui-grid: #afb5cc15;
     --ui-practice-ink: #c1aaff; --ui-practice-surface: #312d4b; --ui-compete-surface: #303a2b;
     --right-text: #d1f879;
     color-scheme: dark;

@@ -1,4 +1,7 @@
 <% content_for :title, "Your next minute · MatheMinute" %>
+<% content_for :under_logo do %>
+  <h1 class="ui-home__heading">Master <%= maths.capitalize %> in <span>Minutes</span></h1>
+<% end %>
 <% content_for :beside_hello do %>
   <span class="streak ui-streak <%= "streak--done" if @user.practised_today? %>" aria-label="<%= @user.streak %> day streak"
         title="<%= @user.streak %> day streak"><%= icon(:flame) %><strong><%= @user.streak %></strong></span>
@@ -7,15 +10,12 @@
 <main class="page home ui-home">
   <%= render "flash" %>
 
-  <h1 class="ui-home__heading">Master <%= maths.capitalize %> in <span>Minutes</span></h1>
-
   <nav class="home-actions ui-actions" aria-label="Play">
     <div class="home-action home-action--challenge ui-daily">
       <div class="ui-daily__info">
         <p class="ui-eyebrow"><span class="ui-live-dot" aria-hidden="true"></span> <%= @user.today.strftime("%A %-d %B") %></p>
         <h2 class="home-action__label">Daily Challenge</h2>
-        <p class="ui-daily__description">Same questions for everyone.<br>See how you stack up.</p>
-        <p class="ui-daily__meta"><span>60 seconds</span><span>One go per game</span></p>
+        <p class="ui-daily__description">Same questions for everyone. 1 minute to prove yourself.</p>
         <div class="ui-daily__games">
           <% DailyTest.on(@user.today).each do |daily_test| %>
             <%= render "home/daily_game", daily_test: daily_test, attempt: @user.daily_game(daily_test) %>

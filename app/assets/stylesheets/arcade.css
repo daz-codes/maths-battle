@@ -31,9 +31,9 @@
 .app-shell .ui-header { flex-direction: column; align-items: stretch; gap: 14px; max-width: 1120px; margin: 0 auto; padding: 26px 24px 8px; }
 .ui-brand { display: flex; align-items: center; justify-content: center; gap: 0.3em; font-size: clamp(34px, 11.5vw, 64px); font-weight: 800; letter-spacing: -0.06em; line-height: 1; text-decoration: none; }
 .ui-header__who { display: flex; align-items: center; gap: 10px; }
-.ui-header__hello { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+.ui-header__hello { font-size: 38px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
 /* The home page's streak beside the hello, the same size, in the pink and yellow flame it always had: grey until today's game */
-.ui-header .ui-streak { --pink: #ff5cc6; --yellow: #efff2e; display: inline-flex; flex-direction: row; gap: 0; margin: 0; align-items: center; color: var(--muted); font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+.ui-header .ui-streak { --pink: #ff5cc6; --yellow: #efff2e; display: inline-flex; flex-direction: row; gap: 0; margin: 0; align-items: center; color: var(--muted); font-size: 38px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
 .ui-header .ui-streak.streak--done { color: var(--ink); }
 .ui-header .ui-streak .icon { width: 1.45em; height: 1.45em; margin: -0.25em -0.2em -0.25em -0.15em; }
 .ui-header__who .header-sign-in { margin-left: auto; }
@@ -56,33 +56,34 @@ a.ui-profile { display: flex; align-items: center; min-width: 44px; min-height: 
 /* The home screen: an actual daily event, two clear alternatives, then personal progress. */
 .app-shell .ui-home { gap: 30px; }
 .ui-eyebrow { display: flex; align-items: center; gap: 7px; margin: 0; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .025em; }
-/* Master Maths in Minutes on one line, right across the page */
-.app-shell .ui-home { container-type: inline-size; }
-.ui-home__heading { margin: 0; font-size: 9.5cqi; font-weight: 800; letter-spacing: -.065em; line-height: 1.08; white-space: nowrap; }
-.ui-home__heading > span { color: var(--ui-accent); }
+/* Master Maths in Minutes under the logo, on one line */
+.ui-home__heading { margin: 0; font-size: clamp(28px, 8vw, 52px); font-weight: 800; letter-spacing: -.065em; line-height: 1.08; text-align: center; white-space: nowrap; }
+.ui-home__heading > span { color: var(--ui-pop); }
 .app-shell .ui-actions { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); grid-template-rows: 1fr 1fr; gap: 16px; width: 100%; }
 .app-shell .ui-actions .home-action { align-items: stretch; justify-content: flex-start; min-width: 0; margin: 0; padding: 24px; border: 1px solid var(--line); border-radius: var(--radius-big); text-align: left; white-space: normal; }
-.app-shell .ui-actions .ui-daily { position: relative; grid-row: 1 / 3; overflow: hidden; min-height: 362px; padding: 30px; border-color: transparent; background: var(--ui-hero); color: var(--ui-hero-ink); }
+.app-shell .ui-actions .ui-daily { position: relative; grid-row: 1 / 3; overflow: hidden; min-height: 330px; padding: 30px; border-color: transparent; background: var(--ui-hero); color: var(--ui-hero-ink); }
 .ui-daily__info { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; height: 100%; }
 .app-shell .ui-actions .ui-daily { display: flex; flex-direction: column; }
 .ui-daily__info { flex: 1; }
-.ui-daily .home-action__label, .ui-daily__description, .ui-daily__meta { margin-bottom: 0; }
+.ui-daily .home-action__label, .ui-daily__description { margin-bottom: 0; }
 .ui-daily .ui-eyebrow { color: inherit; opacity: .95; font-size: 11px; }
-.ui-live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ui-pop); }
+.ui-live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .ui-daily .home-action__label { display: block; margin-top: 21px; font-size: clamp(25px, 3.3vw, 33px); font-weight: 800; letter-spacing: -.05em; line-height: 1.13; }
-.ui-daily__description { display: block; max-width: 230px; margin-top: 12px; font-size: 12px; font-weight: 500; line-height: 1.7; opacity: .9; }
-.ui-daily__meta { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 18px; font-size: 11px; font-weight: 700; }
-.ui-daily__meta > span { padding: 4px 9px; border: 1px solid color-mix(in srgb, var(--ui-hero-ink) 30%, transparent); border-radius: 7px; }
+.ui-daily__description { display: block; max-width: 300px; margin-top: 8px; font-size: 14px; font-weight: 600; line-height: 1.5; }
 /* Today's games, right on the card: Play, or once played, the score and where it stands (opening its results) */
-.ui-daily__games { display: grid; gap: 10px; width: 100%; margin-top: auto; padding-top: 22px; }
-.app-shell a.ui-daily__game { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 12px; min-height: 56px; margin: 0; padding: 10px 10px 10px 16px; border: 1px solid color-mix(in srgb, var(--ui-hero-ink) 30%, transparent); border-radius: 10px; background: color-mix(in srgb, var(--ui-hero) 82%, var(--ui-hero-ink)); color: var(--ui-hero-ink); text-decoration: none; }
-.app-shell a.ui-daily__game:hover { background: color-mix(in srgb, var(--ui-hero) 72%, var(--ui-hero-ink)); }
+.ui-daily__games { display: grid; gap: 10px; width: 100%; margin-top: auto; padding-top: 18px; }
+.app-shell a.ui-daily__game { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px; min-height: 52px; margin: 0; padding: 9px 10px 9px 16px; border: 1px solid color-mix(in srgb, var(--ui-hero-ink) 25%, transparent); border-radius: 10px; background: color-mix(in srgb, var(--ui-hero) 75%, #fff); color: var(--ui-hero-ink); text-decoration: none; }
+.app-shell a.ui-daily__game:hover { background: color-mix(in srgb, var(--ui-hero) 62%, #fff); }
+.app-shell a.ui-daily__game--played { flex-direction: column; align-items: flex-start; padding-block: 11px; }
+.ui-daily__game--played > span { width: 100%; }
 .ui-daily__game-name { font-size: 15px; font-weight: 800; letter-spacing: -.02em; }
-.ui-daily__game-play { display: inline-flex; align-items: center; gap: 14px; min-height: 36px; padding: 6px 13px; border-radius: 7px; background: var(--ui-pop); color: #14191a; font-size: 13px; font-weight: 800; }
+.ui-daily__game-play { display: inline-flex; align-items: center; gap: 14px; min-height: 36px; padding: 6px 13px; border-radius: 7px; background: var(--ui-hero-ink); color: var(--ui-hero); font-size: 13px; font-weight: 800; }
 .ui-daily__game-play > span { font-size: 18px; line-height: 1; }
-.ui-daily__game-score { grid-row: 1 / 3; grid-column: 2; font-family: ui-monospace, monospace; font-size: 13px; font-weight: 800; text-align: right; }
-.ui-daily__game-status { grid-column: 1; font-size: 11px; font-weight: 600; opacity: .9; }
-.ui-daily__art { position: absolute; top: 67px; right: -51px; width: 235px; pointer-events: none; }
+.ui-daily__game-score { font-family: ui-monospace, monospace; font-size: 14px; font-weight: 800; }
+.ui-daily__game-status { font-size: 13px; font-weight: 600; }
+.ui-daily__art { position: absolute; top: -40px; right: -60px; width: 260px; opacity: .3; pointer-events: none; }
+.ui-daily__art { --yellow: var(--ui-art-a); --pink: var(--ui-art-a); --blue: var(--ui-art-b); --green: var(--ui-art-b); }
+.ui-daily__art .clock { width: 100%; height: auto; color: var(--ui-hero-ink); }
 .ui-art { display: block; width: 100%; overflow: visible; }
 .app-shell .ui-actions .ui-secondary { gap: 0; background: var(--paper-alt); color: var(--ink); }
 .ui-secondary__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -180,9 +181,8 @@ a.ui-profile { display: flex; align-items: center; min-width: 44px; min-height: 
 /* Arcade details: grid artwork, mono captions and an electric scoreboard. */
 .app-shell .ui-home { background-image: radial-gradient(var(--ui-grid) .7px, transparent .7px); background-size: 18px 18px; }
 .app-shell .ui-home__heading { font-weight: 800; letter-spacing: -.07em; }
-.app-shell .ui-eyebrow, .app-shell .ui-daily__meta, .app-shell .ui-stat-caption { font-family: ui-monospace, monospace; }
+.app-shell .ui-eyebrow, .app-shell .ui-stat-caption { font-family: ui-monospace, monospace; }
 .app-shell .ui-actions .ui-daily { border: 1px solid var(--ui-hero-line); }
-.app-shell .ui-daily__art { top: 84px; right: -86px; width: 247px; }
 .app-shell .ui-actions .ui-secondary { background: var(--paper-alt); border-radius: 12px; }
 .app-shell .home-action--practice .ui-secondary__icon { color: var(--ui-practice-ink); background: var(--ui-practice-surface); }
 .app-shell .home-action--compete .ui-secondary__icon { background: var(--ui-compete-surface); }
@@ -192,25 +192,25 @@ a.ui-profile { display: flex; align-items: center; min-width: 44px; min-height: 
 @media (min-width: 1160px) {
   .app-shell .ui-navigation { top: 160px; bottom: auto; right: auto; left: max(24px, calc((100vw - 1200px) / 2)); width: 78px; margin: 0; padding: 6px; border-radius: 18px; }
   .ui-navigation nav { grid-template-columns: 1fr; gap: 6px; }
+  .ui-header__who { justify-content: center; }
   .app-shell .ui-navigation .site-footer__tab { min-height: 67px; }
   .app-shell .page { max-width: 1000px; padding-left: 48px; padding-right: 32px; }
   .app-shell .page--narrow { max-width: 560px; }
   .app-shell .practice, .app-shell .daily-challenge, .app-shell .results { max-width: 760px; }
-  .app-shell .ui-daily__art { right: -29px; }
 }
 
 @media (max-width: 700px) {
   .app-shell .ui-header { gap: 10px; padding: 20px 20px 13px; }
-  .ui-header__hello, .ui-header .ui-streak { font-size: 26px; }
+  .ui-header__hello, .ui-header .ui-streak { font-size: 34px; }
 
   .app-shell .page { gap: 22px; padding: 24px 20px 112px; }
   .app-shell .ui-home { gap: 24px; }
   .ui-eyebrow { font-size: 11px; }
   .app-shell .ui-actions { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 12px; }
-  .app-shell .ui-actions .ui-daily { grid-column: 1 / -1; grid-row: auto; min-height: 302px; padding: 24px; }
-  .ui-daily .home-action__label { margin-top: 19px; font-size: 28px; }
-  .ui-daily__description { max-width: 200px; margin-top: 9px; font-size: 12px; }
-  .ui-daily__meta { margin-top: 13px; font-size: 10px; }
+  .app-shell .ui-actions .ui-daily { grid-column: 1 / -1; grid-row: auto; min-height: 0; padding: 18px 18px 16px; }
+  .ui-daily .home-action__label { margin-top: 8px; font-size: 26px; }
+  .ui-daily__description { margin-top: 4px; font-size: 13px; }
+  .ui-daily__games { gap: 8px; padding-top: 14px; }
   .app-shell .ui-actions .ui-secondary { min-height: 170px; padding: 17px; }
   .ui-secondary__top { margin-bottom: 12px; }
   .ui-secondary .home-action__label { font-size: 18px; }
@@ -224,14 +224,13 @@ a.ui-profile { display: flex; align-items: center; min-width: 44px; min-height: 
   .app-shell .groups > section { padding: 20px; }
   .app-shell .topic-cards { grid-template-columns: 1fr; }
   .app-shell .test { padding-inline: 15px; }
-  .app-shell .ui-daily__art { top: 86px; right: -20px; width: 180px; }
+  .app-shell .ui-daily__art { top: -30px; right: -50px; width: 190px; }
 }
 
 @media (max-width: 360px) {
 
   .app-shell .ui-header { padding-inline: 15px; }
   .app-shell .page { padding-inline: 15px; }
-  .ui-daily__art { opacity: .55; }
   .ui-section-heading h2 { font-size: 12px; }
 }
 

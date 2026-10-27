@@ -111,12 +111,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".site-header .ui-header__who a.ui-profile[href=?]", edit_profile_path
   end
 
-  test "the greeting with the streak beside it, then the heading, then Challenge, Practice and Compete" do
+  test "the heading under the logo, then the greeting with the streak beside it, then Challenge, Practice and Compete" do
     @user.update!(name: "Ada")
     sign_in_as @user
     get root_path
 
-    parts = %w[ ui-header__hello streak ui-home__heading home-actions ]
+    parts = %w[ ui-home__heading ui-header__hello streak home-actions ]
     order = css_select(parts.map { ".#{_1}" }.join(", ")).map { |element| (element["class"].split & parts).first }
     assert_equal parts, order
   end
