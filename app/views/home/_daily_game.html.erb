@@ -2,13 +2,13 @@
     opening that game's results. Not fetched ahead on a hover: today's game page is only for playing %>
 <% if attempt %>
   <%= link_to attempt_path(attempt), class: "ui-daily__game ui-daily__game--played daily-game--#{daily_test.kind}" do %>
-    <span class="ui-daily__game-name"><%= daily_test.name %></span>
+    <span class="ui-daily__game-name"><%= topic_icon(daily_test.topic) %> <%= daily_test.name %></span>
     <span class="ui-daily__game-score"><%= number_with_delimiter attempt.score %> · <%= pluralize(attempt.correct, "correct answer") %></span>
     <span class="ui-daily__game-status"><%= daily_standing_message(daily_test.standing_of(attempt)) %></span>
   <% end %>
 <% else %>
   <%= link_to play_path(daily_test.topic.slug, daily: daily_test.kind), class: "ui-daily__game daily-game--#{daily_test.kind}", data: { turbo_prefetch: false } do %>
-    <span class="ui-daily__game-name"><%= daily_test.name %></span>
+    <span class="ui-daily__game-name"><%= topic_icon(daily_test.topic) %> <%= daily_test.name %></span>
     <span class="ui-daily__game-play">Play <span aria-hidden="true">↗</span></span>
   <% end %>
 <% end %>

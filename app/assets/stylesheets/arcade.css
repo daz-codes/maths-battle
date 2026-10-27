@@ -65,19 +65,19 @@ a.ui-profile { display: flex; align-items: center; min-width: 44px; min-height: 
 .ui-daily__info { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; height: 100%; }
 .app-shell .ui-actions .ui-daily { display: flex; flex-direction: column; }
 .ui-daily__info { flex: 1; }
-.ui-daily .home-action__label, .ui-daily__description { margin-bottom: 0; }
+.ui-daily .home-action__label { margin-bottom: 0; }
 .ui-daily .ui-eyebrow { color: inherit; opacity: .95; font-size: 11px; }
 .ui-live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .ui-daily .home-action__label { display: block; margin-top: 21px; font-size: clamp(25px, 3.3vw, 33px); font-weight: 800; letter-spacing: -.05em; line-height: 1.13; }
-.ui-daily__description { display: block; max-width: 300px; margin-top: 8px; font-size: 14px; font-weight: 600; line-height: 1.5; }
 /* Today's games, right on the card: Play, or once played, the score and where it stands (opening its results) */
 .ui-daily__games { display: grid; gap: 10px; width: 100%; margin-top: auto; padding-top: 18px; }
-.app-shell a.ui-daily__game { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px; min-height: 52px; margin: 0; padding: 9px 10px 9px 16px; border: 1px solid color-mix(in srgb, var(--ui-hero-ink) 25%, transparent); border-radius: 10px; background: color-mix(in srgb, var(--ui-hero) 75%, #fff); color: var(--ui-hero-ink); text-decoration: none; }
-.app-shell a.ui-daily__game:hover { background: color-mix(in srgb, var(--ui-hero) 62%, #fff); }
+.app-shell a.ui-daily__game { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px; min-height: 52px; margin: 0; padding: 9px 10px 9px 16px; border: 0; border-radius: 10px; background: #1677e0; box-shadow: 0 3px 0 #0d55a6; color: #fff; text-decoration: none; }
+.app-shell a.ui-daily__game:hover { background: #0f68c9; }
 .app-shell a.ui-daily__game--played { flex-direction: column; align-items: flex-start; padding-block: 11px; }
 .ui-daily__game--played > span { width: 100%; }
-.ui-daily__game-name { font-size: 15px; font-weight: 800; letter-spacing: -.02em; }
-.ui-daily__game-play { display: inline-flex; align-items: center; gap: 14px; min-height: 36px; padding: 6px 13px; border-radius: 7px; background: var(--ui-hero-ink); color: var(--ui-hero); font-size: 13px; font-weight: 800; }
+.ui-daily__game-name { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 800; letter-spacing: -.02em; }
+.ui-daily__game-name .icon { flex: none; width: 22px; height: 22px; }
+.ui-daily__game-play { display: inline-flex; align-items: center; gap: 14px; min-height: 36px; padding: 6px 13px; border-radius: 7px; background: #fff; color: #1677e0; font-size: 13px; font-weight: 800; }
 .ui-daily__game-play > span { font-size: 18px; line-height: 1; }
 .ui-daily__game-score { font-family: ui-monospace, monospace; font-size: 14px; font-weight: 800; }
 .ui-daily__game-status { font-size: 13px; font-weight: 600; }
@@ -209,8 +209,7 @@ a.ui-profile { display: flex; align-items: center; min-width: 44px; min-height: 
   .app-shell .ui-actions { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 12px; }
   .app-shell .ui-actions .ui-daily { grid-column: 1 / -1; grid-row: auto; min-height: 0; padding: 18px 18px 16px; }
   .ui-daily .home-action__label { margin-top: 8px; font-size: 26px; }
-  .ui-daily__description { margin-top: 4px; font-size: 13px; }
-  .ui-daily__games { gap: 8px; padding-top: 14px; }
+    .ui-daily__games { gap: 8px; padding-top: 14px; }
   .app-shell .ui-actions .ui-secondary { min-height: 170px; padding: 17px; }
   .ui-secondary__top { margin-bottom: 12px; }
   .ui-secondary .home-action__label { font-size: 18px; }
@@ -248,3 +247,6 @@ html .app-shell :is(.test__ghost--behind, .test__rival--behind) { color: var(--r
 .app-shell .feedback, .app-shell .missed > .label { text-align: center; }
 .app-shell .score-tally li { background: var(--ui-pop); color: #14191a; }
 .app-shell .score-tally .score-tally__wrong { background: var(--paper-alt); box-shadow: inset 0 0 0 2px var(--wrong); color: var(--wrong); }
+
+/* Practice's Play level button in pink, lilac in dark mode */
+.app-shell .button--start.button--play { background: var(--pink); color: #14191a; }

@@ -14,8 +14,7 @@
     <div class="home-action home-action--challenge ui-daily">
       <div class="ui-daily__info">
         <p class="ui-eyebrow"><span class="ui-live-dot" aria-hidden="true"></span> <%= @user.today.strftime("%A %-d %B") %></p>
-        <h2 class="home-action__label">Daily Challenge</h2>
-        <p class="ui-daily__description">Same questions for everyone. 1 minute to prove yourself.</p>
+        <h2 class="home-action__label">Daily Challenges</h2>
         <div class="ui-daily__games">
           <% DailyTest.on(@user.today).each do |daily_test| %>
             <%= render "home/daily_game", daily_test: daily_test, attempt: @user.daily_game(daily_test) %>

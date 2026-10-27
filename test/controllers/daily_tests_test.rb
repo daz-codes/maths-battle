@@ -20,6 +20,8 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
       day: Date.current.iso8601, results: Array.new(2 + i) { { a: 2, b: 3, given: 6, ms: 3000 } }) }
 
     get root_path
+    assert_select ".home-action--challenge h2", text: "Daily Challenges"
+    assert_select ".home-action--challenge .ui-daily__game-name svg", 2, "each with its topic's icon"
     assert_select ".home-action--challenge .ui-daily__game", text: /Daily Tables Test\s*Play/
     assert_select ".home-action--challenge .ui-daily__game", text: /Patternz\s*Play/
     assert_select ".home-action--challenge a.ui-daily__game[data-turbo-prefetch=false]", 2, "not fetched, and kept for offline, on a hover"
