@@ -23,14 +23,15 @@ module Attempt::Rateable
     stars if stars > self.class.stars_for(previous_best_correct, topic_module)
   end
 
-  # The level's best practice score before this game, 0 if it's the first
+  # The level's best practice score before this game, 0 if it's the first. For a daily challenge, the best of that
+  # challenge's earlier days
   def previous_best
-    earlier_at_level.maximum(:score).to_i
+    earlier_like_this.maximum(:score).to_i
   end
 
   # The most it had got right before this game
   def previous_best_correct
-    earlier_at_level.maximum(:correct).to_i
+    earlier_like_this.maximum(:correct).to_i
   end
 
   private
@@ -39,7 +40,8 @@ module Attempt::Rateable
       practice? && correct >= topic_module.star_scores[1] && previous_best_correct < topic_module.star_scores[1]
     end
 
-    def earlier_at_level
-      user.attempts.at_level(topic_module, level).where(id: ...id)
+    def earlier_like_this
+      earlier = daily_test? ? user.attempts.where(mode: "daily", topic: topic) : user.attempts.at_level(topic_module, level)
+      earlier.where(id: ...id)
     end
 end

@@ -70,6 +70,26 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     assert_redirected_to challenge_path, "a link from before Patternz is the Tables Test"
   end
 
+  test "the result says how it compares with your best Tables Test, and the most you've got right in one" do
+    first = play_today(right: 3)
+    get attempt_path(first)
+    assert_select ".best-line", count: 0, message: "nothing to compare with on a first go"
+
+    travel 1.day do
+      Attempt.record!(user: @ada, topic: "times_tables", level: 1, mode: "practice", results: Array.new(20) { { a: 2, b: 3, given: 6, ms: 500 } })
+      attempt = play_today(right: 5)
+      get attempt_path(attempt)
+      assert_select ".best-line--new", text: "#{attempt.score}, up from #{first.score}", message: "not practice's best"
+      assert_select ".best-line--right", text: "5 correct answers, your most yet!"
+    end
+
+    travel 2.days do
+      get attempt_path(play_today(right: 4))
+      assert_select ".best-line", text: /more to beat your best of/
+      assert_select ".best-line--right", text: /4 correct answers · your most is 5/
+    end
+  end
+
   test "stats from every Tables Test played: the best, the average, and how many" do
     scores = [ 3, 9 ].map.with_index do |right, ago|
       Attempt.record!(user: @ada, topic: "times_tables", level: 2, mode: "daily", day: (Date.current - ago - 1).iso8601,
