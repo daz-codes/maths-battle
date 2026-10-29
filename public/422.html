@@ -23,7 +23,6 @@
     .clock { display: block; color: var(--ink); overflow: visible; }
     .logo__mark { width: 32px; height: 32px; }
     .logo__minute { font-weight: 500; }
-    .logo__period { color: var(--accent); }
     main { display: flex; flex-direction: column; align-items: center; gap: 1rem; max-width: 26rem; margin: 0 auto; padding: 3rem 1rem; }
     .error__icon { margin: 0; color: var(--accent); }
     .error__icon svg { width: 4rem; height: 4rem; }
@@ -42,13 +41,13 @@
       <!-- BEGIN app/views/application/_clock.html.erb
 --><svg class="clock logo__mark" viewBox="0 0 48 48" aria-hidden="true">
   <defs>
-    <mask id="clock-gaps-575b8a21" maskUnits="userSpaceOnUse" x="0" y="0" width="48" height="48">
+    <mask id="clock-gaps-1f5ae44b" maskUnits="userSpaceOnUse" x="0" y="0" width="48" height="48">
       <rect width="48" height="48" fill="white"/>
       <rect x="22.75" width="2.5" height="48" fill="black"/>
       <rect y="22.75" width="48" height="2.5" fill="black"/>
     </mask>
   </defs>
-  <g transform="rotate(-90 24 24)" fill="none" stroke-width="6" mask="url(#clock-gaps-575b8a21)">
+  <g transform="rotate(-90 24 24)" fill="none" stroke-width="6" mask="url(#clock-gaps-1f5ae44b)">
       <circle cx="24" cy="24" r="20" pathLength="100" stroke="var(--yellow)"
               stroke-dasharray="25 75" stroke-dashoffset="0"
                />
@@ -71,7 +70,7 @@
     <circle cx="24" cy="24" r="2.4" fill="currentColor"/>
 </svg>
 <!-- END app/views/application/_clock.html.erb -->
-      <span>mathe<span class="logo__minute">minute</span><span class="logo__period">.</span></span>
+      <span>Mathe<span class="logo__minute">Minute</span></span>
     </a>
   </header>
   <main>

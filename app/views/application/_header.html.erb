@@ -2,8 +2,8 @@
     playing: their picture (tap for settings) and a hello, with whatever the page puts beside it (the home page's streak) %>
 <header class="site-header ui-header">
   <%= link_to root_path, class: "logo ui-brand", aria: { label: "MatheMinute home" } do %>
-    <span class="ui-brand__mark"><%= render "clock", class: "logo__mark" %></span>
-    <span>mathe<span class="ui-brand__minute">minute</span><span class="ui-brand__period">.</span></span>
+    <%= render "clock", class: "logo__mark" %>
+    <span>Mathe<span class="ui-brand__minute">Minute</span></span>
   <% end %>
   <%= yield :under_logo %>
   <div class="ui-header__who">

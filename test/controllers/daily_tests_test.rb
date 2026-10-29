@@ -22,12 +22,12 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     get root_path
     assert_select ".home-action--challenge h2", text: "Daily Challenges"
     assert_select ".home-action--challenge .ui-daily__game-name svg", 2, "each with its topic's icon"
-    assert_select ".home-action--challenge .ui-daily__game", text: /Daily Tables Test\s*Play/
+    assert_select ".home-action--challenge .ui-daily__game", text: /Tables Test\s*Play/
     assert_select ".home-action--challenge .ui-daily__game", text: /Patternz\s*Play/
     assert_select ".home-action--challenge a.ui-daily__game[data-turbo-prefetch=false]", 2, "not fetched, and kept for offline, on a hover"
     get challenge_path
     assert_select "h1", text: /Daily Challenge/
-    assert_select "details.daily-test:not([open]) summary .daily-test__name", text: /Daily Tables Test #\d+/, message: "a button to open each"
+    assert_select "details.daily-test:not([open]) summary .daily-test__name", text: /Tables Test #\d+/, message: "a button to open each"
     assert_select "details.daily-test summary .daily-test__name", text: /Patternz #\d+/
     assert_select ".daily-test__status", text: "Not played yet", count: 2
     assert_select ".stats", count: 0, message: "no stats before a first game"
@@ -45,7 +45,7 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     assert_equal [ "daily", 2 ], [ game.mode, game.level ]
     get attempt_path(game)
     assert_select ".banner--group", text: "Top score today!"
-    assert_select ".label", text: /Daily Tables Test #\d+/
+    assert_select ".label", text: /Tables Test #\d+/
     assert_select ".result__stats", text: /Best/, count: 0
     assert_select "a.button[href=?]", challenge_path, text: "See today's results"
     assert_select "[data-share-text-value*=?]", "🎯 Top 25% today"
@@ -61,16 +61,16 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     assert_match /Best score\s+#{game.score}/, css_select(".stats div").map { _1.text.squish }.join(" · ")
     assert_match /Played\s*1/, css_select(".stats div").map { _1.text.squish }.join(" · ")
     get root_path
-    assert_select ".home-action--challenge a.ui-daily__game--played[href=?]", attempt_path(game), text: /Daily Tables Test\s*#{game.score}\s*8 correct answers\s*Top score today!/, message: "played, it opens the game's results"
+    assert_select ".home-action--challenge a.ui-daily__game--played[href=?]", attempt_path(game), text: /\ATables Test\s*#{game.score}\z/, message: "played, its score where Play was, opening the game's results"
     assert_select ".home-action--challenge a.ui-daily__game[href=?]", play_path("sequences", daily: "patternz"), text: /Patternz\s*Play/
 
     get play_path("times-tables", daily: "tables")
     assert_redirected_to challenge_path, "one go a day"
     get play_path("times-tables", daily: 1)
-    assert_redirected_to challenge_path, "a link from before Patternz is the Daily Tables Test"
+    assert_redirected_to challenge_path, "a link from before Patternz is the Tables Test"
   end
 
-  test "stats from every Daily Tables Test played: the best, the average, and how many" do
+  test "stats from every Tables Test played: the best, the average, and how many" do
     scores = [ 3, 9 ].map.with_index do |right, ago|
       Attempt.record!(user: @ada, topic: "times_tables", level: 2, mode: "daily", day: (Date.current - ago - 1).iso8601,
         played_at: (Time.current - (ago + 1).days).iso8601, results: Array.new(right) { { a: 2, b: 3, given: 6, ms: 1000 } }).score

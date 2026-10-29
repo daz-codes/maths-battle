@@ -4,7 +4,7 @@
 # compared with everyone else's that day: "You're in the top 10% today". The day is each player's own
 class DailyTest
   KINDS = {
-    "tables" => { name: "Daily Tables Test", about: "Times tables 2 to 12", topic: TimesTables, level: 2, mix: :level_only,
+    "tables" => { name: "Tables Test", about: "Times tables 2 to 12", topic: TimesTables, level: 2, mix: :level_only,
       first_day: Date.new(2026, 10, 25), seed: 0 },
     "patternz" => { name: "Patternz", about: "Spot the pattern and find the next number", topic: Sequences, level: Sequences.max_level,
       mix: :all_levels, first_day: Date.new(2026, 10, 26), seed: 1_000_000 }

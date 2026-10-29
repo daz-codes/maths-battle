@@ -38,10 +38,8 @@
 .ui-header .ui-streak .icon { width: 1.45em; height: 1.45em; margin: -0.25em -0.2em -0.25em -0.15em; }
 .ui-header__who .header-sign-in { margin-left: auto; }
 .app-shell a.ui-brand { margin: 0; padding: 0; background: none; }
-.ui-brand__mark { display: grid; place-items: center; width: 1.25em; height: 1.25em; border: 1px solid var(--line); border-radius: 0.3em; background: var(--paper-alt); }
-.ui-brand .logo__mark { width: 0.9em; height: 0.9em; filter: none; }
+.ui-brand .logo__mark { width: 1.05em; height: 1.05em; filter: none; }
 .ui-brand__minute { font-weight: 500; }
-.ui-brand__period { color: var(--ui-accent); }
 a.ui-profile { display: flex; align-items: center; min-width: 44px; min-height: 44px; margin: 0; padding: 5px; text-decoration: none; }
 .app-shell .ui-navigation { right: 16px; bottom: max(12px, env(safe-area-inset-bottom)); left: 16px; width: min(520px, calc(100% - 32px)); margin: 0 auto; padding: 6px; border: 1px solid var(--line); border-radius: 20px; background: color-mix(in srgb, var(--paper-alt) 96%, transparent); box-shadow: 0 6px 30px #14213a12; }
 .ui-navigation nav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); width: 100%; }
@@ -76,15 +74,11 @@ a.ui-profile { display: flex; align-items: center; min-width: 44px; min-height: 
 .daily-game--tables { --game: #d1f879; }
 .daily-game--patternz { --game: #b59bff; }
 .ui-daily__game .icon { --yellow: currentColor; --pink: currentColor; --green: currentColor; --blue: currentColor; }
-.app-shell a.ui-daily__game--played { flex-direction: column; align-items: flex-start; padding-block: 11px; }
-.ui-daily__game--played > span { width: 100%; }
 .ui-daily__game-name { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 800; letter-spacing: -.02em; }
 .ui-daily__game-name .icon { flex: none; width: 22px; height: 22px; }
 .ui-daily__game-play { display: inline-flex; align-items: center; gap: 14px; min-height: 36px; padding: 6px 13px; border-radius: 7px; background: #14191a; color: var(--game); font-size: 13px; font-weight: 800; }
 .ui-daily__game-play > span { font-size: 18px; line-height: 1; }
-.ui-daily__game-score { margin-top: 2px; font-size: 40px; font-weight: 800; letter-spacing: -.05em; line-height: 1; }
-.ui-daily__game-correct { font-size: 14px; font-weight: 700; }
-.ui-daily__game-status { margin-top: 4px; font-size: 13px; font-weight: 600; }
+.ui-daily__game-score { display: inline-flex; align-items: center; min-height: 36px; padding: 0 6px; font-size: 26px; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
 .ui-daily__art { position: absolute; top: -40px; right: -60px; width: 260px; opacity: .3; pointer-events: none; }
 .ui-daily__art { --yellow: var(--ui-art-a); --pink: var(--ui-art-a); --blue: var(--ui-art-b); --green: var(--ui-art-b); }
 .ui-daily__art .clock { width: 100%; height: auto; color: var(--ui-hero-ink); }
