@@ -59,7 +59,19 @@ class PlayingLiveTest < ApplicationSystemTestCase
       assert_selector ".banner", text: "You came", wait: 15
       assert_selector "#live-podium .leaderboard__row", text: /Ada.*90.*3 right/m, wait: 5
       assert_selector "#live-podium .leaderboard__row", text: /Zara.*60.*2 right/m
+      assert_selector "#live-again", text: "If Ada plays again"
     end
+
+    click_on "Play again"
+    assert_selector ".live-code"
+    rematch = LiveGame.find_by!(code: code).rematch
+    assert_selector ".live-code", text: rematch.code
+    using_session :zara do
+      assert_text "Waiting for Ada to start…", wait: 5
+      assert_current_path live_game_path(rematch.code)
+    end
+    assert_selector "#live-players", text: "Zara", wait: 5
+    assert_selector "#live-mode", text: "Power mode"
   end
 
   test "a Power game's boxes come at 15 seconds, and a Freeze stops the player ahead's keypad, with news for both" do

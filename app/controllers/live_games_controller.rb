@@ -2,7 +2,7 @@
 # share, and for the host the choice of Classic or Power and the Start button), then the game under way, then
 # the podium
 class LiveGamesController < ApplicationController
-  allow_unauthenticated_access only: :show
+  allow_unauthenticated_access only: %i[ index show ]
   rate_limit to: 10, within: 10.minutes, only: :create
 
   def create
@@ -19,6 +19,11 @@ class LiveGamesController < ApplicationController
       live_game.choose_game(topic: Topic.find(params[:topic]), level: params[:level].to_i)
     end
     redirect_to live_game
+  end
+
+  # A code typed in, spaces and case as they come
+  def index
+    redirect_to live_game_path(params[:code].to_s.upcase.delete("^A-Z0-9").presence || "-")
   end
 
   def show

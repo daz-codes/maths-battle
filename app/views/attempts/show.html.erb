@@ -15,9 +15,9 @@
 
   <%= render "card", attempt: @attempt %>
 
-  <% if @attempt.practice? && (previous = @attempt.previous_best).positive? %>
-    <%# Beating the level's best score is the point: by how much, or how close it was. Then how many were right,
-        against the most they've got right %>
+  <% if (@attempt.practice? || @attempt.daily_test?) && (previous = @attempt.previous_best).positive? %>
+    <%# Beating the level's best score (or the daily challenge's) is the point: by how much, or how close it was.
+        Then how many were right, against the most they've got right %>
     <% if @attempt.score > previous %>
       <p class="best-line best-line--new"><%= icon(:trophy) %> <%= number_with_delimiter @attempt.score %>, up from <%= number_with_delimiter previous %></p>
     <% elsif @attempt.score == previous %>
@@ -65,12 +65,13 @@
       <% place = live_game.place_of(@attempt.user) %>
       <p class="banner banner--group" <%= "data-controller=confetti" if place&.rank == 1 %>><%= icon(:lightning) %> <%= place&.rank ? "You came #{place.rank.ordinalize}!" : "Your game's saved" %></p>
       <%= render "live_games/podium", live_game: live_game %>
+      <%= render "live_games/again", live_game: live_game, user: @attempt.user %>
     <% else %>
       <p class="banner banner--group">Saved to your history: this live game was over before your game was saved.</p>
+      <div class="results__actions results__actions--one">
+        <%= button_to safe_join([ icon(:lightning), " Play live again" ]), live_games_path, class: "button button--blue button--wide", form_class: "wide-form" %>
+      </div>
     <% end %>
-    <div class="results__actions results__actions--one">
-      <%= button_to safe_join([ icon(:lightning), " Play live again" ]), live_games_path, class: "button button--blue button--wide", form_class: "wide-form" %>
-    </div>
   <% elsif @attempt.daily_test? %>
     <%# Where it stands among everyone's today %>
     <% standing = @attempt.daily_test.standing_of(@attempt) %>

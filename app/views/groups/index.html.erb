@@ -19,6 +19,11 @@
   <section class="live-start" aria-labelledby="live-heading">
     <h2 class="settings__heading" id="live-heading">Live</h2>
     <%= button_to safe_join([ icon(:lightning), " Play Live" ]), live_games_path, class: "button button--start button--wide", form_class: "wide-form" %>
+    <%= form_with url: live_games_path, method: :get, class: "group-join__form" do %>
+      <label class="visually-hidden" for="live_code">Live game code</label>
+      <%= text_field_tag :code, nil, id: "live_code", placeholder: "Got a code? Like K7Q2M", autocomplete: "off", autocapitalize: "characters", maxlength: 12, class: "group-join__code" %>
+      <%= submit_tag "Join", class: "button button--blue", name: nil %>
+    <% end %>
   </section>
 
   <section class="group-list" aria-labelledby="groups-heading">

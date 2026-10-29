@@ -14,6 +14,7 @@
       <%= render "live_games/started", live_game: @live_game %>
     <% end %>
     <%= render "live_games/podium", live_game: @live_game %>
+    <%= render "live_games/again", live_game: @live_game, user: @user if @player %>
   <% else %>
     <section id="live-status" class="live-status">
       <% if host %>
@@ -35,13 +36,15 @@
           <%= submit_tag "Change", class: "button", name: nil %>
         <% end %>
         <% url = live_game_url(@live_game) %>
+        <p class="live-code" aria-label="Game code <%= @live_game.code.chars.join(" ") %>"><%= @live_game.code %></p>
+        <p class="hint hint--centre">Friends type this code on Compete, or open <%= url %></p>
         <button type="button" class="button button--blue button--wide" data-controller="share"
-                data-share-text-value="Race me at <%= @live_game.title %> on MatheMinute, live! <%= url %>" data-action="share#share">Share the link</button>
-        <p class="hint hint--centre"><%= url %> · code <strong><%= @live_game.code %></strong></p>
+                data-share-text-value="Race me at <%= @live_game.title %> on MatheMinute, live! Join with code <%= @live_game.code %> or <%= url %>" data-action="share#share">Share the link</button>
         <%= button_to "Start", live_game_start_path(@live_game), class: "button button--start button--wide", form_class: "wide-form" %>
         <p class="hint hint--centre">Everyone's game starts together. Start once your friends are in.</p>
       <% elsif @player %>
         <p class="live-status__waiting">Waiting for <%= @live_game.host.display_name %> to start…</p>
+        <p class="hint hint--centre">More friends can join with code <strong><%= @live_game.code %></strong></p>
       <% elsif @live_game.joinable? %>
         <%= form_with url: live_game_player_path(@live_game), class: "form" do %>
           <% if @user.name.blank? && @user.guest? %>

@@ -2,9 +2,10 @@
 # (/live/K7Q2MX); whoever opens it joins the lobby (Joinable), and when the host starts it everyone's game begins
 # together, on the same questions, with each other's scores ticking over as they play (Startable, LiveGameChannel).
 # Each player has one go, and a podium ranks them as they finish (Rankable). Either way the highest score wins: a
-# Classic game is a straight race, and a Power game has power-ups to slow the players ahead (Powerable)
+# Classic game is a straight race, and a Power game has power-ups to slow the players ahead (Powerable). Then the
+# host can play again with everyone (Rematchable)
 class LiveGame < ApplicationRecord
-  include Joinable, Powerable, Rankable, Startable
+  include Joinable, Powerable, Rankable, Rematchable, Startable
 
   belongs_to :host, class_name: "User"
   has_many :players, -> { order(:created_at, :id) }, dependent: :destroy
@@ -17,8 +18,8 @@ class LiveGame < ApplicationRecord
   validate :level_in_topic
 
   # The host's game, at their topic and level. Unweighted questions, like a group's, so no one's history shapes them
-  def self.make(host:, topic:, level:)
-    create!(host: host, topic: topic.key, level: level, questions: User.new.questions(topic: topic, level: level)).tap { |game| game.join(host) }
+  def self.make(host:, topic:, level:, mode: "classic")
+    create!(host: host, topic: topic.key, level: level, mode: mode, questions: User.new.questions(topic: topic, level: level)).tap { |game| game.join(host) }
   end
 
   def to_param

@@ -149,4 +149,57 @@ class LiveGamesTest < ActionDispatch::IntegrationTest
     get live_game_path("NOPE22")
     assert_redirected_to groups_path
   end
+
+  test "a code typed on the Compete page, any case and spacing, goes to its lobby" do
+    game = LiveGame.make(host: @ada, topic: TimesTables, level: 1)
+    sign_in_as @bob
+    get groups_path
+    assert_select "form[action=?][method=get] input[name=code]", live_games_path
+
+    get live_games_path, params: { code: " #{game.code.downcase.chars.join(" ")} " }
+    assert_redirected_to live_game_path(game.code)
+    follow_redirect!
+    assert_select "input[type=submit][value=?]", "Join the game"
+
+    get live_games_path, params: { code: "" }
+    follow_redirect!
+    assert_redirected_to groups_path
+  end
+
+  test "the lobby shows its code big, to read out" do
+    game = LiveGame.make(host: @ada, topic: TimesTables, level: 1)
+    sign_in_as @ada
+    get live_game_path(game.code)
+    assert_select ".live-code", text: game.code
+    assert_select "[data-share-text-value*=?]", "code #{game.code}"
+  end
+
+  test "after the game the host plays again, and the others find the next lobby from their result" do
+    game = LiveGame.make(host: @ada, topic: TimesTables, level: 1)
+    game.join(@bob)
+    game.start!
+
+    travel 20.seconds do
+      sign_in_as @bob
+      play_live(game, right: 3)
+      get attempt_path(@bob.attempts.last)
+      assert_select "#live-again", text: /If Ada plays again/
+      post live_game_rematch_path(game.code)
+      assert_response :not_found, "only the host"
+
+      sign_in_as @ada
+      play_live(game, right: 5)
+      get attempt_path(@ada.attempts.last)
+      assert_select "#live-again form[action=?] button", live_game_rematch_path(game.code), text: /Play again/
+      post live_game_rematch_path(game.code)
+      rematch = game.reload.rematch
+      assert_redirected_to live_game_path(rematch.code)
+
+      sign_in_as @bob
+      get attempt_path(@bob.attempts.last)
+      assert_select "#live-again form[action=?] button", live_game_player_path(rematch.code), text: /Play again/
+      post live_game_player_path(rematch.code)
+      assert_equal [ @ada, @bob ], rematch.users.to_a
+    end
+  end
 end

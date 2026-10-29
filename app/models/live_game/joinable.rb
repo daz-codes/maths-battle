@@ -1,9 +1,11 @@
-# Joining a live game's lobby from its link, before it starts, while there's room. The code is six letters and
-# digits that can't be mistaken for each other, like a group's, so it can be read out too
+# Joining a live game's lobby from its link or its code, before it starts, while there's room. The code is five
+# letters and digits that can't be mistaken for each other, like a group's but shorter, so it's quick to read out
+# and type in
 module LiveGame::Joinable
   extend ActiveSupport::Concern
 
   MAX_PLAYERS = 8
+  CODE_LENGTH = 5
   # A lobby no one starts closes after this long
   LOBBY_TIME = 30.minutes
 
@@ -36,7 +38,7 @@ module LiveGame::Joinable
   private
     def assign_code
       self.code ||= loop do
-        code = Array.new(Group::Joinable::CODE_LENGTH) { Group::Joinable::CODE_CHARACTERS.sample }.join
+        code = Array.new(CODE_LENGTH) { Group::Joinable::CODE_CHARACTERS.sample }.join
         break code unless LiveGame.exists?(code: code)
       end
     end

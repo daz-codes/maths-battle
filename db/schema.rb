@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_24_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -213,8 +213,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_24_150000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "mode", default: "classic", null: false
+    t.integer "rematch_id"
     t.index ["code"], name: "index_live_games_on_code", unique: true
     t.index ["host_id"], name: "index_live_games_on_host_id"
+    t.index ["rematch_id"], name: "index_live_games_on_rematch_id"
   end
 
   create_table "push_subscriptions", force: :cascade do |t|
@@ -278,6 +280,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_24_150000) do
   add_foreign_key "live_game_players", "attempts", on_delete: :nullify
   add_foreign_key "live_game_players", "live_games"
   add_foreign_key "live_game_players", "users"
+  add_foreign_key "live_games", "live_games", column: "rematch_id", on_delete: :nullify
   add_foreign_key "live_games", "users", column: "host_id"
   add_foreign_key "push_subscriptions", "users"
   add_foreign_key "sessions", "users"

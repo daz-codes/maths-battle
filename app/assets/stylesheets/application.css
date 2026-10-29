@@ -1288,6 +1288,7 @@ body.testing {
 /* Live games: the lobby, the others' scores while playing, and the podium */
 .live-start, .live-status, .live-podium { display: grid; gap: 0.6rem; width: 100%; }
 .live-status__waiting { font-size: 1.2rem; font-weight: 700; }
+.live-code { margin: 0; text-align: center; font-size: clamp(2.5rem, 12vw, 3.5rem); font-weight: 800; letter-spacing: 0.2em; padding-left: 0.2em; font-variant-numeric: tabular-nums; }
 .live-players__count { list-style: none; }
 .test--live { grid-template-rows: auto auto 1fr auto; }
 .test__rivals { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem 0.75rem; margin: 0; padding: 0 1rem; list-style: none; }

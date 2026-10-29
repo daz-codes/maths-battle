@@ -19,7 +19,7 @@ class LiveGameTest < ActiveSupport::TestCase
   end
 
   test "the host makes a lobby with a code, at their topic and level, and is its first player" do
-    assert_match(/\A[A-Z2-9]{6}\z/, @game.code)
+    assert_match(/\A[A-HJ-NP-Z2-9]{5}\z/, @game.code)
     assert_equal [ @ada ], @game.users.to_a
     assert_equal User::QUESTION_COUNT, @game.questions.size
     assert_equal @game, LiveGame.find_by_code(@game.code.downcase)
@@ -101,6 +101,23 @@ class LiveGameTest < ActiveSupport::TestCase
       "6 lightning answers, the 5th and 6th doubled, beat 8 slow ones"
     @game.update!(mode: "classic")
     assert_equal [ @ada, @bob ], @game.podium.map(&:user)
+  end
+
+  test "playing again: once it's started, the host makes the next game once, at the same topic, level and mode, and everyone looking hears" do
+    @game.join(@bob)
+    @game.update!(mode: "power")
+    assert_nil @game.play_again!, "not before it's started"
+
+    @game.start!
+    rematch = nil
+    assert_turbo_stream_broadcasts(@game) { rematch = @game.play_again! }
+    assert_equal [ "times_tables", 1, "power", @ada ], [ rematch.topic, rematch.level, rematch.mode, rematch.host ]
+    assert_equal [ @ada ], rematch.users.to_a, "the others join from the podium"
+    assert rematch.joinable?
+    assert_not_equal @game.code, rematch.code
+    assert_equal rematch, @game.reload.rematch
+    assert_equal rematch, @game.play_again!, "only once"
+    assert_equal 2, LiveGame.count
   end
 
   test "a live game doesn't change a level's best" do

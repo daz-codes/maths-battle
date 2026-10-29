@@ -1,0 +1,16 @@
+<%# Playing again, under the podium and each player's result (LiveGame::Rematchable). When the host makes the next
+    game it's sent here joining: everyone still looking joins its lobby straight away %>
+<% joining = local_assigns[:joining] %>
+<div id="live-again" class="results__actions results__actions--one" <%= "data-controller=live-rematch" if joining %>>
+  <% if live_game.rematch %>
+    <%= button_to safe_join([ icon(:lightning), " Play again" ]), live_game_player_path(live_game.rematch),
+          class: "button button--start button--wide", form_class: "wide-form" %>
+  <% elsif live_game.hosted_by?(user) %>
+    <%= button_to safe_join([ icon(:lightning), " Play again" ]), live_game_rematch_path(live_game),
+          class: "button button--start button--wide", form_class: "wide-form" %>
+    <p class="hint hint--centre">Everyone here goes to a new lobby with you.</p>
+  <% else %>
+    <p class="hint hint--centre">If <%= live_game.host.display_name %> plays again, you'll go straight to the next game.</p>
+    <%= button_to safe_join([ icon(:lightning), " Host your own" ]), live_games_path, class: "button button--blue button--wide", form_class: "wide-form" %>
+  <% end %>
+</div>
