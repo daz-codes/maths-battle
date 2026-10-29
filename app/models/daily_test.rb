@@ -16,6 +16,9 @@ class DailyTest
     def first? = rank == 1
   end
 
+  # A day of a player's week at one kind, and their game that day, if they played
+  Day = Data.define(:day, :attempt)
+
   attr_reader :day, :kind
 
   # Every kind, for a day
@@ -59,6 +62,13 @@ class DailyTest
     rank = scores.count { |score| score > attempt.score } + 1
     beaten = scores.count { |score| score < attempt.score }
     Standing.new(rank: rank, players: scores.size, top_percent: (100.0 * rank / scores.size).ceil, beaten_percent: (100 * beaten / scores.size))
+  end
+
+  # The player's games at this kind over the week up to this day, a day each, played or not
+  def week_of(user)
+    days = (day - 6)..day
+    games = user.attempts.where(mode: "daily", topic: topic.key, played_on: days).order(id: :desc).index_by(&:played_on)
+    days.map { |date| Day.new(day: date, attempt: games[date]) }
   end
 
   private

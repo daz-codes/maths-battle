@@ -750,6 +750,18 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* On the results page: how the game compares with the level's best */
 .best-line { margin: 0; color: var(--muted); font-size: 1.05rem; font-weight: 700; }
 .best-line--new { color: var(--pink-text); font-size: 1.2rem; }
+/* A daily challenge's week: thin columns from one baseline, this game's in the accent, the rest lilac */
+.week-chart { display: grid; gap: 0.6rem; width: 100%; margin: 0; }
+.week-chart__title { color: var(--muted); font-size: 0.95rem; font-weight: 700; text-align: center; }
+.week-chart__days { display: grid; grid-template-columns: repeat(7, 1fr); margin: 0; padding: 0; list-style: none; }
+.week-chart__day { display: grid; justify-items: center; gap: 0.35rem; border-radius: 8px; outline-offset: 2px; }
+.week-chart__plot { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 0.2rem; width: 100%; height: 6.5rem; border-bottom: 1px solid var(--line); }
+.week-chart__bar { width: min(24px, 60%); height: max(2px, calc(5rem * var(--share))); border-radius: 4px 4px 0 0; background: var(--pink); }
+.week-chart__day--this .week-chart__bar { background: var(--ui-accent); }
+.week-chart__value { visibility: hidden; color: var(--ink); font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+.week-chart__value--shown, .week-chart__day:is(:hover, :focus-visible) .week-chart__value { visibility: visible; }
+.week-chart__label { color: var(--muted); font-size: 0.75rem; font-weight: 600; }
+.week-chart__day--this .week-chart__label { color: var(--ink); font-weight: 800; }
 
 .freeze-earned { margin: 0; padding: 0.45rem 1rem; border-radius: 999px; background: var(--blue); color: var(--on-neon); font-weight: 700; }
 

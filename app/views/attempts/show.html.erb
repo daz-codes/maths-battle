@@ -76,6 +76,7 @@
     <%# Where it stands among everyone's today %>
     <% standing = @attempt.daily_test.standing_of(@attempt) %>
     <p class="banner banner--group" <%= "data-controller=confetti" if standing.top_percent <= 10 && standing.players > 1 %>><%= icon(:target) %> <%= daily_standing_message(standing) %></p>
+    <%= render "attempts/week", attempt: @attempt, week: @attempt.daily_test.week_of(@attempt.user) %>
     <div class="results__actions">
       <button type="button" class="button button--share" data-controller="share"
               data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>

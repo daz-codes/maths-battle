@@ -90,6 +90,23 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "the result charts the week's Tables Tests, a column a day, this game's highlighted and the best labelled" do
+    get attempt_path(play_today(right: 3))
+    assert_select ".week-chart", count: 0, message: "nothing to chart on a first go"
+
+    travel 2.days do
+      attempt = play_today(right: 6)
+      get attempt_path(attempt)
+      assert_select ".week-chart__title", text: "Your Tables Test this week"
+      assert_select ".week-chart__day", 7
+      assert_select ".week-chart__day--missed", 5
+      assert_select ".week-chart__day--this[aria-label=?]", "#{Date.current.strftime("%A %-d %B")}: #{attempt.score}, 6 right"
+      assert_select ".week-chart__day--this .week-chart__label", text: "Today"
+      assert_select ".week-chart__day--this .week-chart__bar[style=?]", "--share: 1.0"
+      assert_select ".week-chart__value--shown", 1, "this game is also the best"
+    end
+  end
+
   test "stats from every Tables Test played: the best, the average, and how many" do
     scores = [ 3, 9 ].map.with_index do |right, ago|
       Attempt.record!(user: @ada, topic: "times_tables", level: 2, mode: "daily", day: (Date.current - ago - 1).iso8601,
