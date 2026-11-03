@@ -23,7 +23,7 @@ class GroupsTest < ApplicationSystemTestCase
     sign_in users(:bob)
     click_on "Compete"
     fill_in "Group code", with: code.downcase
-    click_on "Join"
+    click_on "Join group"
     click_on "Join the group"
     assert_text "You've joined Class 4B!"
 

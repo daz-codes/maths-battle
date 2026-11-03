@@ -1,5 +1,5 @@
-<%# Today's challenge on the home page: what it is, then Play. Once played, the player's best today and where it
-    stands (opening that game's results) above Play again. Not fetched ahead on a hover: the game page is for playing %>
+<%# Today's challenge on the home page, kept simple: its name, then Play. Once played, the player's best today and
+    where it stands (opening that game's results) above Play again. Not fetched ahead on a hover: the game page is for playing %>
 <% attempt = user.daily_game(daily_test) %>
 <div class="ui-daily__game daily-game--<%= daily_test.kind %>">
   <p class="ui-daily__game-name"><%= topic_icon(daily_test.topic) %> <%= daily_test.name %> <span>#<%= daily_test.number %></span></p>
@@ -9,13 +9,8 @@
       <span class="ui-daily__best-score"><%= number_with_delimiter attempt.score %></span>
       <span class="ui-daily__best-about">Your best today · <%= daily_standing_message(daily_test.standing_of(attempt)) %></span>
     <% end %>
-  <% else %>
-    <p class="ui-daily__about"><%= daily_test.about %> in one minute. Play as often as you like: your best score counts.</p>
   <% end %>
   <%= link_to play_path(daily_test.topic.slug, daily: daily_test.kind), class: "ui-daily__play", data: { turbo_prefetch: false } do %>
-    <%= attempt ? "Play again" : "Play today's challenge" %> <span aria-hidden="true">→</span>
-  <% end %>
-  <% if (players = daily_test.players).positive? %>
-    <p class="ui-daily__players"><%= pluralize(players, "player") %> today</p>
+    <%= attempt ? "Play again" : "Play" %> <span aria-hidden="true">→</span>
   <% end %>
 </div>

@@ -12,6 +12,8 @@
   --ui-art-a: #fff; --ui-art-b: #14191a; --ui-grid: #1e90ff15;
   --ui-practice-ink: #c2127f; --ui-practice-surface: #ffe6f5; --ui-compete-surface: #e8f3ff;
   --right-text: #1677e0;
+  /* The fluo yellow at the heart of the streak flame, the same in both themes */
+  --fluo: #efff2e;
   --font: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --radius: 14px; --radius-big: 20px; --glow-strength: 0%;
   color-scheme: light;

@@ -80,7 +80,6 @@
     <p class="banner banner--group" <%= "data-controller=confetti" if standing.top_percent <= 10 && standing.players > 1 %>><%= icon(:target) %> <%= daily_standing_message(standing) %></p>
     <% if !daily_test.retired? && daily_test.day == @attempt.user.today %>
       <%= link_to "Play again", play_path(daily_test.topic.slug, daily: daily_test.kind), class: "button button--start button--wide", data: { turbo_prefetch: false } %>
-      <p class="hint hint--centre">New questions, just as hard. Your best score today counts.</p>
     <% end %>
     <%= render "attempts/week", attempt: @attempt, week: daily_test.week_of(@attempt.user, showing: @attempt) %>
     <div class="results__actions">

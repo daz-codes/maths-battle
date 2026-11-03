@@ -21,12 +21,13 @@ class PlayingOfflineTest < ApplicationSystemTestCase
     assert_equal 0, @user.attempts.count
 
     go_online
-    assert_difference -> { @user.attempts.count }, 1 do
-      visit root_path
-      click_on "Practice"
-      assert_selector ".levels__name", text: "Level 2", wait: 8 # the 5 right was a bronze
-    end
-    assert_equal 0, unsent_games
+    visit root_path
+    # The upload happens in the background once back online: wait for it before looking at Practice, which
+    # would otherwise show the levels as they were if it loads first
+    page.document.synchronize(8) { unsent_games.zero? || raise(Capybara::ExpectationNotMet, "game not uploaded yet") }
+    assert_equal 1, @user.attempts.count
+    click_on "Practice"
+    assert_selector ".levels__name", text: "Level 2" # the 5 right was a bronze
   end
 
   test "uploading again doesn't save the game twice" do

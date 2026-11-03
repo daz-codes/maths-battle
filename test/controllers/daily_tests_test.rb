@@ -25,8 +25,8 @@ class DailyTestsTest < ActionDispatch::IntegrationTest
     assert_select "main > section.ui-daily:first-of-type h2", text: "Daily Challenge", message: "first, before the other ways to play"
     assert_select ".ui-daily .ui-daily__game-name", text: /Tables Test\s*#\d+/
     assert_select ".ui-daily .ui-daily__game-name svg", 1, "with its topic's icon"
-    assert_select ".ui-daily a.ui-daily__play[href=?][data-turbo-prefetch=false]", play_path("times-tables", daily: "tables"), text: /Play today's challenge/
-    assert_select ".ui-daily .ui-daily__players", text: "3 players today"
+    assert_select ".ui-daily a.ui-daily__play[href=?][data-turbo-prefetch=false]", play_path("times-tables", daily: "tables"), text: /\APlay\s*→\z/
+    assert_select ".ui-daily__game p", 1, "just its name: nothing to explain on the card"
     assert_select ".ui-daily", text: /Patternz/, count: 0
     assert_select "nav.ui-actions .home-action", 2, "practice and compete, after it"
 

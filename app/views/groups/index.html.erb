@@ -22,7 +22,7 @@
     <%= form_with url: live_games_path, method: :get, class: "group-join__form" do %>
       <label class="visually-hidden" for="live_code">Live game code</label>
       <%= text_field_tag :code, nil, id: "live_code", placeholder: "Got a code? Like K7Q2M", autocomplete: "off", autocapitalize: "characters", maxlength: 12, class: "group-join__code" %>
-      <%= submit_tag "Join", class: "button button--blue", name: nil %>
+      <%= submit_tag "Join game", class: "button button--blue", name: nil %>
     <% end %>
   </section>
 
@@ -53,7 +53,7 @@
     <%= form_with url: join_group_path, method: :get, class: "group-join__form" do %>
       <label class="visually-hidden" for="code">Group code</label>
       <%= text_field_tag :code, nil, placeholder: "Code, like K7Q2MX", autocomplete: "off", autocapitalize: "characters", maxlength: 12, class: "group-join__code" %>
-      <%= submit_tag "Join", class: "button button--blue", name: nil %>
+      <%= submit_tag "Join group", class: "button button--blue", name: nil %>
     <% end %>
   </section>
 
