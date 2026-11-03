@@ -1,48 +1,48 @@
-/* Arcade: one responsive game interface, in lime and lilac in light and dark mode alike, on pale paper or ink.
-   The saved theme can also follow the device. */
+/* Arcade: one responsive game interface, in dodger blue and neon pink, on pale paper in light mode and ink in
+   dark mode. The saved theme can also follow the device. */
 
 :root {
   --paper: #f3f6fb; --paper-alt: #fff; --ink: #152541; --muted: #596a80; --line: #dce3ee;
-  --yellow: #d1f879; --pink: #b59bff; --blue: #b59bff; --green: #d1f879;
-  --blue-deep: #6d4fe0; --green-deep: #507b25; --pink-deep: #6d4fe0; --grey-deep: #263852;
-  --pink-text: #6d4fe0; --on-pink-text: #fff; --wrong: #ce2d50; --on-neon: #14191a;
-  --trophy: #9d7bff; --trophy-outline: transparent;
-  --ui-accent: #6d4fe0; --ui-accent-ink: #fff; --ui-pop: #d1f879;
-  --ui-hero: #1d2136; --ui-hero-ink: #f5f6fb; --ui-soft: #f0ebff; --ui-hero-line: #1d2136;
-  --ui-art-a: #d1f879; --ui-art-b: #b59bff; --ui-grid: #6d4fe015;
-  --ui-practice-ink: #6d4fe0; --ui-practice-surface: #f0ebff; --ui-compete-surface: #eef8d6;
-  --right-text: #507b25;
+  --yellow: #ff5cc6; --pink: #ff5cc6; --blue: #1e90ff; --green: #1e90ff;
+  --blue-deep: #1677e0; --green-deep: #1677e0; --pink-deep: #d4148c; --grey-deep: #263852;
+  --pink-text: #1677e0; --on-pink-text: #fff; --wrong: #ce2d50; --on-neon: #152541;
+  --trophy: #ff5cc6; --trophy-outline: transparent;
+  --ui-accent: #1677e0; --ui-accent-ink: #fff; --ui-pop: #ff5cc6;
+  --ui-hero: #ff5cc6; --ui-hero-ink: #14191a; --ui-soft: #e8f3ff; --ui-hero-line: #ff5cc6;
+  --ui-art-a: #fff; --ui-art-b: #14191a; --ui-grid: #1e90ff15;
+  --ui-practice-ink: #c2127f; --ui-practice-surface: #ffe6f5; --ui-compete-surface: #e8f3ff;
+  --right-text: #1677e0;
   --font: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --radius: 14px; --radius-big: 20px; --glow-strength: 0%;
   color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --paper: #10121b; --paper-alt: #1b1e2c; --ink: #f5f6fb; --muted: #afb5cc; --line: #34394f;
-  --yellow: #d1f879; --pink: #b59bff; --blue: #b59bff; --green: #d1f879;
-  --blue-deep: #7260b9; --green-deep: #507b25; --pink-deep: #7260b9; --grey-deep: #33394e;
-  --pink-text: #d1f879; --on-pink-text: #14191a; --wrong: #ff8caa; --on-neon: #14191a;
-  --trophy: #d1f879; --trophy-outline: transparent;
-  --ui-accent: #d1f879; --ui-accent-ink: #14191a; --ui-pop: #d1f879;
-  --ui-hero: #222638; --ui-hero-ink: #f5f6fb; --ui-soft: #2a3040; --ui-hero-line: #4c526b;
-  --ui-art-a: #d1f879; --ui-art-b: #b59bff; --ui-grid: #afb5cc15;
-  --ui-practice-ink: #c1aaff; --ui-practice-surface: #312d4b; --ui-compete-surface: #303a2b;
-  --right-text: #d1f879;
+  --paper: #10121b; --paper-alt: #1b1e2c; --ink: #f5f6fb; --muted: #b7bdd2; --line: #34394f;
+  --yellow: #ff6fcf; --pink: #ff6fcf; --blue: #4aa3ff; --green: #4aa3ff;
+  --blue-deep: #2f86e8; --green-deep: #2f86e8; --pink-deep: #e0389f; --grey-deep: #33394e;
+  --pink-text: #6cb6ff; --on-pink-text: #10121b; --wrong: #ff8caa; --on-neon: #10121b;
+  --trophy: #ff6fcf; --trophy-outline: transparent;
+  --ui-accent: #4aa3ff; --ui-accent-ink: #0b1020; --ui-pop: #ff6fcf;
+  --ui-hero: #ff5cc6; --ui-hero-ink: #14191a; --ui-soft: #1d2b45; --ui-hero-line: #ff5cc6;
+  --ui-art-a: #fff; --ui-art-b: #14191a; --ui-grid: #4aa3ff15;
+  --ui-practice-ink: #ff8ad8; --ui-practice-surface: #3a2340; --ui-compete-surface: #1d2b45;
+  --right-text: #6cb6ff;
   color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #10121b; --paper-alt: #1b1e2c; --ink: #f5f6fb; --muted: #afb5cc; --line: #34394f;
-    --yellow: #d1f879; --pink: #b59bff; --blue: #b59bff; --green: #d1f879;
-    --blue-deep: #7260b9; --green-deep: #507b25; --pink-deep: #7260b9; --grey-deep: #33394e;
-    --pink-text: #d1f879; --on-pink-text: #14191a; --wrong: #ff8caa; --on-neon: #14191a;
-    --trophy: #d1f879; --trophy-outline: transparent;
-    --ui-accent: #d1f879; --ui-accent-ink: #14191a; --ui-pop: #d1f879;
-    --ui-hero: #222638; --ui-hero-ink: #f5f6fb; --ui-soft: #2a3040; --ui-hero-line: #4c526b;
-    --ui-art-a: #d1f879; --ui-art-b: #b59bff; --ui-grid: #afb5cc15;
-    --ui-practice-ink: #c1aaff; --ui-practice-surface: #312d4b; --ui-compete-surface: #303a2b;
-    --right-text: #d1f879;
+    --paper: #10121b; --paper-alt: #1b1e2c; --ink: #f5f6fb; --muted: #b7bdd2; --line: #34394f;
+    --yellow: #ff6fcf; --pink: #ff6fcf; --blue: #4aa3ff; --green: #4aa3ff;
+    --blue-deep: #2f86e8; --green-deep: #2f86e8; --pink-deep: #e0389f; --grey-deep: #33394e;
+    --pink-text: #6cb6ff; --on-pink-text: #10121b; --wrong: #ff8caa; --on-neon: #10121b;
+    --trophy: #ff6fcf; --trophy-outline: transparent;
+    --ui-accent: #4aa3ff; --ui-accent-ink: #0b1020; --ui-pop: #ff6fcf;
+    --ui-hero: #ff5cc6; --ui-hero-ink: #14191a; --ui-soft: #1d2b45; --ui-hero-line: #ff5cc6;
+    --ui-art-a: #fff; --ui-art-b: #14191a; --ui-grid: #4aa3ff15;
+    --ui-practice-ink: #ff8ad8; --ui-practice-surface: #3a2340; --ui-compete-surface: #1d2b45;
+    --right-text: #6cb6ff;
     color-scheme: dark;
   }
 }
@@ -100,7 +100,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   padding: calc(1.5rem + env(safe-area-inset-top)) 1rem 0;
 }
 
-.tagline { margin: 0; color: var(--muted); font-size: 0.95rem; font-weight: 600; text-align: center; }
+.tagline { margin: 0; color: var(--muted); font-size: 1.05rem; font-weight: 600; text-align: center; }
 
 .page {
   display: flex;
@@ -166,14 +166,14 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .label {
   margin: 0;
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .aside, .hint { margin: 0; color: var(--muted); }
-.hint { margin-top: -0.4rem; font-size: 0.85rem; text-align: left; }
+.hint { margin-top: -0.4rem; font-size: 0.95rem; text-align: left; }
 
 /* ── Buttons ────────────────────────────────────── */
 
@@ -249,7 +249,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   text-align: left;
 }
 
-.form label, .choice legend { font-size: 0.9rem; font-weight: 700; }
+.form label, .choice legend { font-size: 1rem; font-weight: 700; }
 
 .form input[type="text"],
 .form input[type="password"] {
@@ -340,7 +340,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 .streak__label {
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -348,7 +348,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* Play, right under the streak it keeps going, saying so when the streak needs it */
 .button--play { flex-direction: column; gap: 0.15rem; width: var(--panel-width); min-height: 3.9rem; padding-block: 0.5rem; font-size: clamp(1.4rem, 6.5vw, 1.75rem); }
-.button__note { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; opacity: 0.9; }
+.button__note { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em; opacity: 0.9; }
 
 .save-nudge {
   margin: 0;
@@ -356,7 +356,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   border: 1.5px dashed var(--muted);
   border-radius: var(--radius);
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
 }
 
 .install { display: flex; flex-direction: column; align-items: center; }
@@ -381,7 +381,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .stats div:nth-child(3) { --stripe: var(--blue); }
 .stats div:nth-child(4) { --stripe: var(--pink); }
 
-.stats dt { color: var(--muted); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.stats dt { color: var(--muted); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
 .stats dd { margin: 0; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; }
 
 /* ── Footer: fixed to the bottom like an app's tab bar ── */
@@ -399,14 +399,14 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   border-top: 1.5px solid var(--line);
   background: color-mix(in srgb, var(--paper) 92%, transparent);
   backdrop-filter: blur(8px);
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .site-footer__start { display: flex; flex: 0 1 auto; align-items: center; gap: 0.5rem; min-width: 0; }
 /* Name (or sign in and sign up) over the player's gems */
 .site-footer__who { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
 .site-footer__name { overflow: hidden; color: inherit; font-weight: 700; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
-.site-footer__gems { color: var(--muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+.site-footer__gems { color: var(--muted); font-size: 0.9rem; font-weight: 700; white-space: nowrap; }
 .site-footer__tab { flex: none; }
 
 .site-footer__player, .site-footer__tab {
@@ -425,10 +425,10 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .site-footer__player { min-width: 0; }
 .site-footer__player:hover, .site-footer__tab:hover { background: color-mix(in srgb, var(--ink) 5%, var(--paper)); }
 .site-footer__player span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.site-footer__auth { color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
+.site-footer__auth { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
 
 /* Icon above its label, like a tab bar, so three fit on a small phone */
-.site-footer__tab { flex-direction: column; justify-content: center; gap: 0.1rem; font-size: 0.75rem; }
+.site-footer__tab { flex-direction: column; justify-content: center; gap: 0.1rem; font-size: 0.875rem; }
 
 .footer-icon { width: 1.5rem; height: 1.5rem; }
 
@@ -472,12 +472,12 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .greeting__avatar { display: inline-flex; border-radius: 50%; text-decoration: none; }
 
 .avatar-field { margin: 0 0 0.75rem; padding: 0; border: 0; }
-.avatar-field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.9rem; font-weight: 700; }
+.avatar-field legend { margin-bottom: 0.6rem; padding: 0; font-size: 1rem; font-weight: 700; }
 .avatar-field__row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.6rem; }
 .avatar-field__controls { display: grid; gap: 0.6rem; justify-items: start; }
-.avatar-field__controls .button { min-height: 2.75rem; padding: 0.4rem 1rem; font-size: 0.85rem; cursor: pointer; }
+.avatar-field__controls .button { min-height: 2.75rem; padding: 0.4rem 1rem; font-size: 0.95rem; cursor: pointer; }
 .avatar-field__controls .button:focus-within { outline: 3px solid var(--blue); outline-offset: 3px; }
-.avatar-field__remove { display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; font-weight: 500; }
+.avatar-field__remove { display: flex; align-items: center; gap: 0.4rem; font-size: 1rem; font-weight: 500; }
 .avatar-field .hint { margin-top: 0; }
 
 /* ── Groups ─────────────────────────────────────── */
@@ -491,9 +491,9 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .group-card, .challenge-card { display: flex; flex-direction: column; gap: 0.2rem; padding: 1rem; border-radius: var(--radius); background: var(--paper-alt); color: var(--ink); text-align: left; text-decoration: none; }
 .group-card:hover, .challenge-card:hover { background: color-mix(in srgb, var(--ink) 6%, var(--paper-alt)); }
 .group-card__name, .challenge-card__title { font-size: 1.15rem; font-weight: 800; }
-.group-card__about, .challenge-card__status { color: var(--muted); font-size: 0.9rem; font-weight: 600; }
-.group-card__waiting { color: var(--pink-text); font-size: 0.9rem; font-weight: 700; }
-.challenge-card__you { font-size: 0.95rem; font-weight: 600; }
+.group-card__about, .challenge-card__status { color: var(--muted); font-size: 1rem; font-weight: 600; }
+.group-card__waiting { color: var(--pink-text); font-size: 1rem; font-weight: 700; }
+.challenge-card__you { font-size: 1.05rem; font-weight: 600; }
 .challenge-card__you:empty { display: none; }
 .challenge-card--ended { opacity: 0.75; }
 .groups .settings__heading, .group .settings__heading, .challenge .settings__heading { align-self: flex-start; }
@@ -505,7 +505,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 
 /* The owner's code to share: big enough to read out to a class */
 .group-code { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; width: 100%; padding: 1rem; border-radius: var(--radius); background: linear-gradient(var(--green) 0 6px, var(--paper-alt) 6px); }
-.group-code__label { margin: 0; color: var(--muted); font-size: 0.9rem; font-weight: 700; }
+.group-code__label { margin: 0; color: var(--muted); font-size: 1rem; font-weight: 700; }
 .group-code__code { margin: 0; font-size: 2.4rem; font-weight: 900; letter-spacing: 0.18em; }
 
 .group-members { width: 100%; text-align: left; }
@@ -515,31 +515,31 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .group-members__name { flex: 1; min-width: 0; }
 .group-members__player .avatar { flex: none; }
 /* Small and quiet, but a button: outlined in the ink colour */
-.group-members__remove { --fill: transparent; min-height: 2.25rem; padding: 0.3rem 0.85rem; border: 1.5px solid color-mix(in srgb, var(--ink) 30%, transparent); color: var(--ink); font-size: 0.8rem; }
+.group-members__remove { --fill: transparent; min-height: 2.25rem; padding: 0.3rem 0.85rem; border: 1.5px solid color-mix(in srgb, var(--ink) 30%, transparent); color: var(--ink); font-size: 0.9rem; }
 
 /* A challenge's leaderboard: the player's own row stands out */
 .challenge__you { margin: 0; font-size: 1.2rem; font-weight: 700; }
 .leaderboard__rows { display: grid; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
 .leaderboard__row { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.75rem; border-radius: var(--radius); background: var(--paper-alt); text-align: left; }
 .leaderboard__row--you { background: color-mix(in srgb, var(--yellow) 35%, var(--paper-alt)); }
-.leaderboard__rank { display: inline-grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; font-size: 0.95rem; font-weight: 800; }
+.leaderboard__rank { display: inline-grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; font-size: 1.05rem; font-weight: 800; }
 /* The top three's places in the logo's colours */
 .leaderboard__rank--1 { background: var(--yellow); color: var(--on-neon); }
 .leaderboard__rank--2 { background: var(--blue); color: var(--on-neon); }
 .leaderboard__rank--3 { background: var(--pink); color: var(--on-neon); }
 .leaderboard__name { flex: 1; min-width: 0; overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .leaderboard__score { font-size: 1.25rem; font-weight: 800; }
-.leaderboard__wrong { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
+.leaderboard__wrong { color: var(--muted); font-size: 0.9rem; font-weight: 600; }
 
 /* An every day challenge's leaderboards: today's, or the week's by total or best day */
 .board-switch { display: grid; grid-template-columns: repeat(3, 1fr); padding: 0.25rem; border-radius: 999px; background: var(--paper-alt); }
-.board-switch__option { padding: 0.45rem 0.5rem; border-radius: 999px; color: var(--muted); font-size: 0.9rem; font-weight: 700; text-align: center; text-decoration: none; }
+.board-switch__option { padding: 0.45rem 0.5rem; border-radius: 999px; color: var(--muted); font-size: 1rem; font-weight: 700; text-align: center; text-decoration: none; }
 .board-switch__option[aria-current="true"] { background: var(--blue-deep); color: #fff; }
 
 /* On the home page, under Play */
 .group-waiting { display: flex; flex-direction: column; gap: 0.15rem; width: var(--panel-width); padding: 0.75rem 1rem; border-radius: var(--radius); background: linear-gradient(90deg, var(--yellow) 0 6px, var(--paper-alt) 6px); color: var(--ink); text-decoration: none; }
 .group-waiting__title { font-weight: 800; }
-.group-waiting__about { color: var(--muted); font-size: 0.9rem; font-weight: 600; }
+.group-waiting__about { color: var(--muted); font-size: 1rem; font-weight: 600; }
 .banner--group { background: var(--yellow); color: var(--on-neon); }
 
 /* The topic and level menus, one under the other in the form */
@@ -560,7 +560,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 }
 
 .current-topic__name { display: flex; align-items: center; gap: 0.45rem; margin: 0; font-size: clamp(2rem, 9vw, 2.6rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.15; }
-.current-topic__change { font-size: 0.95rem; font-weight: 700; }
+.current-topic__change { font-size: 1.05rem; font-weight: 700; }
 
 /* Changing topic: a tile for each, with the player's progress in it */
 .topic-cards { display: grid; gap: 0.75rem; width: 100%; margin: 0; padding: 0; list-style: none; }
@@ -586,16 +586,16 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .topic-card__icon .icon { width: 2.2rem; height: 2.2rem; }
 .topic-card__body { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
 .topic-card__title { font-size: 1.15rem; font-weight: 800; }
-.topic-card__now { color: var(--pink-text); font-size: 0.85rem; font-weight: 700; }
-.topic-card__level { color: var(--muted); font-size: 0.9rem; font-weight: 600; }
+.topic-card__now { color: var(--pink-text); font-size: 0.95rem; font-weight: 700; }
+.topic-card__level { color: var(--muted); font-size: 1rem; font-weight: 600; }
 /* Each level: its number in a small circle like the home page's, its stars under it, or a padlock */
 .topic-card__levels { display: flex; flex-wrap: wrap; gap: 0.35rem 0.55rem; margin-top: 0.15rem; }
 .topic-card__step { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; width: 2.7rem; }
-.topic-card__number { display: grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--paper); font-size: 0.85rem; font-weight: 800; }
+.topic-card__number { display: grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--paper); font-size: 0.95rem; font-weight: 800; }
 .topic-card__step--locked .topic-card__number { color: var(--muted); }
 .topic-card__step--locked .icon { width: 0.75rem; height: 0.75rem; }
 .topic-card__step .stars .icon { width: 0.8rem; height: 0.8rem; }
-.topic-card__done { color: var(--green-deep); font-size: 0.85rem; font-weight: 700; }
+.topic-card__done { color: var(--green-deep); font-size: 0.95rem; font-weight: 700; }
 
 /* Levels: unlocked ones can be picked, locked ones show a padlock */
 /* The levels with their name and any action under them, spread across the page, with room for the medals */
@@ -628,7 +628,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* A medal level's best medal, on its circle and under its name */
 .levels__level { position: relative; }
 /* A level's best score, small under its circle */
-.levels__best { position: absolute; top: calc(100% + 1.45rem); left: 50%; transform: translateX(-50%); color: var(--muted); font-size: 0.8rem; font-weight: 700; line-height: 1; }
+.levels__best { position: absolute; top: calc(100% + 1.45rem); left: 50%; transform: translateX(-50%); color: var(--muted); font-size: 0.9rem; font-weight: 700; line-height: 1; }
 .levels { margin-bottom: 1.4rem; }
 .levels:has(.levels__best) { margin-bottom: 2.4rem; }
 /* Under each level's circle: its stars, then its best */
@@ -647,14 +647,14 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* Under the level's name, kept close to it, and kept from widening the levels like the name */
 .levels__learn { width: 0; min-width: 100%; margin: -1rem 0 0; font-size: 1.1rem; font-weight: 700; white-space: nowrap; }
 
-.level-progress { margin: 0; color: var(--muted); font-size: 0.95rem; }
+.level-progress { margin: 0; color: var(--muted); font-size: 1.05rem; }
 .level-progress strong { color: var(--ink); }
-.level-progress__rule { display: block; margin-top: 0.2rem; font-size: 0.8rem; }
+.level-progress__rule { display: block; margin-top: 0.2rem; font-size: 0.9rem; }
 
 .banner--level { background: var(--green); }
 .banner--medal { background: var(--blue); }
 
-.tables__example { display: block; color: var(--muted); font-size: 0.75rem; font-weight: 500; }
+.tables__example { display: block; color: var(--muted); font-size: 0.875rem; font-weight: 500; }
 
 /* ── Score pops ─────────────────────────────────── */
 
@@ -706,7 +706,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* Where a game's score came from: right answers, speed, combos, and what wrong ones lost */
 .score-tally { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
 .score-tally .score-tally__wrong { color: var(--wrong); }
-.score-tally li { padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--paper-alt); color: var(--muted); font-size: 0.85rem; font-weight: 700; }
+.score-tally li { padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--paper-alt); color: var(--muted); font-size: 0.95rem; font-weight: 700; }
 
 /* The player's collection, on the home page under the streak */
 .gems-total { margin: -0.5rem 0 0; color: var(--muted); font-weight: 700; }
@@ -719,8 +719,8 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .freezes__icons .icon { width: 1.4rem; height: 1.4rem; }
 .icon--faded { opacity: 0.3; }
 .freezes__form { display: contents; }
-.freezes__buy { --fill: var(--blue-deep); --glow: var(--blue); min-height: 2.6rem; padding: 0.4rem 1.1rem; font-size: 0.9rem; }
-.freezes__hint { max-width: 22rem; margin: 0; color: var(--muted); font-size: 0.85rem; }
+.freezes__buy { --fill: var(--blue-deep); --glow: var(--blue); min-height: 2.6rem; padding: 0.4rem 1.1rem; font-size: 1rem; }
+.freezes__hint { max-width: 22rem; margin: 0; color: var(--muted); font-size: 0.95rem; }
 
 /* Settings: the player's gems and streak freezes, above their picture and name */
 .collection { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; padding: 1rem; border-radius: var(--radius); background: linear-gradient(var(--blue) 0 6px, var(--paper-alt) 6px); }
@@ -730,14 +730,14 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .settings__section { display: flex; flex-direction: column; align-items: center; gap: 1rem; width: 100%; }
 .settings__section + .settings__section { padding-top: 1.5rem; border-top: 2px dashed color-mix(in srgb, var(--ink) 15%, transparent); }
 .settings__heading { align-self: flex-start; margin: 0; font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; }
-.settings__saved { margin: 0; color: var(--green-deep); font-size: 0.9rem; font-weight: 700; text-align: center; }
+.settings__saved { margin: 0; color: var(--green-deep); font-size: 1rem; font-weight: 700; text-align: center; }
 .settings__saved:empty { display: none; }
 .collection { width: 100%; }
 
 /* Daily reminders on the settings page: a time, and turning them on or off */
 .reminder { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; width: 100%; padding: 1rem; border-radius: var(--radius); background: linear-gradient(var(--pink) 0 6px, var(--paper-alt) 6px); }
 .reminder .label { margin: 0; }
-.reminder__about, .reminder__status { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.reminder__about, .reminder__status { margin: 0; color: var(--muted); font-size: 1rem; }
 .reminder__status:empty { display: none; }
 .reminder__row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
 .reminder__time { min-height: 3.25rem; padding: 0 0.75rem; border: 0; border-radius: var(--radius); background: var(--paper); color: var(--ink); font: inherit; font-weight: 700; }
@@ -750,17 +750,17 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* On the results page: how the game compares with the level's best */
 .best-line { margin: 0; color: var(--muted); font-size: 1.05rem; font-weight: 700; }
 .best-line--new { color: var(--pink-text); font-size: 1.2rem; }
-/* A daily challenge's week: thin columns from one baseline, this game's in the accent, the rest lilac */
+/* A daily challenge's week: thin columns from one baseline, this game's in the accent, the rest pink */
 .week-chart { display: grid; gap: 0.6rem; width: 100%; margin: 0; }
-.week-chart__title { color: var(--muted); font-size: 0.95rem; font-weight: 700; text-align: center; }
+.week-chart__title { color: var(--muted); font-size: 1.05rem; font-weight: 700; text-align: center; }
 .week-chart__days { display: grid; grid-template-columns: repeat(7, 1fr); margin: 0; padding: 0; list-style: none; }
 .week-chart__day { display: grid; justify-items: center; gap: 0.35rem; border-radius: 8px; outline-offset: 2px; }
 .week-chart__plot { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 0.2rem; width: 100%; height: 6.5rem; border-bottom: 1px solid var(--line); }
 .week-chart__bar { width: min(24px, 60%); height: max(2px, calc(5rem * var(--share))); border-radius: 4px 4px 0 0; background: var(--pink); }
 .week-chart__day--this .week-chart__bar { background: var(--ui-accent); }
-.week-chart__value { visibility: hidden; color: var(--ink); font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+.week-chart__value { visibility: hidden; color: var(--ink); font-size: 0.875rem; font-weight: 700; white-space: nowrap; }
 .week-chart__value--shown, .week-chart__day:is(:hover, :focus-visible) .week-chart__value { visibility: visible; }
-.week-chart__label { color: var(--muted); font-size: 0.75rem; font-weight: 600; }
+.week-chart__label { color: var(--muted); font-size: 0.875rem; font-weight: 600; }
 .week-chart__day--this .week-chart__label { color: var(--ink); font-weight: 800; }
 
 .freeze-earned { margin: 0; padding: 0.45rem 1rem; border-radius: 999px; background: var(--blue); color: var(--on-neon); font-weight: 700; }
@@ -835,7 +835,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 /* On a new award's yellow tile, its icon sits on a disc so a yellow one still shows */
 .badges--new .badge__icon { display: grid; place-items: center; width: 3.1rem; height: 3.1rem; border-radius: 50%; background: var(--paper); }
 .badge__name { font-weight: 800; line-height: 1.2; }
-.badge__how { color: var(--muted); font-size: 0.75rem; line-height: 1.3; }
+.badge__how { color: var(--muted); font-size: 0.875rem; line-height: 1.3; }
 
 /* Not earned yet: faded, so the earned ones stand out */
 .badge--locked { background: color-mix(in srgb, var(--paper-alt) 55%, var(--paper)); }
@@ -863,7 +863,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 }
 
 .badge-summary:hover { background: linear-gradient(var(--pink) 0 6px, color-mix(in srgb, var(--ink) 6%, var(--paper-alt)) 6px); }
-.badge-summary__label { color: var(--muted); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.badge-summary__label { color: var(--muted); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
 .badge-summary__count { color: var(--muted); font-weight: 600; }
 .badge-summary__count strong { color: var(--ink); font-size: 1.75rem; letter-spacing: -0.03em; }
 .badge-summary__count::after { content: " ›"; }
@@ -888,7 +888,7 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
 .tables caption { margin-bottom: 0.5rem; }
 
 .tables th, .tables td { padding: 0.45rem 0.3rem; text-align: right; white-space: nowrap; }
-.tables thead th { color: var(--muted); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.tables thead th { color: var(--muted); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
 .tables tbody tr { border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); }
 .tables tbody th { font-weight: 700; text-align: left; }
 .tables__bar { width: 100%; }
@@ -970,7 +970,7 @@ body.testing {
 
 /* The score, with the best to beat under it, which turns the logo's pink once it's passed */
 .test__tally { display: flex; flex-direction: column; align-items: flex-end; justify-self: end; gap: 0.15rem; }
-.test__best { color: var(--muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+.test__best { color: var(--muted); font-size: 0.9rem; font-weight: 700; white-space: nowrap; }
 .test--beating .test__score { color: var(--pink-text); text-shadow: 0 0 14px color-mix(in srgb, var(--pink) var(--glow-strength), transparent); }
 .test--beating .test__best { color: var(--pink-text); }
 .score-pop--best { color: var(--pink-text); font-size: 1.9rem; font-weight: 900; }
@@ -1268,7 +1268,7 @@ body.testing {
 .rival-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.5rem 0.5rem 0.75rem; border-radius: var(--radius); background: var(--paper-alt); text-align: left; }
 .rival-row__who { display: flex; flex: 1; flex-direction: column; min-width: 0; }
 .rival-row__name { overflow: hidden; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
-.rival-row__record { color: var(--muted); font-size: 0.85rem; font-weight: 600; }
+.rival-row__record { color: var(--muted); font-size: 0.95rem; font-weight: 600; }
 .rival-row__button { min-height: 2.5rem; padding: 0.4rem 0.9rem; font-size: 1rem; }
 .head-to-head-waiting { background: linear-gradient(90deg, var(--pink) 0 6px, var(--paper-alt) 6px); }
 
@@ -1286,12 +1286,12 @@ body.testing {
 /* A head to head's ghost: the challenger's score at this point in their minute, pink while they're ahead and
    green once you are */
 /* The combo: how much right answers in a row multiply the gems */
-.test__combo { padding: 0.05rem 0.45rem; border-radius: 999px; background: var(--pink); color: var(--on-neon); font-size: 0.85rem; font-weight: 900; }
+.test__combo { padding: 0.05rem 0.45rem; border-radius: 999px; background: var(--pink); color: var(--on-neon); font-size: 0.95rem; font-weight: 900; }
 .test__combo--new { animation: combo-pulse 450ms ease-out; }
 @keyframes combo-pulse { 0% { transform: scale(1.6); } 100% { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .test__combo--new { animation: none; } }
 
-.test__ghost { color: var(--muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; transition: color 150ms; }
+.test__ghost { color: var(--muted); font-size: 0.9rem; font-weight: 700; white-space: nowrap; transition: color 150ms; }
 .test__ghost--ahead { color: var(--pink-text); }
 .test__ghost--behind { color: var(--green-deep); }
 :root[data-theme="dark"] .test__ghost--behind { color: var(--green); }
@@ -1304,7 +1304,7 @@ body.testing {
 .live-players__count { list-style: none; }
 .test--live { grid-template-rows: auto auto 1fr auto; }
 .test__rivals { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem 0.75rem; margin: 0; padding: 0 1rem; list-style: none; }
-.test__rival { color: var(--muted); font-size: 0.85rem; font-weight: 700; white-space: nowrap; transition: color 150ms; }
+.test__rival { color: var(--muted); font-size: 0.95rem; font-weight: 700; white-space: nowrap; transition: color 150ms; }
 .test__rival strong { font-size: 1rem; }
 .test__rival--ahead { color: var(--pink-text); }
 .test__rival--behind { color: var(--green-deep); }
@@ -1312,7 +1312,7 @@ body.testing {
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .test__rival--behind { color: var(--green); } }
 .live-status .board-switch { grid-template-columns: 1fr 1fr; }
 .board-switch__form { margin: 0; }
-button.board-switch__option { width: 100%; border: 0; background: transparent; cursor: pointer; font: inherit; font-size: 0.9rem; font-weight: 700; }
+button.board-switch__option { width: 100%; border: 0; background: transparent; cursor: pointer; font: inherit; font-size: 1rem; font-weight: 700; }
 .live-mode { margin: 0; color: var(--muted); }
 .live-mode .icon { width: 1.1em; height: 1.1em; vertical-align: -0.2em; }
 
@@ -1341,7 +1341,7 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 .test__counts { display: flex; gap: 0.6rem; }
 .test__count { display: flex; flex-direction: column; align-items: center; }
 .test__count .test__score, .test__count .test__right { padding: 0 0.15rem; font-size: clamp(1.6rem, 7vw, 2.1rem); font-weight: 700; line-height: 1; }
-.test__count-label { color: var(--muted); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.test__count-label { color: var(--muted); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .test__rival .icon { width: 0.9em; height: 0.9em; margin-left: 0.1em; vertical-align: -0.1em; }
 
 /* Power-ups in a Power game: the one held, to tap; news of what's hit whom; and each one's effect on the player
@@ -1352,7 +1352,7 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 .test__power .icon { width: 1.3em; height: 1.3em; }
 .test__power--shield { background: var(--blue); box-shadow: none; cursor: default; }
 .test__power--new { animation: combo-pulse 450ms ease-out; }
-.test__power-news { margin: 0; color: var(--pink-text); font-size: 0.85rem; font-weight: 800; text-align: center; }
+.test__power-news { margin: 0; color: var(--pink-text); font-size: 0.95rem; font-weight: 800; text-align: center; }
 .test__power-news:empty { display: none; }
 
 .test--flip .question--current { transform: rotate(180deg); transition: transform 300ms; }
@@ -1397,10 +1397,12 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 .daily-test__toggle::-webkit-details-marker { display: none; }
 .daily-test__toggle::after { content: "▾"; color: var(--muted); font-size: 1rem; transition: transform 150ms; }
 .daily-test[open] .daily-test__toggle::after { transform: rotate(180deg); }
+/* Open, the score and where it stands are shown big below, so the button just says which challenge it is */
+.daily-test[open] :is(.daily-test__score, .daily-test__status) { display: none; }
 .daily-test__name { font-size: 1.25rem; font-weight: 800; }
 .daily-test__name .icon { width: 1.1em; height: 1.1em; vertical-align: -0.15em; }
-.daily-test__status { color: var(--muted); font-size: 0.9rem; font-weight: 700; }
+.daily-test__status { color: var(--muted); font-size: 1rem; font-weight: 700; }
 .daily-test__score { font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
-.daily-test__score span { color: var(--muted); font-size: 0.9rem; font-weight: 700; }
+.daily-test__score span { color: var(--muted); font-size: 1rem; font-weight: 700; }
 .daily-test__body { display: grid; justify-items: center; gap: 0.75rem; margin-top: 0.75rem; }
 .daily-test__number { color: var(--muted); font-weight: 700; }

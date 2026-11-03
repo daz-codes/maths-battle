@@ -3,8 +3,7 @@
 # (multiplying each time, or halving), then Fibonacci style (each term the two before added), then two-step (two
 # steps taking turns). Every answer is a whole number, and every question has one answer: five terms are shown (5
 # to 7 for two steps, so the next isn't always the first step), and a question that another kind of sequence would
-# continue differently is never asked (Patternz, the daily challenge, mixes them all, so the kind has to be
-# spotted too)
+# continue differently is never asked (mixed practice mixes them all, so the kind has to be spotted too)
 module Sequences
   TOPIC = "sequences"
   SLUG = "sequences"

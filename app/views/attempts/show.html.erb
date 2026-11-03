@@ -73,10 +73,16 @@
       </div>
     <% end %>
   <% elsif @attempt.daily_test? %>
-    <%# Where it stands among everyone's today %>
-    <% standing = @attempt.daily_test.standing_of(@attempt) %>
+    <%# Where it would put the player among everyone's best today, then straight into another go while it's still
+        today's (and still played) %>
+    <% daily_test = @attempt.daily_test %>
+    <% standing = daily_test.standing_of(@attempt) %>
     <p class="banner banner--group" <%= "data-controller=confetti" if standing.top_percent <= 10 && standing.players > 1 %>><%= icon(:target) %> <%= daily_standing_message(standing) %></p>
-    <%= render "attempts/week", attempt: @attempt, week: @attempt.daily_test.week_of(@attempt.user) %>
+    <% if !daily_test.retired? && daily_test.day == @attempt.user.today %>
+      <%= link_to "Play again", play_path(daily_test.topic.slug, daily: daily_test.kind), class: "button button--start button--wide", data: { turbo_prefetch: false } %>
+      <p class="hint hint--centre">New questions, just as hard. Your best score today counts.</p>
+    <% end %>
+    <%= render "attempts/week", attempt: @attempt, week: daily_test.week_of(@attempt.user, showing: @attempt) %>
     <div class="results__actions">
       <button type="button" class="button button--share" data-controller="share"
               data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>

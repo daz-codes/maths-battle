@@ -30,7 +30,7 @@ module Attempt::Recordable
     # Mixed games are issued at the highest level. That signed level stays valid if an offline upload
     # arrives after another game has unlocked a new one. A group game is at whatever level its challenge set,
     # unlocked or not, for one of the challenge's players, and a head to head or live game at its level, for its players
-    # The Daily Tables Test's game must be saved on the day it was for, one a day
+    # A daily challenge's game must be saved on the day it was for, and not for a retired one
     def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil, mode: "practice", round: nil, head_to_head: nil, live_game: nil, day: nil)
       if existing = already_recorded(user, client_id)
         return existing
@@ -66,7 +66,7 @@ module Attempt::Recordable
           played_at = play_time(played_at)
           played_on = played_at.in_time_zone(user.time_zone).to_date
           raise Invalid, "Today's daily challenge is already done" if mode == "challenge" && user.daily_challenge_on(topic_named(topic), played_on)
-          check_daily_test_day(user, DailyTest.new(played_on, DailyTest.kind_for(topic_named(topic))), day) if mode == "daily"
+          check_daily_test_day(DailyTest.new(played_on, DailyTest.kind_for(topic_named(topic))), day) if mode == "daily"
 
           user.attempts.create!(topic: topic, level: level, results: results, client_id: client_id.presence, played_at: played_at, mode: mode, round: round)
             .tap { |attempt| head_to_head&.played(attempt) }
@@ -97,11 +97,11 @@ module Attempt::Recordable
       def check_daily_test(topic, level)
         kind = DailyTest.kind_for(topic)
         raise Invalid, "Bad question" unless kind && level == DailyTest::KINDS.fetch(kind)[:level]
+        raise Invalid, "That daily challenge isn't played any more" if DailyTest::KINDS.fetch(kind)[:retired]
       end
 
-      def check_daily_test_day(user, test, day)
+      def check_daily_test_day(test, day)
         raise Invalid, "That #{test.name} was for another day" unless day.to_s == test.day.iso8601
-        raise Invalid, "Today's #{test.name} is already done" if user.daily_game(test)
       end
 
       def check_unlocked(user, topic, level)

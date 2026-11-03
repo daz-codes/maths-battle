@@ -10,29 +10,28 @@
 <main class="page home ui-home">
   <%= render "flash" %>
 
-  <nav class="home-actions ui-actions" aria-label="Play">
-    <div class="home-action home-action--challenge ui-daily">
-      <div class="ui-daily__info">
-        <p class="ui-eyebrow"><span class="ui-live-dot" aria-hidden="true"></span> <%= @user.today.strftime("%A %-d %B") %></p>
-        <h2 class="home-action__label">Daily Challenges</h2>
-        <div class="ui-daily__games">
-          <% DailyTest.on(@user.today).each do |daily_test| %>
-            <%= render "home/daily_game", daily_test: daily_test, attempt: @user.daily_game(daily_test) %>
-          <% end %>
-        </div>
-      </div>
-      <%= render "home/daily_art" %>
+  <%# Where to start: today's challenge, big and first. Then the other ways to play %>
+  <section class="ui-daily" aria-labelledby="daily-heading">
+    <div class="ui-daily__info">
+      <p class="ui-eyebrow"><span class="ui-live-dot" aria-hidden="true"></span> <%= @user.today.strftime("%A %-d %B") %></p>
+      <h2 class="ui-daily__heading" id="daily-heading">Daily Challenge</h2>
+      <% DailyTest.on(@user.today).each do |daily_test| %>
+        <%= render "home/daily_game", daily_test: daily_test, user: @user %>
+      <% end %>
     </div>
+    <%= render "home/daily_art" %>
+  </section>
 
+  <nav class="home-actions ui-actions" aria-label="More ways to play">
     <%= link_to practice_path, class: "button home-action home-action--practice ui-secondary" do %>
       <span class="ui-secondary__top"><span class="ui-secondary__icon"><%= icon(:lightning) %></span><span class="ui-secondary__arrow" aria-hidden="true">↗</span></span>
       <span class="home-action__label">Practice</span>
-      <span class="ui-secondary__description"><%= Topic::ALL.size %> topics. Your pace.<br>Keep chasing your best.</span>
+      <span class="ui-secondary__description"><%= Topic::ALL.size %> topics at your own pace</span>
     <% end %>
     <%= link_to groups_path, class: "button home-action home-action--compete ui-secondary" do %>
       <span class="ui-secondary__top"><span class="ui-secondary__icon"><%= icon(:people) %></span><span class="ui-secondary__arrow" aria-hidden="true">↗</span></span>
       <span class="home-action__label">Compete</span>
-      <span class="ui-secondary__description">Bring your friends.<br>Give them a score to beat.</span>
+      <span class="ui-secondary__description">Give your friends a score to beat</span>
     <% end %>
   </nav>
 

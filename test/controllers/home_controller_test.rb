@@ -41,9 +41,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".ui-home__heading", text: "Master Math in Minutes"
     assert_select ".site-header .ui-header__hello", text: "Hi there!"
     assert_select ".ui-header .streak strong", text: "0"
-    assert_select ".home-actions a.button", 2, "Practice and Compete; the Daily Challenge's games are on its card"
-    assert_select ".home-action--challenge a.ui-daily__game[href=?]", play_path("times-tables", daily: "tables"), text: /Tables Test\s*Play/
-    assert_select ".home-action--challenge a.ui-daily__game[href=?]", play_path("sequences", daily: "patternz"), text: /Patternz\s*Play/
+    assert_select ".home-actions a.button", 2, "Practice and Compete; the Daily Challenge is its own card, first"
+    assert_select ".ui-daily a.ui-daily__play[href=?]", play_path("times-tables", daily: "tables"), text: /Play today's challenge/
     assert_select ".ui-eyebrow", text: /Ready for another round/, count: 0
     assert_select "p", text: /A reason to come back/, count: 0
     assert_select ".home-actions a[href=?] .home-action__label", practice_path, text: "Practice"

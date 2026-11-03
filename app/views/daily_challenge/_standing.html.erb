@@ -1,9 +1,9 @@
-<%# Where a Daily Tables Test game stands among everyone's that day %>
+<%# A player's best daily challenge game today, and where it stands among everyone's best %>
 <% standing = attempt.daily_test.standing_of(attempt) %>
-<section class="daily-standing" aria-label="Today's result">
+<section class="daily-standing" aria-label="Your best today">
   <p class="daily-standing__score"><span class="card__number"><%= number_with_delimiter attempt.score %></span> <span class="result__right"><%= pluralize(attempt.correct, "correct answer") %></span></p>
   <p class="banner banner--group">
     <%= icon(:target) %> <%= daily_standing_message(standing) %>
   </p>
-  <p class="aside"><%= standing.rank.ordinalize %> of <%= pluralize(standing.players, "player") %> so far today</p>
+  <p class="aside"><%= standing.rank.ordinalize %> of <%= pluralize(standing.players, "player") %> so far today<%= " · best of #{pluralize(plays, "game")}" if local_assigns[:plays].to_i > 1 %></p>
 </section>
