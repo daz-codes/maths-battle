@@ -8,7 +8,11 @@ module IconsHelper
   STAR = "M12 2.6l2.85 5.9 6.45.85-4.7 4.5 1.17 6.4L12 17.17 6.23 20.25l1.17-6.4-4.7-4.5 6.45-.85z"
 
   ICONS = {
-    # The game
+    # Power-ups: Double points, Extra time and the Streak breaker (the others share Shield, Freeze and Scramble)
+    double: %(<circle cx="12" cy="12" r="9.5" fill="var(--yellow)"/><text x="12" y="16" text-anchor="middle" font-size="10.5" font-weight="800" font-family="Manrope, sans-serif" fill="var(--on-neon, #1d1e17)">×2</text>),
+    time: %(<circle cx="12" cy="13" r="8.5" fill="var(--green)"/><path d="M12 8.5V13l3 2M9.5 2.5h5" fill="none" stroke="var(--on-neon, #1d1e17)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>),
+    breaker: %(<path d="M12 2.5c.6 3.4 5.5 5.6 5.5 11a5.5 5.5 0 0 1-11 0c0-2.6 1.4-4.4 2.6-6 .2 1.8 1 2.8 2 3.2-.4-3 .1-5.8.9-8.2z" fill="var(--pink)"/><path d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>),
+    solo: %(<circle cx="12" cy="7.5" r="4" fill="var(--blue)"/><path d="M4 21a8 8 0 0 1 16 0z" fill="var(--blue)"/>),
     gem: %(<path d="M7 3.5h10l4.5 5.5L12 21 2.5 9z" fill="var(--blue)"/><path d="M2.5 9h19M9.5 3.5 8 9l4 12 4-12-1.5-5.5" fill="none" stroke="var(--blue-deep)" stroke-width="1.3" stroke-linejoin="round"/>),
     # A star earned is solid blue, outlined in the same blue so it's the same size as one still to earn, in grey
     star: %(<path d="#{STAR}" fill="var(--blue)" stroke="var(--blue)" stroke-width="1.6" stroke-linejoin="round"/>),
@@ -66,17 +70,5 @@ module IconsHelper
   def icon(name, label: nil, class: nil)
     tag.svg(ICONS.fetch(name).html_safe, viewBox: "0 0 24 24", class: [ "icon", "icon--#{name}", binding.local_variable_get(:class) ],
       role: ("img" if label), aria: { label: label, hidden: ("true" unless label) }, focusable: "false")
-  end
-
-  # A topic's own icon, named for its key
-  def topic_icon(topic, **options)
-    icon(topic.key.to_sym, **options)
-  end
-
-  # 1 to 3 of a level's stars, filled for those earned: the level's rating
-  def star_rating(earned, out_of: 3, label: true)
-    tag.span(class: "stars", role: ("img" if label), aria: { label: ("#{earned} of #{out_of} stars" if label) }) do
-      safe_join(Array.new(out_of) { |i| icon(i < earned ? :star : :star_empty) })
-    end
   end
 end

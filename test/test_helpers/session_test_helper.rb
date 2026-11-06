@@ -6,12 +6,6 @@ module SessionTestHelper
       cookie_jar.signed[:session_id] = Current.session.id
       cookies["session_id"] = cookie_jar[:session_id]
     end
-    choose_topic
-  end
-
-  # New players pick a topic before the home page shows
-  def choose_topic(topic = TimesTables)
-    cookies["topic"] = topic.key
   end
 
   def sign_out

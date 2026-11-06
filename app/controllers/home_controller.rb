@@ -1,10 +1,10 @@
+# Single player or multiplayer, and where they are in today's world league
 class HomeController < ApplicationController
   allow_unauthenticated_access
 
-  # A new player picks a topic first
   def show
-    return redirect_to topics_path unless topic_chosen?
-
     @user = current_player
+    @world = League.world
+    @standing = @world.entry_for(@user)
   end
 end

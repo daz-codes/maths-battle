@@ -1,7 +1,11 @@
 module GamesHelper
-  EXTRA_KEYS = { "/" => [ "/", "Fraction" ], "." => [ ".", "Decimal point" ], "-" => [ "−", "Minus" ] }
+  EXTRA_KEYS = { "." => [ ".", "Decimal point" ] }
+  POWER_UP_ICONS = { "double" => :double, "shield" => :shield, "time" => :time, "freeze" => :freeze, "reset" => :breaker, "scramble" => :mixed }
 
-  # Each key taps the controller the keypad belongs to: the game's, or a tutorial's
+  def power_up_icons
+    POWER_UP_ICONS
+  end
+
   def keypad_key(digit, label: digit, aria: nil, modifier: nil, controller: "test")
     tag.button(label, type: "button", class: [ "keypad__key", (modifier && "keypad__key--#{modifier}") ],
       data: { action: "pointerdown->#{controller}#tap click->#{controller}#tap", digit: digit }, aria: { label: aria })

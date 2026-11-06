@@ -1,56 +1,45 @@
-<% content_for :title, "#{@topic.title}#{{ "review" => " review", "group" => " group challenge", "mixed" => " mixed practice", "head_to_head" => " head to head", "live" => " live", "daily" => " #{@daily_test&.name}" }[@mode]} · MatheMinute" %>
+<% content_for :title, "#{@live ? "Battle" : "Solo"} · Maths Battle" %>
 <% content_for :viewport, "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" %>
 <% content_for :body_class, "testing" %>
 <% content_for :focus_mode, true %>
-<% content_for :head, tag.meta(name: "turbo-cache-control", content: "no-cache") %>
 
-<main class="test test--<%= @topic.slug %><%= " test--live" if @live %>" data-controller="test"
-      data-test-question-sets-value="<%= @question_sets.to_json %>"
-      data-test-topic-value="<%= @topic.key %>"
-      data-test-level-value="<%= @level %>"
-      data-test-mode-value="<%= @mode %>"
-      data-test-round-value="<%= @round&.id || @head_to_head&.id || @live&.dig(:id) %>"
+<main class="test<%= " test--live" if @live %>" data-controller="test"
+      data-test-game-value="<%= @game.to_json %>"
       data-test-best-value="<%= @best %>"
-      data-test-passed-value="<%= @mode == "head_to_head" ? "Winning!" : "New best!" %>"
-      <% if @ghost %>data-test-ghost-value="<%= @ghost.to_json %>"<% end %>
       <% if @live %>data-test-live-value="<%= @live.to_json %>"<% end %>
-      data-test-keys-value="<%= @topic.keys(@level).to_json %>"
-      data-test-scoring-value="<%= Attempt.scoring_rules(@topic).to_json %>"
+      data-test-powers-value="<%= { every: PowerUp::EVERY, solo: PowerUp::SOLO, battle: PowerUp::BATTLE }.to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">
   <button type="button" class="test__stop" data-action="test#confirmStop" aria-label="Stop the game">✕</button>
 
-  <%# A review has no clock: the logo's ring just shows, with how far through the questions it is %>
   <header class="test__bar">
-    <%# A level's practice shows the best to beat, and a head to head the challenger's score, celebrating passing it %>
     <span class="test__tally">
-      <%# The score and how many are right, side by side (a review's one number is how many are right: it has no clock) %>
       <span class="test__counts">
-        <span class="test__count"><span class="test__score" data-test-target="score" aria-label="<%= @mode == "review" ? "Right" : "Score" %>">0</span><span class="test__count-label"><%= @mode == "review" ? "right" : "score" %></span></span>
-        <% unless @mode == "review" %>
-          <span class="test__count"><span class="test__right" data-test-target="right" aria-label="Right">0</span><span class="test__count-label">right</span></span>
-        <% end %>
+        <span class="test__count"><span class="test__score" data-test-target="score" aria-label="Score">0</span><span class="test__count-label">score</span></span>
+        <span class="test__count"><span class="test__right" data-test-target="right" aria-label="Right">0</span><span class="test__count-label">right</span></span>
       </span>
-      <%# Right answers in a row multiply the score: ×2, ×3, ×4 %>
-      <span class="test__combo" data-test-target="combo" aria-live="polite" hidden></span>
-      <% if @best.positive? %><span class="test__best" data-test-target="best"><%= @mode == "head_to_head" ? "Beat" : "Best" %> <%= @best %></span><% end %>
-      <%# A head to head races the challenger's game: their score as it was at this point in their minute %>
-      <% if @ghost %><span class="test__ghost" data-test-target="ghost" aria-label="<%= @ghost[:name] %>'s score at this point"><%= @ghost[:name] %> 0</span><% end %>
+      <%# Right answers in a row: each scores 10 more than the last %>
+      <span class="test__combo" data-test-target="streak" aria-live="polite" hidden></span>
+      <span class="test__tier" data-test-target="tier" aria-live="polite">Level 1</span>
+      <% if @best.positive? %><span class="test__best" data-test-target="best">Best <%= number_with_delimiter @best %></span><% end %>
     </span>
-    <% if @mode == "review" %>
-      <%= render "clock", hands: false, class: "timer__clock" %>
-      <span class="test__seconds" data-test-target="progress" aria-label="Question">1/<%= @question_sets.first[:questions].size %></span>
-    <% else %>
-      <%= render "clock", timer: true, class: "timer__clock" %>
-      <span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span>
-    <% end %>
+    <%= render "clock", timer: true, class: "timer__clock" %>
+    <span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span>
   </header>
 
-  <%# Icons the game copies into what floats up: lightning for a fast answer, the trophy for a new best %>
-  <template data-test-target="speedIcon"><%= icon(:lightning) %></template>
+  <%# Every ten answers: a power-up, flicking between what it could be until it's tapped %>
+  <div class="test__powers">
+    <button type="button" class="test__spinner" data-test-target="spinner" data-action="test#claim" aria-label="Tap to claim a power-up" hidden>
+      <span class="test__spinner-icon" data-test-target="spinnerIcon"></span>
+      <span class="test__spinner-label">Tap!</span>
+    </button>
+    <p class="test__power-news" data-test-target="powerNews" aria-live="polite"></p>
+  </div>
+  <% power_up_icons.each do |kind, icon_name| %>
+    <template data-test-target="powerIcon" data-power-up="<%= kind %>"><%= icon(icon_name) %></template>
+  <% end %>
   <template data-test-target="trophyIcon"><%= icon(:trophy) %></template>
 
-  <%# A live game: everyone else's score as they play, and in a Power game its power-ups: the one
-      held, tapped to use, and news of what's hit whom %>
+  <%# A battle: everyone else's score as they play %>
   <% if @live %>
     <div class="test__live">
       <ol class="test__rivals" aria-label="Other players">
@@ -58,44 +47,20 @@
           <li class="test__rival" data-test-target="rival" data-player-id="<%= rival[:id] %>" data-name="<%= rival[:name] %>"><%= rival[:name] %> <strong>0</strong></li>
         <% end %>
       </ol>
-      <% if @live[:power] %>
-        <div class="test__powers">
-          <button type="button" class="test__power" data-test-target="powerSlot" data-action="test#usePowerUp" hidden></button>
-          <p class="test__power-news" data-test-target="powerNews" aria-live="polite"></p>
-        </div>
-        <% { "shield" => :shield, "shrink" => :shrink, "flip" => :flip, "ink" => :ink, "freeze" => :freeze, "scramble" => :mixed, "lightning" => :lightning }.each do |power_up, icon_name| %>
-          <template data-test-target="powerIcon" data-power-up="<%= power_up %>"><%= icon(icon_name) %></template>
-        <% end %>
-      <% end %>
     </div>
   <% end %>
 
   <div class="test__stage" data-test-target="stage">
     <p class="question question--current" data-test-target="question" aria-live="off">Ready</p>
     <p class="answer" data-test-target="answer" aria-live="polite"></p>
-    <%# Ink splat, a Power game's power-up, covering the question for a while %>
-    <%= tag.div(class: "test__ink", aria: { hidden: true }) if @live&.dig(:power) %>
     <p class="test__status" data-test-target="status" hidden></p>
-
-    <div class="offline-result" data-test-target="unavailable" hidden>
-      <p class="aside">Connect to load more games.</p>
-      <%= link_to "Try again", play_path(@topic.slug, level: @level), class: "button button--blue button--wide" %>
-      <%= link_to "Home", root_path %>
-    </div>
-
-    <div class="offline-result" data-test-target="offlineResult" hidden>
-      <p class="offline-result__score"><span class="card__number" data-test-target="offlineScore"></span> <%= @mode == "review" ? "right!" : "scored!" %></p>
-      <p class="aside">You're offline, so this game is saved on this device. It'll be saved as soon as you're back online.</p>
-      <%= link_to "Play again", play_path(@topic.slug, level: @level), class: "button button--blue button--wide" if @mode == "practice" %>
-      <%= link_to "Home", root_path %>
-    </div>
   </div>
 
-  <%= render "keypad", keys: @topic.keys(@level) %>
+  <%= render "keypad", keys: [ "." ] %>
 
   <dialog class="dialog" data-test-target="stopDialog" data-action="cancel->test#keepPlaying">
     <h2 class="dialog__title">Stop this game?</h2>
-    <p class="dialog__text">Your answers won't be saved.</p>
+    <p class="dialog__text"><%= @live ? "Your answers won't be saved, and the battle carries on without you." : "Your answers won't be saved." %></p>
     <div class="dialog__actions">
       <button type="button" class="button button--blue" data-action="test#keepPlaying" autofocus>Keep playing</button>
       <button type="button" class="button" data-action="test#stopGame">Stop game</button>

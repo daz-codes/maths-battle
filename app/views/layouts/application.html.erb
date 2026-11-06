@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="<%= language %>" data-theme="<%= colour_preference %>" data-sounds="<%= current_player.sounds? ? "on" : "off" %>">
   <head>
-    <title><%= content_for(:title) || "MatheMinute" %></title>
+    <title><%= content_for(:title) || "Maths Battle" %></title>
     <meta name="viewport" content="<%= content_for(:viewport) || "width=device-width,initial-scale=1" %>">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="MatheMinute">
+    <meta name="apple-mobile-web-app-title" content="Maths Battle">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="application-name" content="MatheMinute">
+    <meta name="application-name" content="Maths Battle">
     <meta name="mobile-web-app-capable" content="yes">
     <% %w[ light dark ].each do |scheme| %>
       <meta name="theme-color" content="<%= theme_colour(scheme) %>" media="(prefers-color-scheme: <%= scheme %>)"
@@ -34,13 +34,8 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <% body_data = { controller: "theme", theme_preference_value: colour_preference } %>
-  <% body_data.merge!(controller: "theme sync", sync_upload_url_value: attempts_path, sync_auto_refresh_value: !content_for?(:no_auto_refresh)) unless content_for?(:focus_mode) %>
-  <body class="<%= ["app-shell", content_for(:body_class)].compact.join(" ") %>" <%= tag.attributes(data: body_data) %>>
-    <% unless content_for?(:focus_mode) %>
-      <%= render "header" %>
-      <p class="flash flash--alert refused-games" role="alert" data-sync-target="refused" hidden></p>
-    <% end %>
+  <body class="<%= ["app-shell", content_for(:body_class)].compact.join(" ") %>" <%= tag.attributes(data: { controller: "theme", theme_preference_value: colour_preference }) %>>
+    <%= render "header" unless content_for?(:focus_mode) %>
     <%= yield %>
     <%= render "footer" unless content_for?(:focus_mode) %>
   </body>

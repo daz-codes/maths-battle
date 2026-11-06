@@ -1,135 +1,59 @@
 require "test_helper"
 
 class AttemptTest < ActiveSupport::TestCase
-  setup { @user = users(:ada) }
-
-  test "the score is worked out on the server" do
-    attempt = record_tables_game(@user, answers([ 7, 8, 56 ], [ 6, 7, 41 ], [ 9, 9, 81 ]).map { |r| r.merge(correct: true, score: 99) })
-
-    assert_equal 2, attempt.correct
-    assert_equal 3, attempt.answered
-    assert_equal [ true, false, true ], attempt.results.map { |r| r["correct"] }
-    assert_equal({ "a" => "6", "b" => "7", "given" => "41", "correct" => false, "ms" => 1000 }, attempt.results[1])
+  test "streaks score 10, 20, 30 and a wrong answer starts again at 10" do
+    results = [ true, true, true, false, true ].map { |correct| { "correct" => correct } }
+    tally = Attempt.tally(results, [])
+    assert_equal 10 + 20 + 30 + 10, tally.score
+    assert_equal 3, tally.best_streak
+    assert_equal [ 10, 30, 60, 60, 70 ], tally.running
   end
 
-  test "each attempt gets an unguessable share token" do
-    attempt = Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]))
-    assert_operator attempt.share_token.length, :>=, 24
+  test "double points doubles the next five right answers" do
+    results = Array.new(7) { { "correct" => true } }
+    tally = Attempt.tally(results, [ { "kind" => "double", "at" => 0 } ])
+    assert_equal (10 + 20 + 30 + 40 + 50) * 2 + 60 + 70, tally.score
   end
 
-  test "rejects too many answers" do
-    assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, results: answers(*Array.new(151) { [ 2, 2, 4 ] }, ms: 100)) }
+  test "a streak shield saves the streak from the next wrong answer only" do
+    results = [ true, true, false, true, false, true ].map { |correct| { "correct" => correct } }
+    tally = Attempt.tally(results, [ { "kind" => "shield", "at" => 1 } ])
+    assert_equal 10 + 20 + 30 + 10, tally.score
   end
 
-  test "rejects answers that took longer than the test" do
-    assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, results: answers(*right_answers(10), ms: 7000)) }
-    assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, results: answers([ 2, 2, 4 ], ms: -5)) }
+  test "a streak breaker ends the streak where it hit" do
+    results = Array.new(4) { { "correct" => true } }
+    tally = Attempt.tally(results, [ { "kind" => "reset", "at" => 2 } ])
+    assert_equal 10 + 20 + 10 + 20, tally.score
   end
 
-  test "rejects questions outside the tables and nonsense answers" do
-    assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, results: answers([ 13, 2, 26 ])) }
-    assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, results: answers([ 2, 2, "four" ])) }
-    assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, results: [ "7x8=56" ]) }
-    assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), topic: "spelling") }
+  test "recording works out the score, streak, top tier and day" do
+    attempt = play(users(:ada), rights: [ true, true, true, true, false ])
+    assert_equal 4, attempt.correct
+    assert_equal 5, attempt.answered
+    assert_equal 100, attempt.score
+    assert_equal 4, attempt.best_streak
+    assert_equal 2, attempt.top_tier
+    assert_equal League.today, attempt.played_on
+    assert attempt.new_best
   end
 
-  test "an unfinished answer, like 0. or a lone minus, is just wrong: the rest of the game still saves" do
-    unlock(@user, TimesTables, 5)
-    results = [ { a: "0.9", b: "20", given: "0.", ms: 2_000 }, { a: "3", b: "6", given: "18", ms: 2_000 }, { a: "2", b: "4", given: "-", ms: 2_000 } ]
-
-    attempt = Attempt.record!(user: @user, level: 5, results: results)
-    assert_equal [ false, true, false ], attempt.results.map { _1["correct"] }
-    assert_equal 1, attempt.correct
+  test "a lower score isn't a new best" do
+    play(users(:ada), rights: [ true ] * 5)
+    assert_not play(users(:ada), rights: [ true ]).new_best
   end
 
-  test "an invalid attempt saves nothing" do
-    assert_no_difference -> { Attempt.count } do
-      assert_raises(Attempt::Invalid) { Attempt.record!(user: @user, results: answers([ 2, 2, 4 ], [ 0, 2, 0 ])) }
-    end
+  test "the same game saved twice is recorded once" do
+    game = checked_game
+    first = Attempt.record!(user: users(:ada), game: game, client_id: "same")
+    assert_equal first, Attempt.record!(user: users(:ada), game: game, client_id: "same")
   end
 
-  test "updates the fact stats, treating both orders as one fact" do
-    record_tables_game(@user, answers([ 7, 8, 56 ], [ 8, 7, 54 ], [ 3, 4, 12 ]))
-
-    seven_eight = @user.fact_stats.find_by!(topic: "times_tables", fact: "7x8")
-    assert_equal [ 1, 1, 50 ], [ seven_eight.correct_count, seven_eight.wrong_count, seven_eight.percent_correct ]
-    assert_equal 100, @user.fact_stats.find_by!(fact: "3x4").percent_correct
-
-    record_tables_game(@user, answers([ 8, 7, 56 ]))
-    assert_equal 67, seven_eight.reload.percent_correct
-  end
-
-  test "keeps the average time of right answers, capping very long ones" do
-    record_tables_game(@user, [ { a: 7, b: 8, given: 56, ms: 2000 }, { a: 8, b: 7, given: 56, ms: 4000 }, { a: 7, b: 8, given: 1, ms: 9000 } ])
-    seven_eight = @user.fact_stats.find_by!(fact: "7x8")
-    assert_equal 3000, seven_eight.average_correct_ms, "wrong answers aren't timed"
-
-    record_tables_game(@user, [ { a: 7, b: 8, given: 56, ms: 30_000 } ])
-    assert_equal 16_000, seven_eight.reload.correct_ms, "a 30 second answer counts as 10"
-  end
-
-  test "any game played to the end keeps the streak, and each game keeps the streak as it stood" do
-    travel_to(Time.zone.local(2026, 11, 2, 12)) do
-      practice = Attempt.record!(user: @user, results: answers(*right_answers(1)))
-      assert_equal [ 1, 1 ], [ @user.reload.current_streak, practice.streak ], "even one answer"
-    end
-    travel_to(Time.zone.local(2026, 11, 3, 12)) do
-      walked_away = Attempt.record!(user: @user, results: [])
-      assert_equal [ 1, 1 ], [ @user.reload.current_streak, walked_away.streak ], "no answers: yesterday's streak, not added to"
-      mixed = Attempt.record!(user: @user, mode: "mixed", results: answers(*right_answers(5)))
-      assert_equal [ 2, 2 ], [ @user.reload.current_streak, mixed.streak ]
-    end
-  end
-
-  test "a game uploaded twice is only recorded once" do
-    first = Attempt.record!(user: @user, results: answers(*right_answers(6)), client_id: "abc-123")
-
-    assert_no_difference -> { Attempt.count } do
-      assert_equal first, Attempt.record!(user: @user, results: answers(*right_answers(6)), client_id: "abc-123")
-    end
-    assert_equal 6, @user.fact_stats.sum(:correct_count), "stats only counted once"
-  end
-
-  test "different players can use the same client id" do
-    Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), client_id: "same")
-    assert_difference -> { Attempt.count } do
-      Attempt.record!(user: users(:bob), results: answers([ 2, 2, 4 ]), client_id: "same")
-    end
-  end
-
-  test "keeps when a game was played, counting the day in the player's time zone" do
-    travel_to Time.utc(2026, 10, 16, 9) do
-      @user.update!(time_zone: "Eastern Time (US & Canada)")
-      attempt = Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), played_at: "2026-10-16T02:30:00Z")
-
-      assert_equal Time.utc(2026, 10, 16, 2, 30), attempt.played_at
-      assert_equal Date.new(2026, 10, 15), attempt.played_on, "half past ten at night on the 15th in New York"
-    end
-  end
-
-  test "a play time in the future or too long ago counts as now" do
-    travel_to Time.utc(2026, 10, 16, 9) do
-      assert_equal Time.current, Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), played_at: "2026-10-20T09:00:00Z").played_at
-      assert_equal Time.current, Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), played_at: "2026-08-01T09:00:00Z").played_at
-      assert_equal Time.current, Attempt.record!(user: @user, results: answers([ 2, 2, 4 ]), played_at: "nonsense").played_at
-    end
-  end
-
-  test "records a new high score" do
-    first = Attempt.record!(user: @user, results: answers(*right_answers(6)))
-    worse = Attempt.record!(user: @user, results: answers(*right_answers(5)))
-
-    assert first.new_high_score
-    assert_not worse.new_high_score
-    assert_equal first.score, @user.best_score(TimesTables, 1)
-  end
-
-  test "keeps the best score as it was when the game was played" do
-    play_daily_challenge(@user)
-    first = Attempt.record!(user: @user, results: answers(*right_answers(6)))
-    Attempt.record!(user: @user, results: answers(*right_answers(9)))
-
-    assert_equal first.score, first.reload.best_score
-    assert_equal "🔥 1 day streak  🏆 High score: #{first.score}", first.share_stats, "a later, better game doesn't change an old share"
+  test "extra time allows a longer minute" do
+    rights = [ true ] * 12
+    dealt = PowerUp::SOLO.keys.map { "time" }.cycle.first(PowerUp::MOST)
+    assert_raises(Attempt::Invalid) { play(users(:ada), rights: rights, ms: 5_800) }
+    attempt = play(users(:ada), rights: rights, ms: 5_800, powers: dealt, claims: [ { drop: 1, at: 10 } ])
+    assert_equal 12, attempt.correct
   end
 end

@@ -1,4 +1,4 @@
-# Joining a live game's lobby from its link. A visitor gets a guest account to play with, giving a name if they've
+# Joining a battle's lobby from its link. A visitor gets a guest account to play with, giving a name if they've
 # none, as the others see it
 class LiveGamePlayersController < ApplicationController
   allow_unauthenticated_access
@@ -6,7 +6,7 @@ class LiveGamePlayersController < ApplicationController
 
   def create
     live_game = LiveGame.find_by_code(params[:live_game_code])
-    return redirect_to(groups_path, alert: "There's no live game with that code.") unless live_game
+    return redirect_to(multiplayer_path, alert: "There's no battle with that code.") unless live_game
 
     player = resume_or_start_guest_session.user
     player.update!(name: params[:name].to_s.strip.first(User::NAME_LENGTH)) if params[:name].present?

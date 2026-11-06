@@ -1,149 +1,50 @@
-<% content_for :title, "#{@attempt.review? ? "#{@attempt.correct} of #{@attempt.answered} right" : "Scored #{number_with_delimiter @attempt.score}!"} · MatheMinute" %>
+<% content_for :title, "Scored #{number_with_delimiter @attempt.score}! · Maths Battle" %>
+<% world = @world.entry_for(@attempt.user) %>
+<% best_today = world && world.score == @attempt.score %>
 
 <main class="page results" data-controller="reveal" data-celebration-id="attempt-<%= @attempt.id %>">
-  <%= results_back_link(@attempt) %>
-  <%# Beating a best is the big one: wave after wave of confetti, and the fanfare %>
-  <% best_beaten = @attempt.practice? && @attempt.new_high_score && @attempt.previous_best.positive? %>
-  <% if @attempt.levelled_up %>
-    <p class="banner banner--level" data-reveal-target="item" data-controller="confetti fanfare" data-confetti-big-value="<%= best_beaten %>"><%= icon(:level_up) %> Level up! You've unlocked Level <%= @attempt.level + 1 %>: <%= @attempt.topic_module.level(@attempt.level + 1)[:name] %></p>
-    <%= link_to safe_join([ icon(:book), " Learn how to do level #{@attempt.level + 1}" ]), lesson_path(@attempt.topic_module.slug, @attempt.level + 1), class: "button button--blue" if @attempt.topic_module.lesson(@attempt.level + 1) %>
-  <% elsif (stars = @attempt.new_stars) %>
-    <p class="banner banner--stars" data-reveal-target="item" data-controller="confetti<%= " fanfare" if best_beaten %>" data-confetti-big-value="<%= best_beaten %>"><%= star_rating(stars) %> <%= pluralize(stars, "star") %> for level <%= @attempt.level %>!</p>
-  <% elsif @attempt.new_high_score %>
-    <p class="banner" data-reveal-target="item" data-controller="confetti<%= " fanfare" if best_beaten %>" data-confetti-big-value="<%= best_beaten %>"><%= icon(:party) %> New high score!</p>
+  <%= link_to "← #{@attempt.battle? ? "Multiplayer" : "Home"}", @attempt.battle? ? multiplayer_path : root_path, class: "back-link" %>
+  <% if @attempt.new_best %>
+    <p class="banner" data-reveal-target="item" data-controller="confetti fanfare" data-confetti-big-value="true"><%= icon(:party) %> New personal best!</p>
   <% end %>
 
-  <%= render "card", attempt: @attempt %>
+  <section class="result">
+    <p class="label"><%= @attempt.battle? ? "Battle" : "Solo" %> · <%= l(@attempt.played_at, format: :short) %></p>
+    <p class="result__score"><span class="card__number"><%= number_with_delimiter @attempt.score %></span> <span class="result__right"><%= pluralize(@attempt.correct, "right answer") %></span></p>
+    <p class="result__stats"><%= icon(:flame) %> Best streak <%= @attempt.best_streak %> · <%= icon(:level_up) %> Reached level <%= @attempt.top_tier %>: <%= @attempt.top_tier_name %></p>
+  </section>
 
-  <% if (@attempt.practice? || @attempt.daily_test?) && (previous = @attempt.previous_best).positive? %>
-    <%# Beating the level's best score (or the daily challenge's) is the point: by how much, or how close it was.
-        Then how many were right, against the most they've got right %>
-    <% if @attempt.score > previous %>
-      <p class="best-line best-line--new"><%= icon(:trophy) %> <%= number_with_delimiter @attempt.score %>, up from <%= number_with_delimiter previous %></p>
-    <% elsif @attempt.score == previous %>
-      <p class="best-line">Level with your best of <%= number_with_delimiter previous %>! A little more next time!</p>
-    <% else %>
-      <% gap = previous - @attempt.score %>
-      <p class="best-line"><%= gap * 10 <= previous ? "So close! " : "" %><%= number_with_delimiter gap + 1 %> more to beat your best of <%= number_with_delimiter previous %></p>
-    <% end %>
-    <% most = @attempt.previous_best_correct %>
-    <p class="best-line best-line--right">
-      <%= pluralize(@attempt.correct, "correct answer") %><%= if @attempt.correct > most then ", your most yet!" elsif @attempt.correct == most then ", level with your most" else " · your most is #{most}" end %>
-    </p>
-  <% end %>
-
-  <%# Where the score came from %>
-  <% tally = @attempt.review? ? {} : @attempt.score_tally.except(:longest_run).reject { |_, points| points.zero? } %>
-  <% if tally.any? %>
-    <ul class="score-tally" aria-label="Where the score came from">
-      <% tally.each do |part, points| %>
-        <li class="score-tally__<%= part %>"><%= Attempt::TALLY_NAMES[part] %><%= " (best run #{@attempt.score_tally[:longest_run]})" if part == :combo %> <%= points.negative? ? "−#{-points}" : "+#{number_with_delimiter points}" %></li>
+  <% if @attempt.powers.any? %>
+    <ul class="score-tally" aria-label="Power-ups">
+      <% @attempt.powers.group_by { |power| power["kind"] }.each do |kind, powers| %>
+        <li><%= icon(power_up_icons.fetch(kind)) %> <%= PowerUp::ALL.dig(kind, :name) %><%= " ×#{powers.size}" if powers.many? %><%= " (hit you)" if kind == "reset" %></li>
       <% end %>
     </ul>
   <% end %>
-  <%= render "badges/earned", badges: @attempt.badges, celebrate: !(@attempt.levelled_up || @attempt.new_high_score), reveal: true %>
 
-  <% if @attempt.group? && (challenge = @attempt.round&.challenge) %>
-    <%# Where the game puts them on the group's leaderboard, if it's the go that counts %>
-    <% leaderboard = challenge.leaderboard(@attempt.round) %>
-    <p class="banner banner--group"><%= icon(:trophy) %> <%= group_result_message(@attempt, leaderboard) %></p>
-    <div class="results__actions results__actions--one">
-      <%= link_to "See the leaderboard", group_challenge_path(challenge.group, challenge), class: "button button--blue" %>
-    </div>
-  <% elsif @attempt.head_to_head? %>
-    <%# Who won, or that it's been sent %>
-    <% head_to_head = @attempt.head_to_heads.first %>
-    <p class="banner banner--group" <%= "data-controller=confetti" if head_to_head&.result_for(@attempt.user) == :won %>><%= icon(:versus) %> <%= head_to_head_result_message(@attempt, head_to_head) %></p>
-    <div class="results__actions results__actions--one">
-      <%= link_to "See the head to head", head_to_head || groups_path, class: "button button--blue" %>
-    </div>
-  <% elsif @attempt.live? %>
+  <% if @live_game %>
     <%# Where they came, and everyone's places as their games come in %>
-    <% live_game = @attempt.live_game %>
-    <% if live_game %>
-      <%= turbo_stream_from live_game %>
-      <% place = live_game.place_of(@attempt.user) %>
-      <p class="banner banner--group" <%= "data-controller=confetti" if place&.rank == 1 %>><%= icon(:lightning) %> <%= place&.rank ? "You came #{place.rank.ordinalize}!" : "Your game's saved" %></p>
-      <%= render "live_games/podium", live_game: live_game %>
-      <%= render "live_games/again", live_game: live_game, user: @attempt.user %>
-    <% else %>
-      <p class="banner banner--group">Saved to your history: this live game was over before your game was saved.</p>
-      <div class="results__actions results__actions--one">
-        <%= button_to safe_join([ icon(:lightning), " Play live again" ]), live_games_path, class: "button button--blue button--wide", form_class: "wide-form" %>
-      </div>
-    <% end %>
-  <% elsif @attempt.daily_test? %>
-    <%# Where it would put the player among everyone's best today, then straight into another go while it's still
-        today's (and still played) %>
-    <% daily_test = @attempt.daily_test %>
-    <% standing = daily_test.standing_of(@attempt) %>
-    <p class="banner banner--group" <%= "data-controller=confetti" if standing.top_percent <= 10 && standing.players > 1 %>><%= icon(:target) %> <%= daily_standing_message(standing) %></p>
-    <% if !daily_test.retired? && daily_test.day == @attempt.user.today %>
-      <%= link_to "Play again", play_path(daily_test.topic.slug, daily: daily_test.kind), class: "button button--start button--wide", data: { turbo_prefetch: false } %>
-    <% end %>
-    <%= render "attempts/week", attempt: @attempt, week: daily_test.week_of(@attempt.user, showing: @attempt) %>
-    <div class="results__actions">
-      <button type="button" class="button button--share" data-controller="share"
-              data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>
-      <%= link_to "See today's results", challenge_path, class: "button button--blue" %>
-    </div>
-  <% elsif @attempt.review? %>
-    <%# Nothing to share without a clock: on to the mistakes still left, or back to practice %>
-    <% topic = @attempt.topic_module %>
-    <div class="results__actions results__actions--one">
-      <% if (left = @attempt.user.review_questions(topic)).any? %>
-        <%= link_to safe_join([ icon(:review), " Review #{left.size} more" ]), play_path(topic.slug, review: 1), class: "button button--blue" %>
-      <% else %>
-        <%= link_to "Play level #{@attempt.user.unlocked_level(topic)}", play_path(topic.slug, level: @attempt.user.unlocked_level(topic)), class: "button button--blue" %>
+    <%= turbo_stream_from @live_game %>
+    <% place = @live_game.place_of(@attempt.user) %>
+    <p class="banner banner--group" <%= "data-controller=confetti" if place&.rank == 1 %>><%= icon(:versus) %> <%= place&.rank ? "You came #{place.rank.ordinalize}!" : "Your game's saved" %></p>
+    <%= render "live_games/podium", live_game: @live_game %>
+    <%= render "live_games/again", live_game: @live_game, user: @attempt.user %>
+  <% end %>
+
+  <%# Today's leagues: where this puts them, if it's their best today %>
+  <section class="league" aria-labelledby="league-heading">
+    <h2 class="settings__heading" id="league-heading">Today's leagues</h2>
+    <ul class="league-places">
+      <li><%= icon(:trophy) %> World league: <% if world && @attempt.user.named? %><strong><%= world.rank.ordinalize %></strong> of <%= number_with_delimiter @world.size %><%= best_today ? "" : " (best today #{number_with_delimiter world.score})" %><% else %><%= link_to "give yourself a name", edit_profile_path %> to appear<% end %></li>
+      <% @leagues.each do |league| %>
+        <% entry = league.standings(@attempt.played_on).entry_for(@attempt.user) %>
+        <li><%= icon(:people) %> <%= link_to league.name, league %>: <strong><%= entry&.rank&.ordinalize || "—" %></strong> of <%= league.standings(@attempt.played_on).size %></li>
       <% end %>
-    </div>
-  <% else %>
+    </ul>
+  </section>
+
   <div class="results__actions">
-    <button type="button" class="button button--share" data-controller="share"
-            data-share-text-value="<%= @attempt.share_text(share_url(@attempt.share_token)) %>" data-action="share#share">Share</button>
-    <% if @attempt.mixed? %>
-      <%= link_to "Play again", play_path(@attempt.topic_module.slug, mixed: 1), class: "button button--blue" %>
-    <% elsif @attempt.daily_challenge? %>
-      <%= link_to "Play level #{@attempt.level}", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
-    <% else %>
-      <%= link_to "Play again", play_path(@attempt.topic_module.slug, level: @attempt.level), class: "button button--blue" %>
-    <% end %>
+    <%= link_to "Play again", play_path, class: "button button--start" unless @live_game %>
+    <%= link_to "Leagues", leagues_path, class: "button button--blue" %>
   </div>
-  <%# The same game, sent for a friend to beat %>
-  <%= link_to safe_join([ icon(:versus), " Challenge a friend to beat #{@attempt.score}" ]), new_head_to_head_path(attempt: @attempt), class: "button button--wide button--challenge" if @attempt.sendable? %>
-  <% end %>
-
-  <p class="feedback"><%= @attempt.feedback_message %></p>
-
-  <% if @attempt.missed_facts.any? || @attempt.slow_facts.any? %>
-    <section class="missed">
-      <h2 class="label">Work on these</h2>
-      <% if @attempt.missed_facts.any? %>
-        <ul>
-          <% @attempt.missed_facts.each do |fact| %>
-            <li><%= fact %></li>
-          <% end %>
-        </ul>
-      <% end %>
-      <%# The slow ones after what they are %>
-      <% if @attempt.slow_facts.any? %>
-        <p class="hint hint--centre">Right, but slow. Practise these to get quicker.</p>
-        <ul class="missed__slow-list">
-          <% @attempt.slow_facts.each do |fact| %>
-            <li class="missed__slow" title="Right, but slow"><%= fact %></li>
-          <% end %>
-        </ul>
-      <% end %>
-    </section>
-  <% end %>
-
-  <%= tag.p(star_progress(@attempt.user, @attempt.topic_module, @attempt.level), class: "level-progress") if @attempt.practice? %>
-  <%= link_to "See your stats", stats_path(@attempt.topic_module.slug) %>
-  <%= link_to "See your awards", awards_path if @attempt.badges.any? %>
-
-  <% if @attempt.user.guest? %>
-    <p class="save-nudge">
-      <%= link_to "Make an account", new_registration_path %> to keep your streak safe and play on any device.
-    </p>
-  <% end %>
 </main>

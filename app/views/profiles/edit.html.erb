@@ -1,8 +1,7 @@
-<% content_for :title, "Settings · MatheMinute" %>
-<% content_for :no_auto_refresh, true %>
+<% content_for :title, "Settings · Maths Battle" %>
 
-<%# Three parts: about the player (saved with its button), their game, and how the app behaves on this
-    device, which saves as it's changed %>
+<%# Two parts: about the player (saved with its button), and how the app behaves on this device, which saves
+    as it's changed %>
 <main class="page page--narrow settings">
   <h1 class="heading">Settings</h1>
   <%= render "flash" %>
@@ -31,26 +30,19 @@
             <% end %>
           </div>
         </div>
-        <p class="hint">Only you can see it. It's never shown on shared results.</p>
+        <p class="hint">Only you can see it.</p>
       </fieldset>
 
       <%= form.label :name, "What should we call you?" %>
+      <p class="hint">It's how you're shown in the leagues and battles. A first name is plenty.</p>
       <%= form.text_field :name, autocomplete: "given-name", maxlength: 30 %>
 
       <%= form.submit "Save", class: "button button--go" %>
     <% end %>
   </section>
 
-  <section class="settings__section" aria-labelledby="your-game">
-    <h2 class="settings__heading" id="your-game">Game</h2>
-
-    <%= render "topics/current", topic: current_topic, from: :profile %>
-  </section>
-
   <section class="settings__section" aria-labelledby="app-settings">
     <h2 class="settings__heading" id="app-settings">App settings</h2>
-
-    <%= render "reminders/settings", user: @user %>
 
     <%= form_with model: @user, url: profile_path, method: :patch, class: "form",
           data: { controller: "autosave", action: "change->autosave#save" } do |form| %>
@@ -80,7 +72,7 @@
   </section>
 
   <% if @user.guest? %>
-    <p class="aside"><%= link_to "Make an account", new_registration_path %> to keep your streak safe.</p>
+    <p class="aside"><%= link_to "Make an account", new_registration_path %> to keep your scores and leagues on every device.</p>
   <% else %>
     <p class="aside">Signed in as <strong><%= @user.username %></strong></p>
     <%= button_to "Sign out", session_path, method: :delete, class: "button button--wide", form_class: "wide-form" %>

@@ -1,0 +1,19 @@
+<%# A day's table: each player's best score, and where the player looking is if they're not in the rows shown %>
+<% entries = standings.entries %>
+<% if entries.any? %>
+  <ol class="leaderboard__rows">
+    <% entries.each do |entry| %>
+      <li class="leaderboard__row <%= "leaderboard__row--you" if entry.user == user %>">
+        <span class="leaderboard__rank leaderboard__rank--<%= entry.rank %>"><%= entry.rank %></span>
+        <%= render "avatar", user: entry.user, size: "small", letter_only: true %>
+        <span class="leaderboard__name"><%= entry.user.display_name %><%= " (you)" if entry.user == user %></span>
+        <span class="leaderboard__score"><%= number_with_delimiter entry.score %></span>
+      </li>
+    <% end %>
+  </ol>
+  <% if (mine = standings.entry_for(user)) && entries.none? { |entry| entry.user == user } %>
+    <p class="hint hint--centre">You're <%= mine.rank.ordinalize %> of <%= number_with_delimiter standings.size %> with <%= number_with_delimiter mine.score %>.</p>
+  <% end %>
+<% else %>
+  <p class="aside">No one's played today yet. Play a game to go top!</p>
+<% end %>

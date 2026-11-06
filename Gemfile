@@ -33,7 +33,6 @@ gem "bootsnap", ">= 1.24.1", require: false
 gem "image_processing", "~> 1.2"
 
 # Daily reminders as web push notifications [https://github.com/pushpad/web-push]
-gem "web-push", "~> 3.1"
 
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 gem "kamal", require: false

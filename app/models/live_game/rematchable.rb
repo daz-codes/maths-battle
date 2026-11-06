@@ -1,6 +1,6 @@
-# Playing again with the same players. Once it's started, the host can make the next game, at the same topic, level
-# and mode with new questions, and everyone still looking at the podium or their result is taken to its lobby and
-# joined (LiveRematchController). Anyone who comes back later finds a Play again button instead
+# Playing again with the same players. Once it's started, the host can make the next battle, and everyone still
+# looking at the podium or their result is taken to its lobby and joined (live_rematch_controller.js). Anyone who
+# comes back later finds a Play again button instead. A matched battle has no host: its players find another match
 module LiveGame::Rematchable
   extend ActiveSupport::Concern
 
@@ -12,9 +12,9 @@ module LiveGame::Rematchable
   def play_again!
     made = with_lock do
       return rematch if rematch
-      return unless started?
+      return unless started? && host
 
-      update!(rematch: LiveGame.make(host: host, topic: topic_module, level: level, mode: mode))
+      update!(rematch: LiveGame.host!(host))
     end
     broadcast_rematch if made
     rematch

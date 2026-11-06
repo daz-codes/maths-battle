@@ -1,7 +1,7 @@
 // Celebrations (confetti, the fanfare, spinning banners) play once for each result on a device: the first time it's
 // shown, not again when the app reopens on the page or it's visited later. A page marks what it celebrates with
 // data-celebration-id; with nothing marked, or no storage, it celebrates
-const KEY = "matheminute:celebrated"
+const KEY = "mathsbattle:celebrated"
 const KEPT = 300
 
 export function celebrating(element) {

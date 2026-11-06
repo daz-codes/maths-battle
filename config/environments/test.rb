@@ -4,9 +4,6 @@
 # and recreated between test runs. Don't rely on the data there!
 
 Rails.application.configure do
-  # Keys for signing daily reminders in tests only (config/initializers/web_push.rb): nothing is ever sent with them
-  config.x.web_push = { public_key: "BE_Q3yDviPt4QEbsrY7LRA3Tc4xnz7DwYu6GP4Nin3kBLKQqv3Xg8QuUtdPlX7-RH-i2JXKBD7KOkKZgmWIviEs=", private_key: "e1pC3TmTLUIZST4kDAlU8HYqjOWamNq63zh5w3dJANo=" }
-
   # Settings specified here will take precedence over those in config/application.rb.
 
   # While tests run files are not watched, reloading is not necessary.

@@ -1,13 +1,12 @@
-<% content_for :title, "Live game · MatheMinute" %>
+<% content_for :title, "Battle · Maths Battle" %>
 <% host = @live_game.hosted_by?(@user) %>
 
 <main class="page live-game">
   <%= turbo_stream_from @live_game %>
-  <%= link_to "← Compete", groups_path, class: "back-link" %>
-  <h1 class="heading"><%= icon(:lightning) %> Live game</h1>
-  <p class="aside">Hosted by <%= host ? "you" : @live_game.host.display_name %></p>
+  <%= link_to "← Multiplayer", multiplayer_path, class: "back-link" %>
+  <h1 class="heading"><%= icon(:versus) %> Battle</h1>
+  <p class="aside"><%= @live_game.matched? ? "Matched with players online" : "Hosted by #{host ? "you" : @live_game.host.display_name}" %></p>
   <%= render "flash" %>
-  <%= render "live_games/mode", live_game: @live_game %>
 
   <% if @live_game.started? %>
     <% if @live_game.running? && @player && !@player.played? %>
@@ -18,28 +17,11 @@
   <% else %>
     <section id="live-status" class="live-status">
       <% if host %>
-        <nav class="board-switch" aria-label="How the game is won">
-          <% { "classic" => "Classic", "power" => "Power" }.each do |mode, label| %>
-            <%= button_to label, live_game_path(@live_game), method: :patch, params: { mode: mode },
-                  class: "board-switch__option", form_class: "board-switch__form", aria: { current: (mode == @live_game.mode) } %>
-          <% end %>
-        </nav>
-        <%= form_with url: live_game_path(@live_game), method: :patch, class: "live-topic" do %>
-          <div class="form__pair" data-controller="challenge-levels" data-challenge-levels-names-value="<%= challenge_level_names.to_json %>">
-            <%= label_tag :topic, "Topic" %>
-            <%= select_tag :topic, options_for_select(Topic::ALL.map { [ _1.title, _1.key ] }, @live_game.topic),
-                  class: "form__select", data: { action: "challenge-levels#update" } %>
-            <%= label_tag :level, "Level" %>
-            <%= select_tag :level, challenge_level_options(@live_game.topic_module, @live_game.level, mixed: false),
-                  class: "form__select", data: { challenge_levels_target: "level" } %>
-          </div>
-          <%= submit_tag "Change", class: "button", name: nil %>
-        <% end %>
         <% url = live_game_url(@live_game) %>
         <p class="live-code" aria-label="Game code <%= @live_game.code.chars.join(" ") %>"><%= @live_game.code %></p>
-        <p class="hint hint--centre">Friends type this code on Compete, or open <%= url %></p>
+        <p class="hint hint--centre">Friends type this code on Multiplayer, or open <%= url %></p>
         <button type="button" class="button button--blue button--wide" data-controller="share"
-                data-share-text-value="Race me at <%= @live_game.title %> on MatheMinute, live! Join with code <%= @live_game.code %> or <%= url %>" data-action="share#share">Share the link</button>
+                data-share-text-value="Battle me on Maths Battle! Join with code <%= @live_game.code %> or <%= url %>" data-action="share#share">Share the link</button>
         <%= button_to "Start", live_game_start_path(@live_game), class: "button button--start button--wide", form_class: "wide-form" %>
         <p class="hint hint--centre">Everyone's game starts together. Start once your friends are in.</p>
       <% elsif @player %>

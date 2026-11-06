@@ -1,10 +1,10 @@
-# A live game while it's being played: each player sends their score and how many they've got right as they change,
-# and everyone in the game sees them. Just for show: the podium comes from the saved games (LiveGame::Startable). In a Power game it
-# also deals each player's boxes and passes on the power-ups they use (LiveGame::Powerable). Players are known by
-# the pass their game's page gives them (LiveGame#pass_for)
+# A battle while it's being played: each player sends their score, how many they've got right and how many they've
+# answered as they change, and everyone in the battle sees the scores. Just for show: the podium comes from the saved
+# games (LiveGame::Startable). Answering another ten drops a power-up for everyone, and the first to claim it hits
+# everyone else (LiveGame::Droppable). Players are known by the pass their game's page gives them (LiveGame#pass_for)
 class LiveGameChannel < ApplicationCable::Channel
-  # The most a game's answers could score: every one right, lightning fast, at the top combo
-  MAX_SCORE = Attempt::MAX_ANSWERS * (Attempt::RIGHT + Attempt::SPEED[:lightning]) * Attempt::COMBOS.values.max
+  # The most a minute's answers could score: every one right in a row, doubled
+  MAX_SCORE = Attempt::Scorable::STEP * (1..Attempt::Recordable::MAX_ANSWERS).sum * 2
 
   def subscribed
     @player = LiveGame.player_from_pass(params[:pass])
@@ -19,21 +19,17 @@ class LiveGameChannel < ApplicationCable::Channel
     @live_game.reload unless @live_game.started?
     return unless @live_game.running?
 
-    score, correct = count(data["score"], MAX_SCORE), count(data["correct"], Attempt::MAX_ANSWERS)
-    @player.update_columns(live_score: score) if @live_game.power?
+    score, correct = count(data["score"], MAX_SCORE), count(data["correct"], Attempt::Recordable::MAX_ANSWERS)
+    @player.update_columns(live_score: score)
     LiveGameChannel.broadcast_to @live_game, { type: "score", player_id: @player.user_id, score: score, correct: correct }
+    if (drop = @live_game.answered(@player, count(data["answered"], Attempt::Recordable::MAX_ANSWERS)))
+      LiveGameChannel.broadcast_to @live_game, { type: "drop", id: drop.id }
+    end
   end
 
-  # Only to the player who opened it
-  def open_box
-    @live_game.reload unless @live_game.started?
-    power_up = @live_game.open_box(@player)
-    transmit({ type: "box", power_up: power_up }) if power_up
-  end
-
-  def use_power_up
-    used = @live_game.use_power_up(@player)
-    LiveGameChannel.broadcast_to @live_game, used.merge(type: "power_up") if used
+  def claim(data)
+    drop = @live_game.claim(data["id"], @player)
+    LiveGameChannel.broadcast_to @live_game, { type: "claimed", id: drop.id, power_up: drop.power_up, by: drop.claimed_by_id } if drop
   end
 
   private

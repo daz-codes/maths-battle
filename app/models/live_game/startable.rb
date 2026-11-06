@@ -46,10 +46,9 @@ module LiveGame::Startable
   end
 
   private
-    # Every page open on the game: the lobby's list of players and its mode, its start, and the podium
+    # Every page open on the game: the lobby's list of players, its start, and the podium
     def broadcast_lobby
       Turbo::StreamsChannel.broadcast_replace_to self, target: "live-players", partial: "live_games/players", locals: { live_game: self }
-      Turbo::StreamsChannel.broadcast_replace_to self, target: "live-mode", partial: "live_games/mode", locals: { live_game: self }
     end
 
     def broadcast_start

@@ -1,0 +1,16 @@
+<% content_for :title, "Join #{@league.name} · Maths Battle" %>
+
+<main class="page page--narrow">
+  <h1 class="heading">Join <%= @league.name %>?</h1>
+  <p class="aside">Run by <%= @league.owner.display_name %>. Your best score each day goes on its table.</p>
+
+  <%= form_with url: league_joins_path, class: "form" do %>
+    <%= hidden_field_tag :code, @league.join_code %>
+    <% unless @user.named? %>
+      <%= label_tag :name, "What should we call you?" %>
+      <%= text_field_tag :name, nil, autocomplete: "given-name", maxlength: User::NAME_LENGTH, required: true %>
+      <p class="hint">It's shown in the league. A first name is plenty.</p>
+    <% end %>
+    <%= submit_tag "Join the league", class: "button button--go", name: nil %>
+  <% end %>
+</main>

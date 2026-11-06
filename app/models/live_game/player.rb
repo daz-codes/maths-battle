@@ -1,4 +1,4 @@
-# Someone in a live game's lobby, and once they've played, their game: the first one saved in time
+# Someone in a battle's lobby, and once they've played, their game: the first one saved in time
 class LiveGame::Player < ApplicationRecord
   belongs_to :live_game
   belongs_to :user

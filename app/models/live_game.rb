@@ -1,57 +1,30 @@
-# Players racing each other at the same moment. The host makes one from the Compete page and shares its link
-# (/live/K7Q2MX); whoever opens it joins the lobby (Joinable), and when the host starts it everyone's game begins
-# together, on the same questions, with each other's scores ticking over as they play (Startable, LiveGameChannel).
-# Each player has one go, and a podium ranks them as they finish (Rankable). Either way the highest score wins: a
-# Classic game is a straight race, and a Power game has power-ups to slow the players ahead (Powerable). Then the
-# host can play again with everyone (Rematchable)
+# A battle: players racing each other in the same minute. A host makes one and shares its code (/live/K7Q2M), and
+# whoever opens it joins the lobby (Joinable); or matchmaking puts together players looking for a game, and it starts
+# at once (MatchRequest). Everyone's game begins together, each climbing their own ladder of questions, with each
+# other's scores ticking over as they play (Startable, LiveGameChannel). Power-ups drop for everyone as anyone
+# answers another ten, and the first to tap one hits all the others with it (Droppable). A podium ranks them as they
+# finish (Rankable), and then the host can play again with everyone (Rematchable)
 class LiveGame < ApplicationRecord
-  include Joinable, Powerable, Rankable, Rematchable, Startable
+  include Droppable, Joinable, Rankable, Rematchable, Startable
 
-  belongs_to :host, class_name: "User"
+  belongs_to :host, class_name: "User", optional: true
   has_many :players, -> { order(:created_at, :id) }, dependent: :destroy
   has_many :users, through: :players
 
-  MODES = %w[ classic power ]
+  def self.host!(host)
+    create!(host: host).tap { |game| game.join(host) }
+  end
 
-  validates :topic, inclusion: { in: Topic.keys }
-  validates :mode, inclusion: { in: MODES }
-  validate :level_in_topic
-
-  # The host's game, at their topic and level. Unweighted questions, like a group's, so no one's history shapes them
-  def self.make(host:, topic:, level:, mode: "classic")
-    create!(host: host, topic: topic.key, level: level, mode: mode, questions: User.new.questions(topic: topic, level: level)).tap { |game| game.join(host) }
+  # Matchmaking's: everyone's in, and it starts at once
+  def self.match!(users)
+    create!(matched: true).tap do |game|
+      users.each { |user| game.players.create!(user: user) }
+      game.update!(starts_at: START_LEAD.from_now)
+    end
   end
 
   def to_param
     code
-  end
-
-  def topic_module
-    Topic.find(topic)
-  end
-
-  def title
-    "#{topic_module.title} · Level #{level}"
-  end
-
-  def power? = mode == "power"
-
-  # The host picks, in the lobby, before it starts
-  def choose_mode(mode)
-    return false if started? || MODES.exclude?(mode)
-
-    update!(mode: mode)
-    broadcast_lobby
-    true
-  end
-
-  # A different topic or level is a new set of questions
-  def choose_game(topic:, level:)
-    return false if started? || !topic&.level(level)
-
-    update!(topic: topic.key, level: level, questions: User.new.questions(topic: topic, level: level))
-    broadcast_lobby
-    true
   end
 
   def hosted_by?(user)
@@ -80,9 +53,4 @@ class LiveGame < ApplicationRecord
   def self.passes
     Rails.application.message_verifier("live-games")
   end
-
-  private
-    def level_in_topic
-      errors.add(:level, :inclusion) unless topic_module&.level(level)
-    end
 end

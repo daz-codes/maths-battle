@@ -1,9 +1,9 @@
 <%# The logo across the whole width, then anything the page puts under it (the home page's heading), then who's
     playing: their picture (tap for settings) and a hello, with whatever the page puts beside it (the home page's streak) %>
 <header class="site-header ui-header">
-  <%= link_to root_path, class: "logo ui-brand", aria: { label: "MatheMinute home" } do %>
+  <%= link_to root_path, class: "logo ui-brand", aria: { label: "Maths Battle home" } do %>
     <%= render "clock", class: "logo__mark" %>
-    <span>Mathe<span class="ui-brand__minute">Minute</span></span>
+    <span>Maths<span class="ui-brand__minute">Battle</span></span>
   <% end %>
   <%= yield :under_logo %>
   <div class="ui-header__who">

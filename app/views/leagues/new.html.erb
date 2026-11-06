@@ -1,0 +1,13 @@
+<% content_for :title, "Make a league · Maths Battle" %>
+
+<main class="page page--narrow">
+  <h1 class="heading">Make a league</h1>
+  <p class="aside">You'll get a code to share. Anyone with it can join, and everyone's best score each day goes on its table.</p>
+
+  <%= form_with model: @league, class: "form" do |form| %>
+    <%= render "errors", user: @league %>
+    <%= form.label :name, "What's it called?" %>
+    <%= form.text_field :name, maxlength: League::NAME_LENGTH, placeholder: "Class 4B, the Smith family…", autofocus: true %>
+    <%= form.submit "Start the league", class: "button button--go" %>
+  <% end %>
+</main>

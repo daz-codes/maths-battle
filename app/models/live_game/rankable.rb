@@ -1,4 +1,4 @@
-# The podium: each player's game by score, then fewer wrong answers, in a Classic game or a Power one alike. Ties
+# The podium: each player's game by score, then fewer wrong answers. Ties
 # share a place. Players still playing (or who never did) come after
 module LiveGame::Rankable
   extend ActiveSupport::Concern

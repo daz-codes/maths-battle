@@ -38,7 +38,7 @@ module LiveGame::Joinable
   private
     def assign_code
       self.code ||= loop do
-        code = Array.new(CODE_LENGTH) { Group::Joinable::CODE_CHARACTERS.sample }.join
+        code = Array.new(CODE_LENGTH) { League::Joinable::CODE_CHARACTERS.sample }.join
         break code unless LiveGame.exists?(code: code)
       end
     end

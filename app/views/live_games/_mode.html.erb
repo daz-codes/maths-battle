@@ -1,9 +1,0 @@
-<%# What's being played and which way it's won, updated for everyone in the lobby when the host changes them %>
-<p id="live-mode" class="live-mode">
-  <strong><%= topic_icon(live_game.topic_module) %> <%= live_game.title %></strong><br>
-  <% if live_game.power? %>
-    <%= icon(:lightning) %> <strong>Power mode:</strong> the highest score wins, with power-ups to slow the others down
-  <% else %>
-    <%= icon(:check) %> <strong>Classic mode:</strong> the highest score wins
-  <% end %>
-</p>

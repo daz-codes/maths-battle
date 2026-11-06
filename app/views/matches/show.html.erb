@@ -1,0 +1,30 @@
+<% content_for :title, "Find a match · Maths Battle" %>
+
+<main class="page live-game">
+  <%= link_to "← Multiplayer", multiplayer_path, class: "back-link" %>
+  <h1 class="heading"><%= icon(:search) %> Find a match</h1>
+  <%= render "flash" %>
+
+  <% if params[:looking] && @user.persisted? && @user.named? %>
+    <%# Looking while the page is open: matched, it goes straight to the battle %>
+    <section class="live-status match" data-controller="matchmaking" data-matchmaking-play-url-value="<%= play_path %>">
+      <div class="match__radar" aria-hidden="true"><%= icon(:versus) %></div>
+      <p class="live-status__waiting" data-matchmaking-target="status" aria-live="polite">Looking for players…</p>
+      <p class="hint hint--centre" data-matchmaking-target="count"><%= pluralize(@waiting, "player") %> looking right now</p>
+      <p class="hint hint--centre">Keep this page open. Your battle starts as soon as someone else is looking too.</p>
+      <%= link_to "Stop looking", multiplayer_path, class: "button button--wide" %>
+    </section>
+  <% else %>
+    <section class="live-status">
+      <p class="aside"><%= pluralize(@waiting, "player") %> looking for a battle right now.</p>
+      <%= form_with url: match_path, class: "form" do %>
+        <% unless @user.named? %>
+          <%= label_tag :name, "What should we call you?" %>
+          <%= text_field_tag :name, nil, autocomplete: "given-name", maxlength: User::NAME_LENGTH, required: true %>
+          <p class="hint">The other players see it. A first name is plenty.</p>
+        <% end %>
+        <%= submit_tag "Start looking", class: "button button--start button--wide", name: nil %>
+      <% end %>
+    </section>
+  <% end %>
+</main>

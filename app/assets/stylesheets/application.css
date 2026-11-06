@@ -138,11 +138,9 @@ a:not(.button, .logo, .greeting__avatar, .site-footer__player, .site-footer__tab
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--blue) var(--glow-strength), transparent));
 }
 
-/* The wordmark is an SVG of Bree Serif: Mathe in ink, Minute in pink. Outlining each letter in its
-   own colour makes it bolder than the font */
-.logo__word { display: block; height: clamp(1.9rem, 8.6vw, 2.4rem); width: auto; overflow: visible; }
-.logo__word path { stroke: currentColor; stroke-width: 2.2; stroke-linejoin: round; }
-.logo__minute { fill: var(--pink-text); stroke: var(--pink-text) !important; }
+/* The wordmark: Maths in ink, Battle in pink */
+.logo__word { display: block; font-size: clamp(1.7rem, 7.8vw, 2.2rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+.logo__minute { color: var(--pink-text); }
 
 /* ── Icons ──────────────────────────────────────── */
 
@@ -1350,10 +1348,19 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
    it hits, for a few seconds. The clock keeps going through them all */
 .test__live { display: grid; gap: 0.3rem; justify-items: center; }
 .test__powers { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.25rem 0.6rem; min-height: 2.25rem; }
-.test__power { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.9rem; border: 0; border-radius: 999px; background: var(--pink); box-shadow: 0 0 16px color-mix(in srgb, var(--pink) 60%, transparent); color: var(--on-neon); cursor: pointer; font: inherit; font-weight: 900; }
-.test__power .icon { width: 1.3em; height: 1.3em; }
-.test__power--shield { background: var(--blue); box-shadow: none; cursor: default; }
-.test__power--new { animation: combo-pulse 450ms ease-out; }
+/* The power-up spinner: flicking between what it could be until it's tapped, then the one claimed, glowing */
+.test__spinner { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.95rem 0.3rem 0.4rem; border: 0; border-radius: 999px; background: var(--yellow); box-shadow: 0 0 18px color-mix(in srgb, var(--yellow) 70%, transparent); color: var(--on-neon); cursor: pointer; font: inherit; font-weight: 900; animation: spinner-bob 600ms ease-in-out infinite alternate; touch-action: manipulation; }
+.test__spinner-icon { display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--paper); }
+.test__spinner-icon .icon { width: 1.8rem; height: 1.8rem; }
+.test__spinner--landed { animation: combo-pulse 450ms ease-out; background: var(--pink); box-shadow: 0 0 22px color-mix(in srgb, var(--pink) 70%, transparent); }
+.test__spinner--landed .test__spinner-label { display: none; }
+.test__spinner:disabled { cursor: default; }
+@keyframes spinner-bob { from { transform: translateY(0) scale(1); } to { transform: translateY(-3px) scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .test__spinner { animation: none; } }
+.test__tier { color: var(--blue-deep); font-size: 0.85rem; font-weight: 800; white-space: nowrap; }
+.test--doubled .test__score { color: var(--pink-text); }
+.test--shielded .test__combo { box-shadow: 0 0 0 2px var(--blue); }
+.score-pop--level { top: 4%; color: var(--blue-deep); font-size: 2rem; font-weight: 900; }
 .test__power-news { margin: 0; color: var(--pink-text); font-size: 0.95rem; font-weight: 800; text-align: center; }
 .test__power-news:empty { display: none; }
 
@@ -1408,3 +1415,17 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 .daily-test__score span { color: var(--muted); font-size: 1rem; font-weight: 700; }
 .daily-test__body { display: grid; justify-items: center; gap: 0.75rem; margin-top: 0.75rem; }
 .daily-test__number { color: var(--muted); font-weight: 700; }
+
+/* ── Maths Battle ───────────────────────────────── */
+.home-actions--modes { grid-template-columns: 1fr 1fr; }
+.home-action--solo .ui-secondary__icon { background: color-mix(in srgb, var(--blue) 22%, transparent); }
+.home-action--battle .ui-secondary__icon { background: color-mix(in srgb, var(--pink) 22%, transparent); }
+.how-to__list { display: grid; gap: 0.6rem; margin: 0; padding-left: 1.2rem; line-height: 1.5; }
+.league { display: grid; gap: 0.75rem; }
+.league-places { display: grid; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
+.league-places .icon { width: 1.1em; height: 1.1em; vertical-align: -0.15em; }
+.match { justify-items: center; text-align: center; }
+.match__radar { display: grid; place-items: center; width: 6rem; height: 6rem; border-radius: 50%; background: color-mix(in srgb, var(--pink) 18%, transparent); animation: radar 1.6s ease-out infinite; }
+.match__radar .icon { width: 3rem; height: 3rem; }
+@keyframes radar { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pink) 55%, transparent); } 100% { box-shadow: 0 0 0 1.75rem transparent; } }
+@media (prefers-reduced-motion: reduce) { .match__radar { animation: none; } }

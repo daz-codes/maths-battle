@@ -1,56 +1,37 @@
-# Saves an attempt from the answers the browser sent. How many were right, and the score, are worked out here rather than trusted
-# from the client, and answers that couldn't have come from a real one-minute test are refused
+# Saves a game from the answers the browser sent, once its ticket has checked them (Attempt::GameTicket). How many
+# were right and the score are worked out here rather than trusted, and answers that couldn't have come from a real
+# minute are refused. A battle's game also takes the Streak breakers other players hit it with (LiveGame::Droppable)
 module Attempt::Recordable
   extend ActiveSupport::Concern
 
   MAX_ANSWERS = 150
-  # The test lasts 60 seconds; allow a little slack for the end-of-test POST
+  # The game lasts 60 seconds; allow a little slack for the end-of-game POST
   MAX_TOTAL_MS = 65_000
-  # A review has no clock, so only each answer's time is limited
-  MAX_REVIEW_ANSWER_MS = 10.minutes.in_milliseconds
-  # Every field a result can have in any topic. Each topic checks its own fields strictly
-  RESULT_FIELDS = %i[ a b c d e f n type v flip given ms ]
-  # Anything the keypad can type, unfinished answers like "0." or "−" included: those are just wrong.
-  # Each topic checks a typed answer against this, and anything else can't have come from the game
-  TYPED_ANSWER = %r{\A-?[0-9./]{0,12}\z}
-  # A game played offline still counts if it reaches the server within this long
-  MAX_OFFLINE_AGE = 30.days
+  # Anything the keypad can type, unfinished answers like "0." included: those are just wrong
+  TYPED_ANSWER = %r{\A[0-9.]{0,12}\z}
 
   class Invalid < StandardError; end
 
   included do
-    before_create :score_results, :set_played_on, :record_high_score
-    # Gems and badges come last, as they look at the streak and any level up
-    after_create :update_streak, :record_fact_stats, :check_level_up, :forget_unlocked_levels, :award_gems, :award_badges
+    before_create :score_results, :set_played_on, :record_best
   end
 
   class_methods do
-    # Raises Attempt::Invalid when the answers couldn't have come from a real test.
     # A game sent again with the same client id (a retried upload) is only recorded once
-    # Mixed games are issued at the highest level. That signed level stays valid if an offline upload
-    # arrives after another game has unlocked a new one. A group game is at whatever level its challenge set,
-    # unlocked or not, for one of the challenge's players, and a head to head or live game at its level, for its players
-    # A daily challenge's game must be saved on the day it was for, and not for a retired one
-    def record!(user:, results:, topic: Topic.default.key, level: 1, client_id: nil, played_at: nil, mode: "practice", round: nil, head_to_head: nil, live_game: nil, day: nil)
+    def record!(user:, game:, client_id:)
       if existing = already_recorded(user, client_id)
         return existing
       end
 
-      topic_module, level = topic_named(topic), Integer(level, exception: false)
-      case mode
-      when "group" then check_round(user, round, topic_module, level)
-      when "head_to_head" then check_head_to_head(user, head_to_head, topic_module, level)
-      when "live" then check_live_game(user, live_game, topic_module, level)
-      when "daily" then check_daily_test(topic_module, level)
-      else check_unlocked(user, topic_module, level)
-      end
-      raise Invalid, "Only a group game has a round" if round && mode != "group"
-      raise Invalid, "Only a head to head game has a head to head" if head_to_head && mode != "head_to_head"
-      raise Invalid, "Only a live game has a live game" if live_game && mode != "live"
-      cleaned = clean_results(topic_module, level, results, mode)
-      raise Invalid, "Answer at least one question to finish the daily challenge" if mode == "challenge" && cleaned.empty?
+      live_game = check_live_game(user, game) if game.mode == "battle"
+      powers = live_game ? live_game.hits_on(user, game.results) : game.powers
+      check_total_time(game.results, powers)
 
-      create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, live_game:, day:, results: cleaned)
+      transaction do
+        user.lock!
+        user.attempts.create!(mode: game.mode, results: game.results, powers: powers, top_tier: game.top_tier, client_id: client_id.presence)
+          .tap { |attempt| live_game&.played(attempt) }
+      end
     rescue ActiveRecord::RecordNotUnique
       already_recorded(user, client_id) || raise
     end
@@ -60,88 +41,18 @@ module Attempt::Recordable
         user.attempts.find_by(client_id: client_id) if client_id.present?
       end
 
-      def create_for!(user, client_id:, played_at:, topic:, level:, mode:, round:, head_to_head:, live_game:, day:, results:)
-        transaction do
-          user.lock!
-          played_at = play_time(played_at)
-          played_on = played_at.in_time_zone(user.time_zone).to_date
-          raise Invalid, "Today's daily challenge is already done" if mode == "challenge" && user.daily_challenge_on(topic_named(topic), played_on)
-          check_daily_test_day(DailyTest.new(played_on, DailyTest.kind_for(topic_named(topic))), day) if mode == "daily"
-
-          user.attempts.create!(topic: topic, level: level, results: results, client_id: client_id.presence, played_at: played_at, mode: mode, round: round)
-            .tap { |attempt| head_to_head&.played(attempt) }
-            .tap { |attempt| live_game&.played(attempt) }
-        end
+      def check_live_game(user, game)
+        live_game = LiveGame.find_by(id: game.live_game_id)
+        raise Invalid, "That battle isn't there any more" unless live_game
+        raise Invalid, "Only its players can play a battle" unless live_game.player?(user)
+        raise Invalid, "That battle hasn't started" unless live_game.started?
+        live_game
       end
 
-      def check_round(user, round, topic, level)
-        challenge = round&.challenge
-        raise Invalid, "That group challenge isn't there any more" unless challenge
-        raise Invalid, "Only the group's players can play its challenge" unless challenge.player?(user)
-        raise Invalid, "Bad question" unless challenge.topic_module == topic && challenge.level == level
-      end
-
-      def check_head_to_head(user, head_to_head, topic, level)
-        raise Invalid, "That head to head isn't there any more" unless head_to_head
-        raise Invalid, "Only its two players can play a head to head" unless head_to_head.player?(user)
-        raise Invalid, "Bad question" unless head_to_head.topic_module == topic && head_to_head.level == level
-      end
-
-      def check_live_game(user, live_game, topic, level)
-        raise Invalid, "That live game isn't there any more" unless live_game
-        raise Invalid, "Only its players can play a live game" unless live_game.player?(user)
-        raise Invalid, "That live game hasn't started" unless live_game.started?
-        raise Invalid, "Bad question" unless live_game.topic_module == topic && live_game.level == level
-      end
-
-      def check_daily_test(topic, level)
-        kind = DailyTest.kind_for(topic)
-        raise Invalid, "Bad question" unless kind && level == DailyTest::KINDS.fetch(kind)[:level]
-        raise Invalid, "That daily challenge isn't played any more" if DailyTest::KINDS.fetch(kind)[:retired]
-      end
-
-      def check_daily_test_day(test, day)
-        raise Invalid, "That #{test.name} was for another day" unless day.to_s == test.day.iso8601
-      end
-
-      def check_unlocked(user, topic, level)
-        raise Invalid, "Level not unlocked" unless level&.between?(1, user.unlocked_level(topic))
-      end
-
-      # The device's clock can be wrong, so a time in the future, or too long ago, counts as now
-      def play_time(value)
-        time = Time.zone.parse(value.to_s) if value.present?
-        time&.between?(MAX_OFFLINE_AGE.ago, 5.minutes.from_now) ? time : Time.current
-      rescue ArgumentError
-        Time.current
-      end
-
-      def topic_named(topic)
-        Topic.find(topic) || raise(Invalid, "Unknown topic")
-      end
-
-      def clean_results(topic, level, results, mode)
-        raise Invalid, "Results must be a list" unless results.is_a?(Array)
-        raise Invalid, "Too many answers" if results.size > MAX_ANSWERS
-
-        max_ms = mode == "review" ? MAX_REVIEW_ANSWER_MS : MAX_TOTAL_MS
-        results.map { |result| clean_result(topic, level, result, max_ms) }.tap { |cleaned| check_total_time(cleaned) unless mode == "review" }
-      end
-
-      # The topic checks and scores each answer; the timing check is the same for every topic
-      def clean_result(topic, level, result, max_ms)
-        raise Invalid, "Bad answer" unless result.is_a?(Hash)
-
-        result = result.stringify_keys
-        topic.clean_result(result, level: level).merge("ms" => clean_ms(result["ms"], max_ms))
-      end
-
-      def clean_ms(ms, max_ms)
-        Integer(ms, exception: false).tap { |value| raise Invalid, "Bad timing" unless value&.between?(0, max_ms) }
-      end
-
-      def check_total_time(results)
-        raise Invalid, "Bad timing" if results.sum { |result| result["ms"] } > MAX_TOTAL_MS
+      # Extra time makes the minute longer
+      def check_total_time(results, powers)
+        most = MAX_TOTAL_MS + powers.sum { |power| PowerUp.extra_ms(power["kind"]) }
+        raise Invalid, "Bad timing" if results.sum { |result| result["ms"] } > most
       end
   end
 
@@ -149,53 +60,17 @@ module Attempt::Recordable
     def score_results
       self.correct = results.count { |result| result["correct"] }
       self.answered = results.size
-      self.score = points
+      self.score = tally.score
+      self.best_streak = tally.best_streak
     end
 
-    # The day the game counts towards, in the player's time zone
+    # Today in the leagues, which everyone shares
     def set_played_on
       self.played_at ||= Time.current
-      self.played_on = played_at.in_time_zone(user.time_zone).to_date
+      self.played_on = League.day(played_at)
     end
 
-    # Best in this topic and level, the score and how many were right: a good times tables score shouldn't make
-    # equations look bad. Kept on the attempt as they stood then, like the streak, so a shared result doesn't change later
-    def record_high_score
-      no_best = review? || group? || head_to_head? || live? || daily_test? || mixed? # mistakes, rivals or a mix: no score to beat
-      best_before =
-        if daily_challenge? then user.best_daily_challenge(topic_module)
-        elsif no_best then Float::INFINITY
-        else user.best_score(topic_module, level)
-        end
-      self.new_high_score = score.positive? && score > best_before
-      self.best_score = no_best ? score : [ score, best_before ].max
-      self.best_correct = no_best || daily_challenge? ? correct : [ correct, user.best_correct(topic_module, level) ].max
-    end
-
-    # A snapshot of the streak is kept on the attempt for its results and share pages. Reaching 7 or 30 days
-    # can earn a streak freeze
-    def update_streak
-      grew = finished? ? user.refresh_streak! : 0
-      update_column(:earned_streak_freeze, true) if grew.positive? && user.earn_streak_freeze(grew)
-      update_column(:streak, user.streak)
-    end
-
-    # Not a review's answers: with no clock and the questions just got wrong, they'd skew the speed and accuracy
-    # that pick a level's questions
-    def record_fact_stats
-      user.fact_stats.record(self) unless review?
-    end
-
-    # The game that unlocks the next level: the level's first bronze, unless the next level was already reached.
-    # Only practice
-    def check_level_up
-      return unless practice? && topic_module.level(level + 1)
-
-      update_column(:levelled_up, true) if first_star? && user.attempts.at_level(topic_module, level + 1).none?
-    end
-
-    # This game may have unlocked a level, or been the first played at one
-    def forget_unlocked_levels
-      user.forget_unlocked_levels
+    def record_best
+      self.new_best = score.positive? && score > user.best_score
     end
 end

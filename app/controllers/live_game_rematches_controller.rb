@@ -1,4 +1,4 @@
-# The host playing again with everyone from their last live game: its next lobby (LiveGame::Rematchable)
+# The host playing again with everyone from their last battle: its next lobby (LiveGame::Rematchable)
 class LiveGameRematchesController < ApplicationController
   rate_limit to: 10, within: 10.minutes
 

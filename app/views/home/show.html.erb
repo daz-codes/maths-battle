@@ -1,53 +1,51 @@
-<% content_for :title, "Your next minute · MatheMinute" %>
+<% content_for :title, "Maths Battle" %>
 <% content_for :under_logo do %>
-  <h1 class="ui-home__heading">Master <%= maths.capitalize %> in <span>Minutes</span></h1>
-<% end %>
-<% content_for :beside_hello do %>
-  <span class="streak ui-streak <%= "streak--done" if @user.practised_today? %>" aria-label="<%= @user.streak %> day streak"
-        title="<%= @user.streak %> day streak"><%= icon(:flame) %><strong><%= @user.streak %></strong></span>
+  <h1 class="ui-home__heading">One minute. <span>Every answer counts.</span></h1>
 <% end %>
 
 <main class="page home ui-home">
   <%= render "flash" %>
 
-  <%# Where to start: today's challenge, big and first. Then the other ways to play %>
-  <section class="ui-daily" aria-labelledby="daily-heading">
-    <div class="ui-daily__info">
-      <p class="ui-eyebrow"><span class="ui-live-dot" aria-hidden="true"></span> <%= @user.today.strftime("%A %-d %B") %></p>
-      <h2 class="ui-daily__heading" id="daily-heading">Daily Challenge</h2>
-      <% DailyTest.on(@user.today).each do |daily_test| %>
-        <%= render "home/daily_game", daily_test: daily_test, user: @user %>
-      <% end %>
-    </div>
-    <%= render "home/daily_art" %>
-  </section>
-
-  <nav class="home-actions ui-actions" aria-label="More ways to play">
-    <%= link_to practice_path, class: "button home-action home-action--practice ui-secondary" do %>
-      <span class="ui-secondary__top"><span class="ui-secondary__icon"><%= icon(:lightning) %></span><span class="ui-secondary__arrow" aria-hidden="true">↗</span></span>
-      <span class="home-action__label">Practice</span>
-      <span class="ui-secondary__description"><%= Topic::ALL.size %> topics at your own pace</span>
+  <nav class="home-actions ui-actions home-actions--modes" aria-label="Play">
+    <%= link_to play_path, class: "button home-action home-action--solo ui-secondary" do %>
+      <span class="ui-secondary__top"><span class="ui-secondary__icon"><%= icon(:solo) %></span><span class="ui-secondary__arrow" aria-hidden="true">↗</span></span>
+      <span class="home-action__label">Single player</span>
+      <span class="ui-secondary__description">Build a streak and beat your best</span>
     <% end %>
-    <%= link_to groups_path, class: "button home-action home-action--compete ui-secondary" do %>
-      <span class="ui-secondary__top"><span class="ui-secondary__icon"><%= icon(:people) %></span><span class="ui-secondary__arrow" aria-hidden="true">↗</span></span>
-      <span class="home-action__label">Compete</span>
-      <span class="ui-secondary__description">Give your friends a score to beat</span>
+    <%= link_to multiplayer_path, class: "button home-action home-action--battle ui-secondary" do %>
+      <span class="ui-secondary__top"><span class="ui-secondary__icon"><%= icon(:versus) %></span><span class="ui-secondary__arrow" aria-hidden="true">↗</span></span>
+      <span class="home-action__label">Multiplayer</span>
+      <span class="ui-secondary__description">Battle anyone online, or your friends</span>
     <% end %>
   </nav>
 
-  <%= render "head_to_heads/to_play", user: @user %>
-  <%= render "groups/to_play", user: @user %>
-
-  <section class="ui-progress" aria-labelledby="ui-progress-heading">
-    <div class="ui-section-heading"><h2 id="ui-progress-heading">Your personal scoreboard</h2><%= link_to "All stats ↗", stats_path %></div>
+  <section class="ui-progress" aria-labelledby="today-heading">
+    <div class="ui-section-heading"><h2 id="today-heading">Today's world league</h2><%= link_to "Leagues ↗", leagues_path %></div>
     <dl class="stats">
-      <div><dt>High score</dt><dd><%= icon(:trophy) %> <%= @user.persisted? ? number_with_delimiter(@user.best_score) : "—" %></dd></div>
-      <div><dt>Longest streak</dt><dd><%= icon(:flame) %> <%= @user.persisted? ? @user.longest_streak : 0 %><span class="ui-stat-unit"> <%= "day".pluralize(@user.longest_streak) %></span></dd></div>
+      <div><dt>Your best today</dt><dd><%= icon(:trophy) %> <%= @standing ? number_with_delimiter(@standing.score) : "—" %></dd></div>
+      <div><dt>Your place</dt><dd><%= @standing ? "#{@standing.rank.ordinalize}" : "—" %><span class="ui-stat-unit"> of <%= number_with_delimiter @world.size %></span></dd></div>
     </dl>
+    <% if (leader = @world.leader) %>
+      <p class="hint"><%= icon(:lightning) %> Top today: <strong><%= leader.user.display_name %></strong> with <%= number_with_delimiter leader.score %>. A new league starts at midnight (UK time).</p>
+    <% else %>
+      <p class="hint">No one's played today yet. Be the first on the board!</p>
+    <% end %>
+    <% if @user.persisted? && !@user.named? %>
+      <p class="hint"><%= link_to "Give yourself a name", edit_profile_path %> to appear in the leagues.</p>
+    <% end %>
+  </section>
+
+  <section class="how-to" aria-labelledby="how-heading">
+    <h2 class="settings__heading" id="how-heading">How it works</h2>
+    <ul class="how-to__list">
+      <li><strong>Streaks score.</strong> 10 for a right answer, 20 for the next in a row, then 30, 40… A wrong answer starts you again at 10.</li>
+      <li><strong>The questions climb.</strong> Get them right and they get harder: bigger tables, then zeroes, then decimals. Get one wrong and they ease off.</li>
+      <li><strong>Power-ups every 10 answers.</strong> Tap the spinner at the top to stop it and claim one. In a battle, the first to tap it gets it, and it hits everyone else!</li>
+    </ul>
   </section>
 
   <% if @user.guest? %>
-    <p class="save-nudge">No account needed to play. <%= link_to "Save your progress", new_registration_path %> to keep your scores across devices.</p>
+    <p class="save-nudge">No account needed to play. <%= link_to "Make an account", new_registration_path %> to keep your scores and leagues on every device.</p>
   <% end %>
   <%= render "install" %>
 </main>

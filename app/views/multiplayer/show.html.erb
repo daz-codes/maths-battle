@@ -1,0 +1,36 @@
+<% content_for :title, "Multiplayer · Maths Battle" %>
+
+<main class="page groups">
+  <%= link_to "← Home", root_path, class: "back-link" %>
+  <h1 class="heading"><%= icon(:versus) %> Multiplayer</h1>
+  <%= render "flash" %>
+
+  <section class="live-start" aria-labelledby="match-heading">
+    <h2 class="settings__heading" id="match-heading">Battle anyone</h2>
+    <p class="aside">Find someone online who's looking for a battle too.</p>
+    <%= link_to safe_join([ icon(:search), " Find a match" ]), match_path, class: "button button--start button--wide" %>
+  </section>
+
+  <section class="live-start" aria-labelledby="host-heading">
+    <h2 class="settings__heading" id="host-heading">Battle your friends</h2>
+    <% if @user.persisted? %>
+      <%= button_to safe_join([ icon(:lightning), " Host a battle" ]), live_games_path, class: "button button--blue button--wide", form_class: "wide-form" %>
+    <% else %>
+      <p class="aside">Play a solo game first, or <%= link_to "make an account", new_registration_path %>, to host a battle.</p>
+    <% end %>
+    <%= form_with url: live_games_path, method: :get, class: "group-join__form" do %>
+      <label class="visually-hidden" for="live_code">Battle code</label>
+      <%= text_field_tag :code, nil, id: "live_code", placeholder: "Got a code? Like K7Q2M", autocomplete: "off", autocapitalize: "characters", maxlength: 12, class: "group-join__code" %>
+      <%= submit_tag "Join battle", class: "button button--blue", name: nil %>
+    <% end %>
+  </section>
+
+  <section class="how-to" aria-labelledby="battle-how-heading">
+    <h2 class="settings__heading" id="battle-how-heading">In a battle</h2>
+    <ul class="how-to__list">
+      <li>Everyone plays the same minute, each on their own questions: the better you do, the harder yours get.</li>
+      <li>Whenever anyone answers another 10, a power-up drops for everyone. Tap it first to <strong>freeze</strong> everyone else, <strong>scramble</strong> their keys or <strong>break their streaks</strong>!</li>
+      <li>Every battle's score counts in today's leagues too.</li>
+    </ul>
+  </section>
+</main>

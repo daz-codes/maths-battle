@@ -1,0 +1,54 @@
+<% content_for :title, "Leagues · Maths Battle" %>
+
+<main class="page groups">
+  <%= link_to "← Home", root_path, class: "back-link" %>
+  <h1 class="heading"><%= icon(:trophy) %> Leagues</h1>
+  <%= render "flash" %>
+  <p class="aside">Your best score today counts, from solo games and battles. Every league starts again at midnight (UK time).</p>
+
+  <section class="league" aria-labelledby="world-heading">
+    <h2 class="settings__heading" id="world-heading">World league · today</h2>
+    <%= render "leagues/table", standings: @world, user: @user %>
+    <% if @yesterday %>
+      <p class="hint hint--centre"><%= icon(:trophy) %> Yesterday's champion: <strong><%= @yesterday.user.display_name %></strong> with <%= number_with_delimiter @yesterday.score %></p>
+    <% end %>
+    <% if @user.persisted? && !@user.named? %>
+      <p class="hint hint--centre"><%= link_to "Give yourself a name", edit_profile_path %> to appear in the leagues.</p>
+    <% end %>
+    <%= link_to "Play now", play_path, class: "button button--start button--wide" %>
+  </section>
+
+  <section class="group-list" aria-labelledby="leagues-heading">
+    <h2 class="settings__heading" id="leagues-heading">Your leagues</h2>
+    <% if @leagues.any? %>
+      <ul class="group-cards">
+        <% @leagues.each do |league| %>
+          <% mine = league.standings.entry_for(@user) %>
+          <li>
+            <%= link_to league, class: "group-card" do %>
+              <span class="group-card__name"><%= league.name %></span>
+              <span class="group-card__about"><%= mine ? "You're #{mine.rank.ordinalize} today" : "Not played today" %><%= " · You run it" if league.owned_by?(@user) %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="aside">Make a league for your family or class, or join one with its code.</p>
+    <% end %>
+  </section>
+
+  <section class="group-join" aria-labelledby="join-heading">
+    <h2 class="settings__heading" id="join-heading">Join a league</h2>
+    <%= form_with url: join_league_path, method: :get, class: "group-join__form" do %>
+      <label class="visually-hidden" for="code">League code</label>
+      <%= text_field_tag :code, nil, placeholder: "Code, like K7Q2MX", autocomplete: "off", autocapitalize: "characters", maxlength: 12, class: "group-join__code" %>
+      <%= submit_tag "Join league", class: "button button--blue", name: nil %>
+    <% end %>
+  </section>
+
+  <% if @user.can_make_leagues? %>
+    <%= link_to safe_join([ icon(:people), " Make a league" ]), new_league_path, class: "button button--go button--wide" %>
+  <% else %>
+    <p class="aside"><%= link_to "Make an account", new_registration_path %> to start a league of your own.</p>
+  <% end %>
+</main>

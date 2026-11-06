@@ -3,16 +3,9 @@ class AttemptsController < ApplicationController
   rate_limit to: 20, within: 1.minute, only: :create
 
   def create
-    results = results_param
-    game = Attempt::GameTicket.verify!(params.dig(:attempt, :ticket), owner: player_key,
-      topic: topic_param, level: level_param, client_id: params.dig(:attempt, :client_id), results: results)
-    player.update_time_zone(params.dig(:attempt, :time_zone))
-    round = Group::Round.find_by(id: game.round_id) if game.round_id
-    head_to_head = HeadToHead.find_by(id: game.head_to_head_id) if game.head_to_head_id
-    live_game = LiveGame.find_by(id: game.live_game_id) if game.live_game_id
-    attempt = Attempt.record!(user: player, topic: topic_param, level: level_param, results: results, mode: game.mode, round: round,
-      head_to_head: head_to_head, live_game: live_game, day: game.day, **upload_params)
-    forget_level(attempt.topic_module) if attempt.levelled_up
+    game = Attempt::GameTicket.verify!(params.dig(:attempt, :ticket), owner: player_key, client_id: params.dig(:attempt, :client_id),
+      answers: list_param(:results, %i[ op a b given ms ]), claims: list_param(:claims, %i[ drop at ]))
+    attempt = Attempt.record!(user: player, game: game, client_id: params.dig(:attempt, :client_id))
     render json: { url: attempt_path(attempt) }, status: :created
   rescue Attempt::Invalid => error
     render json: { error: error.message }, status: :unprocessable_entity
@@ -20,30 +13,20 @@ class AttemptsController < ApplicationController
 
   def show
     @attempt = Current.user.attempts.find(params[:id])
+    @live_game = @attempt.live_game
+    @world = League.world(@attempt.played_on)
+    @leagues = Current.user.leagues.order(:name)
   end
 
   private
-    # Guests' first saved test gives them an account and a session on this device
+    # Guests' first saved game gives them an account and a session on this device
     def player
       @player ||= resume_or_start_guest_session.user
     end
 
-    def topic_param
-      params.dig(:attempt, :topic) || Topic.default.key
-    end
-
-    def level_param
-      params.dig(:attempt, :level) || 1
-    end
-
-    # Games played offline arrive later, with an id made on the device and the time they were played
-    def upload_params
-      params.fetch(:attempt, {}).permit(:client_id, :played_at).to_h.symbolize_keys
-    end
-
     # Anything but a list (like a hash with numbered keys) goes through as it is, to be refused as not a list
-    def results_param
-      results = params.fetch(:attempt, {}).permit(results: Attempt::RESULT_FIELDS).fetch(:results, [])
-      results.is_a?(Array) ? results.map(&:to_h) : results
+    def list_param(name, fields)
+      list = params.fetch(:attempt, {}).permit(name => fields).fetch(name, [])
+      list.is_a?(Array) ? list.map(&:to_h) : list
     end
 end

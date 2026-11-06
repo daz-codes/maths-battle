@@ -1,13 +1,22 @@
 class User < ApplicationRecord
-  include Abandonable, Avatarable, Badgeable, Challengeable, DailyTestable, Groupable, HeadToHeadable, Learnable, Levelable, LivePlayable, Notifiable, Practisable, Registerable, Remindable, Reviewable, Scorable, Gemmable, StreakFreezable, Streakable, Themeable, Trackable
+  include Abandonable, Avatarable, Leaguable, LivePlayable, Registerable, Themeable
 
   has_many :sessions, dependent: :destroy
   has_many :attempts, dependent: :destroy
-  has_many :fact_stats, dependent: :destroy
-  has_many :frozen_days, dependent: :destroy
+  has_many :match_requests, dependent: :destroy
 
-  # The player's record for each fact in a topic's level, keyed like "7x8" or "ax+b=c"
-  def stats_for(topic, level)
-    (@stats_for ||= {})[[ topic, level ]] ||= fact_stats.where(topic: topic.key, level: level).index_by(&:fact)
+  # Shown in the leagues: everyone but a guest who hasn't given a name
+  scope :named, -> { where.not(name: nil).or(where.not(username: nil)) }
+
+  def named?
+    display_name.present?
+  end
+
+  def best_score
+    attempts.maximum(:score) || 0
+  end
+
+  def best_today
+    attempts.on(League.today).maximum(:score)
   end
 end

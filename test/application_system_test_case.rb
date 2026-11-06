@@ -14,40 +14,25 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     options.add_argument("--mute-audio")
   end
 
-  setup do
-    # Back to the usual size, as a test can make the window smaller for its own checks
-    page.current_window.resize_to(400, 800)
-    visit root_path
-    page.evaluate_async_script(<<~JS)
-      const done = arguments[0]
-      navigator.serviceWorker.ready.then(async () => {
-        localStorage.clear()
-        const keys = await caches.keys()
-        await Promise.all(keys.filter(key => key.startsWith('matheminute-pages') || key.startsWith('matheminute-player')).map(key => caches.delete(key)))
-        done()
-      })
-    JS
-    choose_topic
+  # The question showing, answered right ("7 × 8" types 56), or wrong
+  def answer_question(right: true)
+    text = find(".question--current").text
+    a, op, b = text.split(" ")
+    answer = right ? Ladder.answer(op == "×" ? "x" : "÷", a, b) : "1"
+    answer = "0" if !right && Ladder.answer(op == "×" ? "x" : "÷", a, b) == "1"
+    find("body").send_keys(answer)
+    find("body").send_keys(:enter) unless right
+    assert_selector ".answer--wrong" unless right
+    assert_no_selector ".answer--wrong", wait: 2
   end
 
-  # A new player picks a topic before the home page shows
-  def choose_topic(name = "Times tables")
-    assert_selector "h1", text: "What do you want to practise?"
-    click_on name
-    assert_selector ".streak"
-  end
-
-  def game_for_upload(client_id:)
-    owner = find('meta[name="player-key"]', visible: false)["content"]
-    results = answers([ 2, 3, 6 ])
-    { client_id: client_id, played_at: Time.current.iso8601, topic: "times_tables", level: 1, player_key: owner, results: results,
-      ticket: Attempt::GameTicket.issue(owner: owner, topic: "times_tables", level: 1, id: client_id, questions: results) }
-  end
-
-  def queue_game(*games)
-    page.execute_script(<<~JS, games.as_json)
-      const key = 'matheminute:unsent-games:' + document.querySelector('meta[name="player-key"]').content
-      localStorage.setItem(key, JSON.stringify(arguments[0]))
+  # Ends the game in a second, so a test needn't wait the whole minute
+  def shorten_the_minute
+    page.execute_script(<<~JS)
+      const element = document.querySelector("[data-controller=test]")
+      const test = window.Stimulus.getControllerForElementAndIdentifier(element, "test")
+      test.endsAt = performance.now() + 1000
+      test.scheduleEnd()
     JS
   end
 
@@ -56,6 +41,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     fill_in "Username", with: user.username
     fill_in "Password", with: "password"
     click_button "Sign in"
-    assert_selector ".streak"
+    assert_selector ".ui-home__heading"
   end
 end

@@ -2,8 +2,15 @@
 
 ada:
   username: ada
+  name: Ada
   password_digest: <%= password_digest %>
 
 bob:
   username: bob
+  name: Bob
+  password_digest: <%= password_digest %>
+
+cy:
+  username: cy
+  name: Cy
   password_digest: <%= password_digest %>

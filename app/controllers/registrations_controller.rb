@@ -1,4 +1,4 @@
-# Signing up. A guest who has already played keeps their account, so their streak carries over
+# Signing up. A guest who has already played keeps their account, so their scores carry over
 class RegistrationsController < ApplicationController
   allow_unauthenticated_access
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_registration_path, alert: "Try again later." }
