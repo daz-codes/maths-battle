@@ -1,19 +1,28 @@
-# The questions in every game: times tables and division, on a ladder of tiers from 2 × 3 up to 0.7 × 3000 and
-# 2.1 ÷ 0.7. A game starts at the bottom; CLIMB right answers in a row at a tier move up one, and a wrong answer
-# moves down one. So a player doing well gets harder and harder questions until they slip, and one who's struggling
-# gets easier ones until they're right again. In a battle that's what slows the leader down.
+# The questions in every game: times tables and division, on tiers of difficulty from 2 × 3 up to 0.7 × 3000 and
+# 2.1 ÷ 0.7. Which tier the next question comes from is set by the game's temperature: a running measure of how the
+# player is doing, updated after every answer from whether it was right and how long it took. Quick right answers
+# warm it up, so the questions get harder; slow ones barely move it, a very slow one cools it a little, and a wrong
+# one cools it a lot, so the questions ease off until the player warms up again. In a battle that's what slows the
+# leader down. Players never see the tiers: the questions just stay about as hard as they can manage.
 #
-# The server deals each tier a pool of questions for the game (deal), and the browser walks them by the same rule
-# (walk), taking each tier's next question in turn, round again if it runs out. As the walk depends only on the
-# pools and which answers were right, the server can walk them again to check every answer was to the question the
-# browser should have shown
+# The server deals each tier a pool of questions for the game (deal), and the browser follows the temperature by the
+# same rule (walk), taking each tier's next question in turn, round again if it runs out. The temperature is whole
+# numbers only, so the browser and the server always agree, and as the walk depends only on the pools and each
+# answer's result and time, the server can walk it again to check every answer was to the question the browser
+# should have shown. A faster clock gains nothing: harder questions score no more
 require "bigdecimal"
 
 module Ladder
   extend self
 
-  CLIMB = 3
   POOL = 30
+  # A tier is DEGREES of temperature: three quick right answers move up one, and a wrong answer down one
+  DEGREES = 100
+  HEAT = { quick: 45, steady: 30, slow: 5, dawdle: -20, wrong: -100 }
+  # How long a right answer at each tier usually takes: quick is under 60% of it, steady up to it, slow up to
+  # twice it, and longer is dawdling. Harder tiers allow longer
+  EXPECTED_MS = 2_000
+  EXPECTED_MS_PER_TIER = 400
   # tables: the times tables asked; by: what they're multiplied by; divide: how often it's asked as a division;
   # places: how the numbers move by powers of ten (see powers)
   TIERS = [
@@ -39,29 +48,38 @@ module Ladder
     end
   end
 
-  # The question asked for each answer, with the tier it was at, by the climbing rule. The browser follows the same
+  # The question asked for each answer, with the tier it was at, by the temperature. The browser follows the same
   # rule as it plays (test_controller.js). Yields each answer, its question and tier, and wants back whether it was
-  # right. Returns the highest tier reached, which the last answer may have climbed to
+  # right and how many ms it took. Returns the hottest tier reached, which the last answer may have warmed it to
   def walk(pools, answers)
-    tier, in_a_row, taken, highest = 0, 0, Array.new(pools.size, 0), 0
+    temperature, taken, highest = 0, Array.new(pools.size, 0), 0
     answers.each do |answer|
+      tier = temperature / DEGREES
       pool = pools.fetch(tier)
       question = pool[taken[tier] % pool.size]
       taken[tier] += 1
-      right = yield(answer, question, tier)
-      if right
-        in_a_row += 1
-        if in_a_row >= CLIMB && tier < pools.size - 1
-          tier += 1
-          in_a_row = 0
-          highest = [ highest, tier ].max
-        end
-      else
-        tier = [ tier - 1, 0 ].max
-        in_a_row = 0
-      end
+      right, ms = yield(answer, question, tier)
+      temperature = (temperature + heat(right, ms, tier)).clamp(0, pools.size * DEGREES - 1)
+      highest = [ highest, temperature / DEGREES ].max
     end
     highest
+  end
+
+  # How much an answer warms the game up, or cools it down
+  def heat(right, ms, tier)
+    return HEAT[:wrong] unless right
+
+    expected = EXPECTED_MS + EXPECTED_MS_PER_TIER * tier
+    if ms * 10 <= expected * 6 then HEAT[:quick]
+    elsif ms <= expected then HEAT[:steady]
+    elsif ms <= expected * 2 then HEAT[:slow]
+    else HEAT[:dawdle]
+    end
+  end
+
+  # For the browser, to follow the same rule
+  def rules
+    { degrees: DEGREES, heat: HEAT, expectedMs: EXPECTED_MS, expectedMsPerTier: EXPECTED_MS_PER_TIER }
   end
 
   # For the browser: how it reads, and the answer as it's typed
@@ -78,10 +96,6 @@ module Ladder
   def written(number)
     text = number.to_s("F")
     text.include?(".") ? text.sub(/0+\z/, "").delete_suffix(".") : text
-  end
-
-  def tier_name(tier)
-    TIERS.fetch(tier)[:name]
   end
 
   private

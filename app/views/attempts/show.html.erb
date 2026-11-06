@@ -11,7 +11,7 @@
   <section class="result">
     <p class="label"><%= @attempt.battle? ? "Battle" : "Solo" %> · <%= l(@attempt.played_at, format: :short) %></p>
     <p class="result__score"><span class="card__number"><%= number_with_delimiter @attempt.score %></span> <span class="result__right"><%= pluralize(@attempt.correct, "right answer") %></span></p>
-    <p class="result__stats"><%= icon(:flame) %> Best streak <%= @attempt.best_streak %> · <%= icon(:level_up) %> Reached level <%= @attempt.top_tier %>: <%= @attempt.top_tier_name %></p>
+    <p class="result__stats"><%= icon(:flame) %> Best streak <%= @attempt.best_streak %></p>
   </section>
 
   <% if @attempt.powers.any? %>

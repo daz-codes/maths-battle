@@ -21,7 +21,7 @@ class PagesTest < ActionDispatch::IntegrationTest
     assert_response :success
     game = JSON.parse(css_select("main.test").first["data-test-game-value"])
     assert_equal Ladder::TIERS.size, game["pools"].size
-    assert_equal Ladder::CLIMB, game["climb"]
+    assert_equal Ladder::DEGREES, game.dig("ladder", "degrees")
     assert_equal PowerUp::MOST, game["powers"].size
     assert game["pools"].first.first.key?("answer")
   end

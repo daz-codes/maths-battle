@@ -1,17 +1,16 @@
 require "application_system_test_case"
 
 class PlayingSoloTest < ApplicationSystemTestCase
-  test "answering climbs the ladder, a power-up is claimed, and the game is saved" do
+  test "answering quickly brings harder questions, a power-up is claimed, and the game is saved" do
     visit root_path
     click_on "Single player"
     assert_selector ".question--current", text: /[×÷]/, wait: 5
 
     3.times { answer_question }
-    assert_selector ".test__tier", text: "Level 2"
+    assert_no_text "Level"
     assert_selector ".test__combo", text: "3 in a row"
     assert_selector ".test__score", text: "60"
     answer_question(right: false)
-    assert_selector ".test__tier", text: "Level 1"
     6.times { answer_question }
     assert_selector ".test__spinner"
     find(".test__spinner").click

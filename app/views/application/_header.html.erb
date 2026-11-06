@@ -2,7 +2,7 @@
     playing: their picture (tap for settings) and a hello, with whatever the page puts beside it (the home page's streak) %>
 <header class="site-header ui-header">
   <%= link_to root_path, class: "logo ui-brand", aria: { label: "Maths Battle home" } do %>
-    <%= render "clock", class: "logo__mark" %>
+    <%= icon(:versus, class: "logo__mark ui-brand__mark") %>
     <span>Maths<span class="ui-brand__minute">Battle</span></span>
   <% end %>
   <%= yield :under_logo %>

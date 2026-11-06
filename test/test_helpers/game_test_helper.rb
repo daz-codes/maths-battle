@@ -4,12 +4,13 @@ module GameTestHelper
     Ladder.deal(random: Random.new(seed))
   end
 
-  # Answers walking the ladder as the browser would: rights is a list of true (right) and false (wrong)
+  # Answers following the temperature as the browser would: rights is a list of true (right) and false (wrong),
+  # each taking ms
   def walk_answers(pools, rights, ms: 1000)
     answers = []
     Ladder.walk(pools, rights) do |right, (op, a, b), _tier|
       answers << { "op" => op, "a" => a, "b" => b, "given" => right ? Ladder.answer(op, a, b) : "0", "ms" => ms }
-      right
+      [ right, ms ]
     end
     answers
   end

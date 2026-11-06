@@ -2,9 +2,10 @@
 
 One-minute times tables battles, solo or against other players.
 
-- **The ladder** (`Ladder`): questions climb from 2 × 3 to 0.7 × 3000 and 2.1 ÷ 0.7. Three right in a row moves up a
-  tier and a wrong answer drops one. The server deals each game's tiers in a signed ticket and replays the walk to
-  check every answer (`Attempt::GameTicket`).
+- **The temperature** (`Ladder`): questions range from 2 × 3 to 0.7 × 3000 and 2.1 ÷ 0.7. A running temperature,
+  warmed by quick right answers and cooled by slow or wrong ones, picks how hard the next one is. Players never see
+  it. The server deals each game's questions in a signed ticket and replays the temperature to check every answer
+  (`Attempt::GameTicket`).
 - **Streak scoring** (`Attempt::Scorable`): 10, 20, 30… for answers right in a row, back to 10 after a wrong one.
 - **Power-ups** (`PowerUp`): a spinner every 10 answers. Solo: Double points, Streak shield or Extra time, dealt in the
   ticket. In a battle one drops for everyone whenever anyone answers another 10; the first to tap it hits everyone

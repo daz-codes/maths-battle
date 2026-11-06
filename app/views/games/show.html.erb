@@ -17,22 +17,21 @@
         <span class="test__count"><span class="test__score" data-test-target="score" aria-label="Score">0</span><span class="test__count-label">score</span></span>
         <span class="test__count"><span class="test__right" data-test-target="right" aria-label="Right">0</span><span class="test__count-label">right</span></span>
       </span>
-      <%# Right answers in a row: each scores 10 more than the last %>
-      <span class="test__combo" data-test-target="streak" aria-live="polite" hidden></span>
-      <span class="test__tier" data-test-target="tier" aria-live="polite">Level 1</span>
       <% if @best.positive? %><span class="test__best" data-test-target="best">Best <%= number_with_delimiter @best %></span><% end %>
     </span>
     <%= render "clock", timer: true, class: "timer__clock" %>
     <span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span>
   </header>
 
-  <%# Every ten answers: a power-up, flicking between what it could be until it's tapped %>
+  <%# A strip of its own, always the same height so the question never moves: every ten answers a power-up
+      flicking between what it could be until it's tapped, and the streak (each right answer in a row scoring 10
+      more than the last) %>
   <div class="test__powers">
     <button type="button" class="test__spinner" data-test-target="spinner" data-action="test#claim" aria-label="Tap to claim a power-up" hidden>
       <span class="test__spinner-icon" data-test-target="spinnerIcon"></span>
       <span class="test__spinner-label">Tap!</span>
     </button>
-    <p class="test__power-news" data-test-target="powerNews" aria-live="polite"></p>
+    <span class="test__combo" data-test-target="streak" aria-live="polite" hidden></span>
   </div>
   <% power_up_icons.each do |kind, icon_name| %>
     <template data-test-target="powerIcon" data-power-up="<%= kind %>"><%= icon(icon_name) %></template>
@@ -51,6 +50,8 @@
   <% end %>
 
   <div class="test__stage" data-test-target="stage">
+    <%# What a power-up did, over the top of the question so it takes no room of its own %>
+    <p class="test__power-news" data-test-target="powerNews" aria-live="polite"></p>
     <p class="question question--current" data-test-target="question" aria-live="off">Ready</p>
     <p class="answer" data-test-target="answer" aria-live="polite"></p>
     <p class="test__status" data-test-target="status" hidden></p>

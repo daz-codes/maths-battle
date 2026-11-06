@@ -19,23 +19,22 @@ const TICKING_FROM = 5
 const KEYS = [ "." ]
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 
-// Runs the whole one-minute game in the browser, and saves it at the end. The questions climb a ladder (Ladder on
-// the server): `climb` right in a row moves up a tier, a wrong answer down one, each tier asking its own questions
-// in turn. Streaks score: 10 for the first right answer, 20 for the next in a row, and on. Every ten answers a
+// Runs the whole one-minute game in the browser, and saves it at the end. Each question comes from a tier of
+// difficulty set by the game's temperature, which quick right answers warm up and slow or wrong ones cool (Ladder
+// on the server), each tier asking its own questions in turn. The player never sees the tiers. Streaks score: 10
+// for the first right answer, 20 for the next in a row, and on. Every ten answers a
 // power-up spinner appears to tap: solo, it lands on the one the server dealt; in a battle the server drops it
 // for everyone and the first to tap it claims it, hitting everyone else. The server works out the score that
 // counts from the answers, with the same rules (Attempt::Scorable)
 export default class extends Controller {
-  static targets = [ "question", "answer", "right", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "stage", "best", "streak", "tier", "rival", "spinner", "spinnerIcon", "powerNews", "powerIcon", "trophyIcon" ]
+  static targets = [ "question", "answer", "right", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "stage", "best", "streak", "rival", "spinner", "spinnerIcon", "powerNews", "powerIcon", "trophyIcon" ]
   static values = { game: Object, best: Number, live: Object, submitUrl: String, powers: Object }
 
   connect() {
-    const { pools, climb } = this.gameValue
-    this.pools = pools
-    this.climb = climb
+    this.pools = this.gameValue.pools
+    this.temperature = 0
     this.tier = 0
-    this.climbing = 0
-    this.taken = pools.map(() => 0)
+    this.taken = this.pools.map(() => 0)
     this.typed = ""
     this.correct = 0
     this.points = 0
@@ -411,7 +410,7 @@ export default class extends Controller {
     return this.state === "running" && !this.showingCorrection && !(this.frozenUntil > performance.now())
   }
 
-  // The ladder
+  // Questions
 
   // This tier's next question, round again if they've had them all
   get current() {
@@ -438,27 +437,25 @@ export default class extends Controller {
     this.questionTarget.animate([ { transform: "translateY(-25%)", opacity: 0 }, { transform: "none", opacity: 1 } ], { duration: 200, easing: "ease-out" })
   }
 
-  // The same rule as Ladder.walk on the server
-  climbLadder(right) {
+  // The same rule as Ladder.walk on the server, in whole numbers so the two always agree: a quick right answer
+  // warms the game up, a slow one barely, a very slow one cools it a little and a wrong one a lot. The next
+  // question's tier is the temperature in whole tiers
+  warmUp(right, ms) {
+    const { degrees } = this.gameValue.ladder
     this.taken[this.tier]++
-    const before = this.tier
-    if (right) {
-      if (++this.climbing >= this.climb && this.tier < this.pools.length - 1) {
-        this.tier++
-        this.climbing = 0
-      }
-    } else {
-      this.tier = Math.max(0, this.tier - 1)
-      this.climbing = 0
-    }
-    if (this.tier !== before) this.showTier(this.tier > before)
+    this.temperature = Math.min(Math.max(this.temperature + this.heat(right, ms), 0), this.pools.length * degrees - 1)
+    this.tier = Math.floor(this.temperature / degrees)
   }
 
-  showTier(up) {
-    if (!this.hasTierTarget) return
+  heat(right, ms) {
+    const { heat, expectedMs, expectedMsPerTier } = this.gameValue.ladder
+    if (!right) return heat.wrong
 
-    this.tierTarget.textContent = `Level ${this.tier + 1}`
-    if (up) this.popText(`Level ${this.tier + 1}!`, "level")
+    const expected = expectedMs + expectedMsPerTier * this.tier
+    if (ms * 10 <= expected * 6) return heat.quick
+    if (ms <= expected) return heat.steady
+    if (ms <= expected * 2) return heat.slow
+    return heat.dawdle
   }
 
   // The question's own numbers go back with the answer, so the server can check it for itself
@@ -467,7 +464,7 @@ export default class extends Controller {
     const ms = Math.round(performance.now() - this.shownAt)
     const right = this.typed === answer
     this.results.push({ op, a, b, given: this.typed, ms })
-    this.climbLadder(right)
+    this.warmUp(right, ms)
 
     if (right) {
       this.correct++

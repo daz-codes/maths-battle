@@ -1,50 +1,55 @@
-/* Arcade: one responsive game interface, in dodger blue and neon pink, on pale paper in light mode and ink in
-   dark mode. The saved theme can also follow the device. */
+/* Maths Battle: blaze orange and gold on deep indigo, chunky slab type, and thick-outlined "sticker" cards
+   and buttons with hard shadows. Warm cream paper in light mode, an indigo night in dark mode. The saved theme can
+   also follow the device. The colour names are the ones the game has always used: pink is the hot accent (blaze
+   orange), yellow the gold, blue the violet, green the green */
 
 :root {
-  --paper: #f3f6fb; --paper-alt: #fff; --ink: #152541; --muted: #596a80; --line: #dce3ee;
-  --yellow: #ff5cc6; --pink: #ff5cc6; --blue: #1e90ff; --green: #1e90ff;
-  --blue-deep: #1677e0; --green-deep: #1677e0; --pink-deep: #d4148c; --grey-deep: #263852;
-  --pink-text: #1677e0; --on-pink-text: #fff; --wrong: #ce2d50; --on-neon: #152541;
-  --trophy: #ff5cc6; --trophy-outline: transparent;
-  --ui-accent: #1677e0; --ui-accent-ink: #fff; --ui-pop: #ff5cc6;
-  --ui-hero: #ff5cc6; --ui-hero-ink: #14191a; --ui-soft: #e8f3ff; --ui-hero-line: #ff5cc6;
-  --ui-art-a: #fff; --ui-art-b: #14191a; --ui-grid: #1e90ff15;
-  --ui-practice-ink: #c2127f; --ui-practice-surface: #ffe6f5; --ui-compete-surface: #e8f3ff;
-  --right-text: #1677e0;
-  /* The fluo yellow at the heart of the streak flame, the same in both themes */
-  --fluo: #efff2e;
-  --font: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --paper: #fff4e2; --paper-alt: #fffaf1; --ink: #1d1440; --muted: #6a5f86; --line: #1d1440;
+  --yellow: #ffc21a; --pink: #ff5a1f; --blue: #6b3cff; --green: #13c27e;
+  --blue-deep: #5228e0; --green-deep: #0a8f5b; --pink-deep: #d9400a; --grey-deep: #2c2257;
+  --pink-text: #d9400a; --on-pink-text: #fff; --wrong: #e01e4f; --on-neon: #1d1440;
+  --trophy: #ffc21a; --trophy-outline: #1d1440;
+  --ui-accent: #ff5a1f; --ui-accent-ink: #fff; --ui-pop: #ffc21a;
+  --ui-hero: #ffc21a; --ui-hero-ink: #1d1440; --ui-soft: #ffe7c2; --ui-hero-line: #1d1440;
+  --ui-art-a: #fff; --ui-art-b: #1d1440; --ui-grid: #1d144012;
+  --ui-practice-ink: #5228e0; --ui-practice-surface: #e6deff; --ui-compete-surface: #ffe1d2;
+  --right-text: #0a8f5b;
+  --fluo: #ffe23d;
+  --shadow: #1d1440;
+  --font: "Lexend", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
   --radius: 14px; --radius-big: 20px; --glow-strength: 0%;
   color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --paper: #10121b; --paper-alt: #1b1e2c; --ink: #f5f6fb; --muted: #b7bdd2; --line: #34394f;
-  --yellow: #ff6fcf; --pink: #ff6fcf; --blue: #4aa3ff; --green: #4aa3ff;
-  --blue-deep: #2f86e8; --green-deep: #2f86e8; --pink-deep: #e0389f; --grey-deep: #33394e;
-  --pink-text: #6cb6ff; --on-pink-text: #10121b; --wrong: #ff8caa; --on-neon: #10121b;
-  --trophy: #ff6fcf; --trophy-outline: transparent;
-  --ui-accent: #4aa3ff; --ui-accent-ink: #0b1020; --ui-pop: #ff6fcf;
-  --ui-hero: #ff5cc6; --ui-hero-ink: #14191a; --ui-soft: #1d2b45; --ui-hero-line: #ff5cc6;
-  --ui-art-a: #fff; --ui-art-b: #14191a; --ui-grid: #4aa3ff15;
-  --ui-practice-ink: #ff8ad8; --ui-practice-surface: #3a2340; --ui-compete-surface: #1d2b45;
-  --right-text: #6cb6ff;
+  --paper: #150d33; --paper-alt: #22184d; --ink: #fff3e0; --muted: #b9ade0; --line: #070318;
+  --yellow: #ffcb2e; --pink: #ff6a2b; --blue: #8a63ff; --green: #2fe08f;
+  --blue-deep: #a487ff; --green-deep: #2fe08f; --pink-deep: #ff8a52; --grey-deep: #3a2d6e;
+  --pink-text: #ff8a52; --on-pink-text: #150d33; --wrong: #ff6b8b; --on-neon: #150d33;
+  --trophy: #ffcb2e; --trophy-outline: #070318;
+  --ui-accent: #ff6a2b; --ui-accent-ink: #150d33; --ui-pop: #ffcb2e;
+  --ui-hero: #ffcb2e; --ui-hero-ink: #150d33; --ui-soft: #2e2160; --ui-hero-line: #070318;
+  --ui-art-a: #fff; --ui-art-b: #150d33; --ui-grid: #ffffff0d;
+  --ui-practice-ink: #c3b0ff; --ui-practice-surface: #2e2160; --ui-compete-surface: #3a1e2e;
+  --right-text: #2fe08f;
+  --shadow: #070318;
   color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #10121b; --paper-alt: #1b1e2c; --ink: #f5f6fb; --muted: #b7bdd2; --line: #34394f;
-    --yellow: #ff6fcf; --pink: #ff6fcf; --blue: #4aa3ff; --green: #4aa3ff;
-    --blue-deep: #2f86e8; --green-deep: #2f86e8; --pink-deep: #e0389f; --grey-deep: #33394e;
-    --pink-text: #6cb6ff; --on-pink-text: #10121b; --wrong: #ff8caa; --on-neon: #10121b;
-    --trophy: #ff6fcf; --trophy-outline: transparent;
-    --ui-accent: #4aa3ff; --ui-accent-ink: #0b1020; --ui-pop: #ff6fcf;
-    --ui-hero: #ff5cc6; --ui-hero-ink: #14191a; --ui-soft: #1d2b45; --ui-hero-line: #ff5cc6;
-    --ui-art-a: #fff; --ui-art-b: #14191a; --ui-grid: #4aa3ff15;
-    --ui-practice-ink: #ff8ad8; --ui-practice-surface: #3a2340; --ui-compete-surface: #1d2b45;
-    --right-text: #6cb6ff;
+    --paper: #150d33; --paper-alt: #22184d; --ink: #fff3e0; --muted: #b9ade0; --line: #070318;
+    --yellow: #ffcb2e; --pink: #ff6a2b; --blue: #8a63ff; --green: #2fe08f;
+    --blue-deep: #a487ff; --green-deep: #2fe08f; --pink-deep: #ff8a52; --grey-deep: #3a2d6e;
+    --pink-text: #ff8a52; --on-pink-text: #150d33; --wrong: #ff6b8b; --on-neon: #150d33;
+    --trophy: #ffcb2e; --trophy-outline: #070318;
+    --ui-accent: #ff6a2b; --ui-accent-ink: #150d33; --ui-pop: #ffcb2e;
+    --ui-hero: #ffcb2e; --ui-hero-ink: #150d33; --ui-soft: #2e2160; --ui-hero-line: #070318;
+    --ui-art-a: #fff; --ui-art-b: #150d33; --ui-grid: #ffffff0d;
+    --ui-practice-ink: #c3b0ff; --ui-practice-surface: #2e2160; --ui-compete-surface: #3a1e2e;
+    --right-text: #2fe08f;
+    --shadow: #070318;
     color-scheme: dark;
   }
 }
@@ -1357,10 +1362,8 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 .test__spinner:disabled { cursor: default; }
 @keyframes spinner-bob { from { transform: translateY(0) scale(1); } to { transform: translateY(-3px) scale(1.06); } }
 @media (prefers-reduced-motion: reduce) { .test__spinner { animation: none; } }
-.test__tier { color: var(--blue-deep); font-size: 0.85rem; font-weight: 800; white-space: nowrap; }
 .test--doubled .test__score { color: var(--pink-text); }
 .test--shielded .test__combo { box-shadow: 0 0 0 2px var(--blue); }
-.score-pop--level { top: 4%; color: var(--blue-deep); font-size: 2rem; font-weight: 900; }
 .test__power-news { margin: 0; color: var(--pink-text); font-size: 0.95rem; font-weight: 800; text-align: center; }
 .test__power-news:empty { display: none; }
 

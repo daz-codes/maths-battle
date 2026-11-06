@@ -1,4 +1,4 @@
-# Authorizes one game: the ladder's questions dealt for it (Ladder), and solo, the power-ups its spinners land on
+# Authorizes one game: the questions dealt for it, a pool for each tier (Ladder), and solo, the power-ups its spinners land on
 # (PowerUp). Tickets are signed, bound to the browser's player, and expire after an hour. Their id is also the
 # attempt's unique client id, so a game can't be saved twice. Checking a game walks the ladder again, so every
 # answer must be to the question the browser should have asked, and every power-up one the ticket dealt, claimed
@@ -6,7 +6,7 @@
 class Attempt::GameTicket
   LIFETIME = 1.hour
 
-  # top_tier: the highest the ladder reached, from 1
+  # top_tier: the hottest tier the temperature reached, from 1, kept for working out how hard games get
   Game = Data.define(:mode, :live_game_id, :results, :powers, :top_tier)
 
   def self.issue(owner:, id:, pools:, powers: [], live_game: nil)
@@ -46,7 +46,7 @@ class Attempt::GameTicket
 
       correct = given == Ladder.answer(op, a, b)
       results << { "op" => op, "a" => a, "b" => b, "given" => given, "ms" => ms, "correct" => correct, "tier" => tier }
-      correct
+      [ correct, ms ]
     end
     [ results, highest ]
   end

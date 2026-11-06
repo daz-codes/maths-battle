@@ -1,5 +1,5 @@
-# One minute's game: solo, or in a battle against others (LiveGame). Its answers climb the ladder of questions
-# (Ladder), its score comes from streaks and power-ups (Scorable), and its best each day is the player's place in
+# One minute's game: solo, or in a battle against others (LiveGame). Its questions get harder or easier as the
+# player does (Ladder), its score comes from streaks and power-ups (Scorable), and its best each day is the player's place in
 # the leagues (League)
 class Attempt < ApplicationRecord
   include Recordable, Scorable
@@ -22,9 +22,5 @@ class Attempt < ApplicationRecord
 
   def wrong
     answered - correct
-  end
-
-  def top_tier_name
-    Ladder.tier_name(top_tier - 1)
   end
 end

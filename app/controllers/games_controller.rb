@@ -13,7 +13,7 @@ class GamesController < ApplicationController
     powers = @live_game ? [] : PowerUp.deal_solo
     id = SecureRandom.hex(16)
     @game = { id: id, ticket: Attempt::GameTicket.issue(owner: player_key, id: id, pools: pools, powers: powers, live_game: @live_game),
-      pools: pools.map { |pool| pool.map { |question| Ladder.worked(question) } }, powers: powers, climb: Ladder::CLIMB, most: Attempt::Recordable::MAX_ANSWERS }
+      pools: pools.map { |pool| pool.map { |question| Ladder.worked(question) } }, powers: powers, ladder: Ladder.rules, most: Attempt::Recordable::MAX_ANSWERS }
     @live = live_details if @live_game
     @best = current_player.persisted? ? current_player.best_score : 0
   end

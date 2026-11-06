@@ -33,25 +33,48 @@ class LadderTest < ActiveSupport::TestCase
     assert_equal "56", Ladder.answer("x", "7", "8")
   end
 
-  test "three right in a row climbs a tier and a wrong answer drops one" do
-    dealt = Ladder.deal(random: Random.new(1))
+  def tiers_for(answers)
     tiers = []
-    Ladder.walk(dealt, [ true, true, true, true, true, true, false, true ]) { |right, _, tier| tiers << tier; right }
-    assert_equal [ 0, 0, 0, 1, 1, 1, 2, 1 ], tiers
+    Ladder.walk(Ladder.deal(random: Random.new(1)), answers) { |(right, ms), _, tier| tiers << tier; [ right, ms ] }
+    tiers
+  end
+
+  test "quick right answers warm the game up: three move up a tier" do
+    assert_equal [ 0, 0, 0, 1, 1, 2 ], tiers_for([ [ true, 800 ] ] * 6)
+  end
+
+  test "steady ones take four, and slow ones barely move it" do
+    assert_equal [ 0, 0, 0, 0, 1 ], tiers_for([ [ true, 1_800 ] ] * 5)
+    assert_equal [ 0 ] * 10, tiers_for([ [ true, 3_500 ] ] * 10)
+  end
+
+  test "a wrong answer cools it down a tier, and dawdling cools it a little" do
+    assert_equal [ 0, 0, 0, 1, 0 ], tiers_for([ [ true, 800 ] ] * 3 + [ [ false, 800 ], [ true, 800 ] ])
+    assert_equal [ 0, 0, 0, 1, 1, 0 ], tiers_for([ [ true, 800 ] ] * 3 + [ [ true, 9_000 ] ] * 3)
+  end
+
+  test "harder tiers allow longer before an answer is slow" do
+    assert_equal Ladder::HEAT[:quick], Ladder.heat(true, 1_200, 0)
+    assert_equal Ladder::HEAT[:steady], Ladder.heat(true, 1_300, 0)
+    assert_equal Ladder::HEAT[:quick], Ladder.heat(true, 3_000, 9)
+  end
+
+  test "it never goes below the easiest" do
+    assert_equal [ 0 ] * 4, tiers_for([ [ false, 800 ] ] * 4)
   end
 
   test "a tier's questions come in turn, and round again" do
     dealt = Ladder.deal(random: Random.new(1))
     asked = []
-    Ladder.walk(dealt, [ false ] * (Ladder::POOL + 1)) { |right, question, _| asked << question; right }
+    Ladder.walk(dealt, [ false ] * (Ladder::POOL + 1)) { |right, question, _| asked << question; [ right, 1000 ] }
     assert_equal dealt[0], asked.first(Ladder::POOL)
     assert_equal dealt[0][0], asked.last
   end
 
-  test "the top tier stays the top" do
+  test "the hardest tier stays the hardest" do
     dealt = Ladder.deal(random: Random.new(1))
     tiers = []
-    Ladder.walk(dealt, [ true ] * 60) { |right, _, tier| tiers << tier; right }
+    Ladder.walk(dealt, [ true ] * 60) { |right, _, tier| tiers << tier; [ right, 500 ] }
     assert_equal Ladder::TIERS.size - 1, tiers.max
     assert_equal Ladder::TIERS.size - 1, tiers.last
   end
