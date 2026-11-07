@@ -78,4 +78,18 @@ class LadderTest < ActiveSupport::TestCase
     assert_equal Ladder::TIERS.size - 1, tiers.max
     assert_equal Ladder::TIERS.size - 1, tiers.last
   end
+
+  test "a shift asks the next questions from another tier, whatever the temperature" do
+    tiers = []
+    Ladder.walk(Ladder.deal(random: Random.new(1)), [ [ true, 800 ] ] * 6, shifts: { 1 => [ 9, 3 ] }) { |(right, ms), _, tier| tiers << tier; [ right, ms ] }
+    assert_equal [ 0, 9, 9, 9, 1, 2 ], tiers, "quick answers at the hardest tier still warm it up"
+  end
+
+  test "a skipped question is taken, but leaves the temperature as it was" do
+    dealt = Ladder.deal(random: Random.new(1))
+    asked, tiers = [], []
+    Ladder.walk(dealt, [ :skip, [ true, 800 ], :skip ]) { |outcome, question, tier| asked << question; tiers << tier; outcome }
+    assert_equal dealt[0].first(3), asked
+    assert_equal [ 0, 0, 0 ], tiers
+  end
 end

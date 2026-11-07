@@ -7,7 +7,7 @@
       data-test-game-value="<%= @game.to_json %>"
       data-test-best-value="<%= @best %>"
       <% if @live %>data-test-live-value="<%= @live.to_json %>"<% end %>
-      data-test-powers-value="<%= { every: PowerUp::EVERY, solo: PowerUp::SOLO, battle: PowerUp::BATTLE }.to_json %>"
+      data-test-powers-value="<%= { at: PowerUp::AT, solo: PowerUp::SOLO, battle: PowerUp::BATTLE }.to_json %>"
       data-test-submit-url-value="<%= attempts_path %>">
   <button type="button" class="test__stop" data-action="test#confirmStop" aria-label="Stop the game">✕</button>
 
@@ -25,16 +25,18 @@
       </span>
       <% if @best.positive? %><span class="test__best" data-test-target="best">Best <%= number_with_delimiter @best %></span><% end %>
     </span>
-    <span class="test__timer"><span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span><span class="test__count-label">secs</span></span>
+    <span class="test__timer"><span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">120</span><span class="test__count-label">secs</span></span>
   </header>
 
-  <%# A strip of its own, always the same height so the question never moves: every ten answers a power-up,
+  <%# A strip of its own, always the same height so the question never moves: after 3 answers, then 5 more, 8 and on, a power-up,
       flicking between what it could be until it's tapped %>
   <div class="test__powers">
     <button type="button" class="test__spinner" data-test-target="spinner" data-action="test#claim" aria-label="Tap to claim a power-up" hidden>
       <span class="test__spinner-icon" data-test-target="spinnerIcon"></span>
       <span class="test__spinner-label">Tap!</span>
     </button>
+    <%# A Skip held: pass on a question without breaking the streak %>
+    <button type="button" class="test__skip" data-test-target="skip" data-action="test#skip" hidden>Skip</button>
   </div>
   <% power_up_icons.each do |kind, icon_name| %>
     <template data-test-target="powerIcon" data-power-up="<%= kind %>"><%= icon(icon_name) %></template>

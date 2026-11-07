@@ -26,8 +26,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_no_selector ".answer--wrong", wait: 2
   end
 
-  # Ends the game in a second, so a test needn't wait the whole minute
-  def shorten_the_minute
+  # Ends the game in a second, so a test needn't wait the whole two minutes
+  def shorten_the_game
     page.execute_script(<<~JS)
       const element = document.querySelector("[data-controller=test]")
       const test = window.Stimulus.getControllerForElementAndIdentifier(element, "test")

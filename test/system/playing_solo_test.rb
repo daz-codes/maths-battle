@@ -17,7 +17,7 @@ class PlayingSoloTest < ApplicationSystemTestCase
     assert_selector ".test__spinner--landed"
     take_screenshot
 
-    shorten_the_minute
+    shorten_the_game
     assert_selector ".result", wait: 10
     attempt = Attempt.last
     assert_equal 9, attempt.correct

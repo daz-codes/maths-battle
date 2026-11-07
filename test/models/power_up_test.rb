@@ -38,7 +38,7 @@ class PowerUpTest < ActiveSupport::TestCase
   end
 
   test "a Superstar's answers still count as wrong in how many were right" do
-    attempt = play(users(:ada), rights: [ true ] * 10 + [ false ] * 2, powers: [ "star" ] * PowerUp::MOST, claims: [ { drop: 1, at: 10 } ])
+    attempt = play(users(:ada), rights: [ true ] * 3 + [ false ] * 2 + [ true ] * 7, powers: [ "star" ] * PowerUp::MOST, claims: [ { drop: 1, at: 3 } ])
     assert_equal 10, attempt.correct
     assert_equal (1..12).sum * 10, attempt.score
   end
@@ -49,5 +49,10 @@ class PowerUpTest < ActiveSupport::TestCase
     assert_not PowerUp.attack?("horn")
     assert_not PowerUp.attack?("star")
     assert_not PowerUp.attack?("coins")
+  end
+
+  test "a skipped question scores nothing and leaves the streak as it was" do
+    results = [ { "correct" => true }, { "skip" => true, "correct" => false }, { "correct" => true } ]
+    assert_equal 10 + 20, Attempt.tally(results, []).score
   end
 end

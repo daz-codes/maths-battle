@@ -8,8 +8,8 @@ module Badge::Catalogued
 
   GROUPS = { start: "Getting started", streaks: "Answer streaks", right: "Right answers", scores: "Scores", power_ups: "Power-ups", special: "Special" }
   STREAKS = [ 5, 10, 20, 30, 50 ]
-  RIGHT = [ 10, 20, 30, 40, 50 ]
-  SCORES = [ 500, 1_000, 2_500, 5_000, 10_000 ]
+  RIGHT = [ 20, 40, 60, 80, 100 ]
+  SCORES = [ 1_000, 2_500, 5_000, 10_000, 25_000 ]
   POWER_UPS = {
     "double" => [ "Double trouble", "Claim Double points" ], "triple" => [ "Triple threat", "Claim Triple points" ],
     "boost" => [ "Boosted", "Claim a Boost" ], "shield" => [ "Shielded", "Claim a Streak shield" ],
@@ -18,8 +18,11 @@ module Badge::Catalogued
     "ink" => [ "Splat!", "Ink everyone's screens in a battle" ], "mini" => [ "Shrink ray", "Shrink everyone's questions in a battle" ],
     "bomb" => [ "Kaboom!", "Bomb everyone's scores to zero in a battle" ],
     "star" => [ "Superstar", "Claim a Superstar" ], "coins" => [ "Coin collector", "Claim Coins" ],
-    "homing" => [ "Bullseye", "Hit the leader with a Homing shot" ], "horn" => [ "Honk honk", "Claim a Horn in a battle" ],
-    "mirror" => [ "Mirror mirror", "Flip everyone's questions in a battle" ]
+    "homing" => [ "Bullseye", "Hit the leader with a Homing shot" ], "horn" => [ "Shields up", "Claim a Shield in a battle" ],
+    "mirror" => [ "Mirror mirror", "Flip everyone's questions in a battle" ],
+    "curveball" => [ "Curveball", "Throw everyone a Curveball in a battle" ], "shot" => [ "Sharpshooter", "Freeze the player next to you with a Shot" ],
+    "rocket" => [ "Lift-off", "Catch up with a Rocket in a battle" ], "decoy" => [ "Trickster", "Set a Decoy in a battle" ],
+    "skip" => [ "Pass!", "Claim a Skip" ]
   }
   # The world league needs this many players today before its top ten means something
   TOP_TEN_FROM = 20
@@ -44,7 +47,7 @@ module Badge::Catalogued
     private
       def starting_kinds
         [
-          Kind.new("first_game", :start, :party, "First minute", "Finish your first game", [ :finished? ]),
+          Kind.new("first_game", :start, :party, "First battle cry", "Finish your first game", [ :finished? ]),
           Kind.new("first_battle", :start, :versus, "Into battle", "Finish a battle against other players", [ :battle_finished? ]),
           Kind.new("first_win", :start, :trophy, "Victory!", "Come first in a battle", nil),
           Kind.new("first_power_up", :start, :lightning, "Powered up", "Claim your first power-up", [ :claimed_power_up? ]),

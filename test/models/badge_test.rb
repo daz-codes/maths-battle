@@ -6,13 +6,13 @@ class BadgeTest < ActiveSupport::TestCase
   end
 
   test "a first game earns its award, and streaks, right answers and scores theirs" do
-    play(users(:ada), rights: [ true ] * 12)
+    play(users(:ada), rights: [ true ] * 20)
     assert_includes kinds(users(:ada)), "first_game"
-    assert_includes kinds(users(:ada)), "streak_10"
-    assert_includes kinds(users(:ada)), "right_10"
-    assert_includes kinds(users(:ada)), "score_500"
+    assert_includes kinds(users(:ada)), "streak_20"
+    assert_includes kinds(users(:ada)), "right_20"
+    assert_includes kinds(users(:ada)), "score_1000"
     assert_includes kinds(users(:ada)), "perfect"
-    assert_not_includes kinds(users(:ada)), "streak_20"
+    assert_not_includes kinds(users(:ada)), "streak_30"
   end
 
   test "each is earned once, by the first game" do
@@ -23,7 +23,7 @@ class BadgeTest < ActiveSupport::TestCase
   end
 
   test "claiming a power-up earns Powered up and that power-up's own" do
-    play(users(:ada), rights: [ true ] * 12, powers: [ "shield" ] * PowerUp::MOST, claims: [ { drop: 1, at: 10 } ])
+    play(users(:ada), rights: [ true ] * 12, powers: [ "shield" ] * PowerUp::MOST, claims: [ { drop: 1, at: 3 } ])
     assert_includes kinds(users(:ada)), "first_power_up"
     assert_includes kinds(users(:ada)), "power_shield"
   end
@@ -33,7 +33,7 @@ class BadgeTest < ActiveSupport::TestCase
     game.join(users(:bob))
     game.start!
     travel LiveGame::START_LEAD + 1.second
-    drop = game.drops.create!(power_up: "freeze")
+    drop = game.drops.create!(power_up: "freeze", owner: users(:ada))
     game.claim(drop.id, game.player_for(users(:ada)))
 
     play(users(:ada), rights: [ true ] * 5, live_game: game)

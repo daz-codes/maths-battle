@@ -13,7 +13,7 @@ class PlayingABattleTest < ApplicationSystemTestCase
     LiveGame::Droppable.const_set(:BOMB_CHANCE, @bomb_chance)
   end
 
-  test "a hosted battle: joining with its code, starting together, a power-up claimed hitting the other, and the podium" do
+  test "a hosted battle: joining with its code, starting together, a power-up of your own claimed hitting the other, and the podium" do
     sign_in users(:ada)
     within("main") { click_on "Multiplayer" }
     click_on "Host a battle"
@@ -35,17 +35,17 @@ class PlayingABattleTest < ApplicationSystemTestCase
     using_session(:zara) { assert_selector ".question--current", text: /[×÷]/, wait: 12 }
     assert_selector ".question--current", text: /[×÷]/, wait: 12
 
-    # Zara's tenth answer drops a power-up for both of them: Ada taps it first, and it hits Zara
+    # Zara's power-ups are her own: Ada doesn't see them. Ada's come with her own answers, and what she claims
+    # reaches Zara
     using_session(:zara) { 10.times { answer_question } }
     assert_selector ".test__rival", text: "Zara 550", wait: 5
+    3.times { answer_question }
     assert_selector ".test__spinner", wait: 5
     find(".test__spinner").click
     assert_selector ".test__spinner--landed", wait: 5
     using_session(:zara) { assert_selector ".test__power-news", text: "Ada", wait: 5 }
-
-    3.times { answer_question }
-    shorten_the_minute
-    using_session(:zara) { shorten_the_minute }
+    shorten_the_game
+    using_session(:zara) { shorten_the_game }
 
     assert_selector ".banner", text: "You came 2nd", wait: 15
     using_session(:zara) { assert_selector ".banner", text: "You came 1st", wait: 15 }

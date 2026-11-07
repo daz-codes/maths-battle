@@ -50,15 +50,25 @@ module Ladder
 
   # The question asked for each answer, with the tier it was at, by the temperature. The browser follows the same
   # rule as it plays (test_controller.js). Yields each answer, its question and tier, and wants back whether it was
-  # right and how many ms it took. Returns the hottest tier reached, which the last answer may have warmed it to
-  def walk(pools, answers)
+  # right and how many ms it took, or :skip for a question skipped, which leaves the temperature as it was.
+  #
+  # shifts move some questions to another tier for a while, whatever the temperature: { 12 => [ 9, 3 ] } asks the
+  # 13th answer's question and the two after it from the hardest tier (a Curveball), and [ 0, 5 ] the easiest (a
+  # Rocket). Returns the hottest tier the temperature reached, which the last answer may have warmed it to
+  def walk(pools, answers, shifts: {})
     temperature, taken, highest = 0, Array.new(pools.size, 0), 0
-    answers.each do |answer|
-      tier = temperature / DEGREES
+    shifted_tier, shifted_left = nil, 0
+    answers.each_with_index do |answer, index|
+      shifted_tier, shifted_left = shifts[index] if shifts.key?(index)
+      tier = shifted_left.positive? ? shifted_tier.clamp(0, pools.size - 1) : temperature / DEGREES
+      shifted_left -= 1 if shifted_left.positive?
       pool = pools.fetch(tier)
       question = pool[taken[tier] % pool.size]
       taken[tier] += 1
-      right, ms = yield(answer, question, tier)
+      outcome = yield(answer, question, tier)
+      next if outcome == :skip
+
+      right, ms = outcome
       temperature = (temperature + heat(right, ms, tier)).clamp(0, pools.size * DEGREES - 1)
       highest = [ highest, temperature / DEGREES ].max
     end

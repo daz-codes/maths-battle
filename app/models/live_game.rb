@@ -1,4 +1,4 @@
-# A battle: players racing each other in the same minute. A host makes one and shares its code (/live/K7Q2M), and
+# A battle: players racing each other in the same two minutes. A host makes one and shares its code (/live/K7Q2M), and
 # whoever opens it joins the lobby (Joinable); or matchmaking puts together players looking for a game, and it starts
 # at once (MatchRequest). Everyone's game begins together, each with their own questions, as hard as they can manage, with each
 # other's scores ticking over as they play (Startable, LiveGameChannel). Power-ups drop for everyone as anyone

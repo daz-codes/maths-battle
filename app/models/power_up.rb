@@ -1,14 +1,18 @@
-# Power-ups. Every EVERY answers a spinner appears at the top of the game, flicking between them, and tapping it
-# stops it and claims the one it lands on.
+# Power-ups. A spinner appears at the top of the game after 3 answers, then 5 more, 8, 13, 21 and on, further apart
+# each time (AT), flicking between them, and tapping it stops it and claims the one it lands on.
 #
 # Solo, they help the player, and the server deals them in the game's ticket, so the spinner lands on the one dealt
 # and the server knows what was claimed and checks when (Attempt::GameTicket, Attempt::Scorable).
 #
-# In a battle, one drops for everyone whenever any player answers another EVERY, and the first to tap it claims it
-# (LiveGame::Droppable). It hits everyone else. Most only slow them down; the Streak breaker and the Bomb change
+# In a battle, each player gets their own at the same answer counts, and an extra one when they've fallen far
+# behind (LiveGame::Droppable). It hits everyone else. Most only slow them down; the Streak breaker and the Bomb change
 # their scores, so their games take them where they hit
 module PowerUp
-  EVERY = 10
+  # The answer counts a spinner appears at: the gaps between them go 3, 5, 8, 13, 21, like the Fibonacci numbers
+  AT = [ 3, 5 ].then do |gaps|
+    gaps << gaps[-1] + gaps[-2] while gaps.sum + gaps[-1] + gaps[-2] <= Attempt::Recordable::MAX_ANSWERS
+    gaps.each_with_object([]) { |gap, at| at << (at.last || 0) + gap }
+  end
 
   # answers: how many right answers it lasts for
   SOLO = {
@@ -18,7 +22,8 @@ module PowerUp
     "shield" => { name: "Streak shield", news: "Streak shield: your next wrong answer won't break your streak" },
     "time" => { name: "Extra time", news: "+5 seconds!", seconds: 5 },
     "star" => { name: "Superstar", news: "Superstar! Your next 5 answers all count as right", answers: 5 },
-    "coins" => { name: "Coins", news: "Coins! +100", points: 100 }
+    "coins" => { name: "Coins", news: "Coins! +100", points: 100 },
+    "skip" => { name: "Skip", news: "Skip! Tap Skip to pass on a question without breaking your streak" }
   }
   # seconds: how long it lasts on everyone it hits. sent: what the player who claimed it did; hit: what it did to
   # each of the others, after their name. own: it helps the one who claims it, rather than hitting the others (the
@@ -35,7 +40,13 @@ module PowerUp
     "homing" => { name: "Homing shot", sent: "broke the leader's streak", hit: "broke your streak with a Homing shot" },
     "star" => { name: "Superstar", sent: "can't be hit, and your next 5 answers all count as right", hit: "got a Superstar", own: true, answers: 5 },
     "coins" => { name: "Coins", sent: "got 100 points", hit: "got Coins", own: true, points: 100 },
-    "horn" => { name: "Horn", sent: "will block the next attack on you", hit: "got a Horn", own: true }
+    # Stored as "horn", what it was called when it came in
+    "horn" => { name: "Shield", sent: "will block the next attack on you", hit: "got a Shield", own: true },
+    "curveball" => { name: "Curveball", sent: "threw everyone else 3 tough questions", hit: "threw you a Curveball: 3 tough questions", questions: 3 },
+    "shot" => { name: "Shot", sent: "froze the player next to you", hit: "froze you with a Shot", seconds: 4 },
+    "rocket" => { name: "Rocket", sent: "get 5 easy questions to catch up", hit: "got a Rocket", own: true, questions: 5 },
+    "decoy" => { name: "Decoy", sent: "set a Decoy: everyone else's next power-up is a fake", hit: "set a Decoy", own: true, seconds: 3 },
+    "skip" => { name: "Skip", sent: "can skip a question", hit: "got a Skip", own: true }
   }
   DROPPED = BATTLE.keys - %w[ bomb ]
 
@@ -45,20 +56,29 @@ module PowerUp
   end
   ALL = SOLO.merge(BATTLE)
 
-  # One every EVERY answers, so a game can't have more than this many
-  MOST = Attempt::Recordable::MAX_ANSWERS / EVERY
+  # A game can't have more than this many
+  MOST = AT.size
+
+  # When the nth spinner appears, from 1, and when the next takes its place, so the nth must be claimed before then
+  def self.appears_at(drop)
+    AT[drop - 1]
+  end
+
+  def self.replaced_at(drop)
+    AT[drop] || Attempt::Recordable::MAX_ANSWERS + 1
+  end
 
   def self.deal_solo(random: Random.new)
     Array.new(MOST) { SOLO.keys.sample(random: random) }
   end
 
-  # Extra time is the only one that makes the minute longer
+  # Extra time is the only one that makes the game longer
   def self.extra_ms(kind)
     kind == "time" ? SOLO.dig("time", :seconds) * 1000 : 0
   end
 
   # For the game's page: names, what's said, and how long each lasts
   def self.rules
-    { every: EVERY, all: ALL }
+    { at: AT, all: ALL }
   end
 end

@@ -8,10 +8,10 @@ class LiveGameChannelTest < ActionCable::Channel::TestCase
     travel LiveGame::START_LEAD + 1.second
   end
 
-  test "a player's tenth answer drops a power-up for everyone, and the first to claim it gets it" do
+  test "a player's third answer drops them a power-up, and they can claim it, once" do
     subscribe pass: @game.pass_for(users(:ada))
     assert subscription.confirmed?
-    assert_broadcasts(@game, 2) { perform :score, score: 100, correct: 10, answered: 10 }
+    assert_broadcasts(@game, 2) { perform :score, score: 60, correct: 3, answered: 3 }
     drop = @game.drops.last
     assert_broadcasts(@game, 1) { perform :claim, id: drop.id }
     assert_equal users(:ada), drop.reload.claimed_by

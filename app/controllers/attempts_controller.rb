@@ -4,7 +4,8 @@ class AttemptsController < ApplicationController
 
   def create
     game = Attempt::GameTicket.verify!(params.dig(:attempt, :ticket), owner: player_key, client_id: params.dig(:attempt, :client_id),
-      answers: list_param(:results, %i[ op a b given ms ]), claims: list_param(:claims, %i[ drop at ]))
+      answers: list_param(:results, %i[ op a b given ms skip ]), claims: list_param(:claims, %i[ drop at ]),
+      shifts: list_param(:shifts, %i[ drop at ]), user: (player if authenticated?))
     attempt = Attempt.record!(user: player, game: game, client_id: params.dig(:attempt, :client_id))
     render json: { url: attempt_path(attempt) }, status: :created
   rescue Attempt::Invalid => error

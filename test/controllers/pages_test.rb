@@ -24,14 +24,14 @@ class PagesTest < ActionDispatch::IntegrationTest
     sign_in_as users(:ada)
     get awards_path
     assert_select ".badge", Badge.catalogue.size
-    assert_select ".badge:not(.badge--locked) .badge__name", text: "First minute"
+    assert_select ".badge:not(.badge--locked) .badge__name", text: "First battle cry"
   end
 
   test "a game's results lead with Play again, and show the awards it earned" do
     sign_in_as users(:ada)
     get attempt_path(play(users(:ada), rights: [ true ] * 3))
     assert_select ".button--again[href=?]", play_path
-    assert_select ".badges--new .badge__name", text: "First minute"
+    assert_select ".badges--new .badge__name", text: "First battle cry"
   end
 
   test "a solo game's page carries its ladder and the power-ups dealt" do

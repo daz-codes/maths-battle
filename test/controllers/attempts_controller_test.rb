@@ -15,9 +15,9 @@ class AttemptsControllerTest < ActionDispatch::IntegrationTest
 
   test "a solo power-up claimed counts" do
     powers = [ "double" ] * PowerUp::MOST
-    post attempts_path, params: game_upload(rights: [ true ] * 12, powers: powers, claims: [ { drop: 1, at: 10 } ]), as: :json
+    post attempts_path, params: game_upload(rights: [ true ] * 12, powers: powers, claims: [ { drop: 1, at: 3 } ]), as: :json
     assert_response :created
-    assert_equal (1..10).sum * 10 + (110 + 120) * 2, Attempt.last.score
+    assert_equal (1..12).sum * 10 + (40 + 50 + 60 + 70 + 80), Attempt.last.score
   end
 
   test "a game that doesn't match its ticket is refused" do

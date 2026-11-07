@@ -1,4 +1,4 @@
-# One minute's game: solo, or in a battle against others (LiveGame). Its questions get harder or easier as the
+# A two-minute game: solo, or in a battle against others (LiveGame). Its questions get harder or easier as the
 # player does (Ladder), its score comes from streaks and power-ups (Scorable), and its best each day is the player's place in
 # the leagues (League)
 class Attempt < ApplicationRecord

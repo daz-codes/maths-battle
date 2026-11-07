@@ -49,11 +49,11 @@ class AttemptTest < ActiveSupport::TestCase
     assert_equal first, Attempt.record!(user: users(:ada), game: game, client_id: "same")
   end
 
-  test "extra time allows a longer minute" do
+  test "extra time allows a longer game" do
     rights = [ true ] * 12
     dealt = PowerUp::SOLO.keys.map { "time" }.cycle.first(PowerUp::MOST)
-    assert_raises(Attempt::Invalid) { play(users(:ada), rights: rights, ms: 5_800) }
-    attempt = play(users(:ada), rights: rights, ms: 5_800, powers: dealt, claims: [ { drop: 1, at: 10 } ])
+    assert_raises(Attempt::Invalid) { play(users(:ada), rights: rights, ms: 10_600) }
+    attempt = play(users(:ada), rights: rights, ms: 10_600, powers: dealt, claims: [ { drop: 1, at: 3 } ])
     assert_equal 12, attempt.correct
   end
 end

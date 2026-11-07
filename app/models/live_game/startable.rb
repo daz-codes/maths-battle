@@ -1,12 +1,12 @@
 # Starting together. The host starts it with a few seconds' lead, so every device has loaded the game by then;
-# each counts down to the same moment and plays the same minute, ending together. Scores sent while playing are
+# each counts down to the same moment and plays the same two minutes, ending together. Scores sent while playing are
 # just for show (LiveGameChannel): what counts is each saved game, checked on the server like any other
 module LiveGame::Startable
   extend ActiveSupport::Concern
 
   START_LEAD = 6.seconds
-  DURATION = 60.seconds
-  # Saving a game takes a moment after the minute ends, and a dropped connection a little longer
+  DURATION = 2.minutes
+  # Saving a game takes a moment after it ends, and a dropped connection a little longer
   SAVE_TIME = 2.minutes
 
   def started?

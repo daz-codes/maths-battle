@@ -414,3 +414,23 @@ html, body { overflow-x: clip; overscroll-behavior-x: none; }
 .app-shell .home-actions--modes .home-action .ui-secondary__icon { flex: none; width: 52px; height: 52px; margin: 0; }
 .app-shell .home-actions--modes .home-action .ui-secondary__icon .icon { width: 30px; height: 30px; }
 .app-shell .home-actions--modes .home-action .home-action__label { margin: 0; font-size: clamp(24px, 6.6vw, 32px); overflow-wrap: normal; white-space: nowrap; }
+
+/* The power-up strip: the spinner in the middle, a Skip held on the right */
+.test__powers { grid-template-columns: 1fr auto 1fr; }
+.test__spinner { grid-column: 2; }
+.test__skip {
+  grid-column: 3;
+  justify-self: end;
+  padding: 0.4rem 0.9rem;
+  border: var(--edge);
+  border-radius: 999px;
+  background: var(--blue);
+  box-shadow: var(--lift-small);
+  color: #fff;
+  font: inherit;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.test__skip:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--shadow); }

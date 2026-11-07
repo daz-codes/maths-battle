@@ -4,7 +4,7 @@ import { finished, typedWith } from "lib/answer_input"
 import * as feedback from "lib/feedback"
 import confetti from "canvas-confetti"
 
-const DURATION = 60_000
+const DURATION = 120_000
 const NEWS_TIME = 3_000
 // The server leaves this out of where a Streak breaker hit (LiveGame::Droppable), so keep them the same
 const WRONG_PAUSE = 400
@@ -17,15 +17,15 @@ const TICKING_FROM = 5
 const KEYS = [ "." ]
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 
-// Runs the whole one-minute game in the browser, and saves it at the end. Each question comes from a tier of
+// Runs the whole two-minute game in the browser, and saves it at the end. Each question comes from a tier of
 // difficulty set by the game's temperature, which quick right answers warm up and slow or wrong ones cool (Ladder
 // on the server), each tier asking its own questions in turn. The player never sees the tiers. Streaks score: 10
-// for the first right answer, 20 for the next in a row, and on. Every ten answers a
+// for the first right answer, 20 for the next in a row, and on. After 3 answers, then 5 more, 8 and on, a
 // power-up spinner appears to tap: solo, it lands on the one the server dealt; in a battle the server drops it
 // for everyone and the first to tap it claims it, hitting everyone else. The server works out the score that
 // counts from the answers, with the same rules (Attempt::Scorable)
 export default class extends Controller {
-  static targets = [ "question", "answer", "right", "score", "seconds", "status", "keypad", "stopDialog", "stage", "best", "streak", "streakCount", "rival", "spinner", "spinnerIcon", "powerNews", "powerIcon", "trophyIcon" ]
+  static targets = [ "question", "answer", "right", "score", "seconds", "status", "keypad", "stopDialog", "stage", "best", "streak", "streakCount", "skip", "rival", "spinner", "spinnerIcon", "powerNews", "powerIcon", "trophyIcon" ]
   static values = { game: Object, best: Number, live: Object, submitUrl: String, powers: Object }
 
   connect() {
@@ -42,6 +42,11 @@ export default class extends Controller {
     this.boosts = 0
     this.stars = 0
     this.horns = 0
+    this.skips = 0
+    // Curveballs and Rockets: questions from another tier for a while, from the answer they land at
+    this.shift = { tier: 0, left: 0 }
+    this.pendingShifts = {}
+    this.shifts = []
     this.shields = 0
     this.results = []
     this.claims = []
@@ -71,7 +76,7 @@ export default class extends Controller {
     clearTimeout(this.endTimer)
   }
 
-  // Battles: everyone starts at the same moment, set by the server, and plays the same minute
+  // Battles: everyone starts at the same moment, set by the server, and plays the same two minutes
 
   get live() {
     return this.hasLiveValue && Object.keys(this.liveValue).length > 0
@@ -84,7 +89,7 @@ export default class extends Controller {
     this.waitForLiveStart()
   }
 
-  // Counts down to the start, or starts at once if it's already begun (the minute is shorter, not longer)
+  // Counts down to the start, or starts at once if it's already begun (the game is shorter, not longer)
   waitForLiveStart() {
     const lead = COUNTDOWN.reduce((total, [ , ms ]) => total + ms, 0)
     const untilCountdown = this.liveStartAt - lead - performance.now()
@@ -99,7 +104,7 @@ export default class extends Controller {
   liveMessage(data) {
     if (this.state !== "running" && this.state !== "paused") return
 
-    if (data.type === "drop") this.dropped(data.id)
+    if (data.type === "drop") { if (data.for === this.liveValue.me) this.dropped(data.id) }
     else if (data.type === "claimed") this.claimed(data)
     else if (data.type === "score") this.rivalScored(data)
   }
@@ -135,17 +140,20 @@ export default class extends Controller {
 
   // Power-ups
 
-  // Solo, every ten answers: it lands on the one dealt for it
+  // Solo, at each of PowerUp::AT: it lands on the one dealt for it
   offerSolo() {
-    const drop = this.results.length / this.powersValue.every
-    if (!Number.isInteger(drop) || drop < 1) return
+    const drop = this.powersValue.at.indexOf(this.results.length) + 1
+    if (drop < 1) return
 
     this.spin({ drop }, Object.keys(this.powersValue.solo))
   }
 
-  // In a battle, when anyone passes another ten
+  // In a battle, this player's own, as they answer and when they're far behind. After someone else's Decoy, the
+  // next one is a fake
   dropped(id) {
-    this.spin({ id }, Object.keys(this.powersValue.battle))
+    const decoy = this.decoyArmed
+    this.decoyArmed = false
+    this.spin({ id, decoy }, Object.keys(this.powersValue.battle))
   }
 
   // The spinner flicks between what it could be until it's tapped. A new one takes the place of one not tapped
@@ -178,7 +186,11 @@ export default class extends Controller {
     const offer = this.offer
     this.offer = null
     this.spinnerTarget.disabled = true
-    if (offer.drop) {
+    if (offer.decoy) {
+      this.hideSpinner()
+      this.hitBy("decoy")
+      this.news("It was a Decoy!")
+    } else if (offer.drop) {
       const kind = this.gameValue.powers[offer.drop - 1]
       this.claims.push({ drop: offer.drop, at: this.results.length })
       this.land(kind)
@@ -210,6 +222,7 @@ export default class extends Controller {
     else if (kind === "shield") this.shields++
     else if (kind === "star") this.stars += solo.star.answers
     else if (kind === "coins") this.addCoins(solo.coins.points)
+    else if (kind === "skip") this.gainSkip()
     else if (kind === "time") {
       this.endsAt += this.powersValue.solo.time.seconds * 1000
       this.scheduleEnd()
@@ -220,7 +233,7 @@ export default class extends Controller {
   }
 
   // Someone got it. If it was this player, an attack hits everyone else and anything else helps them. If not, an
-  // attack hits this player, unless the server says their Horn or Superstar saved them, and a Homing shot only
+  // attack hits this player, unless the server says their Shield or Superstar saved them, and a Homing shot only
   // hits whoever was leading
   claimed({ id, power_up, by, target, blocked = [] }) {
     const details = this.powersValue.battle[power_up]
@@ -229,26 +242,30 @@ export default class extends Controller {
     if (this.claiming === id) this.claiming = null
     if (by === this.liveValue.me) {
       this.land(power_up)
-      if (own) this.gotOwn(power_up, details)
+      if (own) this.gotOwn(power_up, details, id)
       this.news(`${name}! You ${sent}`)
       feedback.fanfare()
       return
     }
 
     if (mine) this.hideSpinner()
-    if (own) return this.news(`${this.playerName(by)} ${hit}`)
-    if (power_up === "homing" && target !== this.liveValue.me) return this.news(`${this.playerName(by)} hit ${this.playerName(target)} with a Homing shot!`)
+    if (own) {
+      if (power_up === "decoy") this.decoyArmed = true
+      return this.news(`${this.playerName(by)} ${hit}`)
+    }
+    if ((power_up === "homing" || power_up === "shot") && target !== this.liveValue.me) return this.news(`${this.playerName(by)} hit ${this.playerName(target)} with a ${name}!`)
     if (blocked.includes(this.liveValue.me)) {
       const starred = this.starUntil > performance.now()
       if (!starred) this.horns = Math.max(0, this.horns - 1)
-      return this.news(`Your ${starred ? "Superstar" : "Horn"} saved you from ${this.playerName(by)}'s ${name}!`)
+      return this.news(`Your ${starred ? "Superstar" : "Shield"} saved you from ${this.playerName(by)}'s ${name}!`)
     }
-    this.hitBy(power_up)
+    if (power_up === "curveball") this.shiftFrom(id, this.pools.length - 1, details.questions)
+    else this.hitBy(power_up)
     this.news(`${this.playerName(by)} ${hit}!`)
   }
 
   // A battle's power-up that helps whoever claimed it
-  gotOwn(kind, details) {
+  gotOwn(kind, details, id) {
     if (kind === "star") {
       this.stars += details.answers
       this.starUntil = performance.now() + this.liveValue.starSeconds * 1000
@@ -256,6 +273,10 @@ export default class extends Controller {
       this.addCoins(details.points)
     } else if (kind === "horn") {
       this.horns++
+    } else if (kind === "rocket") {
+      this.shiftFrom(id, 0, details.questions)
+    } else if (kind === "skip") {
+      this.gainSkip()
     }
     this.showBoosts()
   }
@@ -290,6 +311,7 @@ export default class extends Controller {
     }
 
     const ms = this.powersValue.battle[kind].seconds * 1000
+    if (kind === "shot" || kind === "decoy") kind = "freeze"
     if (kind === "freeze") this.frozenUntil = performance.now() + ms
     if (kind === "scramble") this.scrambleKeys()
     this.element.classList.add(`test--${kind}`)
@@ -387,7 +409,7 @@ export default class extends Controller {
     if (seconds !== this.seconds) {
       this.seconds = seconds
       this.secondsTarget.textContent = seconds
-      this.element.dataset.quarter = Math.max(0, Math.min(3, Math.floor((60 - seconds) / 15)))
+      this.element.dataset.quarter = Math.max(0, Math.min(3, Math.floor((DURATION / 1000 - seconds) / (DURATION / 4000))))
       if (seconds <= TICKING_FROM) feedback.clockTick()
     }
     this.frame = requestAnimationFrame(this.tick)
@@ -450,13 +472,33 @@ export default class extends Controller {
 
   // Questions
 
-  // This tier's next question, round again if they've had them all
+  // The question showing, and the tier it came from, fixed as it's shown, so a Curveball landing while it's on
+  // screen doesn't change it
   get current() {
-    const pool = this.pools[this.tier]
-    return pool[this.taken[this.tier] % pool.length]
+    return this.asked.question
+  }
+
+  // The next question, by the same rule as Ladder.walk: from the tier the temperature says, or the one a Curveball
+  // or Rocket moved it to, that tier's next in turn, round again if they've had them all
+  ask() {
+    const index = this.results.length
+    if (this.pendingShifts[index]) this.shift = { ...this.pendingShifts[index] }
+    const tier = this.shift.left > 0 ? this.shift.tier : this.tier
+    if (this.shift.left > 0) this.shift.left--
+    const pool = this.pools[tier]
+    this.asked = { question: pool[this.taken[tier] % pool.length], tier }
+    this.taken[tier]++
+  }
+
+  // Questions from another tier, from the question after the one showing: the server checks where it landed
+  shiftFrom(drop, tier, questions) {
+    const at = this.results.length + 1
+    this.pendingShifts[at] = { tier, left: questions }
+    this.shifts.push({ drop, at })
   }
 
   show() {
+    this.ask()
     const text = this.current.text
     this.questionTarget.textContent = text
     this.questionTarget.classList.toggle("question--long", text.length > 8 && text.length <= 12)
@@ -480,20 +522,44 @@ export default class extends Controller {
   // question's tier is the temperature in whole tiers
   warmUp(right, ms) {
     const { degrees } = this.gameValue.ladder
-    this.taken[this.tier]++
-    this.temperature = Math.min(Math.max(this.temperature + this.heat(right, ms), 0), this.pools.length * degrees - 1)
+    this.temperature = Math.min(Math.max(this.temperature + this.heat(right, ms, this.asked.tier), 0), this.pools.length * degrees - 1)
     this.tier = Math.floor(this.temperature / degrees)
   }
 
-  heat(right, ms) {
+  heat(right, ms, tier) {
     const { heat, expectedMs, expectedMsPerTier } = this.gameValue.ladder
     if (!right) return heat.wrong
 
-    const expected = expectedMs + expectedMsPerTier * this.tier
+    const expected = expectedMs + expectedMsPerTier * tier
     if (ms * 10 <= expected * 6) return heat.quick
     if (ms <= expected) return heat.steady
     if (ms <= expected * 2) return heat.slow
     return heat.dawdle
+  }
+
+  // A Skip: a button to pass on a question without breaking the streak, as many as are held
+  gainSkip() {
+    this.skips++
+    this.showSkip()
+  }
+
+  showSkip() {
+    this.skipTarget.hidden = this.skips < 1
+    this.skipTarget.textContent = this.skips > 1 ? `Skip ×${this.skips}` : "Skip"
+  }
+
+  // Skipped: it's still taken, but the temperature, streak and score stay as they were
+  skip() {
+    if (!this.accepting || this.skips < 1) return
+
+    const { op, a, b } = this.current
+    this.results.push({ op, a, b, given: "", ms: Math.round(performance.now() - this.shownAt), skip: true })
+    this.skips--
+    this.showSkip()
+    this.popText("Skipped", "level")
+    this.reportToRivals()
+    if (!this.live) this.offerSolo()
+    this.next()
   }
 
   // The question's own numbers go back with the answer, so the server can check it for itself
@@ -694,7 +760,7 @@ export default class extends Controller {
 
   async submit() {
     this.status("Saving…")
-    const body = JSON.stringify({ attempt: { client_id: this.gameValue.id, ticket: this.gameValue.ticket, results: this.results, claims: this.claims } })
+    const body = JSON.stringify({ attempt: { client_id: this.gameValue.id, ticket: this.gameValue.ticket, results: this.results, claims: this.claims, shifts: this.shifts } })
     try {
       const response = await fetch(this.submitUrlValue, {
         method: "POST",

@@ -15,8 +15,10 @@ class Attempt::GameTicket
   end
 
   # The checked answers, each marked right or wrong with its tier, and the power-ups claimed
-  def self.verify!(ticket, owner:, client_id:, answers:, claims:)
-    raise Attempt::Invalid, "Answers must be a list" unless answers.is_a?(Array) && claims.is_a?(Array)
+  # shifts: where a battle's Curveballs and Rockets moved its questions, as the browser says, each checked against its
+  # drop (LiveGame::Droppable#shifts_for). user: whose game it is, for a battle's
+  def self.verify!(ticket, owner:, client_id:, answers:, claims:, shifts: [], user: nil)
+    raise Attempt::Invalid, "Answers must be a list" unless answers.is_a?(Array) && claims.is_a?(Array) && shifts.is_a?(Array)
     raise Attempt::Invalid, "Too many answers" if answers.size > Attempt::Recordable::MAX_ANSWERS
 
     game = verifier.verified(ticket, purpose: "game") if ticket.is_a?(String) && ticket.bytesize <= 100_000
@@ -24,15 +26,19 @@ class Attempt::GameTicket
       raise Attempt::Invalid, "This game has expired or belongs to another player. Start a new one."
     end
 
-    results, highest = checked_answers(game.fetch("pools"), answers)
+    pools = game.fetch("pools")
+    live_game = LiveGame.find_by(id: game["live_game"]) if game["mode"] == "battle"
+    shifted = live_game && user ? live_game.shifts_for(user, shifts, answers, pools.size) : {}
+    results, highest = checked_answers(pools, answers, shifted)
     powers = game["mode"] == "solo" ? checked_claims(game.fetch("powers"), claims, results.size) : []
+    check_skips(results, powers, live_game, user)
     Game.new(mode: game["mode"], live_game_id: game["live_game"], results:, powers:, top_tier: highest + 1)
   end
 
   # The answers, checked, and the highest tier they reached
-  def self.checked_answers(pools, answers)
+  def self.checked_answers(pools, answers, shifts = {})
     results = []
-    highest = Ladder.walk(pools, answers) do |answer, (op, a, b), tier|
+    highest = Ladder.walk(pools, answers, shifts: shifts) do |answer, (op, a, b), tier|
       raise Attempt::Invalid, "Bad answer" unless answer.is_a?(Hash)
 
       answer = answer.stringify_keys
@@ -44,6 +50,11 @@ class Attempt::GameTicket
       ms = Integer(answer["ms"], exception: false)
       raise Attempt::Invalid, "Bad timing" unless ms&.between?(0, Attempt::Recordable::MAX_TOTAL_MS)
 
+      if ActiveModel::Type::Boolean.new.cast(answer["skip"])
+        results << { "op" => op, "a" => a, "b" => b, "given" => "", "ms" => ms, "correct" => false, "skip" => true, "tier" => tier }
+        next :skip
+      end
+
       correct = given == Ladder.answer(op, a, b)
       results << { "op" => op, "a" => a, "b" => b, "given" => given, "ms" => ms, "correct" => correct, "tier" => tier }
       [ correct, ms ]
@@ -51,13 +62,13 @@ class Attempt::GameTicket
     [ results, highest ]
   end
 
-  # Each spinner appears once its EVERY answers are in, and the next one takes its place, so it's claimed at most
-  # once, before then
+  # Each spinner appears once its answers are in (PowerUp::AT), and the next one takes its place, so it's claimed at
+  # most once, before then
   def self.checked_claims(dealt, claims, answered)
     claims.map do |claim|
       claim = claim.respond_to?(:to_h) ? claim.to_h.stringify_keys : {}
       drop, at = Integer(claim["drop"], exception: false), Integer(claim["at"], exception: false)
-      raise Attempt::Invalid, "Bad power-up" unless drop&.between?(1, dealt.size) && at&.between?(drop * PowerUp::EVERY, [ (drop + 1) * PowerUp::EVERY - 1, answered ].min)
+      raise Attempt::Invalid, "Bad power-up" unless drop&.between?(1, dealt.size) && at&.between?(PowerUp.appears_at(drop), [ PowerUp.replaced_at(drop) - 1, answered ].min)
 
       { "kind" => dealt[drop - 1], "drop" => drop, "at" => at }
     end.tap do |powers|
@@ -65,8 +76,21 @@ class Attempt::GameTicket
     end.sort_by { |power| power["at"] }
   end
 
+  # Each question skipped needs a Skip claimed for it: solo, by then; in a battle, any this player tapped
+  def self.check_skips(results, powers, live_game, user)
+    skipped = results.each_index.select { |index| results[index]["skip"] }
+    return if skipped.empty?
+
+    if live_game
+      raise Attempt::Invalid, "Bad skip" if user.nil? || skipped.size > live_game.drops.where(claimed_by: user, power_up: "skip").count
+    else
+      claimed = powers.select { |power| power["kind"] == "skip" }.map { |power| power["at"] }.sort
+      skipped.each { |index| raise Attempt::Invalid, "Bad skip" unless (at = claimed.shift) && at <= index }
+    end
+  end
+
   def self.verifier
     Rails.application.message_verifier("game-tickets")
   end
-  private_class_method :verifier, :checked_answers, :checked_claims
+  private_class_method :verifier, :checked_answers, :checked_claims, :check_skips
 end

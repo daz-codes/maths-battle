@@ -32,6 +32,11 @@ module Attempt::Scorable
           when "bomb" then score, streak = 0, 0
           end
         end
+        if result["skip"]
+          running << score
+          next
+        end
+
         starred = stars.positive?
         stars -= 1 if starred
         if result["correct"] || starred

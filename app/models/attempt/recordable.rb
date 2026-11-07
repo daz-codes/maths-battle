@@ -1,12 +1,12 @@
 # Saves a game from the answers the browser sent, once its ticket has checked them (Attempt::GameTicket). How many
 # were right and the score are worked out here rather than trusted, and answers that couldn't have come from a real
-# minute are refused. A battle's game also takes the Streak breakers other players hit it with (LiveGame::Droppable)
+# game are refused. A battle's game also takes the Streak breakers other players hit it with (LiveGame::Droppable)
 module Attempt::Recordable
   extend ActiveSupport::Concern
 
-  MAX_ANSWERS = 150
-  # The game lasts 60 seconds; allow a little slack for the end-of-game POST
-  MAX_TOTAL_MS = 65_000
+  MAX_ANSWERS = 300
+  # The game lasts two minutes; allow a little slack for the end-of-game POST
+  MAX_TOTAL_MS = 125_000
   # Anything the keypad can type, unfinished answers like "0." included: those are just wrong
   TYPED_ANSWER = %r{\A[0-9.]{0,12}\z}
 
@@ -50,7 +50,7 @@ module Attempt::Recordable
         live_game
       end
 
-      # Extra time makes the minute longer
+      # Extra time makes the game longer
       def check_total_time(results, powers)
         most = MAX_TOTAL_MS + powers.sum { |power| PowerUp.extra_ms(power["kind"]) }
         raise Invalid, "Bad timing" if results.sum { |result| result["ms"] } > most
@@ -60,7 +60,7 @@ module Attempt::Recordable
   private
     def score_results
       self.correct = results.count { |result| result["correct"] }
-      self.answered = results.size
+      self.answered = results.count { |result| !result["skip"] }
       self.score = tally.score
       self.best_streak = tally.best_streak
     end

@@ -37,15 +37,26 @@ class Attempt::GameTicketTest < ActiveSupport::TestCase
   end
 
   test "a claimed power-up is the one dealt for its spinner" do
-    game = verify(walk_answers(@pools, [ true ] * 12), claims: [ { "drop" => 1, "at" => 11 } ])
-    assert_equal [ { "kind" => @powers.first, "drop" => 1, "at" => 11 } ], game.powers
+    game = verify(walk_answers(@pools, [ true ] * 12), claims: [ { "drop" => 1, "at" => 3 } ])
+    assert_equal [ { "kind" => @powers.first, "drop" => 1, "at" => 3 } ], game.powers
   end
 
   test "a spinner can't be claimed before it appears, after the next takes its place, or twice" do
     answers = walk_answers(@pools, [ true ] * 25)
-    assert_raises(Attempt::Invalid) { verify(answers, claims: [ { "drop" => 1, "at" => 9 } ]) }
-    assert_raises(Attempt::Invalid) { verify(answers, claims: [ { "drop" => 1, "at" => 20 } ]) }
-    assert_raises(Attempt::Invalid) { verify(answers, claims: [ { "drop" => 1, "at" => 10 }, { "drop" => 1, "at" => 12 } ]) }
+    assert_raises(Attempt::Invalid) { verify(answers, claims: [ { "drop" => 1, "at" => 2 } ]) }
+    assert_raises(Attempt::Invalid) { verify(answers, claims: [ { "drop" => 1, "at" => 8 } ]) }
+    assert_raises(Attempt::Invalid) { verify(answers, claims: [ { "drop" => 1, "at" => 3 }, { "drop" => 1, "at" => 4 } ]) }
     assert_raises(Attempt::Invalid) { verify(answers, claims: [ { "drop" => 3, "at" => 30 } ]) }
+  end
+
+  test "a question can be skipped once a Skip's been claimed for it, and not before" do
+    ticket = Attempt::GameTicket.issue(owner: "me", id: "game-2", pools: @pools, powers: [ "skip" ] * PowerUp::MOST)
+    answers = walk_answers(@pools, [ true ] * 11)
+    skipped = answers + [ walk_answers(@pools, [ true ] * 12).last.merge("given" => "", "skip" => true) ]
+    game = Attempt::GameTicket.verify!(ticket, owner: "me", client_id: "game-2", answers: skipped, claims: [ { "drop" => 1, "at" => 3 } ])
+    assert game.results.last["skip"]
+
+    early = walk_answers(@pools, [ true ] * 3).each_with_index.map { |answer, i| i == 2 ? answer.merge("given" => "", "skip" => true) : answer }
+    assert_raises(Attempt::Invalid) { Attempt::GameTicket.verify!(ticket, owner: "me", client_id: "game-2", answers: early, claims: []) }
   end
 end

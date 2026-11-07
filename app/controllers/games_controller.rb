@@ -19,7 +19,7 @@ class GamesController < ApplicationController
   end
 
   private
-    # A started battle the player is in and hasn't played yet, before its minute is up
+    # A started battle the player is in and hasn't played yet, before it's over
     def playable_live_game
       game = LiveGame.find_by_code(params[:live])
       game if game&.running? && (player = game.player_for(current_player)) && !player.played?
