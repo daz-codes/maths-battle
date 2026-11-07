@@ -28,7 +28,7 @@ class GamesController < ApplicationController
     # When it starts, from now, so every device counts down to the same moment, and who else is playing
     def live_details
       rivals = @live_game.players.includes(:user).reject { |player| player.user_id == current_player.id }
-      { me: current_player.id, pass: @live_game.pass_for(current_player), startsInMs: ((@live_game.starts_at - Time.current) * 1000).round,
+      { me: current_player.id, pass: @live_game.pass_for(current_player), starSeconds: LiveGame::STAR_SECONDS, startsInMs: ((@live_game.starts_at - Time.current) * 1000).round,
         rivals: rivals.map { |player| { id: player.user_id, name: player.user.display_name } } }
     end
 end

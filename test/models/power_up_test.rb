@@ -24,4 +24,30 @@ class PowerUpTest < ActiveSupport::TestCase
     assert_includes PowerUp::DROPPED, "ink"
     assert_includes PowerUp::DROPPED, "mini"
   end
+
+  test "Coins add 100 there and then" do
+    tally = Attempt.tally(right(2), [ { "kind" => "coins", "at" => 1 } ])
+    assert_equal 10 + 100 + 20, tally.score
+  end
+
+  test "a Superstar counts the next five answers as right, whatever was typed" do
+    results = [ { "correct" => true } ] + Array.new(5) { { "correct" => false } } + [ { "correct" => false } ]
+    tally = Attempt.tally(results, [ { "kind" => "star", "at" => 1 } ])
+    assert_equal 10 + 20 + 30 + 40 + 50 + 60, tally.score
+    assert_equal 6, tally.best_streak
+  end
+
+  test "a Superstar's answers still count as wrong in how many were right" do
+    attempt = play(users(:ada), rights: [ true ] * 10 + [ false ] * 2, powers: [ "star" ] * PowerUp::MOST, claims: [ { drop: 1, at: 10 } ])
+    assert_equal 10, attempt.correct
+    assert_equal (1..12).sum * 10, attempt.score
+  end
+
+  test "attacks are told apart from the ones that help whoever claims them" do
+    assert PowerUp.attack?("homing")
+    assert PowerUp.attack?("mirror")
+    assert_not PowerUp.attack?("horn")
+    assert_not PowerUp.attack?("star")
+    assert_not PowerUp.attack?("coins")
+  end
 end

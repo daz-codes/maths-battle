@@ -347,3 +347,70 @@ html, body { overflow-x: clip; overscroll-behavior-x: none; }
   75% { transform: translate(3px, -2px); }
 }
 @media (prefers-reduced-motion: reduce) { .test--bombed { animation: none; } }
+
+/* ── The home page's four boxes: the world league, then the records ── */
+
+.app-shell .stats--home { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; width: 100%; margin: 0; }
+.app-shell .stats--home .stats__tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 18px 16px;
+  border: var(--edge);
+  border-radius: var(--radius-big);
+  background: var(--paper-alt);
+  box-shadow: var(--lift);
+  color: var(--ink);
+  text-decoration: none;
+}
+.app-shell .stats--home dt { color: var(--muted); font-size: 14px; font-weight: 700; line-height: 1.3; }
+.app-shell .stats--home dt .icon { display: block; width: 26px; height: 26px; margin-bottom: 8px; }
+.app-shell .stats--home dd { margin: 10px 0 0; font-family: var(--font-display); font-size: clamp(26px, 8vw, 40px); line-height: 1; white-space: nowrap; }
+.app-shell .stats--home .stats__unit { font-family: var(--font); font-size: 15px; font-weight: 700; color: var(--muted); }
+.app-shell .stats--home .stats__tile--league { --trophy: #fff; background: var(--yellow); }
+.app-shell .stats--home .stats__tile--league :is(dt, .stats__unit) { color: var(--on-neon); }
+.app-shell .stats--home .stats__tile--league dd { color: var(--on-neon); }
+.app-shell .stats--home a.stats__tile:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--shadow); }
+
+/* Mirror: the question shows back to front */
+.test--mirror .question--current { transform: scaleX(-1); }
+
+/* A Superstar running: the score glows gold. A Superstar's pop is gold too */
+.app-shell .test--starred .test__score { color: var(--yellow); text-shadow: 2px 2px 0 var(--shadow); }
+.app-shell .test .test__stage .score-pop--level { color: var(--yellow); font-size: 1.9rem; }
+
+/* ── The tab bar: along the bottom, the whole width, part of the page rather than floating over it ── */
+
+.app-shell .ui-navigation,
+.app-shell .ui-navigation[class] {
+  position: fixed;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 6px max(8px, env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
+  border: 0;
+  border-top: var(--edge);
+  border-radius: 0;
+  background: var(--paper-alt);
+  box-shadow: none;
+}
+.app-shell .ui-navigation nav { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; max-width: 640px; margin: 0 auto; }
+.app-shell .ui-navigation .site-footer__tab { min-height: 56px; }
+
+/* The home page's two ways to play: each a single line, its icon then its name */
+.app-shell .ui-actions.home-actions--modes .home-action {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  min-height: 0;
+  padding: 16px 20px;
+}
+.app-shell .home-actions--modes .home-action .ui-secondary__icon { flex: none; width: 52px; height: 52px; margin: 0; }
+.app-shell .home-actions--modes .home-action .ui-secondary__icon .icon { width: 30px; height: 30px; }
+.app-shell .home-actions--modes .home-action .home-action__label { margin: 0; font-size: clamp(24px, 6.6vw, 32px); overflow-wrap: normal; white-space: nowrap; }

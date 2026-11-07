@@ -29,8 +29,8 @@ class LiveGameTest < ActiveSupport::TestCase
     drop = @game.drops.create!(power_up: "reset")
     travel_to(@game.starts_at + 3.5.seconds, with_usec: true) { @game.claim(drop.id, @bob) }
     results = Array.new(6) { { "correct" => true, "ms" => 1000 } }
-    assert_equal [ { "kind" => "reset", "at" => 3, "from" => users(:bob).id } ], @game.hits_on(users(:ada), results)
-    assert_empty @game.hits_on(users(:bob), results)
+    assert_equal [ { "kind" => "reset", "at" => 3, "from" => users(:bob).id } ], @game.powers_in(users(:ada), results)
+    assert_empty @game.powers_in(users(:bob), results)
   end
 
   test "a battle's game takes the streak breakers that hit it" do
@@ -78,5 +78,44 @@ class LiveGameTest < ActiveSupport::TestCase
     travel_to(@game.starts_at + 2.5.seconds, with_usec: true) { @game.claim(drop.id, @bob) }
     attempt = play(users(:ada), rights: [ true ] * 4, live_game: @game)
     assert_equal 10 + 20, attempt.score
+  end
+
+  test "a Homing shot goes for the leader, and only hits them" do
+    game = LiveGame.match!([ users(:ada), users(:bob), users(:cy) ])
+    travel LiveGame::START_LEAD + 1.second
+    game.player_for(users(:ada)).update_columns(live_score: 500)
+    game.player_for(users(:bob)).update_columns(live_score: 200)
+    drop = game.drops.create!(power_up: "homing")
+    never = Struct.new(:value) { def rand(*) = 1.0 }.new # so it doesn't turn into the Bomb
+    claimed = game.claim(drop.id, game.player_for(users(:cy)), random: never)
+    assert_equal users(:ada), claimed.target
+    assert claimed.hits?(users(:ada))
+    assert_not claimed.hits?(users(:bob))
+  end
+
+  test "a Horn blocks the next attack, once" do
+    horn = @game.drops.create!(power_up: "horn")
+    @game.claim(horn.id, @ada)
+    assert_equal 1, @ada.reload.horns
+
+    first = @game.claim(@game.drops.create!(power_up: "reset").id, @bob)
+    assert_equal [ users(:ada).id ], first.blocked_ids
+    second = @game.claim(@game.drops.create!(power_up: "reset").id, @bob)
+    assert_empty second.blocked_ids
+    assert_equal 0, @ada.reload.horns
+  end
+
+  test "nothing hits someone with a Superstar running" do
+    @game.claim(@game.drops.create!(power_up: "star").id, @ada)
+    bomb = @game.drops.create!(power_up: "bomb")
+    assert_equal [ users(:ada).id ], @game.claim(bomb.id, @bob).blocked_ids
+    travel LiveGame::STAR_SECONDS + 1
+    assert_empty @game.claim(@game.drops.create!(power_up: "reset").id, @bob).blocked_ids
+  end
+
+  test "the Coins and Superstars a player claims count in their own game" do
+    travel_to(@game.starts_at + 1.5.seconds, with_usec: true) { @game.claim(@game.drops.create!(power_up: "coins").id, @ada) }
+    attempt = play(users(:ada), rights: [ true ] * 3, live_game: @game)
+    assert_equal 10 + 100 + 20 + 30, attempt.score
   end
 end

@@ -16,7 +16,10 @@ module Badge::Catalogued
     "time" => [ "Extra time", "Claim Extra time" ], "freeze" => [ "Ice cold", "Freeze everyone in a battle" ],
     "scramble" => [ "Scrambler", "Scramble everyone's keys in a battle" ], "reset" => [ "Streak breaker", "Break everyone's streaks in a battle" ],
     "ink" => [ "Splat!", "Ink everyone's screens in a battle" ], "mini" => [ "Shrink ray", "Shrink everyone's questions in a battle" ],
-    "bomb" => [ "Kaboom!", "Bomb everyone's scores to zero in a battle" ]
+    "bomb" => [ "Kaboom!", "Bomb everyone's scores to zero in a battle" ],
+    "star" => [ "Superstar", "Claim a Superstar" ], "coins" => [ "Coin collector", "Claim Coins" ],
+    "homing" => [ "Bullseye", "Hit the leader with a Homing shot" ], "horn" => [ "Honk honk", "Claim a Horn in a battle" ],
+    "mirror" => [ "Mirror mirror", "Flip everyone's questions in a battle" ]
   }
   # The world league needs this many players today before its top ten means something
   TOP_TEN_FROM = 20

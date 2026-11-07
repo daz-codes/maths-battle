@@ -29,7 +29,7 @@ class LiveGameChannel < ApplicationCable::Channel
 
   def claim(data)
     drop = @live_game.claim(data["id"], @player)
-    LiveGameChannel.broadcast_to @live_game, { type: "claimed", id: drop.id, power_up: drop.power_up, by: drop.claimed_by_id } if drop
+    LiveGameChannel.broadcast_to @live_game, { type: "claimed", id: drop.id, power_up: drop.power_up, by: drop.claimed_by_id, target: drop.target_id, blocked: drop.blocked_ids } if drop
   end
 
   private

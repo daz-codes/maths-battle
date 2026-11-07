@@ -2,7 +2,9 @@
 # wrong answer ends the streak, so the next right one is back to 10. Power-ups change that as they're claimed:
 # Double or Triple points multiply the next five right answers (Triple first, if both), a Boost adds 50 to each of
 # the next five, a Streak shield saves the streak from the next wrong one, and in a battle someone else's Streak
-# breaker ends it, and their Bomb takes the score back to nothing as well. Worked out here from the checked answers and power-ups, so
+# breaker or Homing shot ends it, and their Bomb takes the score back to nothing as well. Coins add 100 there and
+# then, and a Superstar counts the next five answers as right, whatever was typed. They still count as wrong for
+# how hard the questions get (Ladder), and in how many were right (Recordable's correct). Worked out here from the checked answers and power-ups, so
 # what floats up during the game is just for show
 module Attempt::Scorable
   extend ActiveSupport::Concern
@@ -16,7 +18,7 @@ module Attempt::Scorable
     # powers: what was claimed (or hit this player), each at the number of answers given by then
     def tally(results, powers)
       by_answer = powers.group_by { |power| power["at"] }
-      score, streak, best, doubles, triples, boosts, shields, running = 0, 0, 0, 0, 0, 0, 0, []
+      score, streak, best, doubles, triples, boosts, shields, stars, running = 0, 0, 0, 0, 0, 0, 0, 0, []
       results.each_with_index do |result, index|
         by_answer.fetch(index, []).each do |power|
           case power["kind"]
@@ -24,11 +26,15 @@ module Attempt::Scorable
           when "triple" then triples += PowerUp::SOLO.dig("triple", :answers)
           when "boost" then boosts += PowerUp::SOLO.dig("boost", :answers)
           when "shield" then shields += 1
-          when "reset" then streak = 0
+          when "star" then stars += PowerUp::SOLO.dig("star", :answers)
+          when "coins" then score += PowerUp::SOLO.dig("coins", :points)
+          when "reset", "homing" then streak = 0
           when "bomb" then score, streak = 0, 0
           end
         end
-        if result["correct"]
+        starred = stars.positive?
+        stars -= 1 if starred
+        if result["correct"] || starred
           streak += 1
           points = STEP * streak
           if triples.positive?

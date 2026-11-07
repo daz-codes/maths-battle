@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_07_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_140000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -100,8 +100,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_100000) do
     t.datetime "claimed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "target_id"
+    t.json "blocked_ids", default: [], null: false
     t.index ["claimed_by_id"], name: "index_live_game_drops_on_claimed_by_id"
     t.index ["live_game_id"], name: "index_live_game_drops_on_live_game_id"
+    t.index ["target_id"], name: "index_live_game_drops_on_target_id"
   end
 
   create_table "live_game_players", force: :cascade do |t|
@@ -112,6 +115,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_100000) do
     t.integer "answered", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "horns", default: 0, null: false
+    t.datetime "star_until"
     t.index ["attempt_id"], name: "index_live_game_players_on_attempt_id"
     t.index ["live_game_id", "user_id"], name: "index_live_game_players_on_live_game_id_and_user_id", unique: true
     t.index ["live_game_id"], name: "index_live_game_players_on_live_game_id"
@@ -168,6 +173,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_100000) do
   add_foreign_key "leagues", "users", column: "owner_id"
   add_foreign_key "live_game_drops", "live_games"
   add_foreign_key "live_game_drops", "users", column: "claimed_by_id"
+  add_foreign_key "live_game_drops", "users", column: "target_id"
   add_foreign_key "live_game_players", "attempts", on_delete: :nullify
   add_foreign_key "live_game_players", "live_games"
   add_foreign_key "live_game_players", "users"

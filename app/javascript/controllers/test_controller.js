@@ -40,6 +40,8 @@ export default class extends Controller {
     this.doubles = 0
     this.triples = 0
     this.boosts = 0
+    this.stars = 0
+    this.horns = 0
     this.shields = 0
     this.results = []
     this.claims = []
@@ -206,6 +208,8 @@ export default class extends Controller {
     else if (kind === "triple") this.triples += solo.triple.answers
     else if (kind === "boost") this.boosts += solo.boost.answers
     else if (kind === "shield") this.shields++
+    else if (kind === "star") this.stars += solo.star.answers
+    else if (kind === "coins") this.addCoins(solo.coins.points)
     else if (kind === "time") {
       this.endsAt += this.powersValue.solo.time.seconds * 1000
       this.scheduleEnd()
@@ -215,20 +219,52 @@ export default class extends Controller {
     feedback.fanfare()
   }
 
-  // Someone got it: if it was this player, it hits everyone else; if not, it hits this one
-  claimed({ id, power_up, by }) {
-    const { name, sent, hit } = this.powersValue.battle[power_up]
+  // Someone got it. If it was this player, an attack hits everyone else and anything else helps them. If not, an
+  // attack hits this player, unless the server says their Horn or Superstar saved them, and a Homing shot only
+  // hits whoever was leading
+  claimed({ id, power_up, by, target, blocked = [] }) {
+    const details = this.powersValue.battle[power_up]
+    const { name, sent, hit, own } = details
     const mine = this.offer?.id === id || this.claiming === id
     if (this.claiming === id) this.claiming = null
     if (by === this.liveValue.me) {
       this.land(power_up)
+      if (own) this.gotOwn(power_up, details)
       this.news(`${name}! You ${sent}`)
       feedback.fanfare()
-    } else {
-      if (mine) this.hideSpinner()
-      this.hitBy(power_up)
-      this.news(`${this.playerName(by)} ${hit}!`)
+      return
     }
+
+    if (mine) this.hideSpinner()
+    if (own) return this.news(`${this.playerName(by)} ${hit}`)
+    if (power_up === "homing" && target !== this.liveValue.me) return this.news(`${this.playerName(by)} hit ${this.playerName(target)} with a Homing shot!`)
+    if (blocked.includes(this.liveValue.me)) {
+      const starred = this.starUntil > performance.now()
+      if (!starred) this.horns = Math.max(0, this.horns - 1)
+      return this.news(`Your ${starred ? "Superstar" : "Horn"} saved you from ${this.playerName(by)}'s ${name}!`)
+    }
+    this.hitBy(power_up)
+    this.news(`${this.playerName(by)} ${hit}!`)
+  }
+
+  // A battle's power-up that helps whoever claimed it
+  gotOwn(kind, details) {
+    if (kind === "star") {
+      this.stars += details.answers
+      this.starUntil = performance.now() + this.liveValue.starSeconds * 1000
+    } else if (kind === "coins") {
+      this.addCoins(details.points)
+    } else if (kind === "horn") {
+      this.horns++
+    }
+    this.showBoosts()
+  }
+
+  addCoins(points) {
+    this.points += points
+    this.scoreTarget.textContent = this.points.toLocaleString()
+    this.popText(`+${points}`, "lightning")
+    this.reportToRivals()
   }
 
   // Freeze stops the keypad, Scramble moves its keys, Ink blots run down the screen and Mini text shrinks the
@@ -236,7 +272,7 @@ export default class extends Controller {
   // everyone's. The server takes the last two at the same point (LiveGame::Droppable)
   hitBy(kind) {
     feedback.wrong()
-    if (kind === "reset" || kind === "bomb") {
+    if (kind === "reset" || kind === "homing" || kind === "bomb") {
       if (kind === "bomb") {
         this.points = 0
         this.scoreTarget.textContent = "0"
@@ -466,10 +502,15 @@ export default class extends Controller {
     const ms = Math.round(performance.now() - this.shownAt)
     const right = this.typed === answer
     this.results.push({ op, a, b, given: this.typed, ms })
+    // How hard the questions get goes by what was really right; a Superstar only counts it in the score
     this.warmUp(right, ms)
+    const starred = this.stars > 0
+    if (starred) this.stars--
+    this.showBoosts()
 
-    if (right) {
-      this.correct++
+    if (right || starred) {
+      if (right) this.correct++
+      else this.popText("★ Superstar!", "level")
       this.rightTarget.textContent = this.correct
       this.earnPoints()
       this.flash(this.scoreTarget, "--right")
@@ -512,7 +553,8 @@ export default class extends Controller {
   showBoosts() {
     this.element.classList.toggle("test--doubled", this.doubles > 0 || this.triples > 0)
     this.element.classList.toggle("test--boosted", this.boosts > 0)
-    this.element.classList.toggle("test--shielded", this.shields > 0)
+    this.element.classList.toggle("test--shielded", this.shields > 0 || this.horns > 0)
+    this.element.classList.toggle("test--starred", this.stars > 0)
   }
 
   // A Streak shield takes the hit instead

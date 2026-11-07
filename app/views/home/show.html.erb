@@ -7,40 +7,30 @@
   <%= render "flash" %>
 
   <nav class="home-actions ui-actions home-actions--modes" aria-label="Play">
+    <%# Each on one line: its icon, then what it is %>
     <%= link_to play_path, class: "button home-action home-action--solo ui-secondary" do %>
-      <span class="ui-secondary__top"><span class="ui-secondary__icon"><%= icon(:solo) %></span><span class="ui-secondary__arrow" aria-hidden="true">↗</span></span>
+      <span class="ui-secondary__icon"><%= icon(:solo) %></span>
       <span class="home-action__label">Single player</span>
-      <span class="ui-secondary__description">Build a streak and beat your best</span>
     <% end %>
     <%= link_to multiplayer_path, class: "button home-action home-action--battle ui-secondary" do %>
-      <span class="ui-secondary__top"><span class="ui-secondary__icon"><%= icon(:versus) %></span><span class="ui-secondary__arrow" aria-hidden="true">↗</span></span>
+      <span class="ui-secondary__icon"><%= icon(:versus) %></span>
       <span class="home-action__label">Multiplayer</span>
-      <span class="ui-secondary__description">Battle anyone online, or your friends</span>
     <% end %>
   </nav>
 
-  <%# Their records, each from one game %>
-  <section class="ui-progress" aria-labelledby="records-heading">
-    <div class="ui-section-heading"><h2 id="records-heading">Your records</h2><%= link_to "Awards ↗", awards_path %></div>
-    <dl class="stats stats--records">
-      <div><dt><%= icon(:flame) %> Longest streak</dt><dd><%= @user.persisted? ? @user.longest_streak : 0 %></dd></div>
-      <div><dt><%= icon(:target) %> Most right</dt><dd><%= @user.persisted? ? @user.most_correct : 0 %></dd></div>
-      <div><dt><%= icon(:star) %> Highest score</dt><dd><%= number_with_delimiter(@user.persisted? ? @user.best_score : 0) %></dd></div>
-    </dl>
-    <p class="hint">
-      <% if @standing %>
-        <%= icon(:trophy) %> You're <strong><%= @standing.rank.ordinalize %></strong> of <%= number_with_delimiter @world.size %> in today's world league with <%= number_with_delimiter @standing.score %>.
-      <% elsif (leader = @world.leader) %>
-        <%= icon(:trophy) %> Top of today's world league: <strong><%= leader.user.display_name %></strong> with <%= number_with_delimiter leader.score %>.
-      <% else %>
-        <%= icon(:trophy) %> No one's in today's world league yet. Be the first!
-      <% end %>
-      <%= link_to "Leagues", leagues_path %>
-    </p>
-    <% if @user.persisted? && !@user.named? %>
-      <p class="hint"><%= link_to "Give yourself a name", edit_profile_path %> to appear in the leagues.</p>
+  <%# Four boxes: where they are in today's world league, then their records, each from one game %>
+  <dl class="stats stats--home">
+    <%= link_to leagues_path, class: "stats__tile stats__tile--league" do %>
+      <dt><%= icon(:trophy) %> World league</dt>
+      <dd><% if @standing %><%= @standing.rank.ordinalize %><span class="stats__unit"> of <%= number_with_delimiter @world.size %></span><% else %>—<% end %></dd>
     <% end %>
-  </section>
+    <div class="stats__tile"><dt><%= icon(:star) %> Highest score</dt><dd><%= number_with_delimiter(@user.persisted? ? @user.best_score : 0) %></dd></div>
+    <div class="stats__tile"><dt><%= icon(:flame) %> Longest streak</dt><dd><%= @user.persisted? ? @user.longest_streak : 0 %></dd></div>
+    <div class="stats__tile"><dt><%= icon(:target) %> Most right</dt><dd><%= @user.persisted? ? @user.most_correct : 0 %></dd></div>
+  </dl>
+  <% if @user.persisted? && !@user.named? %>
+    <p class="hint"><%= link_to "Give yourself a name", edit_profile_path %> to appear in the leagues.</p>
+  <% end %>
 
   <% if @user.guest? %>
     <p class="save-nudge">No account needed to play. <%= link_to "Make an account", new_registration_path %> to keep your scores and leagues on every device.</p>

@@ -8,13 +8,13 @@ class PagesTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", multiplayer_path, text: /Multiplayer/
   end
 
-  test "the home page shows their records, where they are today, and a link to how it works" do
+  test "the home page shows where they are in the world league, their records, and a link to how it works" do
     play(users(:ada), rights: [ true ] * 3)
     sign_in_as users(:ada)
     get root_path
-    assert_select ".stats--records dd", 3
-    assert_select ".stats--records dd", text: /60/
-    assert_select ".ui-progress .hint", text: /1st/
+    assert_select ".stats--home .stats__tile", 4
+    assert_select ".stats__tile--league dd", text: /1st/
+    assert_select ".stats--home dd", text: "60"
     assert_select ".how-link a[href=?]", how_it_works_path
     assert_select ".how-to", count: 0
   end

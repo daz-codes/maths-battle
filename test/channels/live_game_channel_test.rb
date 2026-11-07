@@ -13,7 +13,8 @@ class LiveGameChannelTest < ActionCable::Channel::TestCase
     assert subscription.confirmed?
     assert_broadcasts(@game, 2) { perform :score, score: 100, correct: 10, answered: 10 }
     drop = @game.drops.last
-    assert_broadcast_on(@game, { type: "claimed", id: drop.id, power_up: drop.power_up, by: users(:ada).id }) { perform :claim, id: drop.id }
+    assert_broadcasts(@game, 1) { perform :claim, id: drop.id }
+    assert_equal users(:ada), drop.reload.claimed_by
     assert_no_broadcasts(@game) { perform :claim, id: drop.id }
   end
 

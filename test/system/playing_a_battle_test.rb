@@ -1,9 +1,21 @@
 require "application_system_test_case"
 
 class PlayingABattleTest < ApplicationSystemTestCase
+  # The scores below are known only if no drop turns into the Bomb, which is up to chance for someone far behind
+  setup do
+    @bomb_chance = LiveGame::Droppable::BOMB_CHANCE
+    LiveGame::Droppable.send(:remove_const, :BOMB_CHANCE)
+    LiveGame::Droppable.const_set(:BOMB_CHANCE, 0)
+  end
+
+  teardown do
+    LiveGame::Droppable.send(:remove_const, :BOMB_CHANCE)
+    LiveGame::Droppable.const_set(:BOMB_CHANCE, @bomb_chance)
+  end
+
   test "a hosted battle: joining with its code, starting together, a power-up claimed hitting the other, and the podium" do
     sign_in users(:ada)
-    click_on "Multiplayer"
+    within("main") { click_on "Multiplayer" }
     click_on "Host a battle"
     assert_selector "h1", text: "Battle"
     code = LiveGame.last.code

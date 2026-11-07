@@ -1,7 +1,8 @@
 module GamesHelper
   EXTRA_KEYS = { "." => [ ".", "Decimal point" ] }
   POWER_UP_ICONS = { "double" => :double, "triple" => :triple, "boost" => :boost, "shield" => :shield, "time" => :time,
-    "freeze" => :freeze, "reset" => :breaker, "scramble" => :mixed, "ink" => :ink, "mini" => :shrink, "bomb" => :bomb }
+    "freeze" => :freeze, "reset" => :breaker, "scramble" => :mixed, "ink" => :ink, "mini" => :shrink, "bomb" => :bomb,
+    "star" => :superstar, "coins" => :coin, "homing" => :target, "horn" => :horn, "mirror" => :flip }
 
   def power_up_icons
     POWER_UP_ICONS

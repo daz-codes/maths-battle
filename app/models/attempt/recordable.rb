@@ -24,7 +24,7 @@ module Attempt::Recordable
       end
 
       live_game = check_live_game(user, game) if game.mode == "battle"
-      powers = live_game ? live_game.hits_on(user, game.results) : game.powers
+      powers = live_game ? live_game.powers_in(user, game.results) : game.powers
       check_total_time(game.results, powers)
 
       transaction do
