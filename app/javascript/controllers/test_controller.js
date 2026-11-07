@@ -11,8 +11,6 @@ const WRONG_PAUSE = 400
 // How fast a spinner flicks between power-ups, and how long the one claimed shows before it goes
 const SPIN_EVERY = 90
 const LANDED_FOR = 1_400
-// Each quarter of the clock ring is a full 25 of 100 units; the clock's cut makes the gaps between them
-const QUARTER_LENGTH = 25
 const COUNTDOWN = [ [ "Ready", 900 ], [ "Set", 900 ], [ "GO!", 600 ] ]
 // The clock ticks out loud for the last seconds
 const TICKING_FROM = 5
@@ -27,7 +25,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
 // for everyone and the first to tap it claims it, hitting everyone else. The server works out the score that
 // counts from the answers, with the same rules (Attempt::Scorable)
 export default class extends Controller {
-  static targets = [ "question", "answer", "right", "score", "quarter", "hand", "seconds", "status", "keypad", "stopDialog", "stage", "best", "streak", "rival", "spinner", "spinnerIcon", "powerNews", "powerIcon", "trophyIcon" ]
+  static targets = [ "question", "answer", "right", "score", "seconds", "status", "keypad", "stopDialog", "stage", "best", "streak", "streakCount", "rival", "spinner", "spinnerIcon", "powerNews", "powerIcon", "trophyIcon" ]
   static values = { game: Object, best: Number, live: Object, submitUrl: String, powers: Object }
 
   connect() {
@@ -334,7 +332,6 @@ export default class extends Controller {
     const left = this.endsAt - performance.now()
     if (left <= 0) return this.finish()
 
-    this.fillRing(1 - Math.min(left, DURATION) / DURATION)
     const seconds = Math.ceil(left / 1000)
     if (seconds !== this.seconds) {
       this.seconds = seconds
@@ -343,16 +340,6 @@ export default class extends Controller {
       if (seconds <= TICKING_FROM) feedback.clockTick()
     }
     this.frame = requestAnimationFrame(this.tick)
-  }
-
-  // Fills the ring's quarters one after another, so a whole minute completes the logo,
-  // and turns the hand once round with it, like a real second hand
-  fillRing(elapsed) {
-    this.quarterTargets.forEach((quarter, i) => {
-      const filled = Math.min(1, Math.max(0, elapsed * 4 - i)) * QUARTER_LENGTH
-      quarter.setAttribute("stroke-dasharray", `${filled} ${100 - filled}`)
-    })
-    if (this.hasHandTarget) this.handTarget.setAttribute("transform", `rotate(${elapsed * 360} 24 24)`)
   }
 
   // Input
@@ -511,15 +498,16 @@ export default class extends Controller {
     this.showStreak()
   }
 
+  // The flame burns once there's a run going, and pulses as it grows
   showStreak() {
-    this.streakTarget.hidden = this.streak < 2
-    this.streakTarget.textContent = `${this.streak} in a row`
-    if (this.streak >= 2) {
-      this.streakTarget.classList.remove("test__combo--new")
-      void this.streakTarget.offsetWidth // so the pulse plays again
-      this.streakTarget.classList.add("test__combo--new")
-    }
+    this.streakTarget.textContent = this.streak
+    this.streakCountTarget.classList.toggle("test__streak--hot", this.streak >= 2)
+    this.streakCountTarget.classList.remove("test__streak--new")
+    if (this.streak < 2) return
+    void this.streakCountTarget.offsetWidth // so the pulse plays again
+    this.streakCountTarget.classList.add("test__streak--new")
   }
+
 
   // Spread out a little, so quick answers in a row don't land on top of each other
   popText(text, tier) {
@@ -622,7 +610,6 @@ export default class extends Controller {
     this.state = "done"
     this.stopClock()
     this.endPowerUps()
-    this.fillRing(1)
     this.secondsTarget.textContent = 0
     this.questionTarget.textContent = "Time's up!"
     this.questionTarget.classList.remove("question--long", "question--longer")

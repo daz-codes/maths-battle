@@ -116,31 +116,51 @@
    question, which gets all the room left above the keypad. A battle has its rivals' scores under the strip */
 .test { grid-template-rows: auto auto 1fr auto; row-gap: 0.5rem; }
 .test--live { grid-template-rows: auto auto auto 1fr auto; }
-.app-shell .test__bar { padding: 10px 8px 12px; border-bottom: var(--edge); }
+/* The score, right answers and streak on the left (clear of the stop button), the seconds on the right */
+.app-shell .test__bar { grid-template-columns: 1fr auto; gap: 10px; padding: 8px 4px 12px 56px; border-bottom: var(--edge); }
+.app-shell .test__tally { align-items: flex-start; justify-self: start; }
+.app-shell .test__counts { align-items: flex-end; gap: 14px; }
 .app-shell .test__score { font-size: 40px; }
-.app-shell .test__seconds { font-size: 30px; }
+.app-shell .test__right { font-size: 30px; }
+
+/* The streak: a flame and the run, grey until there's one going, then red and pulsing as it grows */
+.test__streak-number { display: inline-flex; align-items: center; gap: 2px; font-family: var(--font-display); font-size: 30px; line-height: 1; color: var(--muted); }
+.test__streak-number .icon { width: 0.95em; height: 0.95em; filter: grayscale(1); opacity: 0.5; transition: filter 150ms, opacity 150ms; }
+.test__streak--hot .test__streak-number { color: var(--pink-text); }
+.test__streak--hot .test__streak-number .icon { filter: none; opacity: 1; }
+.test__streak--new .test__streak-number { animation: combo-pulse 450ms ease-out; }
+
+/* The seconds left, big in a pill that turns from green to blue, gold and red as the minute goes */
+.test__timer { display: flex; flex-direction: column; align-items: center; justify-self: end; }
+.app-shell .test__timer .test__seconds {
+  display: grid;
+  place-items: center;
+  min-width: 2.1em;
+  padding: 4px 10px;
+  border: var(--edge);
+  border-radius: var(--radius);
+  background: var(--green);
+  box-shadow: var(--lift-small);
+  color: var(--on-neon);
+  font-size: 38px;
+  line-height: 1;
+}
+.test[data-quarter="1"] .test__timer .test__seconds { background: var(--blue); color: #fff; }
+.test[data-quarter="2"] .test__timer .test__seconds { background: var(--yellow); color: var(--on-neon); }
+.test[data-quarter="3"] .test__timer .test__seconds { background: var(--pink); color: #fff; }
+.test__timer .test__count-label { margin-top: 5px; }
 .app-shell .test__count-label { font-family: var(--font); font-weight: 700; }
 
 .test__powers {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 0.5rem;
-  height: 3.4rem;
+  place-items: center;
+  height: 4.6rem;
   min-height: 0;
 }
-.app-shell .test__combo {
-  padding: 0.2rem 0.65rem;
-  border: 2px solid var(--line);
-  border-radius: 999px;
-  box-shadow: 2px 2px 0 var(--shadow);
-  font-size: 0.9rem;
-  font-weight: 800;
-  white-space: nowrap;
-}
-.app-shell .test__combo { grid-column: 3; justify-self: end; transform-origin: right center; background: var(--pink); color: #fff; }
-.test__spinner { grid-column: 2; border: var(--edge); box-shadow: var(--lift-small); }
-.test__spinner-icon { border: 2px solid var(--line); }
+/* The power-up spinner: big, gold and bouncing, so it can't be missed */
+.test__spinner { gap: 0.6rem; padding: 0.35rem 1.4rem 0.35rem 0.45rem; border: var(--edge); box-shadow: var(--lift); font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; }
+.test__spinner-icon { width: 3.4rem; height: 3.4rem; border: 2px solid var(--line); }
+.test__spinner-icon .icon { width: 2.5rem; height: 2.5rem; }
 
 /* What a power-up did: over the top of the question, so it takes no room of its own */
 .test__stage .test__power-news { position: absolute; top: 0; right: 0; left: 0; z-index: 4; margin: 0; pointer-events: none; }
@@ -148,7 +168,7 @@
 /* As big as the room allows: the question sized to the stage's own width and height (cqw, cqh), smaller only for
    the longest, like 0.08 × 700 */
 /* The top of the stage is kept for what floats up and what a power-up did, so neither covers the question */
-.test__stage { justify-content: center; gap: 0.4rem; padding-top: 2.4rem; }
+.test__stage { justify-content: center; gap: 0.4rem; padding-top: 3.2rem; }
 .test .question--current:not(.question--done) { font-size: clamp(2.75rem, min(21cqw, 50cqh), 10rem); line-height: 1; }
 .test .question--current.question--long:not(.question--done) { font-size: clamp(2.4rem, min(15cqw, 42cqh), 8rem); }
 .test .question--current.question--longer:not(.question--done) { font-size: clamp(2.1rem, min(12cqw, 36cqh), 6.5rem); }
@@ -162,8 +182,19 @@
 .test__stage .answer--wrong { border-color: var(--wrong); }
 
 /* What floats up rises from the top of the stage, above the question, and fades */
-.test__stage .score-pop { top: 1.1rem; font-size: 1.35rem; animation: battle-pop 1.1s ease-out forwards; }
-.test__stage .score-pop--lightning { font-size: 1.6rem; }
+/* +10, +20…: chunky gold with an ink outline and shadow, bigger once a streak's worth 100 or more. Gold in dark
+   mode too, over the green the older rules give it there */
+.app-shell .test .test__stage .score-pop {
+  top: 1.1rem;
+  color: var(--yellow);
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 400;
+  text-shadow: -1.5px -1.5px 0 var(--shadow), 1.5px -1.5px 0 var(--shadow), -1.5px 1.5px 0 var(--shadow), 3px 3px 0 var(--shadow);
+  animation: battle-pop 1.1s ease-out forwards;
+}
+.app-shell .test .test__stage .score-pop--lightning { color: var(--pink); font-size: 2.8rem; }
+.app-shell .test .test__stage .score-pop--wrong { color: var(--paper-alt); font-size: 1.7rem; }
 @keyframes battle-pop {
   0% { opacity: 0; transform: translate(calc(-50% + var(--drift) * 0.2), 0.4rem) scale(0.6); }
   15% { opacity: 1; transform: translate(calc(-50% + var(--drift) * 0.4), 0) scale(1.15); }
@@ -189,13 +220,14 @@
 .app-shell .test .keypad__key--submit { background: var(--pink); color: #fff; font-family: var(--font); font-weight: 800; font-size: 1.05rem; }
 .app-shell .test__stop { border: 2px solid var(--line); background: var(--paper-alt); }
 
-/* Short phones: a smaller clock and slimmer keys, so the question keeps its room */
+/* Short phones: a smaller bar and slimmer keys, so the question keeps its room */
 @media (max-height: 740px) {
-  .app-shell .test .timer__clock { width: 54px; height: 54px; }
   .app-shell .test__score { font-size: 32px; }
-  .app-shell .test__seconds { font-size: 26px; }
+  .app-shell .test__right, .test__streak-number { font-size: 26px; }
+  .app-shell .test__timer .test__seconds { font-size: 30px; }
   .app-shell .test__bar { padding-block: 6px 8px; }
-  .test__powers { height: 3rem; }
+  .test__powers { height: 4rem; }
+  .test__spinner-icon { width: 2.9rem; height: 2.9rem; }
   .app-shell .test .keypad__key { height: 46px; min-height: 46px; font-size: 1.6rem; }
   .app-shell .test .keypad__key--submit { height: 40px; min-height: 40px; font-size: 1rem; }
   .test .keypad { gap: 0.4rem; }
@@ -243,4 +275,11 @@ html, body { overflow-x: clip; overscroll-behavior-x: none; }
 /* Four tabs on a small phone: smaller labels so "Multiplayer" fits */
 @media (max-width: 400px) {
   .app-shell .ui-navigation .site-footer__tab { font-size: 11px; padding-inline: 2px; }
+}
+
+/* On a phone, Single player and Multiplayer each get a line of their own */
+@media (max-width: 600px) {
+  .app-shell .ui-actions.home-actions--modes { grid-template-columns: 1fr; gap: 18px; }
+  .app-shell .home-actions--modes .home-action { min-height: 0; }
+  .app-shell .home-actions--modes .home-action .home-action__label { font-size: clamp(26px, 7.5vw, 34px); }
 }

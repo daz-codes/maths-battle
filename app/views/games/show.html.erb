@@ -11,27 +11,30 @@
       data-test-submit-url-value="<%= attempts_path %>">
   <button type="button" class="test__stop" data-action="test#confirmStop" aria-label="Stop the game">✕</button>
 
+  <%# The score, how many are right and the streak (each right answer in a row scoring 10 more than the last), then
+      the seconds left, counting down %>
   <header class="test__bar">
     <span class="test__tally">
       <span class="test__counts">
         <span class="test__count"><span class="test__score" data-test-target="score" aria-label="Score">0</span><span class="test__count-label">score</span></span>
         <span class="test__count"><span class="test__right" data-test-target="right" aria-label="Right">0</span><span class="test__count-label">right</span></span>
+        <span class="test__count test__streak" data-test-target="streakCount">
+          <span class="test__streak-number"><%= icon(:flame) %><span data-test-target="streak" aria-label="Right in a row">0</span></span>
+          <span class="test__count-label">streak</span>
+        </span>
       </span>
       <% if @best.positive? %><span class="test__best" data-test-target="best">Best <%= number_with_delimiter @best %></span><% end %>
     </span>
-    <%= render "clock", timer: true, class: "timer__clock" %>
-    <span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span>
+    <span class="test__timer"><span class="test__seconds" data-test-target="seconds" aria-label="Seconds left">60</span><span class="test__count-label">secs</span></span>
   </header>
 
-  <%# A strip of its own, always the same height so the question never moves: every ten answers a power-up
-      flicking between what it could be until it's tapped, and the streak (each right answer in a row scoring 10
-      more than the last) %>
+  <%# A strip of its own, always the same height so the question never moves: every ten answers a power-up,
+      flicking between what it could be until it's tapped %>
   <div class="test__powers">
     <button type="button" class="test__spinner" data-test-target="spinner" data-action="test#claim" aria-label="Tap to claim a power-up" hidden>
       <span class="test__spinner-icon" data-test-target="spinnerIcon"></span>
       <span class="test__spinner-label">Tap!</span>
     </button>
-    <span class="test__combo" data-test-target="streak" aria-live="polite" hidden></span>
   </div>
   <% power_up_icons.each do |kind, icon_name| %>
     <template data-test-target="powerIcon" data-power-up="<%= kind %>"><%= icon(icon_name) %></template>

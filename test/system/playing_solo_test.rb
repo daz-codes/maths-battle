@@ -8,7 +8,7 @@ class PlayingSoloTest < ApplicationSystemTestCase
 
     3.times { answer_question }
     assert_no_text "Level"
-    assert_selector ".test__combo", text: "3 in a row"
+    assert_selector ".test__streak--hot [data-test-target=streak]", text: "3"
     assert_selector ".test__score", text: "60"
     answer_question(right: false)
     6.times { answer_question }
