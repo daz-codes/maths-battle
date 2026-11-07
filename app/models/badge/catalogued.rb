@@ -11,9 +11,12 @@ module Badge::Catalogued
   RIGHT = [ 10, 20, 30, 40, 50 ]
   SCORES = [ 500, 1_000, 2_500, 5_000, 10_000 ]
   POWER_UPS = {
-    "double" => [ "Double trouble", "Claim Double points" ], "shield" => [ "Shielded", "Claim a Streak shield" ],
+    "double" => [ "Double trouble", "Claim Double points" ], "triple" => [ "Triple threat", "Claim Triple points" ],
+    "boost" => [ "Boosted", "Claim a Boost" ], "shield" => [ "Shielded", "Claim a Streak shield" ],
     "time" => [ "Extra time", "Claim Extra time" ], "freeze" => [ "Ice cold", "Freeze everyone in a battle" ],
-    "scramble" => [ "Scrambler", "Scramble everyone's keys in a battle" ], "reset" => [ "Streak breaker", "Break everyone's streaks in a battle" ]
+    "scramble" => [ "Scrambler", "Scramble everyone's keys in a battle" ], "reset" => [ "Streak breaker", "Break everyone's streaks in a battle" ],
+    "ink" => [ "Splat!", "Ink everyone's screens in a battle" ], "mini" => [ "Shrink ray", "Shrink everyone's questions in a battle" ],
+    "bomb" => [ "Kaboom!", "Bomb everyone's scores to zero in a battle" ]
   }
   # The world league needs this many players today before its top ten means something
   TOP_TEN_FROM = 20

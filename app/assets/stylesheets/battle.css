@@ -283,3 +283,67 @@ html, body { overflow-x: clip; overscroll-behavior-x: none; }
   .app-shell .home-actions--modes .home-action { min-height: 0; }
   .app-shell .home-actions--modes .home-action .home-action__label { font-size: clamp(26px, 7.5vw, 34px); }
 }
+
+/* ── Power-ups at work ────────────────────────────── */
+
+/* Solo: the score turns red while it's multiplied, green while it's boosted, and the streak gets a blue ring while
+   a shield's held */
+.app-shell .test--doubled .test__score { color: var(--pink-text); }
+.app-shell .test--boosted .test__score { color: var(--green-deep); }
+.test--shielded .test__streak-number { border-radius: 999px; box-shadow: 0 0 0 3px var(--blue); padding-inline: 4px; }
+
+/* Mini text: the question shrinks to almost nothing */
+.test--mini .question--current, .test--mini .answer { transform: scale(0.22); transition: transform 250ms; }
+.question--current, .answer { transition: transform 250ms; }
+
+/* Ink blot: five blots of ink fall down the whole screen, one after another, stretching into drips as they go */
+/* Over the one big splat the shared styles draw: here it's only the frame the blots fall through */
+.test .test__ink, .test--ink .test__ink { position: absolute; inset: 0; z-index: 6; overflow: hidden; border-radius: 0; background: none; opacity: 1; animation: none; pointer-events: none; }
+.test__blot {
+  position: absolute;
+  top: -40%;
+  width: 52%;
+  aspect-ratio: 1;
+  border-radius: 46% 54% 41% 59% / 57% 43% 57% 43%;
+  background: #0b0a12;
+  opacity: 0;
+}
+.test__blot::after {
+  content: "";
+  position: absolute;
+  top: 70%;
+  left: 38%;
+  width: 22%;
+  height: 90%;
+  border-radius: 0 0 999px 999px;
+  background: inherit;
+}
+.test__blot:nth-child(1) { left: 2%; }
+.test__blot:nth-child(2) { left: 46%; width: 60%; }
+.test__blot:nth-child(3) { left: 18%; width: 44%; }
+.test__blot:nth-child(4) { left: 52%; width: 40%; }
+.test__blot:nth-child(5) { left: -6%; width: 58%; }
+.test--ink .test__blot { animation: ink-run 4.2s ease-in forwards; }
+.test--ink .test__blot:nth-child(2) { animation-delay: 0.35s; }
+.test--ink .test__blot:nth-child(3) { animation-delay: 0.9s; }
+.test--ink .test__blot:nth-child(4) { animation-delay: 1.4s; }
+.test--ink .test__blot:nth-child(5) { animation-delay: 1.8s; }
+@keyframes ink-run {
+  0% { top: -35%; opacity: 0.96; transform: scale(0.7, 0.7); }
+  12% { top: -5%; transform: scale(1.05, 0.95); }
+  100% { top: 110%; opacity: 0.92; transform: scale(0.95, 1.35); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .test--ink .test__blot { animation: ink-fade 6s linear forwards; top: 20%; }
+}
+
+/* The Bomb: the whole game shakes */
+.test--bombed { animation: bomb-shake 500ms ease-out; }
+@keyframes bomb-shake {
+  0%, 100% { transform: none; }
+  15% { transform: translate(-8px, 4px) rotate(-1deg); }
+  35% { transform: translate(7px, -5px) rotate(1deg); }
+  55% { transform: translate(-5px, 3px); }
+  75% { transform: translate(3px, -2px); }
+}
+@media (prefers-reduced-motion: reduce) { .test--bombed { animation: none; } }

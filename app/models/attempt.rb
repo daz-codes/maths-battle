@@ -11,6 +11,7 @@ class Attempt < ApplicationRecord
   validates :mode, inclusion: { in: MODES }
 
   scope :on, ->(day) { where(played_on: day) }
+  scope :solo, -> { where(mode: "solo") }
 
   def solo? = mode == "solo"
   def battle? = mode == "battle"

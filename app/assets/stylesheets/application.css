@@ -1361,8 +1361,8 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 .test__spinner:disabled { cursor: default; }
 @keyframes spinner-bob { from { transform: translateY(0) scale(1); } to { transform: translateY(-3px) scale(1.06); } }
 @media (prefers-reduced-motion: reduce) { .test__spinner { animation: none; } }
-.test--doubled .test__score { color: var(--pink-text); }
-.test--shielded .test__combo { box-shadow: 0 0 0 2px var(--blue); }
+
+
 .test__power-news { margin: 0; color: var(--pink-text); font-size: 0.95rem; font-weight: 800; text-align: center; }
 .test__power-news:empty { display: none; }
 

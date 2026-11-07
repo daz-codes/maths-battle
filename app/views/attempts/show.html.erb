@@ -36,17 +36,19 @@
     <%= render "live_games/again", live_game: @live_game, user: @attempt.user %>
   <% end %>
 
-  <%# Today's leagues: where this puts them, if it's their best today %>
-  <section class="league" aria-labelledby="league-heading">
-    <h2 class="settings__heading" id="league-heading">Today's leagues</h2>
-    <ul class="league-places">
-      <li><%= icon(:trophy) %> World league: <% if world && @attempt.user.named? %><strong><%= world.rank.ordinalize %></strong> of <%= number_with_delimiter @world.size %><%= best_today ? "" : " (best today #{number_with_delimiter world.score})" %><% else %><%= link_to "give yourself a name", edit_profile_path %> to appear<% end %></li>
-      <% @leagues.each do |league| %>
-        <% entry = league.standings(@attempt.played_on).entry_for(@attempt.user) %>
-        <li><%= icon(:people) %> <%= link_to league.name, league %>: <strong><%= entry&.rank&.ordinalize || "—" %></strong> of <%= league.standings(@attempt.played_on).size %></li>
-      <% end %>
-    </ul>
-  </section>
+  <%# Today's leagues, for a solo game: where it puts them, if it's their best today. Battles don't count in them %>
+  <% if @attempt.solo? %>
+    <section class="league" aria-labelledby="league-heading">
+      <h2 class="settings__heading" id="league-heading">Today's leagues</h2>
+      <ul class="league-places">
+        <li><%= icon(:trophy) %> World league: <% if world && @attempt.user.named? %><strong><%= world.rank.ordinalize %></strong> of <%= number_with_delimiter @world.size %><%= best_today ? "" : " (best today #{number_with_delimiter world.score})" %><% else %><%= link_to "give yourself a name", edit_profile_path %> to appear<% end %></li>
+        <% @leagues.each do |league| %>
+          <% entry = league.standings(@attempt.played_on).entry_for(@attempt.user) %>
+          <li><%= icon(:people) %> <%= link_to league.name, league %>: <strong><%= entry&.rank&.ordinalize || "—" %></strong> of <%= league.standings(@attempt.played_on).size %></li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
 
   <div class="results__actions results__actions--one">
     <%= link_to "See the leagues", leagues_path, class: "button button--blue" %>

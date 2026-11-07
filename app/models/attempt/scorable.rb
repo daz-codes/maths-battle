@@ -1,7 +1,8 @@
 # A game's score, from streaks: the first right answer scores 10, the next in a row 20, then 30, 40 and on, and a
 # wrong answer ends the streak, so the next right one is back to 10. Power-ups change that as they're claimed:
-# Double points doubles the next five right answers, a Streak shield saves the streak from the next wrong one, and in
-# a battle a Streak breaker from someone else ends it. Worked out here from the checked answers and power-ups, so
+# Double or Triple points multiply the next five right answers (Triple first, if both), a Boost adds 50 to each of
+# the next five, a Streak shield saves the streak from the next wrong one, and in a battle someone else's Streak
+# breaker ends it, and their Bomb takes the score back to nothing as well. Worked out here from the checked answers and power-ups, so
 # what floats up during the game is just for show
 module Attempt::Scorable
   extend ActiveSupport::Concern
@@ -15,21 +16,31 @@ module Attempt::Scorable
     # powers: what was claimed (or hit this player), each at the number of answers given by then
     def tally(results, powers)
       by_answer = powers.group_by { |power| power["at"] }
-      score, streak, best, doubles, shields, running = 0, 0, 0, 0, 0, []
+      score, streak, best, doubles, triples, boosts, shields, running = 0, 0, 0, 0, 0, 0, 0, []
       results.each_with_index do |result, index|
         by_answer.fetch(index, []).each do |power|
           case power["kind"]
           when "double" then doubles += PowerUp::SOLO.dig("double", :answers)
+          when "triple" then triples += PowerUp::SOLO.dig("triple", :answers)
+          when "boost" then boosts += PowerUp::SOLO.dig("boost", :answers)
           when "shield" then shields += 1
           when "reset" then streak = 0
+          when "bomb" then score, streak = 0, 0
           end
         end
         if result["correct"]
           streak += 1
           points = STEP * streak
-          if doubles.positive?
+          if triples.positive?
+            points *= 3
+            triples -= 1
+          elsif doubles.positive?
             points *= 2
             doubles -= 1
+          end
+          if boosts.positive?
+            points += PowerUp::SOLO.dig("boost", :points)
+            boosts -= 1
           end
           score += points
         elsif shields.positive?

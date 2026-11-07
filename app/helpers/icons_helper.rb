@@ -10,6 +10,9 @@ module IconsHelper
   ICONS = {
     # Power-ups: Double points, Extra time and the Streak breaker (the others share Shield, Freeze and Scramble)
     double: %(<circle cx="12" cy="12" r="9.5" fill="var(--yellow)"/><text x="12" y="16" text-anchor="middle" font-size="10.5" font-weight="800" font-family="Manrope, sans-serif" fill="var(--on-neon, #1d1e17)">×2</text>),
+    triple: %(<circle cx="12" cy="12" r="9.5" fill="var(--pink)"/><text x="12" y="16" text-anchor="middle" font-size="10.5" font-weight="800" font-family="Lexend, sans-serif" fill="#fff">×3</text>),
+    boost: %(<circle cx="12" cy="12" r="9.5" fill="var(--green)"/><path d="M12 5.5 17 11h-3v6.5h-4V11H7z" fill="#fff" stroke="var(--on-neon, #0d1b3e)" stroke-width="1.2" stroke-linejoin="round"/>),
+    bomb: %(<circle cx="11" cy="14" r="7.5" fill="var(--on-neon, #0d1b3e)"/><circle cx="8.5" cy="11.5" r="1.8" fill="#fff" opacity=".55"/><path d="M15.5 8.5 18 6" stroke="var(--on-neon, #0d1b3e)" stroke-width="2.4" stroke-linecap="round"/><path d="M19.5 2.5v2.2M21.6 5.2h-2.2M18.2 3.6l1 1" stroke="var(--yellow)" stroke-width="1.8" stroke-linecap="round"/>),
     time: %(<circle cx="12" cy="13" r="8.5" fill="var(--green)"/><path d="M12 8.5V13l3 2M9.5 2.5h5" fill="none" stroke="var(--on-neon, #1d1e17)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>),
     breaker: %(<path d="M12 2.5c.6 3.4 5.5 5.6 5.5 11a5.5 5.5 0 0 1-11 0c0-2.6 1.4-4.4 2.6-6 .2 1.8 1 2.8 2 3.2-.4-3 .1-5.8.9-8.2z" fill="var(--pink)"/><path d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>),
     solo: %(<circle cx="12" cy="7.5" r="4" fill="var(--blue)"/><path d="M4 21a8 8 0 0 1 16 0z" fill="var(--blue)"/>),

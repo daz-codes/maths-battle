@@ -1,4 +1,4 @@
-# A league's table for a day: each player's best score that day, highest first, tied players sharing a place. The
+# A league's table for a day: each player's best solo score that day, highest first, tied players sharing a place. The
 # world league is everyone with a name (a guest who hasn't given one isn't shown); a league is just its members
 class League::Standings
   Entry = Data.define(:rank, :user, :score)
@@ -44,7 +44,7 @@ class League::Standings
 
   private
     def scope
-      attempts = Attempt.on(day).joins(:user).merge(User.named)
+      attempts = Attempt.solo.on(day).joins(:user).merge(User.named)
       @users ? attempts.where(user_id: @users.select(:id)) : attempts
     end
 

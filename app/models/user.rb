@@ -17,6 +17,6 @@ class User < ApplicationRecord
   end
 
   def best_today
-    attempts.on(League.today).maximum(:score)
+    attempts.solo.on(League.today).maximum(:score)
   end
 end

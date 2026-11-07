@@ -1,5 +1,6 @@
 # A family's or a class's own league: an owner makes it, others join with its code, and its table is each member's
-# best game today. Every game counts, solo or battle, in every league its player is in, and in the world league,
+# best solo game today. Battles don't count, as other players' power-ups change their scores. Every solo game counts
+# in every league its player is in, and in the world league,
 # which is everyone's (League::Standings). Leagues start again every day, at midnight in London for everyone, so a
 # day's table is the same wherever it's looked at
 class League < ApplicationRecord

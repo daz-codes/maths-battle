@@ -62,6 +62,11 @@
 
   <%= render "keypad", keys: [ "." ] %>
 
+  <%# Someone's Ink blot: blots that run down the whole screen, covering different parts as they go %>
+  <% if @live %>
+    <div class="test__ink" aria-hidden="true"><% 5.times do %><span class="test__blot"></span><% end %></div>
+  <% end %>
+
   <dialog class="dialog" data-test-target="stopDialog" data-action="cancel->test#keepPlaying">
     <h2 class="dialog__title">Stop this game?</h2>
     <p class="dialog__text"><%= @live ? "Your answers won't be saved, and the battle carries on without you." : "Your answers won't be saved." %></p>

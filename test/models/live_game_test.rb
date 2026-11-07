@@ -53,4 +53,30 @@ class LiveGameTest < ActiveSupport::TestCase
     assert_equal [ users(:ada), users(:cy) ], game.users.to_a
     assert_nil game.play_again!
   end
+
+  test "a drop claimed by someone far behind a leader worth bombing can be the Bomb, once a battle" do
+    @ada.update_columns(live_score: 1_000)
+    @bob.update_columns(live_score: 100)
+    always = Struct.new(:value) { def rand(*) = 0.0 }.new
+    drop = @game.drops.create!(power_up: "freeze")
+    assert_equal "bomb", @game.claim(drop.id, @bob, random: always).power_up
+
+    again = @game.drops.create!(power_up: "freeze")
+    assert_equal "freeze", @game.claim(again.id, @bob, random: always).power_up, "only one a battle"
+  end
+
+  test "the leader, or someone close behind, never gets the Bomb" do
+    always = Struct.new(:value) { def rand(*) = 0.0 }.new
+    @ada.update_columns(live_score: 1_000)
+    @bob.update_columns(live_score: 700)
+    assert_not @game.bomb_for?(@bob, always)
+    assert_not @game.bomb_for?(@ada, always)
+  end
+
+  test "a Bomb hits the others' games where it was claimed" do
+    drop = @game.drops.create!(power_up: "bomb")
+    travel_to(@game.starts_at + 2.5.seconds, with_usec: true) { @game.claim(drop.id, @bob) }
+    attempt = play(users(:ada), rights: [ true ] * 4, live_game: @game)
+    assert_equal 10 + 20, attempt.score
+  end
 end

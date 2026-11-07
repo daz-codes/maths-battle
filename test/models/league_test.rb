@@ -48,4 +48,14 @@ class LeagueTest < ActiveSupport::TestCase
       assert_equal Date.new(2026, 7, 2), League.today
     end
   end
+
+  test "battles don't count in the leagues: only solo games do" do
+    game = LiveGame.host!(users(:ada))
+    game.join(users(:bob))
+    game.start!
+    travel LiveGame::START_LEAD + 1.second
+    play(users(:ada), rights: [ true ] * 8, live_game: game)
+    play(users(:bob), rights: [ true ] * 2)
+    assert_equal [ users(:bob) ], League.world.entries.map(&:user)
+  end
 end

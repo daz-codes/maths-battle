@@ -38,6 +38,8 @@ export default class extends Controller {
     this.points = 0
     this.streak = 0
     this.doubles = 0
+    this.triples = 0
+    this.boosts = 0
     this.shields = 0
     this.results = []
     this.claims = []
@@ -199,42 +201,55 @@ export default class extends Controller {
   }
 
   gotSolo(kind) {
-    if (kind === "double") this.doubles += this.powersValue.solo.double.answers
+    const { solo } = this.powersValue
+    if (kind === "double") this.doubles += solo.double.answers
+    else if (kind === "triple") this.triples += solo.triple.answers
+    else if (kind === "boost") this.boosts += solo.boost.answers
     else if (kind === "shield") this.shields++
     else if (kind === "time") {
       this.endsAt += this.powersValue.solo.time.seconds * 1000
       this.scheduleEnd()
     }
-    this.element.classList.toggle("test--doubled", this.doubles > 0)
-    this.element.classList.toggle("test--shielded", this.shields > 0)
-    this.news(this.powersValue.solo[kind].news)
+    this.showBoosts()
+    this.news(solo[kind].news)
     feedback.fanfare()
   }
 
   // Someone got it: if it was this player, it hits everyone else; if not, it hits this one
   claimed({ id, power_up, by }) {
-    const { name, news } = this.powersValue.battle[power_up]
+    const { name, sent, hit } = this.powersValue.battle[power_up]
     const mine = this.offer?.id === id || this.claiming === id
     if (this.claiming === id) this.claiming = null
     if (by === this.liveValue.me) {
       this.land(power_up)
-      this.news(`${name}! You ${news} everyone else`)
+      this.news(`${name}! You ${sent}`)
       feedback.fanfare()
     } else {
       if (mine) this.hideSpinner()
       this.hitBy(power_up)
-      this.news(`${this.playerName(by)} ${news} you!`)
+      this.news(`${this.playerName(by)} ${hit}!`)
     }
   }
 
-  // Freeze stops the keypad and Scramble moves its keys; the Streak breaker ends the streak. The clock keeps going,
-  // as it's everyone's
+  // Freeze stops the keypad, Scramble moves its keys, Ink blots run down the screen and Mini text shrinks the
+  // question; the Streak breaker ends the streak, and the Bomb the score too. The clock keeps going, as it's
+  // everyone's. The server takes the last two at the same point (LiveGame::Droppable)
   hitBy(kind) {
     feedback.wrong()
-    if (kind === "reset") {
-      if (this.streak > 0) this.popText("Streak broken!", "wrong")
+    if (kind === "reset" || kind === "bomb") {
+      if (kind === "bomb") {
+        this.points = 0
+        this.scoreTarget.textContent = "0"
+        this.element.classList.remove("test--bombed")
+        void this.element.offsetWidth // so the shake plays again
+        this.element.classList.add("test--bombed")
+        this.popText("Kaboom!", "wrong")
+      } else if (this.streak > 0) {
+        this.popText("Streak broken!", "wrong")
+      }
       this.streak = 0
       this.showStreak()
+      this.showRivalLeads()
       return
     }
 
@@ -470,26 +485,41 @@ export default class extends Controller {
     if (!this.live) this.offerSolo()
   }
 
-  // 10 for the first in a row, 20 for the next, and on, doubled while Double points lasts
+  // 10 for the first in a row, 20 for the next, and on: tripled or doubled while Triple or Double points lasts
+  // (Triple first), and 50 more while a Boost lasts. The same as Attempt::Scorable
   earnPoints() {
     this.streak++
     let points = 10 * this.streak
-    if (this.doubles > 0) {
+    if (this.triples > 0) {
+      points *= 3
+      this.triples--
+    } else if (this.doubles > 0) {
       points *= 2
       this.doubles--
-      this.element.classList.toggle("test--doubled", this.doubles > 0)
     }
+    if (this.boosts > 0) {
+      points += this.powersValue.solo.boost.points
+      this.boosts--
+    }
+    this.showBoosts()
     this.points += points
     this.scoreTarget.textContent = this.points.toLocaleString()
     this.popText(`+${points}`, points >= 100 ? "lightning" : "right")
     this.showStreak()
   }
 
+  // What's still running shows on the score: pink while it's multiplied, green while it's boosted
+  showBoosts() {
+    this.element.classList.toggle("test--doubled", this.doubles > 0 || this.triples > 0)
+    this.element.classList.toggle("test--boosted", this.boosts > 0)
+    this.element.classList.toggle("test--shielded", this.shields > 0)
+  }
+
   // A Streak shield takes the hit instead
   breakStreak() {
     if (this.shields > 0) {
       this.shields--
-      this.element.classList.toggle("test--shielded", this.shields > 0)
+      this.showBoosts()
       this.news("Your Streak shield saved your streak!")
       return
     }
