@@ -1,5 +1,5 @@
 module ApplicationHelper
-  THEME_COLOURS = { "light" => "#fff4e2", "dark" => "#150d33" }.freeze
+  THEME_COLOURS = { "light" => "#e3f2ff", "dark" => "#0a1536" }.freeze
 
   def colour_preference
     current_player.theme.presence_in(User::THEMES) || "system"

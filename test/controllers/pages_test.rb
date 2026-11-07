@@ -8,12 +8,30 @@ class PagesTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", multiplayer_path, text: /Multiplayer/
   end
 
-  test "the home page shows where they are today" do
+  test "the home page shows their records, where they are today, and a link to how it works" do
     play(users(:ada), rights: [ true ] * 3)
     sign_in_as users(:ada)
     get root_path
-    assert_select ".stats dd", text: /60/
-    assert_select ".stats dd", text: /1st/
+    assert_select ".stats--records dd", 3
+    assert_select ".stats--records dd", text: /60/
+    assert_select ".ui-progress .hint", text: /1st/
+    assert_select ".how-link a[href=?]", how_it_works_path
+    assert_select ".how-to", count: 0
+  end
+
+  test "the awards page shows them all, with the ones earned picked out" do
+    play(users(:ada), rights: [ true ] * 3)
+    sign_in_as users(:ada)
+    get awards_path
+    assert_select ".badge", Badge.catalogue.size
+    assert_select ".badge:not(.badge--locked) .badge__name", text: "First minute"
+  end
+
+  test "a game's results lead with Play again, and show the awards it earned" do
+    sign_in_as users(:ada)
+    get attempt_path(play(users(:ada), rights: [ true ] * 3))
+    assert_select ".button--again[href=?]", play_path
+    assert_select ".badges--new .badge__name", text: "First minute"
   end
 
   test "a solo game's page carries its ladder and the power-ups dealt" do
@@ -27,7 +45,7 @@ class PagesTest < ActionDispatch::IntegrationTest
   end
 
   test "multiplayer, find a match, and the leagues show to anyone" do
-    [ multiplayer_path, match_path, leagues_path, new_session_path, new_registration_path, edit_profile_path ].each do |path|
+    [ multiplayer_path, match_path, leagues_path, awards_path, how_it_works_path, new_session_path, new_registration_path, edit_profile_path ].each do |path|
       get path
       assert_response :success, path
     end

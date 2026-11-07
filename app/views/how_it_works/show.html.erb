@@ -1,0 +1,33 @@
+<% content_for :title, "How it works · Maths Battle" %>
+
+<main class="page page--narrow">
+  <%= link_to "← Home", root_path, class: "back-link" %>
+  <h1 class="heading">How it works</h1>
+
+  <section class="how-to" aria-labelledby="game-heading">
+    <h2 class="settings__heading" id="game-heading">A minute of times tables</h2>
+    <ul class="how-to__list">
+      <li><strong>Streaks score.</strong> 10 for a right answer, 20 for the next in a row, then 30, 40… A wrong answer starts you again at 10.</li>
+      <li><strong>The questions keep up with you.</strong> Answer quickly and they get harder: bigger tables, then zeroes, then decimals. Slow down or slip up and they ease off.</li>
+    </ul>
+  </section>
+
+  <section class="how-to" aria-labelledby="power-heading">
+    <h2 class="settings__heading" id="power-heading">Power-ups</h2>
+    <ul class="how-to__list">
+      <li>Every 10 answers a spinner appears at the top. Tap it to stop it and claim what it lands on: <strong>Double points</strong>, a <strong>Streak shield</strong> or <strong>Extra time</strong>.</li>
+      <li>In a battle, one drops for everyone whenever anyone answers another 10. The first to tap it gets it, and it hits everyone else: a <strong>Freeze</strong>, <strong>Scrambled</strong> keys or a <strong>Streak breaker</strong>.</li>
+    </ul>
+  </section>
+
+  <section class="how-to" aria-labelledby="battle-heading">
+    <h2 class="settings__heading" id="battle-heading">Battles and leagues</h2>
+    <ul class="how-to__list">
+      <li><strong>Find a match</strong> to battle anyone online, or <strong>host a battle</strong> and share its code with friends.</li>
+      <li>Your best game each day goes in the <strong>world league</strong> and your own leagues, for families and classes. They start again at midnight (UK time).</li>
+      <li><strong>Awards</strong> for your first game, first win, longest streaks, highest scores and more.</li>
+    </ul>
+  </section>
+
+  <%= link_to "Play now", play_path, class: "button button--start button--wide" %>
+</main>

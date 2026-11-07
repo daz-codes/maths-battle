@@ -5,7 +5,8 @@ module NavigationHelper
     [
       [ "Home", :home, root_path, page == "home" ],
       [ "Multiplayer", :versus, multiplayer_path, %w[ multiplayer matches live_games ].include?(page) ],
-      [ "Leagues", :trophy, leagues_path, page.start_with?("league") ]
+      [ "Leagues", :people, leagues_path, page.start_with?("league") ],
+      [ "Awards", :trophy, awards_path, page == "awards" ]
     ]
   end
 end

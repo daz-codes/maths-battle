@@ -1,0 +1,15 @@
+<%# The awards one game earned, on its results page. Each spins to the front of the screen, then back to its place
+    (reveal controller) %>
+<% if badges.any? %>
+  <section class="badges badges--new" data-controller="confetti">
+    <h2 class="settings__heading"><%= badges.one? ? "New award!" : "New awards!" %></h2>
+    <ul class="badges__list">
+      <% badges.each do |badge| %>
+        <li class="badge" data-reveal-target="item">
+          <span class="badge__icon"><%= icon(badge.icon) %></span>
+          <span class="badge__name"><%= badge.name %></span>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

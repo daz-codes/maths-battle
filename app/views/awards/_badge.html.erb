@@ -1,0 +1,12 @@
+<%# One award: bright once earned, faded with how to earn it until then %>
+<li class="badge <%= "badge--locked" unless earned %>">
+  <span class="badge__icon"><%= icon(kind.icon) %></span>
+  <span class="badge__name"><%= kind.name %></span>
+  <span class="badge__how">
+    <% if earned %>
+      <span class="visually-hidden">Earned</span> <%= earned.earned_at.strftime("%-d %b %Y") %>
+    <% else %>
+      <span class="visually-hidden">Not yet:</span> <%= kind.description %>
+    <% end %>
+  </span>
+</li>

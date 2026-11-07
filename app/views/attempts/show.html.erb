@@ -14,6 +14,11 @@
     <p class="result__stats"><%= icon(:flame) %> Best streak <%= @attempt.best_streak %></p>
   </section>
 
+  <%# Straight into another go: the biggest thing on the page after the score %>
+  <%= link_to safe_join([ icon(:lightning), " Play again" ]), play_path, class: "button button--start button--wide button--again" unless @live_game %>
+
+  <%= render "awards/earned", badges: @attempt.badges %>
+
   <% if @attempt.powers.any? %>
     <ul class="score-tally" aria-label="Power-ups">
       <% @attempt.powers.group_by { |power| power["kind"] }.each do |kind, powers| %>
@@ -43,8 +48,7 @@
     </ul>
   </section>
 
-  <div class="results__actions">
-    <%= link_to "Play again", play_path, class: "button button--start" unless @live_game %>
-    <%= link_to "Leagues", leagues_path, class: "button button--blue" %>
+  <div class="results__actions results__actions--one">
+    <%= link_to "See the leagues", leagues_path, class: "button button--blue" %>
   </div>
 </main>

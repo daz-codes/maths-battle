@@ -31,6 +31,7 @@ module Attempt::Recordable
         user.lock!
         user.attempts.create!(mode: game.mode, results: game.results, powers: powers, top_tier: game.top_tier, client_id: client_id.presence)
           .tap { |attempt| live_game&.played(attempt) }
+          .tap(&:award_badges)
       end
     rescue ActiveRecord::RecordNotUnique
       already_recorded(user, client_id) || raise

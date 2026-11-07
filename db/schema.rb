@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_100000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -59,6 +59,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
     t.index ["user_id", "client_id"], name: "index_attempts_on_user_id_and_client_id", unique: true
     t.index ["user_id", "played_on", "score"], name: "index_attempts_on_user_id_and_played_on_and_score"
     t.index ["user_id"], name: "index_attempts_on_user_id"
+  end
+
+  create_table "badges", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "attempt_id"
+    t.string "kind", null: false
+    t.datetime "earned_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["attempt_id"], name: "index_badges_on_attempt_id"
+    t.index ["user_id", "kind"], name: "index_badges_on_user_id_and_kind", unique: true
+    t.index ["user_id"], name: "index_badges_on_user_id"
   end
 
   create_table "league_memberships", force: :cascade do |t|
@@ -149,6 +161,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "attempts", "users"
+  add_foreign_key "badges", "attempts", on_delete: :nullify
+  add_foreign_key "badges", "users"
   add_foreign_key "league_memberships", "leagues"
   add_foreign_key "league_memberships", "users"
   add_foreign_key "leagues", "users", column: "owner_id"

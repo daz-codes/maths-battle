@@ -1,21 +1,20 @@
-/* Maths Battle: blaze orange and gold on deep indigo, chunky slab type, and thick-outlined "sticker" cards
-   and buttons with hard shadows. Warm cream paper in light mode, an indigo night in dark mode. The saved theme can
-   also follow the device. The colour names are the ones the game has always used: pink is the hot accent (blaze
-   orange), yellow the gold, blue the violet, green the green */
+/* Maths Battle: racing colours, primary red, royal blue, coin gold and green, with chunky slab type and
+   thick-outlined "sticker" cards and buttons with hard shadows. Pale sky in light mode, a navy night in dark mode.
+   The saved theme can also follow the device. The colour names are the ones the game has always used: pink is the
+   hot accent (red), yellow the gold, blue the blue, green the green */
 
 :root {
-  --paper: #fff4e2; --paper-alt: #fffaf1; --ink: #1d1440; --muted: #6a5f86; --line: #1d1440;
-  --yellow: #ffc21a; --pink: #ff5a1f; --blue: #6b3cff; --green: #13c27e;
-  --blue-deep: #5228e0; --green-deep: #0a8f5b; --pink-deep: #d9400a; --grey-deep: #2c2257;
-  --pink-text: #d9400a; --on-pink-text: #fff; --wrong: #e01e4f; --on-neon: #1d1440;
-  --trophy: #ffc21a; --trophy-outline: #1d1440;
-  --ui-accent: #ff5a1f; --ui-accent-ink: #fff; --ui-pop: #ffc21a;
-  --ui-hero: #ffc21a; --ui-hero-ink: #1d1440; --ui-soft: #ffe7c2; --ui-hero-line: #1d1440;
-  --ui-art-a: #fff; --ui-art-b: #1d1440; --ui-grid: #1d144012;
-  --ui-practice-ink: #5228e0; --ui-practice-surface: #e6deff; --ui-compete-surface: #ffe1d2;
-  --right-text: #0a8f5b;
-  --fluo: #ffe23d;
-  --shadow: #1d1440;
+  --paper: #e3f2ff; --paper-alt: #ffffff; --ink: #0d1b3e; --muted: #4b5d85; --line: #0d1b3e;
+  --yellow: #ffcc00; --pink: #e52521; --blue: #0a6fd8; --green: #2bb24c;
+  --blue-deep: #0756a8; --green-deep: #13843a; --pink-deep: #b5130f; --grey-deep: #1d2f5e;
+  --pink-text: #c8160f; --on-pink-text: #fff; --wrong: #c8160f; --on-neon: #0d1b3e;
+  --trophy: #ffcc00; --trophy-outline: #0d1b3e;
+  --ui-accent: #e52521; --ui-accent-ink: #fff; --ui-pop: #ffcc00;
+  --ui-hero: #ffcc00; --ui-hero-ink: #0d1b3e; --ui-soft: #fff3c2; --ui-hero-line: #0d1b3e;
+  --ui-art-a: #fff; --ui-art-b: #0d1b3e; --ui-grid: #0d1b3e10;
+  --ui-practice-ink: #0756a8; --ui-practice-surface: #d6e9ff; --ui-compete-surface: #ffdcd9;
+  --right-text: #13843a;
+  --shadow: #0d1b3e;
   --font: "Lexend", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
   --radius: 14px; --radius-big: 20px; --glow-strength: 0%;
@@ -23,33 +22,33 @@
 }
 
 :root[data-theme="dark"] {
-  --paper: #150d33; --paper-alt: #22184d; --ink: #fff3e0; --muted: #b9ade0; --line: #070318;
-  --yellow: #ffcb2e; --pink: #ff6a2b; --blue: #8a63ff; --green: #2fe08f;
-  --blue-deep: #a487ff; --green-deep: #2fe08f; --pink-deep: #ff8a52; --grey-deep: #3a2d6e;
-  --pink-text: #ff8a52; --on-pink-text: #150d33; --wrong: #ff6b8b; --on-neon: #150d33;
-  --trophy: #ffcb2e; --trophy-outline: #070318;
-  --ui-accent: #ff6a2b; --ui-accent-ink: #150d33; --ui-pop: #ffcb2e;
-  --ui-hero: #ffcb2e; --ui-hero-ink: #150d33; --ui-soft: #2e2160; --ui-hero-line: #070318;
-  --ui-art-a: #fff; --ui-art-b: #150d33; --ui-grid: #ffffff0d;
-  --ui-practice-ink: #c3b0ff; --ui-practice-surface: #2e2160; --ui-compete-surface: #3a1e2e;
-  --right-text: #2fe08f;
-  --shadow: #070318;
+  --paper: #0a1536; --paper-alt: #13265c; --ink: #f3f8ff; --muted: #a7b9e4; --line: #030a1f;
+  --yellow: #ffd21f; --pink: #ff3b30; --blue: #2f8cff; --green: #3fd364;
+  --blue-deep: #7ab6ff; --green-deep: #3fd364; --pink-deep: #ff6a5f; --grey-deep: #22397a;
+  --pink-text: #ff6a5f; --on-pink-text: #0a1536; --wrong: #ff6a5f; --on-neon: #0a1536;
+  --trophy: #ffd21f; --trophy-outline: #030a1f;
+  --ui-accent: #ff3b30; --ui-accent-ink: #fff; --ui-pop: #ffd21f;
+  --ui-hero: #ffd21f; --ui-hero-ink: #0a1536; --ui-soft: #1d3375; --ui-hero-line: #030a1f;
+  --ui-art-a: #fff; --ui-art-b: #0a1536; --ui-grid: #ffffff0d;
+  --ui-practice-ink: #9ccaff; --ui-practice-surface: #1d3375; --ui-compete-surface: #4a1730;
+  --right-text: #3fd364;
+  --shadow: #030a1f;
   color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #150d33; --paper-alt: #22184d; --ink: #fff3e0; --muted: #b9ade0; --line: #070318;
-    --yellow: #ffcb2e; --pink: #ff6a2b; --blue: #8a63ff; --green: #2fe08f;
-    --blue-deep: #a487ff; --green-deep: #2fe08f; --pink-deep: #ff8a52; --grey-deep: #3a2d6e;
-    --pink-text: #ff8a52; --on-pink-text: #150d33; --wrong: #ff6b8b; --on-neon: #150d33;
-    --trophy: #ffcb2e; --trophy-outline: #070318;
-    --ui-accent: #ff6a2b; --ui-accent-ink: #150d33; --ui-pop: #ffcb2e;
-    --ui-hero: #ffcb2e; --ui-hero-ink: #150d33; --ui-soft: #2e2160; --ui-hero-line: #070318;
-    --ui-art-a: #fff; --ui-art-b: #150d33; --ui-grid: #ffffff0d;
-    --ui-practice-ink: #c3b0ff; --ui-practice-surface: #2e2160; --ui-compete-surface: #3a1e2e;
-    --right-text: #2fe08f;
-    --shadow: #070318;
+    --paper: #0a1536; --paper-alt: #13265c; --ink: #f3f8ff; --muted: #a7b9e4; --line: #030a1f;
+    --yellow: #ffd21f; --pink: #ff3b30; --blue: #2f8cff; --green: #3fd364;
+    --blue-deep: #7ab6ff; --green-deep: #3fd364; --pink-deep: #ff6a5f; --grey-deep: #22397a;
+    --pink-text: #ff6a5f; --on-pink-text: #0a1536; --wrong: #ff6a5f; --on-neon: #0a1536;
+    --trophy: #ffd21f; --trophy-outline: #030a1f;
+    --ui-accent: #ff3b30; --ui-accent-ink: #fff; --ui-pop: #ffd21f;
+    --ui-hero: #ffd21f; --ui-hero-ink: #0a1536; --ui-soft: #1d3375; --ui-hero-line: #030a1f;
+    --ui-art-a: #fff; --ui-art-b: #0a1536; --ui-grid: #ffffff0d;
+    --ui-practice-ink: #9ccaff; --ui-practice-surface: #1d3375; --ui-compete-surface: #4a1730;
+    --right-text: #3fd364;
+    --shadow: #030a1f;
     color-scheme: dark;
   }
 }

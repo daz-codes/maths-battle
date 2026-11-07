@@ -19,33 +19,32 @@
     <% end %>
   </nav>
 
-  <section class="ui-progress" aria-labelledby="today-heading">
-    <div class="ui-section-heading"><h2 id="today-heading">Today's world league</h2><%= link_to "Leagues ↗", leagues_path %></div>
-    <dl class="stats">
-      <div><dt>Your best today</dt><dd><%= icon(:trophy) %> <%= @standing ? number_with_delimiter(@standing.score) : "—" %></dd></div>
-      <div><dt>Your place</dt><dd><%= @standing ? "#{@standing.rank.ordinalize}" : "—" %><span class="ui-stat-unit"> of <%= number_with_delimiter @world.size %></span></dd></div>
+  <%# Their records, each from one game %>
+  <section class="ui-progress" aria-labelledby="records-heading">
+    <div class="ui-section-heading"><h2 id="records-heading">Your records</h2><%= link_to "Awards ↗", awards_path %></div>
+    <dl class="stats stats--records">
+      <div><dt><%= icon(:flame) %> Longest streak</dt><dd><%= @user.persisted? ? @user.longest_streak : 0 %></dd></div>
+      <div><dt><%= icon(:target) %> Most right</dt><dd><%= @user.persisted? ? @user.most_correct : 0 %></dd></div>
+      <div><dt><%= icon(:star) %> Highest score</dt><dd><%= number_with_delimiter(@user.persisted? ? @user.best_score : 0) %></dd></div>
     </dl>
-    <% if (leader = @world.leader) %>
-      <p class="hint"><%= icon(:lightning) %> Top today: <strong><%= leader.user.display_name %></strong> with <%= number_with_delimiter leader.score %>. A new league starts at midnight (UK time).</p>
-    <% else %>
-      <p class="hint">No one's played today yet. Be the first on the board!</p>
-    <% end %>
+    <p class="hint">
+      <% if @standing %>
+        <%= icon(:trophy) %> You're <strong><%= @standing.rank.ordinalize %></strong> of <%= number_with_delimiter @world.size %> in today's world league with <%= number_with_delimiter @standing.score %>.
+      <% elsif (leader = @world.leader) %>
+        <%= icon(:trophy) %> Top of today's world league: <strong><%= leader.user.display_name %></strong> with <%= number_with_delimiter leader.score %>.
+      <% else %>
+        <%= icon(:trophy) %> No one's in today's world league yet. Be the first!
+      <% end %>
+      <%= link_to "Leagues", leagues_path %>
+    </p>
     <% if @user.persisted? && !@user.named? %>
       <p class="hint"><%= link_to "Give yourself a name", edit_profile_path %> to appear in the leagues.</p>
     <% end %>
-  </section>
-
-  <section class="how-to" aria-labelledby="how-heading">
-    <h2 class="settings__heading" id="how-heading">How it works</h2>
-    <ul class="how-to__list">
-      <li><strong>Streaks score.</strong> 10 for a right answer, 20 for the next in a row, then 30, 40… A wrong answer starts you again at 10.</li>
-      <li><strong>The questions keep up with you.</strong> Answer quickly and they get harder: bigger tables, then zeroes, then decimals. Slow down or slip up and they ease off.</li>
-      <li><strong>Power-ups every 10 answers.</strong> Tap the spinner at the top to stop it and claim one. In a battle, the first to tap it gets it, and it hits everyone else!</li>
-    </ul>
   </section>
 
   <% if @user.guest? %>
     <p class="save-nudge">No account needed to play. <%= link_to "Make an account", new_registration_path %> to keep your scores and leagues on every device.</p>
   <% end %>
   <%= render "install" %>
+  <p class="how-link"><%= link_to "How it works", how_it_works_path %></p>
 </main>

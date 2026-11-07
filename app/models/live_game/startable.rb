@@ -42,10 +42,19 @@ module LiveGame::Startable
     return unless player && !player.played? && attempt.created_at <= ends_at + SAVE_TIME
 
     player.update!(attempt: attempt)
+    award_winners
     broadcast_podium
   end
 
   private
+    # Once everyone's game is in, whoever came first (a tie shares it), if they scored
+    def award_winners
+      places = podium
+      return unless places.many? && places.all?(&:attempt)
+
+      places.select { |place| place.rank == 1 && place.score.positive? }.each { |place| Badge.award(place.user, "first_win", attempt: place.attempt) }
+    end
+
     # Every page open on the game: the lobby's list of players, its start, and the podium
     def broadcast_lobby
       Turbo::StreamsChannel.broadcast_replace_to self, target: "live-players", partial: "live_games/players", locals: { live_game: self }

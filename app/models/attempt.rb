@@ -2,7 +2,7 @@
 # player does (Ladder), its score comes from streaks and power-ups (Scorable), and its best each day is the player's place in
 # the leagues (League)
 class Attempt < ApplicationRecord
-  include Recordable, Scorable
+  include Badgeable, Recordable, Scorable
 
   MODES = %w[ solo battle ]
 

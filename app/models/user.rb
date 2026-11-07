@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  include Abandonable, Avatarable, Leaguable, LivePlayable, Registerable, Themeable
+  include Abandonable, Avatarable, Badgeable, Leaguable, LivePlayable, Registerable, Themeable
 
   has_many :sessions, dependent: :destroy
   has_many :attempts, dependent: :destroy

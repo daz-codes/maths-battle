@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   resource :profile, only: %i[edit update]
   resource :avatar, only: :show
 
+  resource :awards, only: :show
+  get "how-it-works", to: "how_it_works#show", as: :how_it_works
+
   # A solo game, or a battle's (?live=K7Q2M)
   get "play", to: "games#show", as: :play
   resources :attempts, only: %i[create show]
