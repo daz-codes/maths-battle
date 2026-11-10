@@ -121,17 +121,19 @@
 /* The score and clock on top, then the strip with the level, the power-up spinner and the streak, then the
    question, which gets all the room left above the keypad. A battle has its rivals' scores under the strip */
 /* The question's row can never grow with what's in it (minmax(0, 1fr)), so nothing in it moves the keypad */
-.test { grid-template-rows: auto auto minmax(0, 1fr) auto; row-gap: 0.5rem; }
+.test { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto; row-gap: 0.5rem; }
 .test--live { grid-template-rows: auto auto auto minmax(0, 1fr) auto; }
 /* The score, right answers and streak on the left (clear of the stop button), the seconds on the right */
-.app-shell .test__bar { grid-template-columns: 1fr auto; gap: 10px; padding: 8px 4px 12px 56px; border-bottom: var(--edge); }
+.app-shell .test__bar { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 8px 2px 12px 54px; border-bottom: var(--edge); }
 .app-shell .test__tally { align-items: flex-start; justify-self: start; }
-.app-shell .test__counts { align-items: flex-end; gap: 14px; }
-.app-shell .test__score { font-size: 40px; }
-.app-shell .test__right { font-size: 30px; }
+.app-shell .test__counts { align-items: flex-end; gap: clamp(6px, 2vw, 14px); }
+.app-shell .test__tally { min-width: 0; }
+.app-shell .test__score { font-size: clamp(20px, 6.2vw, 40px); }
+.app-shell .test__right { font-size: clamp(17px, 5vw, 30px); }
+.app-shell .test__bar .test__count-label { font-size: clamp(9px, 2.6vw, 12px); }
 
 /* The streak: a flame and the run, grey until there's one going, then red and pulsing as it grows */
-.test__streak-number { display: inline-flex; align-items: center; gap: 2px; font-family: var(--font-display); font-size: 30px; line-height: 1; color: var(--muted); }
+.test__streak-number { display: inline-flex; align-items: center; gap: 2px; font-family: var(--font-display); font-size: clamp(17px, 5vw, 30px); line-height: 1; color: var(--muted); }
 .test__streak-number .icon { width: 0.95em; height: 0.95em; filter: grayscale(1); opacity: 0.5; transition: filter 150ms, opacity 150ms; }
 .test__streak--hot .test__streak-number { color: var(--pink-text); }
 .test__streak--hot .test__streak-number .icon { filter: none; opacity: 1; }
@@ -149,7 +151,7 @@
   background: var(--green);
   box-shadow: var(--lift-small);
   color: var(--on-neon);
-  font-size: 38px;
+  font-size: clamp(22px, 7vw, 38px);
   line-height: 1;
 }
 .test[data-quarter="1"] .test__timer .test__seconds { background: var(--blue); color: var(--on-neon); }
@@ -180,12 +182,13 @@
 /* Rows of their own, sized by the screen rather than by what's in them: the question in the middle of the room
    above, the answer under it, and anything else (Saving…) below. However tall a question's characters come out
    (× and ÷ can come from a fallback font, taller than the slab's own), the answer line stays put */
-.test .test__stage { display: grid; grid-template-rows: minmax(0, 1fr) auto minmax(0, 0.3fr); justify-items: center; align-items: center; }
+.test .test__stage { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto minmax(0, 0.3fr); justify-items: center; align-items: center; }
 .test .question--current { grid-row: 1; line-height: 1; overflow: visible; }
 .test .test__stage .answer { grid-row: 2; }
 .test .test__stage .test__status { grid-row: 3; align-self: start; }
-.test .question--current.question--long:not(.question--done) { font-size: clamp(2.4rem, min(15cqw, 42cqh), 8rem); }
-.test .question--current.question--longer:not(.question--done) { font-size: clamp(2.1rem, min(12cqw, 36cqh), 6.5rem); }
+/* Longer questions (45.6 + 3.75) smaller, so they fit the width */
+.test .question--current.question--long:not(.question--done) { font-size: clamp(1.9rem, min(12.5cqw, 40cqh), 7.5rem); }
+.test .question--current.question--longer:not(.question--done) { font-size: clamp(1.6rem, min(10cqw, 34cqh), 6rem); }
 .test .question--done { font-size: clamp(2.5rem, min(14cqw, 26cqh), 5.5rem); }
 .test__stage .answer {
   min-width: 3ch;
@@ -236,9 +239,9 @@
 
 /* Short phones: a smaller bar and slimmer keys, so the question keeps its room */
 @media (max-height: 740px) {
-  .app-shell .test__score { font-size: 32px; }
-  .app-shell .test__right, .test__streak-number { font-size: 26px; }
-  .app-shell .test__timer .test__seconds { font-size: 30px; }
+  .app-shell .test__score { font-size: clamp(20px, 6.2vw, 32px); }
+  .app-shell .test__right, .test__streak-number { font-size: clamp(17px, 5vw, 26px); }
+  .app-shell .test__timer .test__seconds { font-size: clamp(22px, 7vw, 30px); }
   .app-shell .test__bar { padding-block: 6px 8px; }
   .test__powers { height: 4rem; }
   .test__spinner-icon { width: 2.9rem; height: 2.9rem; }
@@ -465,3 +468,9 @@ html, body { overflow-x: clip; overscroll-behavior-x: none; }
 
 /* The strapline: just "Every answer counts.", in white */
 .app-shell .ui-home__heading { color: var(--ink); }
+
+/* The narrowest phones: the stop button tucked in, so a five-figure score still fits beside the streak and timer */
+@media (max-width: 340px) {
+  .app-shell .test__stop { left: 6px; min-width: 38px; min-height: 38px; }
+  .app-shell .test__bar { padding-left: 44px; }
+}

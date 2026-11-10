@@ -1,5 +1,6 @@
-# The questions in every game: times tables and division, on tiers of difficulty from 2 × 3 up to 0.7 × 3000 and
-# 2.1 ÷ 0.7. Which tier the next question comes from is set by the game's temperature: a running measure of how the
+# The questions in every game: times tables and division, and adding and subtracting, on tiers of difficulty from
+# 2 × 3 and 3 + 4 up to 0.7 × 3000, 2.1 ÷ 0.7 and 45.6 + 3.75. Each tier mixes them (SUMS of its questions are adding
+# and subtracting). Which tier the next question comes from is set by the game's temperature: a running measure of how the
 # player is doing, updated after every answer from whether it was right and how long it took. Quick right answers
 # warm it up, so the questions get harder; slow ones barely move it, a very slow one cools it a little, and a wrong
 # one cools it a lot, so the questions ease off until the player warms up again. In a battle that's what slows the
@@ -24,20 +25,24 @@ module Ladder
   EXPECTED_MS = 2_000
   EXPECTED_MS_PER_TIER = 400
   # tables: the times tables asked; by: what they're multiplied by; divide: how often it's asked as a division;
-  # places: how the numbers move by powers of ten (see powers)
+  # places: how the numbers move by powers of ten (see powers). sums: the adding and subtracting, its two numbers
+  # each drawn from a range of whole numbers then moved that many decimal places: [ 10..99, 1 ] is 1.0 to 9.9
   TIERS = [
-    { name: "Warm up", example: "2 × 3", tables: [ 1, 2, 5, 10 ], by: 1..5, divide: 0, places: :none },
-    { name: "Tables 2–5", example: "5 × 6", tables: [ 2, 3, 4, 5, 10 ], by: 1..10, divide: 0, places: :none },
-    { name: "Tables to 10", example: "7 × 8", tables: 2..10, by: 2..10, divide: 0.3, places: :none },
-    { name: "Tables to 12", example: "12 × 9", tables: 2..12, by: 2..12, divide: 0.5, places: :none },
-    { name: "A zero", example: "30 × 4", tables: 2..12, by: 2..12, divide: 0.4, places: :one_zero },
-    { name: "Zeroes", example: "40 × 300", tables: 2..12, by: 2..12, divide: 0.4, places: :zeroes },
-    { name: "A decimal", example: "0.3 × 4", tables: 2..12, by: 2..12, divide: 0.4, places: :one_decimal },
-    { name: "Decimals", example: "0.3 × 0.4", tables: 2..12, by: 2..12, divide: 0.4, places: :decimals },
-    { name: "Zeroes and decimals", example: "0.7 × 3000", tables: 2..12, by: 2..12, divide: 0.4, places: :mixed },
-    { name: "Expert", example: "0.08 × 700", tables: [ 6, 7, 8, 9, 12 ], by: 3..12, divide: 0.5, places: :mixed }
+    { name: "Warm up", example: "2 × 3", tables: [ 1, 2, 5, 10 ], by: 1..5, divide: 0, places: :none, sums: [ [ 1..9, 0 ], [ 1..9, 0 ] ] },
+    { name: "Tables 2–5", example: "5 × 6", tables: [ 2, 3, 4, 5, 10 ], by: 1..10, divide: 0, places: :none, sums: [ [ 10..20, 0 ], [ 2..9, 0 ] ] },
+    { name: "Tables to 10", example: "7 × 8", tables: 2..10, by: 2..10, divide: 0.3, places: :none, sums: [ [ 21..99, 0 ], [ 2..9, 0 ] ] },
+    { name: "Tables to 12", example: "12 × 9", tables: 2..12, by: 2..12, divide: 0.5, places: :none, sums: [ [ 11..99, 0 ], [ 11..99, 0 ] ] },
+    { name: "A zero", example: "30 × 4", tables: 2..12, by: 2..12, divide: 0.4, places: :one_zero, sums: [ [ 101..999, 0 ], [ 11..99, 0 ] ] },
+    { name: "Zeroes", example: "40 × 300", tables: 2..12, by: 2..12, divide: 0.4, places: :zeroes, sums: [ [ 101..999, 0 ], [ 101..999, 0 ] ] },
+    { name: "A decimal", example: "0.3 × 4", tables: 2..12, by: 2..12, divide: 0.4, places: :one_decimal, sums: [ [ 1..99, 1 ], [ 1..99, 1 ] ] },
+    { name: "Decimals", example: "0.3 × 0.4", tables: 2..12, by: 2..12, divide: 0.4, places: :decimals, sums: [ [ 101..999, 1 ], [ 11..99, 1 ] ] },
+    { name: "Zeroes and decimals", example: "0.7 × 3000", tables: 2..12, by: 2..12, divide: 0.4, places: :mixed, sums: [ [ 101..999, 2 ], [ 11..99, 1 ] ] },
+    { name: "Expert", example: "0.08 × 700", tables: [ 6, 7, 8, 9, 12 ], by: 3..12, divide: 0.5, places: :mixed, sums: [ [ 101..999, 1 ], [ 101..999, 2 ] ] }
   ]
-  OPERATIONS = %w[ x ÷ ]
+  # How many of each tier's questions are adding and subtracting, half each
+  SUMS = 0.4
+  OPERATIONS = %w[ x ÷ + - ]
+  SIGNS = { "x" => "×", "÷" => "÷", "+" => "+", "-" => "−" }
   NUMBER = /\A\d{1,9}(\.\d{1,6})?\z/
 
   # Each tier's pool, as [ op, a, b ]: [ "x", "7", "8" ] is 7 × 8, [ "÷", "56", "8" ] is 56 ÷ 8
@@ -94,12 +99,17 @@ module Ladder
 
   # For the browser: how it reads, and the answer as it's typed
   def worked((op, a, b))
-    { op: op, a: a, b: b, text: "#{a} #{op == "x" ? "×" : "÷"} #{b}", answer: answer(op, a, b) }
+    { op: op, a: a, b: b, text: "#{a} #{SIGNS.fetch(op)} #{b}", answer: answer(op, a, b) }
   end
 
   def answer(op, a, b)
     x, y = decimal(a), decimal(b)
-    written(op == "x" ? x * y : x / y)
+    written(case op
+    when "x" then x * y
+    when "÷" then x / y
+    when "+" then x + y
+    when "-" then x - y
+    end)
   end
 
   # As typed: "2100", "0.42". Exact decimals, so 0.7 × 0.6 is 0.42, not 0.41999…
@@ -111,11 +121,27 @@ module Ladder
   private
     def question(tier, random, excluding:)
       loop do
+        made = random.rand < SUMS ? sum(tier, random) : times_or_divide(tier, random)
+        return made unless made.nil? || made == excluding
+      end
+    end
+
+    # 232 + 17, 6.2 − 2.35: never below zero, and never the same number taken from itself
+    def sum(tier, random)
+      first, second = tier[:sums].map { |range, places| BigDecimal(range.to_a.sample(random: random)) / BigDecimal(10)**places }
+      if random.rand < 0.5
+        [ "+", written(first), written(second) ]
+      elsif first != second
+        [ "-", *[ first, second ].sort.reverse.map { |number| written(number) } ]
+      end
+    end
+
+    def times_or_divide(tier, random)
+      begin
         table, by = tier[:tables].to_a.sample(random: random), tier[:by].to_a.sample(random: random)
         numbers = random.rand < 0.5 ? [ table, by ] : [ by, table ]
         first, second = numbers.zip(powers(numbers, tier[:places], random)).map { |number, power| BigDecimal(number) * BigDecimal(10)**power }
-        made = random.rand < tier[:divide] ? [ "÷", written(first * second), written(first) ] : [ "x", written(first), written(second) ]
-        return made unless made == excluding
+        random.rand < tier[:divide] ? [ "÷", written(first * second), written(first) ] : [ "x", written(first), written(second) ]
       end
     end
 

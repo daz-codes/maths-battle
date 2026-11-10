@@ -13,11 +13,18 @@ class LadderTest < ActiveSupport::TestCase
     assert dealt.all? { |pool| pool.size == Ladder::POOL }
   end
 
-  test "the bottom tier is the easy tables, multiplied" do
-    Ladder.deal(random: Random.new(3)).first.each do |op, a, b|
-      assert_equal "x", op
-      assert [ a, b ].map(&:to_i).all? { |number| number <= 10 }
-    end
+  test "the bottom tier is the easy tables, multiplied, and single digits added and taken away" do
+    bottom = Ladder.deal(random: Random.new(3)).first
+    assert_equal %w[ + - x ], bottom.map(&:first).uniq.sort
+    bottom.each { |_, a, b| assert [ a, b ].map(&:to_i).all? { |number| number <= 10 } }
+  end
+
+  test "sums get bigger up the tiers, then decimal, and never go below zero" do
+    dealt = Ladder.deal(random: Random.new(9))
+    sums = ->(tier) { dealt[tier].select { |op, *| %w[ + - ].include?(op) } }
+    assert sums.(5).any? { |_, a, b| a.to_i >= 100 && b.to_i >= 100 }
+    assert sums.(8).all? { |_, a, b| (a + b).include?(".") }
+    dealt.flatten(1).select { |op, *| op == "-" }.each { |op, a, b| assert_operator BigDecimal(Ladder.answer(op, a, b)), :>, 0 }
   end
 
   test "later tiers have zeroes and then decimals" do
@@ -31,6 +38,8 @@ class LadderTest < ActiveSupport::TestCase
     assert_equal "0.42", Ladder.answer("x", "0.7", "0.6")
     assert_equal "3000", Ladder.answer("÷", "2100", "0.7")
     assert_equal "56", Ladder.answer("x", "7", "8")
+    assert_equal "249", Ladder.answer("+", "232", "17")
+    assert_equal "3.85", Ladder.answer("-", "6.2", "2.35")
   end
 
   def tiers_for(answers)

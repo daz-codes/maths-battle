@@ -1,6 +1,6 @@
 # Maths Battle
 
-One-minute times tables battles, solo or against other players.
+SUMZ: two-minute maths battles (times tables, division, adding and subtracting), solo or against other players.
 
 - **The temperature** (`Ladder`): questions range from 2 × 3 to 0.7 × 3000 and 2.1 ÷ 0.7. A running temperature,
   warmed by quick right answers and cooled by slow or wrong ones, picks how hard the next one is. Players never see

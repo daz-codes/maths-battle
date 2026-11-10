@@ -17,9 +17,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   # The question showing, answered right ("7 × 8" types 56), or wrong
   def answer_question(right: true)
     text = find(".question--current").text
-    a, op, b = text.split(" ")
-    answer = right ? Ladder.answer(op == "×" ? "x" : "÷", a, b) : "1"
-    answer = "0" if !right && Ladder.answer(op == "×" ? "x" : "÷", a, b) == "1"
+    a, sign, b = text.split(" ")
+    real = Ladder.answer(Ladder::SIGNS.key(sign), a, b)
+    answer = right ? real : (real == "1" ? "0" : "1")
     find("body").send_keys(answer)
     find("body").send_keys(:enter) unless right
     assert_selector ".answer--wrong" unless right

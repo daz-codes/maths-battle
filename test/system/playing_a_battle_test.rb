@@ -32,8 +32,8 @@ class PlayingABattleTest < ApplicationSystemTestCase
     assert_selector "#live-players", text: "Zara", wait: 5
     click_on "Start"
     assert_selector ".test__rival", text: "Zara 0"
-    using_session(:zara) { assert_selector ".question--current", text: /[×÷]/, wait: 12 }
-    assert_selector ".question--current", text: /[×÷]/, wait: 12
+    using_session(:zara) { assert_selector ".question--current", text: /[×÷+−]/, wait: 12 }
+    assert_selector ".question--current", text: /[×÷+−]/, wait: 12
 
     # Zara's power-ups are her own: Ada doesn't see them. Ada's come with her own answers, and what she claims
     # reaches Zara

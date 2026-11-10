@@ -4,7 +4,7 @@ class PlayingSoloTest < ApplicationSystemTestCase
   test "answering quickly brings harder questions, a power-up is claimed, and the game is saved" do
     visit root_path
     click_on "Single player"
-    assert_selector ".question--current", text: /[×÷]/, wait: 5
+    assert_selector ".question--current", text: /[×÷+−]/, wait: 5
 
     3.times { answer_question }
     assert_no_text "Level"
