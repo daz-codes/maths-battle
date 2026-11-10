@@ -73,7 +73,7 @@
 
 /* The two ways to play, on the home page: big, bright and tilted a touch, like stickers slapped on */
 .app-shell .home-actions--modes .home-action { min-height: 170px; transition: transform 120ms, box-shadow 120ms; }
-.app-shell .ui-actions .home-action--solo { background: var(--blue); color: var(--on-neon); transform: rotate(-1.2deg); }
+.app-shell .ui-actions .home-action--solo { background: var(--yellow); color: var(--on-neon); transform: rotate(-1.2deg); }
 .app-shell .ui-actions .home-action--battle { background: var(--pink); color: #fff; transform: rotate(1.2deg); }
 .app-shell .home-actions--modes .home-action .ui-secondary__description { color: inherit; opacity: 0.92; }
 .app-shell .home-actions--modes .home-action .ui-secondary__icon { border: 2px solid var(--line); background: var(--paper-alt); }
