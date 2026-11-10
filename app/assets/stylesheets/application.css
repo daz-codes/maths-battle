@@ -1,56 +1,25 @@
-/* Maths Battle: racing colours, primary red, royal blue, coin gold and green, with chunky slab type and
-   thick-outlined "sticker" cards and buttons with hard shadows. Pale sky in light mode, a navy night in dark mode.
-   The saved theme can also follow the device. The colour names are the ones the game has always used: pink is the
-   hot accent (red), yellow the gold, blue the blue, green the green */
+/* SUMZ: the deep blue of its title card behind everything, its yellow and brick red for the UI, and green and
+   orange for highlights, with chunky slab type and thick-outlined "sticker" cards and buttons with hard shadows.
+   Always blue: there's no light version. The colour names are the ones the game has always used: pink is the red,
+   yellow the yellow, blue the orange highlight, green the green */
 
-:root {
-  --paper: #e3f2ff; --paper-alt: #ffffff; --ink: #0d1b3e; --muted: #4b5d85; --line: #0d1b3e;
-  --yellow: #ffcc00; --pink: #e52521; --blue: #0a6fd8; --green: #2bb24c;
-  --blue-deep: #0756a8; --green-deep: #13843a; --pink-deep: #b5130f; --grey-deep: #1d2f5e;
-  --pink-text: #c8160f; --on-pink-text: #fff; --wrong: #c8160f; --on-neon: #0d1b3e;
-  --trophy: #ffcc00; --trophy-outline: #0d1b3e;
-  --ui-accent: #e52521; --ui-accent-ink: #fff; --ui-pop: #ffcc00;
-  --ui-hero: #ffcc00; --ui-hero-ink: #0d1b3e; --ui-soft: #fff3c2; --ui-hero-line: #0d1b3e;
-  --ui-art-a: #fff; --ui-art-b: #0d1b3e; --ui-grid: #0d1b3e10;
-  --ui-practice-ink: #0756a8; --ui-practice-surface: #d6e9ff; --ui-compete-surface: #ffdcd9;
-  --right-text: #13843a;
-  --shadow: #0d1b3e;
+:root, :root[data-theme] {
+  --paper: #24365c; --paper-alt: #2f4573; --ink: #fffbe8; --muted: #b8c4e0; --line: #0f1a33;
+  --yellow: #fdfc52; --pink: #b85757; --blue: #ff9f43; --green: #5cd38c;
+  --blue-deep: #ffb46e; --green-deep: #5cd38c; --pink-deep: #d27272; --grey-deep: #3a5287;
+  --pink-text: #f08c8c; --on-pink-text: #fff; --wrong: #ff8a8a; --on-neon: #1b2a4a;
+  --trophy: #fdfc52; --trophy-outline: #0f1a33;
+  --ui-accent: #b85757; --ui-accent-ink: #fff; --ui-pop: #fdfc52;
+  --ui-hero: #fdfc52; --ui-hero-ink: #1b2a4a; --ui-soft: #3a5287; --ui-hero-line: #0f1a33;
+  --ui-art-a: #fff; --ui-art-b: #1b2a4a; --ui-grid: #ffffff0d;
+  --ui-practice-ink: #fdfc52; --ui-practice-surface: #3a5287; --ui-compete-surface: #5a3346;
+  --right-text: #5cd38c;
+  --shadow: #0f1a33;
   --font: "Lexend", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
+  --font-title: "Monoton", "Alfa Slab One", sans-serif;
   --radius: 14px; --radius-big: 20px; --glow-strength: 0%;
-  color-scheme: light;
-}
-
-:root[data-theme="dark"] {
-  --paper: #0a1536; --paper-alt: #13265c; --ink: #f3f8ff; --muted: #a7b9e4; --line: #030a1f;
-  --yellow: #ffd21f; --pink: #ff3b30; --blue: #2f8cff; --green: #3fd364;
-  --blue-deep: #7ab6ff; --green-deep: #3fd364; --pink-deep: #ff6a5f; --grey-deep: #22397a;
-  --pink-text: #ff6a5f; --on-pink-text: #0a1536; --wrong: #ff6a5f; --on-neon: #0a1536;
-  --trophy: #ffd21f; --trophy-outline: #030a1f;
-  --ui-accent: #ff3b30; --ui-accent-ink: #fff; --ui-pop: #ffd21f;
-  --ui-hero: #ffd21f; --ui-hero-ink: #0a1536; --ui-soft: #1d3375; --ui-hero-line: #030a1f;
-  --ui-art-a: #fff; --ui-art-b: #0a1536; --ui-grid: #ffffff0d;
-  --ui-practice-ink: #9ccaff; --ui-practice-surface: #1d3375; --ui-compete-surface: #4a1730;
-  --right-text: #3fd364;
-  --shadow: #030a1f;
   color-scheme: dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #0a1536; --paper-alt: #13265c; --ink: #f3f8ff; --muted: #a7b9e4; --line: #030a1f;
-    --yellow: #ffd21f; --pink: #ff3b30; --blue: #2f8cff; --green: #3fd364;
-    --blue-deep: #7ab6ff; --green-deep: #3fd364; --pink-deep: #ff6a5f; --grey-deep: #22397a;
-    --pink-text: #ff6a5f; --on-pink-text: #0a1536; --wrong: #ff6a5f; --on-neon: #0a1536;
-    --trophy: #ffd21f; --trophy-outline: #030a1f;
-    --ui-accent: #ff3b30; --ui-accent-ink: #fff; --ui-pop: #ffd21f;
-    --ui-hero: #ffd21f; --ui-hero-ink: #0a1536; --ui-soft: #1d3375; --ui-hero-line: #030a1f;
-    --ui-art-a: #fff; --ui-art-b: #0a1536; --ui-grid: #ffffff0d;
-    --ui-practice-ink: #9ccaff; --ui-practice-surface: #1d3375; --ui-compete-surface: #4a1730;
-    --right-text: #3fd364;
-    --shadow: #030a1f;
-    color-scheme: dark;
-  }
 }
 
 /* ── Base ───────────────────────────────────────── */
@@ -1418,7 +1387,7 @@ button.board-switch__option { width: 100%; border: 0; background: transparent; c
 .daily-test__body { display: grid; justify-items: center; gap: 0.75rem; margin-top: 0.75rem; }
 .daily-test__number { color: var(--muted); font-weight: 700; }
 
-/* ── Maths Battle ───────────────────────────────── */
+/* ── SUMZ ───────────────────────────────── */
 .home-actions--modes { grid-template-columns: 1fr 1fr; }
 .home-action--solo .ui-secondary__icon { background: color-mix(in srgb, var(--blue) 22%, transparent); }
 .home-action--battle .ui-secondary__icon { background: color-mix(in srgb, var(--pink) 22%, transparent); }

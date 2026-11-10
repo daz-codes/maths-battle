@@ -1,4 +1,4 @@
-<% content_for :title, "Battle · Maths Battle" %>
+<% content_for :title, "Battle · SUMZ" %>
 <% host = @live_game.hosted_by?(@user) %>
 
 <main class="page live-game">
@@ -21,7 +21,7 @@
         <p class="live-code" aria-label="Game code <%= @live_game.code.chars.join(" ") %>"><%= @live_game.code %></p>
         <p class="hint hint--centre">Friends type this code on Multiplayer, or open <%= url %></p>
         <button type="button" class="button button--blue button--wide" data-controller="share"
-                data-share-text-value="Battle me on Maths Battle! Join with code <%= @live_game.code %> or <%= url %>" data-action="share#share">Share the link</button>
+                data-share-text-value="Battle me on SUMZ! Join with code <%= @live_game.code %> or <%= url %>" data-action="share#share">Share the link</button>
         <%= button_to "Start", live_game_start_path(@live_game), class: "button button--start button--wide", form_class: "wide-form" %>
         <p class="hint hint--centre">Everyone's game starts together. Start once your friends are in.</p>
       <% elsif @player %>

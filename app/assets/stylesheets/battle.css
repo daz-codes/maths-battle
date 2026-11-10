@@ -1,4 +1,4 @@
-/* Maths Battle's own look, over the shared layout in application.css and arcade.css (this loads last). Chunky slab
+/* SUMZ's own look, over the shared layout in application.css and arcade.css (this loads last). Chunky slab
    type for the title, headings, scores and the questions themselves; everything else in Lexend. Cards, buttons and
    keys are "stickers": a thick ink outline and a hard shadow, and buttons and keys press down into their shadow */
 
@@ -24,14 +24,17 @@
 /* ── The title: crossed swords, then MATHS in ink and BATTLE in blaze orange, outlined, with a hard shadow ── */
 
 .ui-brand, .logo { gap: 0.25em; font-family: var(--font-display); font-weight: 400; letter-spacing: 0; text-transform: uppercase; }
-.app-shell .ui-brand { font-size: clamp(26px, 8.6vw, 58px); white-space: nowrap; }
+.app-shell .ui-brand { font-size: clamp(54px, 19vw, 96px); white-space: nowrap; }
 .ui-brand__mark, .logo__mark { width: 1em; height: 1em; flex: none; filter: drop-shadow(3px 3px 0 var(--shadow)); }
-/* MATHS in royal blue and BATTLE in red, each with a hard ink shadow, like a racing game's title */
+/* SUMZ in Monoton, a neon of parallel lines: SUM in yellow, the Z in red, like its title card */
 .ui-brand > span, .logo__word {
-  color: var(--blue);
-  text-shadow: 0.07em 0.07em 0 var(--shadow);
+  font-family: var(--font-title);
+  font-weight: 400;
+  color: var(--yellow);
+  letter-spacing: 0.04em;
+  text-shadow: none;
 }
-.ui-brand__minute, .logo__minute { margin-left: 0.22em; color: var(--pink); }
+.ui-brand__minute, .logo__minute { margin-left: 0.03em; color: var(--pink); }
 .logo__word { font-family: var(--font-display); font-weight: 400; letter-spacing: 0; }
 .app-shell .ui-home__heading { margin: 0; font-size: clamp(16px, 4.5vw, 30px); text-align: center; }
 .app-shell .ui-home__heading span { color: var(--pink-text); }
@@ -59,7 +62,7 @@
 .app-shell .leaderboard__row--you { background: var(--ui-soft); }
 .app-shell .leaderboard__rank { display: grid; place-items: center; width: 2rem; height: 2rem; border: 2px solid var(--line); border-radius: 50%; background: var(--paper); color: var(--ink); font-size: 15px; }
 .app-shell .leaderboard__rank--1 { background: var(--yellow); color: var(--on-neon); }
-.app-shell .leaderboard__rank--2 { background: var(--blue); color: #fff; }
+.app-shell .leaderboard__rank--2 { background: var(--blue); color: var(--on-neon); }
 .app-shell .leaderboard__rank--3 { background: var(--pink); color: #fff; }
 .app-shell .leaderboard__score { font-size: 20px; }
 .app-shell .banner { background: var(--yellow); color: var(--on-neon); font-weight: 700; }
@@ -67,7 +70,7 @@
 
 /* The two ways to play, on the home page: big, bright and tilted a touch, like stickers slapped on */
 .app-shell .home-actions--modes .home-action { min-height: 170px; transition: transform 120ms, box-shadow 120ms; }
-.app-shell .ui-actions .home-action--solo { background: var(--blue); color: #fff; transform: rotate(-1.2deg); }
+.app-shell .ui-actions .home-action--solo { background: var(--yellow); color: var(--on-neon); transform: rotate(-1.2deg); }
 .app-shell .ui-actions .home-action--battle { background: var(--pink); color: #fff; transform: rotate(1.2deg); }
 .app-shell .home-actions--modes .home-action .ui-secondary__description { color: inherit; opacity: 0.92; }
 .app-shell .home-actions--modes .home-action .ui-secondary__icon { border: 2px solid var(--line); background: var(--paper-alt); }
@@ -89,7 +92,7 @@
 .app-shell .button:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--shadow); }
 .app-shell :is(.button--start, .button--go) { background: var(--pink); color: #fff; }
 .app-shell .button--start { font-family: var(--font-display); font-weight: 400; font-size: 22px; letter-spacing: 0.01em; }
-.app-shell .button--blue { background: var(--blue); color: #fff; }
+.app-shell .button--blue { background: var(--yellow); color: var(--on-neon); }
 .app-shell .button--share { background: var(--yellow); color: var(--on-neon); }
 .app-shell .back-link { padding: 6px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--paper-alt); color: var(--ink); font-weight: 600; }
 .app-shell :is(.form input[type="text"], .form input[type="password"], .form__select, .group-join__code) { border: var(--edge); border-radius: var(--radius); }
@@ -145,7 +148,7 @@
   font-size: 38px;
   line-height: 1;
 }
-.test[data-quarter="1"] .test__timer .test__seconds { background: var(--blue); color: #fff; }
+.test[data-quarter="1"] .test__timer .test__seconds { background: var(--blue); color: var(--on-neon); }
 .test[data-quarter="2"] .test__timer .test__seconds { background: var(--yellow); color: var(--on-neon); }
 .test[data-quarter="3"] .test__timer .test__seconds { background: var(--pink); color: #fff; }
 .test__timer .test__count-label { margin-top: 5px; }
@@ -426,7 +429,7 @@ html, body { overflow-x: clip; overscroll-behavior-x: none; }
   border-radius: 999px;
   background: var(--blue);
   box-shadow: var(--lift-small);
-  color: #fff;
+  color: var(--on-neon);
   font: inherit;
   font-family: var(--font-display);
   font-size: 1.15rem;

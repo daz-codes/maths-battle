@@ -1,4 +1,4 @@
-// Maths Battle needs a connection, for its leagues and battles, so pages come from the network every time. With
+// SUMZ needs a connection, for its leagues and battles, so pages come from the network every time. With
 // none, the offline page shows. Assets are fingerprinted, so they're kept once fetched
 const CACHE = "mathsbattle-v1"
 const OFFLINE_URL = "/offline.html"

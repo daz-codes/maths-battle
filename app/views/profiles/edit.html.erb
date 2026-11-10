@@ -1,4 +1,4 @@
-<% content_for :title, "Settings · Maths Battle" %>
+<% content_for :title, "Settings · SUMZ" %>
 
 <%# Two parts: about the player (saved with its button), and how the app behaves on this device, which saves
     as it's changed %>
@@ -46,16 +46,6 @@
 
     <%= form_with model: @user, url: profile_path, method: :patch, class: "form",
           data: { controller: "autosave", action: "change->autosave#save" } do |form| %>
-      <fieldset class="choice" data-controller="theme">
-        <legend>Colours</legend>
-        <% { "system" => "Same as device", "light" => "Light", "dark" => "Dark" }.each do |theme, label| %>
-          <label class="choice__option">
-            <%= form.radio_button :theme, theme, data: { action: "theme#preview" } %>
-            <span><%= label %></span>
-          </label>
-        <% end %>
-      </fieldset>
-
       <fieldset class="choice" data-controller="sounds">
         <legend>Sounds and vibration</legend>
         <% { true => "On", false => "Off" }.each do |on, label| %>

@@ -1,4 +1,4 @@
-<% content_for :title, "#{@league.name} · Maths Battle" %>
+<% content_for :title, "#{@league.name} · SUMZ" %>
 <% owner = @league.owned_by?(Current.user) %>
 
 <main class="page group">
@@ -21,7 +21,7 @@
       <p class="group-code__label">Share this code so others can join</p>
       <p class="group-code__code"><%= @league.join_code %></p>
       <button type="button" class="button" data-controller="share"
-              data-share-text-value="Join <%= @league.name %> on Maths Battle: <%= join_league_url(@league.join_code) %>" data-action="share#share">Share the link</button>
+              data-share-text-value="Join <%= @league.name %> on SUMZ: <%= join_league_url(@league.join_code) %>" data-action="share#share">Share the link</button>
       <%= button_to "New invite code", league_invite_code_path(@league), class: "link-button",
             form: { data: { turbo_confirm: "Replace this invite code? Old codes and links will stop working. Existing players stay in." } } %>
       <p class="hint">Removed someone by mistake? Share the current code to invite them back.</p>
