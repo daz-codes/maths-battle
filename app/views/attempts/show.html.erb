@@ -19,14 +19,6 @@
 
   <%= render "awards/earned", badges: @attempt.badges %>
 
-  <% if @attempt.powers.any? %>
-    <ul class="score-tally" aria-label="Power-ups">
-      <% @attempt.powers.group_by { |power| power["kind"] }.each do |kind, powers| %>
-        <li><%= icon(power_up_icons.fetch(kind)) %> <%= PowerUp::ALL.dig(kind, :name) %><%= " ×#{powers.size}" if powers.many? %><%= " (hit you)" if kind == "reset" %></li>
-      <% end %>
-    </ul>
-  <% end %>
-
   <% if @live_game %>
     <%# Where they came, and everyone's places as their games come in %>
     <%= turbo_stream_from @live_game %>

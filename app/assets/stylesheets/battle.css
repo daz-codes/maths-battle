@@ -120,8 +120,9 @@
 
 /* The score and clock on top, then the strip with the level, the power-up spinner and the streak, then the
    question, which gets all the room left above the keypad. A battle has its rivals' scores under the strip */
-.test { grid-template-rows: auto auto 1fr auto; row-gap: 0.5rem; }
-.test--live { grid-template-rows: auto auto auto 1fr auto; }
+/* The question's row can never grow with what's in it (minmax(0, 1fr)), so nothing in it moves the keypad */
+.test { grid-template-rows: auto auto minmax(0, 1fr) auto; row-gap: 0.5rem; }
+.test--live { grid-template-rows: auto auto auto minmax(0, 1fr) auto; }
 /* The score, right answers and streak on the left (clear of the stop button), the seconds on the right */
 .app-shell .test__bar { grid-template-columns: 1fr auto; gap: 10px; padding: 8px 4px 12px 56px; border-bottom: var(--edge); }
 .app-shell .test__tally { align-items: flex-start; justify-self: start; }
@@ -176,6 +177,13 @@
 /* The top of the stage is kept for what floats up and what a power-up did, so neither covers the question */
 .test__stage { justify-content: center; gap: 0.4rem; padding-top: 3.2rem; }
 .test .question--current:not(.question--done) { font-size: clamp(2.75rem, min(21cqw, 50cqh), 10rem); line-height: 1; }
+/* Rows of their own, sized by the screen rather than by what's in them: the question in the middle of the room
+   above, the answer under it, and anything else (Saving…) below. However tall a question's characters come out
+   (× and ÷ can come from a fallback font, taller than the slab's own), the answer line stays put */
+.test .test__stage { display: grid; grid-template-rows: minmax(0, 1fr) auto minmax(0, 0.3fr); justify-items: center; align-items: center; }
+.test .question--current { grid-row: 1; line-height: 1; overflow: visible; }
+.test .test__stage .answer { grid-row: 2; }
+.test .test__stage .test__status { grid-row: 3; align-self: start; }
 .test .question--current.question--long:not(.question--done) { font-size: clamp(2.4rem, min(15cqw, 42cqh), 8rem); }
 .test .question--current.question--longer:not(.question--done) { font-size: clamp(2.1rem, min(12cqw, 36cqh), 6.5rem); }
 .test .question--done { font-size: clamp(2.5rem, min(14cqw, 26cqh), 5.5rem); }
@@ -450,3 +458,10 @@ html, body { overflow-x: clip; overscroll-behavior-x: none; }
   touch-action: manipulation;
 }
 .test__skip:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--shadow); }
+
+/* The home page's two ways to play: just the icon, no box around it */
+.app-shell .home-actions--modes .home-action .ui-secondary__icon { width: auto; height: auto; border: 0; border-radius: 0; background: none; }
+.app-shell .home-actions--modes .home-action .ui-secondary__icon .icon { width: 36px; height: 36px; }
+
+/* The strapline: just "Every answer counts.", in white */
+.app-shell .ui-home__heading { color: var(--ink); }

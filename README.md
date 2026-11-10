@@ -23,5 +23,5 @@ Tests: `bin/rails test` and `bin/rails test:system`.
 
 ## Deploying
 
-`bin/kamal deploy`. Production needs its own credentials (`bin/rails credentials:edit`) and `maths-battle.daz.codes`
+`bin/kamal deploy`. Production needs its own credentials (`bin/rails credentials:edit`) and `sumz.daz.codes`
 pointing at the server.

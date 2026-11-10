@@ -1,16 +1,7 @@
-<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" rx="96" fill="#10121b"/>
-  <g transform="translate(22 22) scale(9.75)">
-    <g transform="rotate(-90 24 24)" fill="none" stroke-width="7">
-      <circle cx="24" cy="24" r="20" stroke="#ff5cc6" stroke-dasharray="28.90 96.76"/>
-      <circle cx="24" cy="24" r="20" stroke="#ff5cc6" stroke-dasharray="28.90 96.76" stroke-dashoffset="-31.42"/>
-      <circle cx="24" cy="24" r="20" stroke="#1e90ff" stroke-dasharray="28.90 96.76" stroke-dashoffset="-62.83"/>
-      <circle cx="24" cy="24" r="20" stroke="#1e90ff" stroke-dasharray="28.90 96.76" stroke-dashoffset="-94.25"/>
-    </g>
-    <g stroke="#f5f6fb" stroke-linecap="round">
-      <line x1="24" y1="24" x2="24" y2="10.5" stroke-width="3"/>
-      <line x1="24" y1="24" x2="30.5" y2="27.75" stroke-width="3.5"/>
-    </g>
-    <circle cx="24" cy="24" r="2.4" fill="#f5f6fb"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" fill="#24365c"/>
+<path fill="#fdfc52" transform="translate(68.16 274.21) scale(0.14259 -0.14259)" d="M77 937V1009H374V1297H446V361H374V649H76V721H374V793H77V865H374V937ZM806 1297H878V1009H1156V937H878V865H1156V793H878V721H1156V649H878V361H806ZM662 1297H734V361H662ZM518 1297H590V361H518Z"/>
+<path fill="#e06a5e" transform="translate(264.91 300.07) scale(0.16008 -0.16008)" d="M1050 1080V1008H88V1080ZM1050 792V720H88V792ZM1050 936V864H88V936Z"/>
+<path fill="#e06a5e" transform="translate(75.10 428.00) scale(0.10000 -0.10000)" d="M1491 1440H1579L661 0H571ZM1313 1440H1401L482 0H394ZM1135 1440H1224L305 0H216ZM957 1440H1047L127 0H39ZM517 829 473 759 39 1440H127ZM832 197 876 267 1047 0H957ZM606 968 562 899 217 1440H305ZM921 337 965 406 1224 0H1136ZM695 1108 651 1038 394 1440H483ZM1009 476 1054 546 1402 0H1313ZM784 1247 739 1177 571 1440H661ZM1098 615 1143 684 1579 0H1491Z"/>
+<path fill="#fdfc52" transform="translate(321.36 445.29) scale(0.13073 -0.13073)" d="M161 94H89V454H161ZM305 94H233V454H305ZM449 94H377V454H449ZM-60 722H590V794H-60ZM-60 650H590V578H-60ZM161 912H89V1272H161ZM305 912H233V1272H305ZM449 912H377V1272H449Z"/>
 </svg>
