@@ -65,12 +65,15 @@
 .app-shell .leaderboard__rank--2 { background: var(--blue); color: var(--on-neon); }
 .app-shell .leaderboard__rank--3 { background: var(--pink); color: #fff; }
 .app-shell .leaderboard__score { font-size: 20px; }
-.app-shell .banner { background: var(--yellow); color: var(--on-neon); font-weight: 700; }
+/* Good news, like a new personal best, is green; a notice is too, and an alert keeps its red edge. As specific as
+   the sticker rule above, whose :is() takes its most specific selector's weight, so these come after it to win */
+.app-shell .page :is(.banner, .flash) { background: var(--green); color: var(--on-neon); font-weight: 700; }
+.app-shell .page .flash--alert { background: var(--paper-alt); color: var(--ink); border-color: var(--pink); }
 .app-shell .avatar { border: 2px solid var(--line); }
 
 /* The two ways to play, on the home page: big, bright and tilted a touch, like stickers slapped on */
 .app-shell .home-actions--modes .home-action { min-height: 170px; transition: transform 120ms, box-shadow 120ms; }
-.app-shell .ui-actions .home-action--solo { background: var(--yellow); color: var(--on-neon); transform: rotate(-1.2deg); }
+.app-shell .ui-actions .home-action--solo { background: var(--blue); color: var(--on-neon); transform: rotate(-1.2deg); }
 .app-shell .ui-actions .home-action--battle { background: var(--pink); color: #fff; transform: rotate(1.2deg); }
 .app-shell .home-actions--modes .home-action .ui-secondary__description { color: inherit; opacity: 0.92; }
 .app-shell .home-actions--modes .home-action .ui-secondary__icon { border: 2px solid var(--line); background: var(--paper-alt); }
@@ -92,7 +95,7 @@
 .app-shell .button:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--shadow); }
 .app-shell :is(.button--start, .button--go) { background: var(--pink); color: #fff; }
 .app-shell .button--start { font-family: var(--font-display); font-weight: 400; font-size: 22px; letter-spacing: 0.01em; }
-.app-shell .button--blue { background: var(--yellow); color: var(--on-neon); }
+.app-shell .button--blue { background: var(--green); color: var(--on-neon); }
 .app-shell .button--share { background: var(--yellow); color: var(--on-neon); }
 .app-shell .back-link { padding: 6px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--paper-alt); color: var(--ink); font-weight: 600; }
 .app-shell :is(.form input[type="text"], .form input[type="password"], .form__select, .group-join__code) { border: var(--edge); border-radius: var(--radius); }
@@ -269,7 +272,17 @@ html, body { overflow-x: clip; overscroll-behavior-x: none; }
 .app-shell .badge:not(.badge--locked) .badge__icon { display: grid; place-items: center; width: 3.2rem; height: 3.2rem; border: 2px solid var(--line); border-radius: 50%; background: var(--yellow); }
 .app-shell .badge__icon .icon { width: 2rem; height: 2rem; }
 .app-shell .badge--locked { background: var(--paper); box-shadow: none; border-style: dashed; }
-.app-shell .badges--new .badge { background: var(--yellow); color: var(--on-neon); }
+/* Awards in a run of colours, so a page of them isn't all one: each earned one's medal, and each new one after a game */
+.app-shell .badge:not(.badge--locked):nth-child(4n + 1) .badge__icon { background: var(--green); }
+.app-shell .badge:not(.badge--locked):nth-child(4n + 2) .badge__icon { background: var(--blue); }
+.app-shell .badge:not(.badge--locked):nth-child(4n + 3) .badge__icon { background: var(--pink); }
+.app-shell .badge:not(.badge--locked):nth-child(4n + 4) .badge__icon { background: var(--yellow); }
+.app-shell .badges--new .badge { color: var(--on-neon); }
+.app-shell .badges--new .badge:nth-child(4n + 1) { background: var(--green); }
+.app-shell .badges--new .badge:nth-child(4n + 2) { background: var(--blue); }
+.app-shell .badges--new .badge:nth-child(4n + 3) { background: var(--pink); color: #fff; }
+.app-shell .badges--new .badge:nth-child(4n + 4) { background: var(--yellow); }
+.app-shell .badges--new .badge .badge__icon { background: var(--paper-alt); }
 
 /* After a game, Play again is the big one */
 .app-shell .button--again { min-height: 76px; font-size: 28px; }
@@ -371,7 +384,7 @@ html, body { overflow-x: clip; overscroll-behavior-x: none; }
 .app-shell .stats--home dt .icon { display: block; width: 26px; height: 26px; margin-bottom: 8px; }
 .app-shell .stats--home dd { margin: 10px 0 0; font-family: var(--font-display); font-size: clamp(26px, 8vw, 40px); line-height: 1; white-space: nowrap; }
 .app-shell .stats--home .stats__unit { font-family: var(--font); font-size: 15px; font-weight: 700; color: var(--muted); }
-.app-shell .stats--home .stats__tile--league { --trophy: #fff; background: var(--yellow); }
+.app-shell .stats--home .stats__tile--league { --trophy: #fff; background: var(--green); }
 .app-shell .stats--home .stats__tile--league :is(dt, .stats__unit) { color: var(--on-neon); }
 .app-shell .stats--home .stats__tile--league dd { color: var(--on-neon); }
 .app-shell .stats--home a.stats__tile:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--shadow); }
