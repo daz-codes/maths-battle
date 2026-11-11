@@ -16,9 +16,12 @@ module PowerUp
 
   # answers: how many right answers it lasts for
   SOLO = {
-    "double" => { name: "Double points", news: "Double points for your next 5 right answers!", answers: 5 },
-    "triple" => { name: "Triple points", news: "Triple points for your next 5 right answers!", answers: 5 },
-    "boost" => { name: "Boost", news: "Boost: +50 on each of your next 5 right answers!", answers: 5, points: 50 },
+    # Small on purpose: each adds a little to the next few right answers, rather than multiplying the streak, so a
+    # solo score is about answering well, not when a power-up came up. Stored as "double" and "triple", their names
+    # when they did multiply
+    "double" => { name: "Bonus +10", news: "+10 on each of your next 5 right answers!", answers: 5, points: 10 },
+    "triple" => { name: "Bonus +20", news: "+20 on each of your next 5 right answers!", answers: 5, points: 20 },
+    "boost" => { name: "Boost", news: "Boost: +30 on each of your next 5 right answers!", answers: 5, points: 30 },
     "shield" => { name: "Streak shield", news: "Streak shield: your next wrong answer won't break your streak" },
     "time" => { name: "Extra time", news: "+5 seconds!", seconds: 5 },
     "star" => { name: "Superstar", news: "Superstar! Your next 5 answers all count as right", answers: 5 },

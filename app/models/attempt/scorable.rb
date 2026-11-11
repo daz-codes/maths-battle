@@ -1,7 +1,7 @@
 # A game's score, from streaks: the first right answer scores 10, the next in a row 20, then 30, 40 and on, and a
 # wrong answer ends the streak, so the next right one is back to 10. Power-ups change that as they're claimed:
-# Double or Triple points multiply the next five right answers (Triple first, if both), a Boost adds 50 to each of
-# the next five, a Streak shield saves the streak from the next wrong one, and in a battle someone else's Streak
+# a Bonus +10, Bonus +20 or Boost adds 10, 20 or 30 to each of the next five right answers (each running at once
+# adds its own), a Streak shield saves the streak from the next wrong one, and in a battle someone else's Streak
 # breaker or Homing shot ends it, and their Bomb takes the score back to nothing as well. Coins add 100 there and
 # then, and a Superstar counts the next five answers as right, whatever was typed. They still count as wrong for
 # how hard the questions get (Ladder), and in how many were right (Recordable's correct). Worked out here from the checked answers and power-ups, so
@@ -42,12 +42,13 @@ module Attempt::Scorable
         if result["correct"] || starred
           streak += 1
           points = STEP * streak
-          if triples.positive?
-            points *= 3
-            triples -= 1
-          elsif doubles.positive?
-            points *= 2
+          if doubles.positive?
+            points += PowerUp::SOLO.dig("double", :points)
             doubles -= 1
+          end
+          if triples.positive?
+            points += PowerUp::SOLO.dig("triple", :points)
+            triples -= 1
           end
           if boosts.positive?
             points += PowerUp::SOLO.dig("boost", :points)

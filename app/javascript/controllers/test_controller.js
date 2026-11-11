@@ -592,20 +592,22 @@ export default class extends Controller {
     if (!this.live) this.offerSolo()
   }
 
-  // 10 for the first in a row, 20 for the next, and on: tripled or doubled while Triple or Double points lasts
-  // (Triple first), and 50 more while a Boost lasts. The same as Attempt::Scorable
+  // 10 for the first in a row, 20 for the next, and on, with 10, 20 or 30 more while a Bonus +10, Bonus +20 or
+  // Boost lasts. The same as Attempt::Scorable
   earnPoints() {
     this.streak++
+    const { solo } = this.powersValue
     let points = 10 * this.streak
-    if (this.triples > 0) {
-      points *= 3
-      this.triples--
-    } else if (this.doubles > 0) {
-      points *= 2
+    if (this.doubles > 0) {
+      points += solo.double.points
       this.doubles--
     }
+    if (this.triples > 0) {
+      points += solo.triple.points
+      this.triples--
+    }
     if (this.boosts > 0) {
-      points += this.powersValue.solo.boost.points
+      points += solo.boost.points
       this.boosts--
     }
     this.showBoosts()

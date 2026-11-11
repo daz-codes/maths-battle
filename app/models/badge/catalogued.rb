@@ -11,7 +11,7 @@ module Badge::Catalogued
   RIGHT = [ 20, 40, 60, 80, 100 ]
   SCORES = [ 1_000, 2_500, 5_000, 10_000, 25_000 ]
   POWER_UPS = {
-    "double" => [ "Double trouble", "Claim Double points" ], "triple" => [ "Triple threat", "Claim Triple points" ],
+    "double" => [ "Bonus round", "Claim a Bonus +10" ], "triple" => [ "Big bonus", "Claim a Bonus +20" ],
     "boost" => [ "Boosted", "Claim a Boost" ], "shield" => [ "Shielded", "Claim a Streak shield" ],
     "time" => [ "Extra time", "Claim Extra time" ], "freeze" => [ "Ice cold", "Freeze everyone in a battle" ],
     "scramble" => [ "Scrambler", "Scramble everyone's keys in a battle" ], "reset" => [ "Streak breaker", "Break everyone's streaks in a battle" ],

@@ -9,10 +9,10 @@ class AttemptTest < ActiveSupport::TestCase
     assert_equal [ 10, 30, 60, 60, 70 ], tally.running
   end
 
-  test "double points doubles the next five right answers" do
+  test "a Bonus +10 adds 10 to each of the next five right answers, rather than multiplying them" do
     results = Array.new(7) { { "correct" => true } }
     tally = Attempt.tally(results, [ { "kind" => "double", "at" => 0 } ])
-    assert_equal (10 + 20 + 30 + 40 + 50) * 2 + 60 + 70, tally.score
+    assert_equal (10 + 20 + 30 + 40 + 50 + 60 + 70) + 10 * 5, tally.score
   end
 
   test "a streak shield saves the streak from the next wrong answer only" do

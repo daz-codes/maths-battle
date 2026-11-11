@@ -8,9 +8,9 @@ module IconsHelper
   STAR = "M12 2.6l2.85 5.9 6.45.85-4.7 4.5 1.17 6.4L12 17.17 6.23 20.25l1.17-6.4-4.7-4.5 6.45-.85z"
 
   ICONS = {
-    # Power-ups: Double points, Extra time and the Streak breaker (the others share Shield, Freeze and Scramble)
-    double: %(<circle cx="12" cy="12" r="9.5" fill="var(--yellow)"/><text x="12" y="16" text-anchor="middle" font-size="10.5" font-weight="800" font-family="Manrope, sans-serif" fill="var(--on-neon, #1d1e17)">×2</text>),
-    triple: %(<circle cx="12" cy="12" r="9.5" fill="var(--pink)"/><text x="12" y="16" text-anchor="middle" font-size="10.5" font-weight="800" font-family="Lexend, sans-serif" fill="#fff">×3</text>),
+    # Power-ups: the Bonuses (+10 and +20), Extra time and the Streak breaker, and more below
+    double: %(<circle cx="12" cy="12" r="9.5" fill="var(--yellow)"/><text x="12" y="16" text-anchor="middle" font-size="8.5" font-weight="800" font-family="Manrope, sans-serif" fill="var(--on-neon, #1d1e17)">+10</text>),
+    triple: %(<circle cx="12" cy="12" r="9.5" fill="var(--pink)"/><text x="12" y="16" text-anchor="middle" font-size="8.5" font-weight="800" font-family="Lexend, sans-serif" fill="#fff">+20</text>),
     boost: %(<circle cx="12" cy="12" r="9.5" fill="var(--green)"/><path d="M12 5.5 17 11h-3v6.5h-4V11H7z" fill="#fff" stroke="var(--on-neon, #0d1b3e)" stroke-width="1.2" stroke-linejoin="round"/>),
     bomb: %(<circle cx="11" cy="14" r="7.5" fill="var(--on-neon, #0d1b3e)"/><circle cx="8.5" cy="11.5" r="1.8" fill="#fff" opacity=".55"/><path d="M15.5 8.5 18 6" stroke="var(--on-neon, #0d1b3e)" stroke-width="2.4" stroke-linecap="round"/><path d="M19.5 2.5v2.2M21.6 5.2h-2.2M18.2 3.6l1 1" stroke="var(--yellow)" stroke-width="1.8" stroke-linecap="round"/>),
     superstar: %(<path d="M12 1.8l3.05 6.3 6.9.95-5 4.8 1.23 6.85L12 17.4l-6.18 3.3 1.23-6.85-5-4.8 6.9-.95z" fill="var(--yellow)" stroke="var(--on-neon, #0d1b3e)" stroke-width="1.3" stroke-linejoin="round"/><circle cx="9.6" cy="11.2" r="1.1" fill="var(--on-neon, #0d1b3e)"/><circle cx="14.4" cy="11.2" r="1.1" fill="var(--on-neon, #0d1b3e)"/>),
