@@ -30,7 +30,7 @@ gem "solid_cable"
 gem "bootsnap", ">= 1.24.1", require: false
 
 # Resize and clean up uploaded avatars [https://github.com/janko/image_processing]
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.2"
 
 # Daily reminders as web push notifications [https://github.com/pushpad/web-push]
 
